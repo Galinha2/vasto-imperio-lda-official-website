@@ -1,0 +1,45 @@
+{
+    "header": {
+        "logo": "/logo.png",
+        "logoMini": "/favicon-vasto-imperio.ico",
+        "links": [
+            {
+                "label": "Home",
+                "url": "/"
+            },
+            {
+                "label": "Produtos",
+                "url": "/produtos"
+            },
+            {
+                "label": "Sobre Nós",
+                "url": "/sobre-nos"
+            },
+            {
+                "label": "Contacto",
+                "url": "/contacto"
+            }
+        ]
+    },
+    "homeHeader": {
+        "background": "/Background.png",
+        "tools": "/tools.png",
+        "text": [
+            {
+                "title": "SOLUÇÕES PARA ORGANIZAR",
+                "subTitle": "Veja as nossas soluções para organizar o seu negócio.",
+                "button": "Ver Produtos",
+                "url": "/produtos"
+            }  
+        ]
+    },
+    "homeCards": {
+        "text": [
+            {
+                "icon": "IoIosClose",
+                "title": "Entregas em todo o país.",
+                "subTitle": "VEnvios rápidos graças a stock permanente disponível."
+            }  
+        ]
+    }
+}

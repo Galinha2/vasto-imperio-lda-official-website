@@ -1,0 +1,24 @@
+{
+    "header": {
+        "logo": "/logo-vasto-imperio-mini.png",
+        "links": [
+            {
+                "label": "Home",
+                "url": "/"
+            },
+            {
+                "label": "Products",
+                "url": "/produtos"
+            },
+            {
+                "label": "About Us",
+                "url": "/sobre-nos"
+            },
+            {
+                "label": "Contact",
+                "url": "/contacto"
+            }
+        ]
+    },
+    "logo": "/logo.png"
+}

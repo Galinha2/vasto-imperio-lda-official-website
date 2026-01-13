@@ -17,6 +17,8 @@
   --shadows-third-person: -5px -5px 7px white,
                            2px 2px 4px #4b75a62c,
                            0px 0px 20px #4b75a644;
+  --background: #ffffff;
+  --foreground: #1E1E1E;
 }
 
 * {
@@ -34,13 +36,6 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
 }
 
 body {

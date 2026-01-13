@@ -7,20 +7,35 @@ import contentpt from "@/assets/contentpt.json";
 import contenten from "@/assets/contenten.json";
 import { useLanguage } from "./LanguageContext";
 import { IoIosClose } from "react-icons/io";
+import { useEffect } from "react";
 
-export default function PageSelection({ isOpen, setIsOpen }) {
+export default function PageSelectionMobile({ isOpen, setIsOpen }) {
   const { language } = useLanguage();
   const pathname = usePathname();
   const content = language === "pt" ? contentpt : contenten;
 
+  // Bloquear scroll quando o menu mobile estiver aberto
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "auto";
+    }
+    return () => {
+      document.body.style.overflow = "auto";
+    };
+  }, [isOpen]);
+
   return (
-    <div className={`${isOpen ? "block" : "hidden"} z-10000000000`}>
+    <div className={`${isOpen ? "block" : "hidden"} relative z-50`}>
+      {/* Overlay atrás do menu */}
       <div
-        className="absolute top-0 inset-0 bg-[var(--blur)] backdrop-blur-[1.5px]"
-        onClick={() => setIsOpen(!isOpen)}
+        className="fixed top-0 left-0 w-full h-screen bg-[var(--blur)] backdrop-blur-[1.5px] z-40"
+        onClick={() => setIsOpen(false)}
       ></div>
 
-      <ul className="absolute right-0 top-0 bg-white w-80 justify-start items-start py-5 h-screen flex flex-col gap-4">
+      {/* Menu */}
+      <ul className="fixed right-0 top-0 bg-white w-80 h-screen z-50 flex flex-col py-5 gap-4">
         <div className="flex px-3 justify-between w-full">
           <Image
             src={content.header.logoMini}
@@ -31,7 +46,7 @@ export default function PageSelection({ isOpen, setIsOpen }) {
           />
           <IoIosClose
             className="self-end hover:text-[var(--orange)] bg-white shadow-md rounded-full w-8 h-8 active:p-0.5 cursor-pointer"
-            onClick={() => setIsOpen(!isOpen)}
+            onClick={() => setIsOpen(false)}
           />
         </div>
         {content.header.links.map((item) => (

@@ -10,7 +10,7 @@ function Banner() {
   const content = language === "pt" ? contentpt : contenten;
   const item = content.homeHeader.text[0];
   return (
-    <div className="relative flex w-full h-150 border-[var(--horizontal-line)] border-b-[0.5px] overflow-hidden">
+    <div className="relative flex w-full mt-17 h-150 border-(--horizontal-line) border-b overflow-hidden">
       <Image
         src={content.homeHeader.background}
         alt="Banner Image"
@@ -18,7 +18,7 @@ function Banner() {
         priority
         className="z-1 absolute object-cover object-bottom-left object-bottom rotate-180 md:rotate-0"
       />
-      <div className="w-full max-w-450 h-full m-auto flex flex-col md:flex-row items-center md:items-end px-10 justify-between">
+      <div className="w-full max-w-450 h-full m-auto flex flex-col md:flex-row items-center md:items-end px-5 justify-between">
         <div className="flex gap-3 flex-col-reverse items-center md:items-start md:flex-col">
               <Image
                 src={content.header.logo}
@@ -30,9 +30,9 @@ function Banner() {
               />
             <div className="flex flex-col md:items-start text-center md:text-left items-center gap-4 justify-end z-1 relative bg-[var(--gray-transparent)] backdrop-blur-[5px] w-90 h-60 md:h-58 pt-5 px-5 pb-6 md:pb-4 rounded-[0px_0px_35px_35px] md:rounded-[35px_35px_0px_0px]">
               <h1 className="text-4xl font-black text-[var(--blue)]">
-                SOLUÇÕES PARA{" "}
+                {item.title.split(" ").slice(0, -1).join(" ")}{" "}
                 <span className="bg-gradient-to-r from-[var(--blue)] to-[var(--orange)] bg-clip-text text-transparent">
-                  ORGANIZAR
+                  {item.title.split(" ").slice(-1)}
                 </span>
               </h1>
               <p className="text-[var(--blue)] w-75">{item.subTitle}</p>

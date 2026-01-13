@@ -20,7 +20,7 @@ function LanguageSelection() {
         <p>{language}</p>
       </button>
       {isOpen && (
-        <ul className="absolute mt-2 bg-white shadow-md rounded-[10px]">
+        <ul className="z-500 absolute mt-2 bg-white shadow-md rounded-[10px]">
           {languages.map((lang) => (
             <li
               key={lang}

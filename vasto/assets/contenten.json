@@ -1,24 +1,81 @@
 {
-    "header": {
-        "logo": "/logo-vasto-imperio-mini.png",
-        "links": [
-            {
-                "label": "Home",
-                "url": "/"
-            },
-            {
-                "label": "Products",
-                "url": "/produtos"
-            },
-            {
-                "label": "About Us",
-                "url": "/sobre-nos"
-            },
-            {
-                "label": "Contact",
-                "url": "/contacto"
-            }
-        ]
-    },
-    "logo": "/logo.png"
+  "header": {
+    "logo": "/logo.png",
+    "logoMini": "/favicon-vasto-imperio.ico",
+    "links": [
+      {
+        "label": "Home",
+        "url": "/"
+      },
+      {
+        "label": "Products",
+        "url": "/produtos"
+      },
+      {
+        "label": "About Us",
+        "url": "/sobre-nos"
+      },
+      {
+        "label": "Contact",
+        "url": "/contacto"
+      }
+    ]
+  },
+  "homeHeader": {
+    "background": "/Background.png",
+    "tools": "/tools.png",
+    "text": [
+      {
+        "title": "SOLUTIONS TO ORGANISE",
+        "subTitle": "Discover our solutions to organise your business.",
+        "button": "View Products",
+        "url": "/produtos"
+      }
+    ]
+  },
+  "homeInfoCards": {
+    "title": "How can Vasto Império help your company?",
+    "text": [
+      {
+        "icon": "TbTruckDelivery",
+        "title": "Nationwide deliveries.",
+        "subTitle": "Fast shipping thanks to permanent available stock."
+      },
+      {
+        "icon": "FaMapMarkedAlt",
+        "title": "Multiple locations in Portugal.",
+        "subTitle": "Find our warehouse in Viseu or Benedita."
+      },
+      {
+        "icon": "MdOutlineWorkspacePremium",
+        "title": "Professional support.",
+        "subTitle": "Specialised assistance before and after delivery."
+      },
+      {
+        "icon": "FaRankingStar",
+        "title": "Quality and reliability.",
+        "subTitle": "Robust solutions, ready for immediate use."
+      }
+    ]
+  },
+  "homeCards": {
+    "text": [
+      {
+        "pageTitle": "Request your quote now!",
+        "title": "100% free quotes.",
+        "subTitle": "Fast shipping thanks to permanent available stock.",
+        "button": "Request",
+        "image": "/montagemprateleira.png",
+        "image2": "/montagemrack.png"
+      },
+      {
+        "pageTitle": "Our products.",
+        "title": "Storage solutions tailored to your needs.",
+        "subTitle": "Discover the shelving, racks, lockers, chairs and manual or electric forklifts we have available and find the right solution for your business.",
+        "button": "View Products",
+        "url": "/produtos",
+        "image": "/prateleira.png"
+      }
+    ]
+  }
 }

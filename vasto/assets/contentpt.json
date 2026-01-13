@@ -1,45 +1,104 @@
 {
-    "header": {
-        "logo": "/logo.png",
-        "logoMini": "/favicon-vasto-imperio.ico",
-        "links": [
-            {
-                "label": "Home",
-                "url": "/"
-            },
-            {
-                "label": "Produtos",
-                "url": "/produtos"
-            },
-            {
-                "label": "Sobre Nós",
-                "url": "/sobre-nos"
-            },
-            {
-                "label": "Contacto",
-                "url": "/contacto"
-            }
-        ]
-    },
-    "homeHeader": {
-        "background": "/Background.png",
-        "tools": "/tools.png",
-        "text": [
-            {
-                "title": "SOLUÇÕES PARA ORGANIZAR",
-                "subTitle": "Veja as nossas soluções para organizar o seu negócio.",
-                "button": "Ver Produtos",
-                "url": "/produtos"
-            }  
-        ]
-    },
-    "homeCards": {
-        "text": [
-            {
-                "icon": "IoIosClose",
-                "title": "Entregas em todo o país.",
-                "subTitle": "VEnvios rápidos graças a stock permanente disponível."
-            }  
-        ]
-    }
+  "header": {
+    "logo": "/logo.png",
+    "logoMini": "/favicon-vasto-imperio.ico",
+    "links": [
+      {
+        "label": "Home",
+        "url": "/"
+      },
+      {
+        "label": "Produtos",
+        "url": "/produtos"
+      },
+      {
+        "label": "Orçamento",
+        "url": "/orcamento"
+      },
+      {
+        "label": "Sobre Nós",
+        "url": "/sobre-nos"
+      },
+      {
+        "label": "Contacto",
+        "url": "/contacto"
+      }
+    ]
+  },
+  "homeHeader": {
+    "background": "/Background.png",
+    "tools": "/tools.png",
+    "text": [
+      {
+        "title": "SOLUÇÕES PARA ORGANIZAR",
+        "subTitle": "Veja as nossas soluções para organizar o seu negócio.",
+        "button": "Ver Produtos",
+        "url": "/produtos"
+      }
+    ]
+  },
+  "homeInfoCards": {
+    "title": "Como pode a Vasto Império ajudar a sua empresa?",
+    "text": [
+      {
+        "icon": "TbTruckDelivery",
+        "title": "Entregas em todo o país.",
+        "subTitle": "Envios rápidos graças a stock permanente disponível."
+      },
+      {
+        "icon": "FaMapMarkedAlt",
+        "title": "Vários centros em Portugal.",
+        "subTitle": "Encontre o nosso armazém em Viseu ou na Benedita."
+      },
+      {
+        "icon": "MdOutlineWorkspacePremium",
+        "title": "Acompanhamento profissional.",
+        "subTitle": "Apoio especializado antes e após a entrega."
+      },
+      {
+        "icon": "FaRankingStar",
+        "title": "Qualidade e fiabilidade.",
+        "subTitle": "Soluções robustas, prontas para uso imediato."
+      }
+    ]
+  },
+  "homeCards": {
+    "text": [
+      {
+        "pageTitle": "Peça já o seu orçamento!",
+        "title": "Orçamentos 100% gratuitos.",
+        "subTitle": "Orçamentos 100% gratuitos e sem compromisso. Saiba exatamente o custo do seu projeto antes de avançar, de forma rápida, transparente e sem surpresas.",
+        "button": "Pedir",
+        "url": "/orcamento",
+        "image": "/montagemprateleira.png",
+        "image2": "/montagemrack.png"
+      },
+      {
+        "pageTitle": "Os nossos produtos.",
+        "title": "Soluções de arrumação à sua medida.",
+        "subTitle": "Conheça as prateleiras, racks, cacifos, cadeiras e empilhadores manuais e elétricos que temos disponíveis para si e encontre a solução certa para o seu negócio.",
+        "button": "Ver Produtos",
+        "url": "/produtos",
+        "image": "/prateleira.png"
+      }
+    ]
+  },
+  "homeContacts": {
+    "title": "Contacte-nos",
+    "subTitle": "Peça já o seu orçamento 100% Gratuito",
+    "button": "Pedir",
+    "url": "/orcamento",
+    "text": [
+      {
+        "location": "Benedita",
+        "phone": "+351 966 518 436",
+        "mail": "vastoimperio@sapo.pt"
+      },
+      {
+        "location": "Viseu",
+        "phone": "+351 928 348 117",
+        "mail": "vastoimperio@sapo.pt"
+      }
+    ]
+  }
 }

@@ -9,8 +9,8 @@
   --blue: #0879C0;
   --gray: #F0F1F6;
   --gray-transparent: #e7eaf1bf;
-  --text-black: #1E1E1E;
-  --text-gray: #6F6F6F;
+  --back-black: #666666;
+  --back-gray: #c9c9c9ee;
   --blur: #0000008e;
   --selected: #f7f7f7;
   --horizontal-line: #E0E0E0;
@@ -18,7 +18,16 @@
                            2px 2px 4px #4b75a62c,
                            0px 0px 20px #4b75a644;
   --background: #ffffff;
-  --foreground: #1E1E1E;
+  --foreground: #1e1e1e;
+}
+
+@layer components {
+  .title {
+    @apply font-bold text-[1.5em] md:text-[2em] text-(--orange);
+  }
+  .buttonGallery {
+    @apply p-2 text-[2em] cursor-pointer bg-(--back-gray) shadow-[0px_4px_3px_#1e1e1e48] text-(--back-black) rounded-full;
+  }
 }
 
 * {

@@ -30,62 +30,62 @@
     "tools": "/tools.png",
     "text": [
       {
-        "title": "SOLUÇÕES PARA ORGANIZAR",
-        "subTitle": "Veja as nossas soluções para organizar o seu negócio.",
+        "title": "Racks e Prateleiras em <span class='bg-clip-text text-transparent bg-gradient-to-r from-[var(--blue)] to-[var(--orange)]'>Viseu e Benedita</span>",
+        "subTitle": "Soluções locais para organização e armazenamento de alta qualidade.",
         "button": "Ver Produtos",
         "url": "/produtos"
       }
     ]
   },
   "homeInfoCards": {
-    "title": "Como pode a Vasto Império ajudar a sua empresa?",
+    "title": "Racks, Prateleiras e Soluções de Arrumação em Viseu e Benedita",
     "text": [
       {
         "icon": "TbTruckDelivery",
-        "title": "Entregas em todo o país.",
-        "subTitle": "Envios rápidos graças a stock permanente disponível."
+        "title": "Entregas Rápidas",
+        "subTitle": "Stock permanente disponível para envio rápido em Viseu, Benedita e em todo o país."
       },
       {
         "icon": "FaMapMarkedAlt",
-        "title": "Vários centros em Portugal.",
-        "subTitle": "Encontre o nosso armazém em Viseu ou na Benedita."
+        "title": "Centros em Viseu e Benedita",
+        "subTitle": "Armazéns locais para melhor suporte e disponibilidade dos nossos produtos."
       },
       {
         "icon": "MdOutlineWorkspacePremium",
-        "title": "Acompanhamento profissional.",
-        "subTitle": "Apoio especializado antes e após a entrega."
+        "title": "Apoio Profissional Localizado",
+        "subTitle": "Consultoria especializada para escolher os melhores racks e prateleiras para o seu negócio."
       },
       {
         "icon": "FaRankingStar",
-        "title": "Qualidade e fiabilidade.",
-        "subTitle": "Soluções robustas, prontas para uso imediato."
+        "title": "Qualidade e Fiabilidade",
+        "subTitle": "Produtos robustos e duradouros, ideais para empresas em Viseu, Benedita e arredores."
       }
     ]
   },
   "homeCards": {
     "text": [
       {
-        "pageTitle": "Peça já o seu orçamento!",
-        "title": "Orçamentos 100% gratuitos.",
-        "subTitle": "Orçamentos 100% gratuitos e sem compromisso. Saiba exatamente o custo do seu projeto antes de avançar, de forma rápida, transparente e sem surpresas.",
+        "pageTitle": "Solicite o Seu Orçamento",
+        "title": "Orçamentos 100% Gratuitos e Sem Compromisso",
+        "subTitle": "Receba um orçamento transparente para racks, prateleiras e soluções de arrumação, adaptado às necessidades do seu negócio local.",
         "button": "Pedir",
         "url": "/orcamento",
         "image": "/montagemprateleira.png",
         "image2": "/montagemrack.png"
       },
       {
-        "pageTitle": "Os nossos produtos.",
-        "title": "Soluções de arrumação à sua medida.",
-        "subTitle": "Conheça as prateleiras, racks, cacifos, cadeiras e empilhadores manuais e elétricos que temos disponíveis para si e encontre a solução certa para o seu negócio.",
+        "pageTitle": "Descubra os Nossos Produtos em Viseu e Benedita",
+        "title": "Racks, Prateleiras, Cacifos e Mais",
+        "subTitle": "Explore a nossa gama completa de soluções de arrumação, incluindo empilhadores manuais e elétricos, disponíveis para entrega rápida nas regiões de Viseu e Benedita.",
         "button": "Ver Produtos",
         "url": "/produtos",
-        "image": "/prateleira.png"
+        "image": "/prateleiras.png"
       }
     ]
   },
   "homeContacts": {
-    "title": "Contacte-nos",
-    "subTitle": "Peça já o seu orçamento 100% Gratuito",
+    "title": "Contacte a Vasto Império em Viseu e Benedita",
+    "subTitle": "Orçamento 100% Gratuito para Soluções Locais",
     "button": "Pedir",
     "url": "/orcamento",
     "text": [
@@ -98,6 +98,47 @@
         "location": "Viseu",
         "phone": "+351 928 348 117",
         "mail": "vastoimperio@sapo.pt"
+      }
+    ]
+  },
+  "productBanner": {
+    "background": "/product banner.png",
+    "logo": "/logo.png",
+    "tools": "/products.png"
+  },
+  "productsShowcase": {
+    "produtoNe": "Produto não encontrado",
+    "caracteristicas": "Caracteristicas",
+    "title": "Contacte a Vasto Império em Viseu e Benedita",
+    "products": [
+      {
+        "id": "racks-industriais",
+        "image": "/racks.png",
+        "images": [
+          "/racks.png",
+          "/prateleira inteira.png",
+          "/cacifo.png"
+        ],
+        "text": "Racks Industriais para Paletes",
+        "materialText": "Material:",
+        "material": "Aço de alta resistência com acabamento em pintura eletrostática.",
+        "medidasText": "Medidas:",
+        "medidas": "Altura: 2m a 8m | Largura: 1m a 3m | Profundidade: 0,6m a 1,2m." 
+      },
+      {
+        "id": "estante-carga-ligeira",
+        "image": "/prateleira inteira.png",
+        "text": "Estante de carga ligeira"
+      },
+      {
+        "id": "cacifos-metalicos",
+        "image": "/cacifo.png",
+        "text": "Cacifos Metálicos"
+      },
+      {
+        "id": "empilhadores",
+        "image": "/empilhador.png",
+        "text": "Empilhadores Manuais e Elétricos"
       }
     ]
   }

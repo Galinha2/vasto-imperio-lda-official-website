@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": [],
+  "sections": [
+    {"offset": {"line": 18, "column": 0}, "map": {"version":3,"sources":["file:///Users/henriquegalinha/Documents/VS%20Code/vasto-imperio-lda-official-website/vasto/app/Home/page.jsx"],"sourcesContent":["function page() {\n    return (\n        <div>\n            <p>Hello World!</p>\n        </div>\n    )\n}\n\nexport default page\n"],"names":[],"mappings":";;;;;;AAAA,SAAS;IACL,qBACI,8OAAC;kBACG,cAAA,8OAAC;sBAAE;;;;;;;;;;;AAGf;uCAEe"}},
+    {"offset": {"line": 44, "column": 0}, "map": {"version":3,"sources":["file:///Users/henriquegalinha/Documents/VS%20Code/vasto-imperio-lda-official-website/vasto/app/page.js"],"sourcesContent":["import Page from \"./Home/page\";\n\nexport default function Home() {\n  return <Page />;\n}"],"names":[],"mappings":";;;;;AAAA;;;AAEe,SAAS;IACtB,qBAAO,8OAAC,+HAAI;;;;;AACd"}}]
+}

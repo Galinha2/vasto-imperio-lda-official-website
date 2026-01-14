@@ -1,0 +1,10 @@
+{
+  "version": 3,
+  "sources": [],
+  "sections": [
+    {"offset": {"line": 3, "column": 0}, "map": {"version":3,"sources":["turbopack:///[project]/assets/contentpt.json"],"sourcesContent":["\"use client\""],"names":[],"mappings":"AAAA"}},
+    {"offset": {"line": 3, "column": 38}, "map": {"version":3,"sources":[],"names":[],"mappings":"A"}},
+    {"offset": {"line": 6, "column": 0}, "map": {"version":3,"sources":["turbopack:///[project]/assets/contenten.json"],"sourcesContent":["{\"header\":{\"logo\":\"/logo-vasto-imperio-mini.png\",\"links\":[{\"label\":\"Home\",\"url\":\"/\"},{\"label\":\"Products\",\"url\":\"/produtos\"},{\"label\":\"About Us\",\"url\":\"/sobre-nos\"},{\"label\":\"Contact\",\"url\":\"/contacto\"}]},\"logo\":\"/logo.png\"}"],"names":[],"mappings":"AAAA"}},
+    {"offset": {"line": 6, "column": 249}, "map": {"version":3,"sources":[],"names":[],"mappings":"A"}},
+    {"offset": {"line": 10, "column": 0}, "map": {"version":3,"sources":["file:///Users/henriquegalinha/Documents/VS%20Code/vasto-imperio-lda-official-website/vasto/components/home/Banner.jsx"],"sourcesContent":["\"use client\";\n\nimport Image from \"next/image\";\nimport contentpt from \"@/assets/contentpt.json\";\nimport contenten from \"@/assets/contenten.json\";\nimport { useLanguage } from \"../header/LanguageContext\";\n\nfunction Banner() {\n  const { language } = useLanguage();\n  const content = language === \"pt\" ? contentpt : contenten;\n\n  return (\n    <div>\n      <Image\n        src={content.homeHeader.background}\n        alt=\"Banner Image\"\n        width={1920}\n        height={600}\n        priority\n        className=\"w-full h-auto\"\n      />\n    </div>\n  );\n}\n\nexport default Banner;\n"],"names":[],"mappings":";;;;;AAEA;AACA;AACA;AACA;;;AALA;;;;;AAOA,SAAS;;IACP,MAAM,EAAE,QAAQ,EAAE,GAAG,IAAA,0JAAW;IAChC,MAAM,UAAU,aAAa,OAAO,sGAAS,GAAG,sGAAS;IAEzD,qBACE,6LAAC;kBACC,cAAA,6LAAC,2IAAK;YACJ,KAAK,QAAQ,UAAU,CAAC,UAAU;YAClC,KAAI;YACJ,OAAO;YACP,QAAQ;YACR,QAAQ;YACR,WAAU;;;;;;;;;;;AAIlB;GAhBS;;QACc,0JAAW;;;KADzB;uCAkBM"}}]
+}

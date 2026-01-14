@@ -23,8 +23,8 @@ function InfoIconsCards() {
   
   return (
       <div className="border-b mb-10 pb-10 pt-10 border-(--horizontal-line)">
-          <div className="max-w-450 flex flex-col m-auto px-5 gap-5 text-(--orange)">
-            <h1 className="font-bold text-[2em]">{title}</h1>
+          <div className="max-w-450 flex flex-col m-auto px-5 gap-5">
+            <h1 className="title">{title}</h1>
               <div className="flex-wrap items-center justify-center lg:justify-between flex flex-col md:flex-row gap-5">
               {item.map((card, index) => {
                 const Icon = iconMap[card.icon];

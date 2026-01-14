@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": [],
+  "sections": [
+    {"offset": {"line": 4, "column": 0}, "map": {"version":3,"sources":["file:///Users/henriquegalinha/Documents/VS%20Code/vasto-imperio-lda-official-website/vasto/components/header/LanguageContext.jsx"],"sourcesContent":["\"use client\";\n\nimport { createContext, useContext, useState } from \"react\";\n\nconst LanguageContext = createContext();\n\nexport function LanguageProvider({ children }) {\n  const [language, setLanguage] = useState(\"pt\"); // idioma padrão\n\n  return (\n    <LanguageContext.Provider value={{ language, setLanguage }}>\n      {children}\n    </LanguageContext.Provider>\n  );\n}\n\nexport function useLanguage() {\n  return useContext(LanguageContext);\n}"],"names":[],"mappings":";;;;;;;AAEA;;;AAFA;;AAIA,MAAM,gCAAkB,IAAA,8KAAa;AAE9B,SAAS,iBAAiB,EAAE,QAAQ,EAAE;;IAC3C,MAAM,CAAC,UAAU,YAAY,GAAG,IAAA,yKAAQ,EAAC,OAAO,gBAAgB;IAEhE,qBACE,6LAAC,gBAAgB,QAAQ;QAAC,OAAO;YAAE;YAAU;QAAY;kBACtD;;;;;;AAGP;GARgB;KAAA;AAUT,SAAS;;IACd,OAAO,IAAA,2KAAU,EAAC;AACpB;IAFgB"}},
+    {"offset": {"line": 48, "column": 0}, "map": {"version":3,"sources":["file:///Users/henriquegalinha/Documents/VS%20Code/vasto-imperio-lda-official-website/vasto/components/header/Header.jsx"],"sourcesContent":["\"use client\";\n\nimport Image from \"next/image\";\nimport contentpt from \"@/assets/contentpt.json\";\nimport contenten from \"@/assets/contenten.json\";\nimport { useLanguage } from \"../header/LanguageContext\";\n"],"names":[],"mappings":";AAEA;AAGA;AALA"}}]
+}

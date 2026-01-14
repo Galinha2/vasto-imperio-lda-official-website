@@ -22,7 +22,7 @@ function ContactCard() {
 
   return (
     <div className="mb-10">
-          <h1 className="mb-5 m-auto w-full text-(--orange) font-bold text-[2em] text-center">{item.title}</h1>
+          <h1 className="mb-5 px-5 m-auto w-full text-(--orange) font-bold text-[1.5em] md:text-[2em] text-center">{item.title}</h1>
         <div className="bg-(--gray) flex flex-col items-center flex-wrap justify-center gap-3 px-4 py-8">
           <div className="flex gap-5 items-center flex-col md:flex-row justify-center">
               {text.map(({ location, phone, mail }, index) => (

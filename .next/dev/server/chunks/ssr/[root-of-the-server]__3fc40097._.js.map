@@ -1,0 +1,6 @@
+{
+  "version": 3,
+  "sources": [],
+  "sections": [
+    {"offset": {"line": 10, "column": 0}, "map": {"version":3,"sources":["file:///Users/henriquegalinha/Documents/VS%20Code/vasto-imperio-lda-official-website/vasto/components/header/Header.jsx"],"sourcesContent":["\"use client\";\n\nimport Image from \"next/image\";\n\nexport default function Header() {\n  return (\n    <div>\n      <Image\n        src=\"/logo-vasto-imperio-mini.png\"\n        alt=\"Vasto Império Logo\"\n        width={50}\n        height={50}\n        priority\n        className=\"\"\n      />\n    </div>\n  );\n}\n"],"names":[],"mappings":";;;;;AAEA;AAFA;;;AAIe,SAAS;IACtB,qBACE,8OAAC;kBACC,cAAA,8OAAC,wIAAK;YACJ,KAAI;YACJ,KAAI;YACJ,OAAO;YACP,QAAQ;YACR,QAAQ;YACR,WAAU;;;;;;;;;;;AAIlB"}}]
+}

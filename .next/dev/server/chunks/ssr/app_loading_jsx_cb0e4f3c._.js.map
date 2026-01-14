@@ -1,0 +1,6 @@
+{
+  "version": 3,
+  "sources": [],
+  "sections": [
+    {"offset": {"line": 4, "column": 0}, "map": {"version":3,"sources":["file:///Users/henriquegalinha/Documents/VS%20Code/vasto-imperio-lda-official-website/vasto/app/loading.jsx"],"sourcesContent":["function Loading() {\n  return (<div className=\"w-screen h-screen gap-5 flex flex-col items-center justify-center\"><img className=\"m-auto text-center\" src=\"/Dual Ring@1x-1.0s-104px-104px.svg\" alt=\"loading\" /></div>);\n}\n\nexport default Loading;\n"],"names":[],"mappings":";;;;;;AAAA,SAAS;IACP,qBAAQ,8OAAC;QAAI,WAAU;kBAAoE,cAAA,8OAAC;YAAI,WAAU;YAAqB,KAAI;YAAqC,KAAI;;;;;;;;;;;AAC9K;uCAEe"}}]
+}

@@ -10,7 +10,7 @@ function Banner() {
   const content = language === "pt" ? contentpt : contenten;
   const item = content.homeHeader.text[0];
   return (
-    <div className="relative flex w-full mt-17 h-150 border-(--horizontal-line) border-b overflow-hidden">
+    <div className="relative flex w-full mt-17 h-150 md:h-120 lg:h-150 border-(--horizontal-line) border-b overflow-hidden">
       <Image
         src={content.homeHeader.background}
         alt="Banner Image"
@@ -23,19 +23,17 @@ function Banner() {
               <Image
                 src={content.header.logo}
                 alt="Banner Image"
-                width={200}
+                width={2000}
                 height={50}
                 priority
-                className="z-1 relative w-full max-w-[100px] sm:max-w-[100px] md:max-w-[250px] lg:max-w-[800px] h-auto"
+                className="z-1 relative w-full max-w-[100px] md:max-w-[250px] lg:max-w-[450px] h-auto"
               />
-            <div className="flex flex-col md:items-start text-center md:text-left items-center gap-4 justify-end z-1 relative bg-[var(--gray-transparent)] backdrop-blur-[5px] w-90 h-60 md:h-58 pt-5 px-5 pb-6 md:pb-4 rounded-[0px_0px_35px_35px] md:rounded-[35px_35px_0px_0px]">
-              <h1 className="text-4xl font-black text-[var(--blue)]">
-                {item.title.split(" ").slice(0, -1).join(" ")}{" "}
-                <span className="bg-gradient-to-r from-[var(--blue)] to-[var(--orange)] bg-clip-text text-transparent">
-                  {item.title.split(" ").slice(-1)}
-                </span>
-              </h1>
-              <p className="text-[var(--blue)] w-75">{item.subTitle}</p>
+            <div className="flex flex-col md:items-start text-center md:text-left items-center gap-4 justify-end z-1 relative bg-[var(--gray-transparent)] backdrop-blur-[5px] w-110 h-60 md:h-58 pt-5 px-5 pb-6 md:pb-4 rounded-[0px_0px_35px_35px] md:rounded-[35px_35px_0px_0px]">
+              <h1
+                className="text-4xl font-black text-[var(--blue)]"
+                dangerouslySetInnerHTML={{ __html: item.title }}
+              ></h1>
+              <p className="text-[var(--blue)] w-90">{item.subTitle}</p>
               <a
                 key={item.url}
                 href={item.url}
@@ -49,10 +47,10 @@ function Banner() {
         <Image
           src={content.homeHeader.tools}
           alt="Banner Image"
-          width={400}
+          width={2000}
           height={100}
           priority
-          className="z-1 relative w-full max-w-[400px] sm:max-w-[400px] lg:max-w-[800px] h-auto"
+          className="z-1 relative w-full max-w-[400px] md:max-w-[300px] lg:max-w-[800px] h-auto"
         />
       </div>
     </div>

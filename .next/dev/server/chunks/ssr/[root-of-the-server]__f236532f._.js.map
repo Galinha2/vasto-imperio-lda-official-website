@@ -1,0 +1,6 @@
+{
+  "version": 3,
+  "sources": [],
+  "sections": [
+    {"offset": {"line": 18, "column": 0}, "map": {"version":3,"sources":["file:///Users/henriquegalinha/Documents/VS%20Code/vasto-imperio-lda-official-website/vasto/app/home/page.jsx"],"sourcesContent":["export const metadata = {\n    title: \"Home\",\n};\n\nexport default function Page() {\n    return (\n        <div>\n            <p className=\"p-5\">Hello World!</p>\n        </div>\n    );\n}\n"],"names":[],"mappings":";;;;;;;;AAAO,MAAM,WAAW;IACpB,OAAO;AACX;AAEe,SAAS;IACpB,qBACI,8OAAC;kBACG,cAAA,8OAAC;YAAE,WAAU;sBAAM;;;;;;;;;;;AAG/B"}}]
+}

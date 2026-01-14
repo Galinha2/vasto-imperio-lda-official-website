@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": [],
+  "sections": [
+    {"offset": {"line": 3, "column": 0}, "map": {"version":3,"sources":["turbopack:///[project]/assets/content.json"],"sourcesContent":["{\"header\":{\"logo\":\"/logo-vasto-imperio-mini.png\",\"links\":[{\"label\":\"Home\",\"url\":\"/\"},{\"label\":\"Sobre Nós\",\"url\":\"/sobre-nos\"},{\"label\":\"Produtos\",\"url\":\"/produtos\"},{\"label\":\"Contacto\",\"url\":\"/contacto\"}]},\"logo\":\"/logo.png\"}"],"names":[],"mappings":"AAAA"}},
+    {"offset": {"line": 3, "column": 251}, "map": {"version":3,"sources":[],"names":[],"mappings":"A"}}]
+}

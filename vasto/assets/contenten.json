@@ -12,6 +12,10 @@
         "url": "/produtos"
       },
       {
+        "label": "Quote",
+        "url": "/orcamento"
+      },
+      {
         "label": "About Us",
         "url": "/sobre-nos"
       },
@@ -26,55 +30,104 @@
     "tools": "/tools.png",
     "text": [
       {
-        "title": "SOLUTIONS TO ORGANISE",
-        "subTitle": "Discover our solutions to organise your business.",
+        "title": "Racks and Shelves in <span class='bg-clip-text text-transparent bg-gradient-to-r from-[var(--blue)] to-[var(--orange)]'>Viseu and Benedita</span>",
+        "subTitle": "Local solutions for high-quality organization and storage.",
         "button": "View Products",
         "url": "/produtos"
       }
     ]
   },
   "homeInfoCards": {
-    "title": "How can Vasto Império help your company?",
+    "title": "Racks, Shelves and Storage Solutions in Viseu and Benedita",
     "text": [
       {
         "icon": "TbTruckDelivery",
-        "title": "Nationwide deliveries.",
-        "subTitle": "Fast shipping thanks to permanent available stock."
+        "title": "Fast Deliveries",
+        "subTitle": "Permanent stock available for quick shipping in Viseu, Benedita and nationwide."
       },
       {
         "icon": "FaMapMarkedAlt",
-        "title": "Multiple locations in Portugal.",
-        "subTitle": "Find our warehouse in Viseu or Benedita."
+        "title": "Centers in Viseu and Benedita",
+        "subTitle": "Local warehouses for better support and availability of our products."
       },
       {
         "icon": "MdOutlineWorkspacePremium",
-        "title": "Professional support.",
-        "subTitle": "Specialised assistance before and after delivery."
+        "title": "Professional Local Support",
+        "subTitle": "Specialized consulting to choose the best racks and shelves for your business."
       },
       {
         "icon": "FaRankingStar",
-        "title": "Quality and reliability.",
-        "subTitle": "Robust solutions, ready for immediate use."
+        "title": "Quality and Reliability",
+        "subTitle": "Robust and durable products, ideal for businesses in Viseu, Benedita and surroundings."
       }
     ]
   },
   "homeCards": {
     "text": [
       {
-        "pageTitle": "Request your quote now!",
-        "title": "100% free quotes.",
-        "subTitle": "Fast shipping thanks to permanent available stock.",
+        "pageTitle": "Request Your Quote",
+        "title": "100% Free Quotes",
+        "subTitle": "Receive a transparent quote for racks, shelves and storage solutions, tailored to your local business needs.",
         "button": "Request",
+        "url": "/orcamento",
         "image": "/montagemprateleira.png",
         "image2": "/montagemrack.png"
       },
       {
-        "pageTitle": "Our products.",
-        "title": "Storage solutions tailored to your needs.",
-        "subTitle": "Discover the shelving, racks, lockers, chairs and manual or electric forklifts we have available and find the right solution for your business.",
+        "pageTitle": "Discover Our Products in Viseu and Benedita",
+        "title": "Racks, Shelves, Lockers and More",
+        "subTitle": "Explore our complete range of storage solutions, including manual and electric forklifts, available for fast delivery in the Viseu and Benedita regions.",
         "button": "View Products",
         "url": "/produtos",
         "image": "/prateleira.png"
+      }
+    ]
+  },
+  "homeContacts": {
+    "title": "Contact Vasto Império in Viseu and Benedita",
+    "subTitle": "100% Free Quote for Local Solutions",
+    "button": "Request",
+    "url": "/orcamento",
+    "text": [
+      {
+        "location": "Benedita",
+        "phone": "+351 966 518 436",
+        "mail": "vastoimperio@sapo.pt"
+      },
+      {
+        "location": "Viseu",
+        "phone": "+351 928 348 117",
+        "mail": "vastoimperio@sapo.pt"
+      }
+    ]
+  },
+  "productBanner": {
+    "background": "/product banner.png",
+    "logo": "/logo.png",
+    "tools": "/products.png"
+  },
+  "productsShowcase": {
+    "title": "Contact Vasto Império in Viseu and Benedita",
+    "products": [
+      {
+        "image": "/racks.png",
+        "text": "Industrial Pallet Racks",
+        "url": "/"
+      },
+      {
+        "image": "/prateleira inteira.png",
+        "text": "Light Load Shelf",
+        "url": "/"
+      },
+      {
+        "image": "/cacifo.png",
+        "text": "Metal Lockers",
+        "url": "/"
+      },
+      {
+        "image": "/empilhador.png",
+        "text": "Manual Electric Forklifts",
+        "url": "/"
       }
     ]
   }

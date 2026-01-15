@@ -19,7 +19,7 @@ function Cards() {
                 <h1 className="font-bold text-(--orange) max-w-450 m-auto pb-5 text-[1.5em] md:text-[2em]">
                   {card.pageTitle}
                 </h1>
-                <div className={`m-auto flex ${index === 0 ? "lg:flex-row justify-end p-2 flex-col-reverse pb-10 lg:p-3" : "text-justify text-right gap-10 flex-col lg:flex-row-reverse justify-end pt-10 lg:pt-20"} max-w-450 bg-(--gray) items-center rounded-[35px] h-auto lg:gap-10 xl:gap-15 2xl:gap-70`}>
+                <div className={`m-auto flex ${index === 0 ? "lg:flex-row justify-end p-2 flex-col-reverse pb-10 lg:p-3" : "text-justify text-right gap-10 flex-col lg:flex-row-reverse justify-end pt-10 lg:pt-20"} max-w-450 bg-(--gray) items-center rounded-[35px] h-auto lg:gap-10 xl:gap-15 2xl:gap-50`}>
                   <div className={`p-5 flex flex-col ${index === 0 ? "items-start" : "items-end"}`}>
                     <h2 className="text-[2em] font-medium">{card.title}</h2>
                     <p className="my-2 max-w-110">{card.subTitle}</p>

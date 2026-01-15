@@ -30,35 +30,35 @@
     "tools": "/tools.png",
     "text": [
       {
-        "title": "Racks and Shelves in <span class='bg-clip-text text-transparent bg-gradient-to-r from-[var(--blue)] to-[var(--orange)]'>Viseu and Benedita</span>",
-        "subTitle": "Local solutions for high-quality organization and storage.",
+        "title": "Racks and Shelving in <span class='bg-clip-text text-transparent bg-gradient-to-r from-[var(--blue)] to-[var(--orange)]'>Viseu and Benedita</span>",
+        "subTitle": "Local solutions for high quality organisation and storage.",
         "button": "View Products",
         "url": "/produtos"
       }
     ]
   },
   "homeInfoCards": {
-    "title": "Racks, Shelves and Storage Solutions in Viseu and Benedita",
+    "title": "Racks, Shelving and Storage Solutions in Viseu and Benedita",
     "text": [
       {
         "icon": "TbTruckDelivery",
         "title": "Fast Deliveries",
-        "subTitle": "Permanent stock available for quick shipping in Viseu, Benedita and nationwide."
+        "subTitle": "Permanent stock available for fast delivery in Viseu, Benedita and across the country."
       },
       {
         "icon": "FaMapMarkedAlt",
-        "title": "Centers in Viseu and Benedita",
-        "subTitle": "Local warehouses for better support and availability of our products."
+        "title": "Centres in Viseu and Benedita",
+        "subTitle": "Local warehouses for better support and product availability."
       },
       {
         "icon": "MdOutlineWorkspacePremium",
-        "title": "Professional Local Support",
-        "subTitle": "Specialized consulting to choose the best racks and shelves for your business."
+        "title": "Local Professional Support",
+        "subTitle": "Specialised consultancy to choose the best racks and shelving for your business."
       },
       {
         "icon": "FaRankingStar",
         "title": "Quality and Reliability",
-        "subTitle": "Robust and durable products, ideal for businesses in Viseu, Benedita and surroundings."
+        "subTitle": "Robust and durable products, ideal for companies in Viseu, Benedita and surrounding areas."
       }
     ]
   },
@@ -66,8 +66,8 @@
     "text": [
       {
         "pageTitle": "Request Your Quote",
-        "title": "100% Free Quotes",
-        "subTitle": "Receive a transparent quote for racks, shelves and storage solutions, tailored to your local business needs.",
+        "title": "100% Free and No Obligation Quotes",
+        "subTitle": "Receive a transparent quote for racks, shelving and storage solutions, tailored to the needs of your local business.",
         "button": "Request",
         "url": "/orcamento",
         "image": "/montagemprateleira.png",
@@ -75,17 +75,17 @@
       },
       {
         "pageTitle": "Discover Our Products in Viseu and Benedita",
-        "title": "Racks, Shelves, Lockers and More",
-        "subTitle": "Explore our complete range of storage solutions, including manual and electric forklifts, available for fast delivery in the Viseu and Benedita regions.",
+        "title": "Racks, Shelving, Lockers and More",
+        "subTitle": "Explore our full range of storage solutions, including manual and electric stackers, available for fast delivery in the regions of Viseu and Benedita.",
         "button": "View Products",
         "url": "/produtos",
-        "image": "/prateleira.png"
+        "image": "/prateleiras.png"
       }
     ]
   },
   "homeContacts": {
     "title": "Contact Vasto Império in Viseu and Benedita",
-    "subTitle": "100% Free Quote for Local Solutions",
+    "subTitle": "Solutions with 100% Free Quotes",
     "button": "Request",
     "url": "/orcamento",
     "text": [
@@ -107,28 +107,91 @@
     "tools": "/products.png"
   },
   "productsShowcase": {
+    "produtoNe": "Product not found",
+    "caracteristicas": "Specifications",
     "title": "Contact Vasto Império in Viseu and Benedita",
     "products": [
       {
+        "id": "racks-industriais",
         "image": "/racks.png",
         "text": "Industrial Pallet Racks",
-        "url": "/"
+        "images": [
+          "/racks.png",
+          "/prateleira inteira.png",
+          "/cacifo.png"
+        ],
+        "materialText": "Material:",
+        "material": "High strength steel with electrostatic powder coating finish.",
+        "medidasText": "Dimensions:",
+        "medidas": "Height: 2m to 8m | Width: 1m to 3m | Depth: 0.6m to 1.2m."
       },
       {
+        "id": "estante-carga-ligeira",
         "image": "/prateleira inteira.png",
-        "text": "Light Load Shelf",
-        "url": "/"
+        "text": "Light Duty Shelving",
+        "images": [
+          "/prateleira inteira.png",
+          "/racks.png",
+          "/cacifo.png"
+        ],
+        "materialText": "Material:",
+        "material": "High strength steel with electrostatic powder coating finish.",
+        "medidasText": "Dimensions:",
+        "medidas": "Height: 2m to 8m | Width: 1m to 3m | Depth: 0.6m to 1.2m."
       },
       {
+        "id": "cacifos-metalicos",
         "image": "/cacifo.png",
         "text": "Metal Lockers",
-        "url": "/"
+        "images": [
+          "/cacifo.png",
+          "/racks.png",
+          "/prateleira inteira.png"
+        ],
+        "materialText": "Material:",
+        "material": "High strength steel with electrostatic powder coating finish.",
+        "medidasText": "Dimensions:",
+        "medidas": "Height: 2m to 8m | Width: 1m to 3m | Depth: 0.6m to 1.2m."
       },
       {
+        "id": "empilhadores",
         "image": "/empilhador.png",
-        "text": "Manual Electric Forklifts",
-        "url": "/"
+        "text": "Manual and Electric Stackers",
+        "images": [
+          "/racks.png",
+          "/prateleira inteira.png",
+          "/cacifo.png"
+        ],
+        "materialText": "Material:",
+        "material": "High strength steel with electrostatic powder coating finish.",
+        "medidasText": "Dimensions:",
+        "medidas": "Height: 2m to 8m | Width: 1m to 3m | Depth: 0.6m to 1.2m."
       }
     ]
+  },
+  "orcamento": {
+    "title": "Request Your 100% Free Quote Now",
+    "nome": "Name | Company",
+    "phone": "Mobile Phone",
+    "mail": "Email",
+    "body": "Message Text",
+    "anexo": "Attach",
+    "submit": "Send",
+    "send": "Sending Quote",
+    "success": "Quote Sent Successfully!",
+    "return": "Return to homepage"
+  },
+  "sobreNos": {
+    "title": "ABOUT VASTO IMPÉRIO LDA.",
+    "p1t": "Over 20 years of experience in storage solutions",
+    "p1": "Vasto Império Lda. has been operating for over 20 years in the sector of shelving, racks, light duty shelving, manual and electric stackers, pallet trucks and other storage equipment. Over the years, we have earned the trust of numerous clients in Portugal by providing quality products and professional services.",
+    "p2t": "Presence in Benedita and Viseu",
+    "p2": "Headquartered in Benedita, Vasto Império Lda. has recently expanded its activity to Viseu, strengthening proximity to our clients and responsiveness to market needs.",
+    "vinte": "20",
+    "anos": "YEARS",
+    "p3t": "Complete and personalised service",
+    "p3": "In addition to equipment sales, we offer assembly and delivery services, ensuring complete solutions tailored to each storage project. Our commitment is to provide safe, durable and efficient products, with maximum attention to customer satisfaction.",
+    "p4t": "Commitment to quality and trust",
+    "p4": "Our accumulated experience and constant updating with the latest trends and technologies allow us to offer innovative and competitive solutions. Vasto Império Lda. is the right choice for companies, independent professionals and individuals looking for quality, reliability and specialised service."
   }
 }

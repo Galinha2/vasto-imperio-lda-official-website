@@ -2,7 +2,7 @@ import ContactCard from "@/components/contacts/ContactCard"
 
 function page() {
     return (
-        <div>
+        <div className="mt-25">
             <ContactCard />
         </div>
     )

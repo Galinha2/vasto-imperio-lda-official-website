@@ -54,7 +54,7 @@ export default function Page({ params, searchParams: ss }) {
 
   return (
     <>
-      <div className="mt-17 m-auto p-5 pb-20 font-medium flex flex-col gap-10 border-b border-(--horizontal-line) mb-10">
+      <div className="mt-17 m-auto pt-10 px-5 2xl:px-30 xl:px-5 pb-20 font-medium flex flex-col gap-10 border-b border-(--horizontal-line) mb-10">
         <h1 className="w-full max-w-450 m-auto title -mb-7">{product.text}</h1>
 
         <div className="flex w-full items-center max-w-450 m-auto justify-center md:justify-start md:gap-5 lg:gap-10 xl:gap-30 md:items-start flex-col md:flex-row gap-5">

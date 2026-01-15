@@ -8,6 +8,7 @@
   --orange-hover: #ff1a1a;
   --blue: #0879C0;
   --gray: #F0F1F6;
+  --yellow: #ffae00;
   --gray-transparent: #e7eaf1bf;
   --back-black: #666666;
   --back-gray: #c9c9c9ee;
@@ -27,6 +28,9 @@
   }
   .buttonGallery {
     @apply p-2 text-[2em] cursor-pointer bg-(--back-gray) shadow-[0px_4px_3px_#1e1e1e48] text-(--back-black) rounded-full;
+  }
+  .input {
+    @apply bg-white shadow-sm rounded-[35px] p-2 px-5 w-full;
   }
 }
 

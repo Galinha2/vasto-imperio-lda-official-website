@@ -85,7 +85,7 @@
   },
   "homeContacts": {
     "title": "Contacte a Vasto Império em Viseu e Benedita",
-    "subTitle": "Orçamento 100% Gratuito para Soluções Locais",
+    "subTitle": "Soluções com orçamento 100% Gratuito",
     "button": "Pedir",
     "url": "/orcamento",
     "text": [
@@ -114,12 +114,12 @@
       {
         "id": "racks-industriais",
         "image": "/racks.png",
+        "text": "Racks Industriais para Paletes",
         "images": [
           "/racks.png",
           "/prateleira inteira.png",
           "/cacifo.png"
         ],
-        "text": "Racks Industriais para Paletes",
         "materialText": "Material:",
         "material": "Aço de alta resistência com acabamento em pintura eletrostática.",
         "medidasText": "Medidas:",
@@ -128,18 +128,70 @@
       {
         "id": "estante-carga-ligeira",
         "image": "/prateleira inteira.png",
-        "text": "Estante de carga ligeira"
+        "text": "Estante de carga ligeira",
+        "images": [
+          "/prateleira inteira.png",
+          "/racks.png",
+          "/cacifo.png"
+        ],
+        "materialText": "Material:",
+        "material": "Aço de alta resistência com acabamento em pintura eletrostática.",
+        "medidasText": "Medidas:",
+        "medidas": "Altura: 2m a 8m | Largura: 1m a 3m | Profundidade: 0,6m a 1,2m." 
       },
       {
         "id": "cacifos-metalicos",
         "image": "/cacifo.png",
-        "text": "Cacifos Metálicos"
+        "text": "Cacifos Metálicos",
+        "images": [
+          "/cacifo.png",
+          "/racks.png",
+          "/prateleira inteira.png"
+        ],
+        "materialText": "Material:",
+        "material": "Aço de alta resistência com acabamento em pintura eletrostática.",
+        "medidasText": "Medidas:",
+        "medidas": "Altura: 2m a 8m | Largura: 1m a 3m | Profundidade: 0,6m a 1,2m." 
       },
       {
         "id": "empilhadores",
         "image": "/empilhador.png",
-        "text": "Empilhadores Manuais e Elétricos"
+        "text": "Empilhadores Manuais e Elétricos",
+        "images": [
+          "/racks.png",
+          "/prateleira inteira.png",
+          "/cacifo.png"
+        ],
+        "materialText": "Material:",
+        "material": "Aço de alta resistência com acabamento em pintura eletrostática.",
+        "medidasText": "Medidas:",
+        "medidas": "Altura: 2m a 8m | Largura: 1m a 3m | Profundidade: 0,6m a 1,2m." 
       }
     ]
+  },
+  "orcamento": {
+    "title": "Solicite já o seu orçamento 100% Gratuito",
+    "nome": "Nome | Empresa",
+    "phone": "Telemóvel",
+    "mail": "E-mail",
+    "body": "Texto da Mensagem",
+    "anexo": "Anexar",
+    "submit": "Enviar",
+    "send": "A Enviar Orçamento",
+    "success": "Orçamento Enviado com Sucesso!",
+    "return": "Voltar à página inicial"
+  },
+  "sobreNos": {
+    "title": "SOBRE A VASTO IMÉRIO LDA.",
+    "p1t": "Mais de 20 anos de experiência em soluções de armazenagem",
+    "p1": "A Vasto Império Lda. atua há mais de 20 anos no sector de prateleiras, racks, estantes ligeiras, empilhadores manuais e elétricos, porta-paletes e outros equipamentos de armazenagem. Ao longo destes anos, conquistámos a confiança de inúmeros clientes em Portugal, oferecendo produtos de qualidade e serviços profissionais.",
+    "p2t": "Presença em Benedita e Viseu",
+    "p2": "Com sede na Benedita, a Vasto Império Lda. expandiu recentemente a sua atividade para Viseu, reforçando a proximidade com os nossos clientes e a capacidade de resposta às necessidades do mercado.",
+    "vinte": "20",
+    "anos": "ANOS",
+    "p3t": "Serviço completo e personalizado",
+    "p3": "Para além da venda de equipamentos, oferecemos serviços de montagem e entrega, assegurando soluções completas e adaptadas a cada projeto de armazenagem. O nosso compromisso é fornecer produtos seguros, duradouros e eficientes, com atenção máxima à satisfação do cliente.",
+    "p4t": "Compromisso com a qualidade e confiança",
+    "p4": "A nossa experiência acumulada e a constante atualização com as últimas tendências e tecnologias permitem-nos oferecer soluções inovadoras e competitivas. A Vasto Império Lda. é a escolha certa para empresas, profissionais independentes e particulares que procuram qualidade, fiabilidade e atendimento especializado."
   }
 }

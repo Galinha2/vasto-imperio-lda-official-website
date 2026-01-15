@@ -5,6 +5,7 @@ import contentpt from "@/assets/contentpt.json";
 import contenten from "@/assets/contenten.json";
 import { useLanguage } from "../header/LanguageContext";
 import { FiUpload } from "react-icons/fi";
+import { useRouter } from "next/navigation";
 
 export default function OrcamentoInputs() {
     const { language } = useLanguage();
@@ -13,6 +14,44 @@ export default function OrcamentoInputs() {
 
     const [files, setFiles] = useState([]);
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const router = useRouter();
+
+    async function handleSubmit(event) {
+        event.preventDefault();
+        setIsSubmitting(true);
+
+        const formData = new FormData();
+        formData.append('name', event.target.name.value);
+        formData.append('email', event.target.email.value);
+        formData.append('phone', event.target.phone.value);
+        formData.append('body', event.target.body.value);
+        files.forEach((file) => {
+            formData.append('files', file);
+        });
+
+        try {
+            const response = await fetch('/api/orcamento', {
+                method: 'POST',
+                body: formData,
+            });
+
+            if (response.ok) {
+                router.push("/sucesso?enviado=true");
+            } else {
+                setIsSubmitting(false);
+                alert(language === "pt"
+                    ? "Ocorreu um erro ao enviar o formulário. Por favor, tente novamente."
+                    : "An error occurred while sending the form. Please try again.");
+                // permanece na página /orcamento
+            }
+        } catch (error) {
+            setIsSubmitting(false);
+            alert(language === "pt"
+                ? "Ocorreu um erro ao enviar o formulário. Por favor, tente novamente."
+                : "An error occurred while sending the form. Please try again.");
+            // permanece na página /orcamento
+        }
+    }
 
     return (
         <div className="p-5 pt-20 w-full max-w-200 m-auto relative">
@@ -26,31 +65,8 @@ export default function OrcamentoInputs() {
             )}
             <h1 className="title mb-5 text-center">{item.title}</h1>
             <form
-                onSubmit={async (e) => {
-                    e.preventDefault();
-                    if (isSubmitting) return;
-                    setIsSubmitting(true);
-
-                    const formData = new FormData(e.target);
-                    files.forEach((file) => formData.append("files", file));
-
-                    try {
-                        const res = await fetch("/api/orcamento", {
-                            method: "POST",
-                            body: formData,
-                        });
-                        if (res.redirected) {
-                            // Define flag antes de redirecionar
-                            sessionStorage.setItem("orcamentoEnviado", "true");
-                            window.location.href = res.url;
-                        }
-                    } catch (err) {
-                        console.error("Erro ao enviar formulário:", err);
-                    } finally {
-                        setIsSubmitting(false);
-                    }
-                }}
                 className="p-5 bg-(--gray) w-auto rounded-[35px] flex gap-5 flex-col"
+                onSubmit={handleSubmit}
             >
                 <div className="flex gap-5">
                     <input
@@ -63,7 +79,7 @@ export default function OrcamentoInputs() {
                     />
                     <input
                         className="input"
-                        type="number"
+                        type="tel"
                         name="phone"
                         id="phone"
                         placeholder={item.phone}
@@ -90,6 +106,7 @@ export default function OrcamentoInputs() {
                         <div><FiUpload className="inline mr-2" />{item.anexo}</div>
                         <input
                             type="file"
+                            name="files"
                             multiple
                             className="hidden"
                             onChange={(e) => {

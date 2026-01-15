@@ -12,7 +12,7 @@ function Sobre() {
   const logo = content.header.logo;
 
   return (
-    <div className="text-medium border-b border-(--horizontal-line) mb-20">
+    <div className="text-medium border-bm-auto w-screen border-(--horizontal-line) mb-20">
       <h1 className="bg-(--gray) p-5 text-center title font-black text-[1.8em] md:text-[2.5em]">{item.title}</h1>
       <div className="flex py-15 flex-col gap-5 m-auto">
         <div className="flex flex-col md:flex-row max-w-200 m-auto">

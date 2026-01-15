@@ -1,88 +1,75 @@
 import nodemailer from "nodemailer";
 import formidable from "formidable";
 import fs from "fs";
-import path from "path";
 
-export const config = { api: { bodyParser: false } };
+export const config = {
+  api: {
+    bodyParser: false,
+  },
+};
 
 export default async function handler(req, res) {
-  if (req.method !== "POST") return res.status(405).end();
+  if (req.method !== "POST")
+    return res.status(405).json({ error: "Method not allowed" });
 
-  // Pasta temporária para ficheiros
-  const uploadDir = path.join(process.cwd(), "tmp");
-  if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir);
+  const form = formidable({ multiples: true });
 
-  const form = formidable({
-    multiples: true,
-    keepExtensions: true,
-    allowEmptyFiles: true,
-    minFileSize: 0,
-    uploadDir,
-    maxFiles: 3,
-  });
-
-  try {
-    const { fields, files } = await new Promise((resolve, reject) => {
-      form.parse(req, (err, fields, files) => {
-        if (err) reject(err);
-        else resolve({ fields, files });
-      });
-    });
-
-    const name = fields.name || "Sem Nome";
-    const email = fields.email || "Sem Email";
-    const phone = fields.phone || "Sem Telefone";
-    const body = fields.body || "";
-
-    let attachments = [];
-
-    // Processar todos os ficheiros enviados
-    const uploadedFiles = [];
-    Object.keys(files).forEach(key => {
-      const fileEntry = files[key];
-      if (Array.isArray(fileEntry)) uploadedFiles.push(...fileEntry);
-      else if (fileEntry?.filepath) uploadedFiles.push(fileEntry);
-    });
-
-    for (const file of uploadedFiles) {
-      if (file.filepath && fs.existsSync(file.filepath)) {
-        attachments.push({
-          filename: file.originalFilename || `file-${attachments.length + 1}`,
-          path: file.filepath,
-        });
-      }
+  form.parse(req, async (err, fields, files) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).json({ error: "Erro ao processar o formulário" });
     }
 
-    // No fallback attachment added if no files uploaded
+    const { name, email, phone, body } = fields;
 
-    // Nodemailer
-    const transporter = nodemailer.createTransport({
-      host: "smtp.gmail.com",
-      port: 587,
-      secure: false,
-      auth: { user: process.env.MAIL_USER, pass: process.env.MAIL_PASS },
-    });
+    if (!name || !email || !phone || !body)
+      return res.status(400).json({ error: "Todos os campos são obrigatórios" });
 
-    await transporter.sendMail({
-      from: `"Website" <${process.env.MAIL_USER}>`,
-      to: process.env.MAIL_USER,
-      subject: `${name} | Novo pedido de orçamento`,
-      text: `
-Nome: ${name}
-Email: ${email}
-Telefone: ${phone}
+    try {
+      // Configuração SMTP
+      const transporter = nodemailer.createTransport({
+        host: process.env.SMTP_HOST,
+        port: Number(process.env.SMTP_PORT),
+        secure: Number(process.env.SMTP_PORT) === 465, // true para 465, false para outros
+        auth: {
+          user: process.env.SMTP_USER,
+          pass: process.env.SMTP_PASS,
+        },
+      });
 
-Mensagem:
-${body}
-      `,
-      attachments,
-    });
+      let attachments = [];
 
-    // Redirecionar para página de sucesso
-    res.writeHead(302, { Location: "/sucesso" });
-    res.end();
-  } catch (err) {
-    console.error("Erro ao enviar email:", err);
-    res.status(500).json({ error: err.message });
-  }
+      if (files) {
+        let fileArray = [];
+
+        if (Array.isArray(files.files)) {
+          fileArray = files.files.slice(0, 3);
+        } else if (files.files) {
+          fileArray = [files.files];
+        }
+
+        for (const file of fileArray) {
+          attachments.push({
+            filename: file.originalFilename || file.newFilename || "attachment",
+            path: file.filepath,
+          });
+        }
+      }
+
+      const mailOptions = {
+        from: `"Orçamento Website" <${email}>`,
+        to: process.env.RECEIVER_EMAIL, // teu email
+        subject: `Novo orçamento de ${name}`,
+        text: `Nome: ${name}\nEmail: ${email}\nTelefone: ${phone}\nMensagem:\n${body}`,
+        attachments,
+      };
+
+      await transporter.sendMail(mailOptions);
+
+      return res.status(200).json({ success: true });
+    } catch (err) {
+      console.error(err);
+      return res.status(500).json({ error: "Erro ao enviar email" });
+    }
+  });
 }

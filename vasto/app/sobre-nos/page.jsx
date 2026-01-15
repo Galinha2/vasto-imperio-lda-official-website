@@ -5,7 +5,9 @@ function page() {
     return (
         <div className="mt-17 max-w-450">
             <Sobre />
-            <ContactCard />
+            <div className="m-auto -mt-30 w-screen">
+                <ContactCard />
+            </div>
         </div>
     )
 }

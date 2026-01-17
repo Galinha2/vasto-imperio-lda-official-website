@@ -71,8 +71,10 @@ export default async function handler(req, res) {
 
       return res.status(200).json({ success: true });
     } catch (err) {
-      console.error(err);
-      return res.status(500).json({ error: "Erro ao enviar email" });
+      console.error("SMTP ERROR FULL:", err);
+      console.error("SMTP ERROR MESSAGE:", err.message);
+      console.error("SMTP ERROR CODE:", err.code);
+      return res.status(500).json({ error: err.message });
     }
   });
 }

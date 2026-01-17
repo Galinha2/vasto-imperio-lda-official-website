@@ -9,6 +9,7 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@emailjs/browser": "^4.4.1",
     "form-data": "^4.0.5",
     "formidable": "^3.5.4",
     "next": "16.1.1",

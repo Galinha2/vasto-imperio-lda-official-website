@@ -1,11 +1,10 @@
 "use client";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import Spinner from "../loadings/Spinner";
 import contentpt from "@/assets/contentpt.json";
 import contenten from "@/assets/contenten.json";
 import { useLanguage } from "../header/LanguageContext";
 import { FiUpload } from "react-icons/fi";
-import { useRouter } from "next/navigation";
 
 export default function OrcamentoInputs() {
   const { language } = useLanguage();
@@ -14,56 +13,42 @@ export default function OrcamentoInputs() {
 
   const [files, setFiles] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const router = useRouter();
+  const fileInputRef = useRef(null);
 
   async function handleSubmit(event) {
     event.preventDefault();
+
+    // Validate file sizes before submitting
+    const oversized = files.filter(
+      (file) => file.size > 10 * 1024 * 1024
+    ); // >10MB
+
+    if (oversized.length > 0) {
+      alert(
+        `Alguns ficheiros foram ignorados porque excedem 10MB: ${oversized
+          .map((f) => f.name)
+          .join(", ")}`
+      );
+      return;
+    }
+
     setIsSubmitting(true);
 
-    try {
-      const formData = new FormData();
-      formData.append("service_id", process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID);
-      formData.append(
-        "template_id",
-        process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID
-      );
-      formData.append("user_id", process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY);
+    const form = event.target;
 
-      // Campos do formulário
-      formData.append("name", event.target.name.value);
-      formData.append("email", event.target.email.value);
-      formData.append("phone", event.target.phone.value);
-      formData.append("body", event.target.body.value);
+    // Create a new DataTransfer to hold files
+    const dataTransfer = new DataTransfer();
+    files.forEach((file) => {
+      dataTransfer.items.add(file);
+    });
 
-      // Anexos
-      files.forEach((file) => {
-        formData.append("files[]", file);
-      });
-
-      const res = await fetch(
-        "https://api.emailjs.com/api/v1.0/email/send-form",
-        {
-          method: "POST",
-          body: formData,
-        }
-      );
-
-      if (!res.ok) throw new Error("Erro ao enviar o email");
-
-      console.log("Email enviado com sucesso!");
-      router.push("/sucesso?enviado=true");
-      event.target.reset();
-      setFiles([]);
-      setIsSubmitting(false);
-    } catch (err) {
-      console.error("Erro ao enviar email:", err);
-      alert(
-        language === "pt"
-          ? "Ocorreu um erro ao enviar o formulário. Por favor, tente novamente."
-          : "An error occurred while sending the form. Please try again."
-      );
-      setIsSubmitting(false);
+    // Assign files to the file input element
+    if (fileInputRef.current) {
+      fileInputRef.current.files = dataTransfer.files;
     }
+
+    // Submit the form normally
+    form.submit();
   }
 
   return (
@@ -82,7 +67,16 @@ export default function OrcamentoInputs() {
       <form
         className="p-5 bg-(--gray) w-auto rounded-[35px] flex gap-5 flex-col"
         onSubmit={handleSubmit}
+        action="https://formsubmit.co/geral.tecfix@gmail.com"
+        method="POST"
+        encType="multipart/form-data"
       >
+        <input type="hidden" name="_subject" value="Novo Pedido de Orçamento" />
+        <input type="hidden" name="_template" value="table" />
+        <input type="hidden" name="_captcha" value="false" />
+        {/* <input type="hidden" name="_next" value="https://SEU_DOMINIO_AQUI/sucesso?enviado=true" /> */}
+        <input type="hidden" name="_next" value="http://localhost:3000/sucesso?enviado=true" />
+
         <div className="flex gap-5">
           <input
             className="input"
@@ -119,7 +113,9 @@ export default function OrcamentoInputs() {
               {item.anexo}
             </div>
             <input
+              ref={fileInputRef}
               type="file"
+              name="attachment"
               multiple
               className="hidden"
               onChange={(e) => {
@@ -139,7 +135,11 @@ export default function OrcamentoInputs() {
                   );
                 }
 
-                setFiles((prev) => [...prev, ...validFiles].slice(0, 3));
+                setFiles((prev) => {
+                  const combinedFiles = [...prev, ...validFiles].slice(0, 3);
+                  return combinedFiles;
+                });
+
                 e.target.value = "";
               }}
             />

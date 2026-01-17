@@ -1,5 +1,5 @@
 "use client";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import Spinner from "../loadings/Spinner";
 import contentpt from "@/assets/contentpt.json";
 import contenten from "@/assets/contenten.json";
@@ -14,6 +14,12 @@ export default function OrcamentoInputs() {
   const [files, setFiles] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const fileInputRef = useRef(null);
+  const nameInputRef = useRef(null);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   async function handleSubmit(event) {
     event.preventDefault();
@@ -34,23 +40,29 @@ export default function OrcamentoInputs() {
 
     setIsSubmitting(true);
 
-    const form = event.target;
+    // Update _subject hidden input with the actual name value
+    if (nameInputRef.current) {
+      const subjectInput = event.target.querySelector('input[name="_subject"]');
+      if (subjectInput) {
+        subjectInput.value = `${nameInputRef.current.value} | Novo Pedido de Orçamento`;
+      }
+    }
 
-    // Create a new DataTransfer to hold files
-    const dataTransfer = new DataTransfer();
-    files.forEach((file) => {
-      dataTransfer.items.add(file);
-    });
-
-    // Assign files to the file input element
+    // Clear the file input's files and add the files from state using DataTransfer
     if (fileInputRef.current) {
+      const dataTransfer = new DataTransfer();
+      files.forEach((file) => {
+        dataTransfer.items.add(file);
+      });
       fileInputRef.current.files = dataTransfer.files;
     }
 
-    // Submit the form normally
-    form.submit();
+    // Submit the form directly
+    event.target.submit();
   }
 
+  if (!mounted) return null;
+  // Only render the component after mount
   return (
     <div className="p-5 pt-20 w-full max-w-200 m-auto relative">
       {isSubmitting && (
@@ -71,7 +83,7 @@ export default function OrcamentoInputs() {
         method="POST"
         encType="multipart/form-data"
       >
-        <input type="hidden" name="_subject" value="Novo Pedido de Orçamento" />
+        <input type="hidden" name="_subject" value="" />
         <input type="hidden" name="_template" value="table" />
         <input type="hidden" name="_captcha" value="false" />
         {/* <input type="hidden" name="_next" value="https://SEU_DOMINIO_AQUI/sucesso?enviado=true" /> */}
@@ -79,6 +91,7 @@ export default function OrcamentoInputs() {
 
         <div className="flex gap-5">
           <input
+            ref={nameInputRef}
             className="input"
             type="text"
             name="name"
@@ -106,7 +119,7 @@ export default function OrcamentoInputs() {
           placeholder={item.body}
           required
         />
-        {files.length < 3 && (
+        {files.length < 1 && (
           <label className="bg-white shadow-sm px-5 py-2 rounded-full w-fit cursor-pointer">
             <div>
               <FiUpload className="inline mr-2" />

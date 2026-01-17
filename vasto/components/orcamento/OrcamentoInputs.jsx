@@ -133,7 +133,7 @@ export default function OrcamentoInputs() {
                                 ✕
                             </button>
                         </div>
-                    ))};
+                    ))}
                 </div>
 
                 <button

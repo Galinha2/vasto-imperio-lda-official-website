@@ -29,13 +29,13 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: "Todos os campos são obrigatórios" });
 
     try {
-      // Configuração SMTP
+      // Configuração SMTP Hostinger
       const transporter = nodemailer.createTransport({
         host: process.env.SMTP_HOST,
         port: Number(process.env.SMTP_PORT),
-        secure: Number(process.env.SMTP_PORT) === 465, // true para 465, false para outros
+        secure: Number(process.env.SMTP_PORT) === 465,
         auth: {
-          user: process.env.SMTP_USER,
+          user: process.env.SMTP_USER, // Email do teu domínio Hostinger
           pass: process.env.SMTP_PASS,
         },
       });
@@ -60,8 +60,9 @@ export default async function handler(req, res) {
       }
 
       const mailOptions = {
-        from: `"Orçamento Website" <${email}>`,
-        to: process.env.RECEIVER_EMAIL, // teu email
+        from: `"Orçamento Website" <${process.env.SMTP_USER}>`, // usar email do domínio
+        replyTo: email, // email do cliente
+        to: process.env.RECEIVER_EMAIL, 
         subject: `Novo orçamento de ${name}`,
         text: `Nome: ${name}\nEmail: ${email}\nTelefone: ${phone}\nMensagem:\n${body}`,
         attachments,

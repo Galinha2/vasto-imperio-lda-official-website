@@ -30,35 +30,35 @@
     "tools": "/tools.png",
     "text": [
       {
-        "title": "Racks and Shelving in <span class='bg-clip-text text-transparent bg-gradient-to-r from-[var(--blue)] to-[var(--orange)]'>Viseu and Benedita</span>",
-        "subTitle": "Local solutions for high quality organisation and storage.",
+        "title": "Racks and Shelving in <span class='bg-clip-text text-transparent bg-gradient-to-r from-[var(--blue)] to-[var(--orange)]'>Benedita and Viseu</span>",
+        "subTitle": "Local solutions for high-quality organization and storage.",
         "button": "View Products",
         "url": "/produtos"
       }
     ]
   },
   "homeInfoCards": {
-    "title": "Racks, Shelving and Storage Solutions in Viseu and Benedita",
+    "title": "Racks, Shelving, and Storage Solutions in Benedita and Viseu",
     "text": [
       {
         "icon": "TbTruckDelivery",
         "title": "Fast Deliveries",
-        "subTitle": "Permanent stock available for fast delivery in Viseu, Benedita and across the country."
+        "subTitle": "Permanent stock available for fast shipping in Benedita, Viseu, and across the country."
       },
       {
         "icon": "FaMapMarkedAlt",
-        "title": "Centres in Viseu and Benedita",
-        "subTitle": "Local warehouses for better support and product availability."
+        "title": "Centers in Benedita and Viseu",
+        "subTitle": "Local warehouses for better product support and availability."
       },
       {
         "icon": "MdOutlineWorkspacePremium",
         "title": "Local Professional Support",
-        "subTitle": "Specialised consultancy to choose the best racks and shelving for your business."
+        "subTitle": "Specialized consultancy to choose the best racks and shelving for your business."
       },
       {
         "icon": "FaRankingStar",
         "title": "Quality and Reliability",
-        "subTitle": "Robust and durable products, ideal for companies in Viseu, Benedita and surrounding areas."
+        "subTitle": "Robust and long-lasting products, ideal for businesses in Benedita, Viseu, and surrounding areas."
       }
     ]
   },
@@ -66,17 +66,17 @@
     "text": [
       {
         "pageTitle": "Request Your Quote",
-        "title": "100% Free and No Obligation Quotes",
-        "subTitle": "Receive a transparent quote for racks, shelving and storage solutions, tailored to the needs of your local business.",
+        "title": "100% Free Quotes with No Obligation",
+        "subTitle": "Receive a transparent quote for racks, shelving, and storage solutions, tailored to your local business needs.",
         "button": "Request",
         "url": "/orcamento",
         "image": "/montagemprateleira.png",
         "image2": "/montagemrack.png"
       },
       {
-        "pageTitle": "Discover Our Products in Viseu and Benedita",
-        "title": "Racks, Shelving, Lockers and More",
-        "subTitle": "Explore our full range of storage solutions, including manual and electric stackers, available for fast delivery in the regions of Viseu and Benedita.",
+        "pageTitle": "Discover Our Products in Benedita and Viseu",
+        "title": "Racks, Shelving, Lockers, and More",
+        "subTitle": "Explore our full range of storage solutions, including manual and electric stackers, available for fast delivery in the Benedita and Viseu regions.",
         "button": "View Products",
         "url": "/produtos",
         "image": "/prateleiras.png"
@@ -84,7 +84,7 @@
     ]
   },
   "homeContacts": {
-    "title": "Contact Vasto Império in Viseu and Benedita",
+    "title": "Contact Vasto Império in Benedita and Viseu",
     "subTitle": "Solutions with 100% Free Quotes",
     "button": "Request",
     "url": "/orcamento",
@@ -108,90 +108,1131 @@
   },
   "productsShowcase": {
     "produtoNe": "Product not found",
-    "caracteristicas": "Specifications",
-    "title": "Contact Vasto Império in Viseu and Benedita",
+    "caracteristicas": "Features",
+    "title": "Contact Vasto Império in Benedita and Viseu",
     "products": [
       {
         "id": "racks-industriais",
-        "image": "/racks.png",
+        "image": "/recorte_DSC4798-1_c_laranja.png",
         "text": "Industrial Pallet Racks",
+        "width": 240,
+        "height": 240,
         "images": [
-          "/racks.png",
-          "/prateleira inteira.png",
-          "/cacifo.png"
+          "/produtos/1-Paleco/i1.jpg",
+          "/produtos/1-Paleco/i2.jpg",
+          "/produtos/1-Paleco/i3.jpg",
+          "/produtos/1-Paleco/i4.jpg",
+          "/produtos/1-Paleco/i5.jpg",
+          "/produtos/1-Paleco/i6.jpg",
+          "/produtos/1-Paleco/i7.jpg"
         ],
-        "materialText": "Material:",
-        "material": "High strength steel with electrostatic powder coating finish.",
-        "medidasText": "Dimensions:",
-        "medidas": "Height: 2m to 8m | Width: 1m to 3m | Depth: 0.6m to 1.2m."
+        "description": "<span class='label'>Material:</span> Galvanized or RAL 5005 / 7035<br/><span class='label'>Height:</span>  2000 to 5000 mm <br/><span class='label'>Depth:</span> 400 to 1200 mm. <br/><span class='label'>Description:</span> Metal frame with base plate, suitable for storage systems and industrial structures. Manufactured from high-strength steel, it allows multiple height and depth configurations, adapting to different load and space requirements. Available in galvanized or painted finish, ensuring durability and anti-corrosion protection in industrial environments.",
+        "tabela": [
+          {
+            "codigo": "PTEC2040",
+            "altura_mm": 2000,
+            "profundidade_mm": 400,
+            "acabamento": "Galvanizado ou RAL 5005 / 7035",
+            "peso_kg": 8.55
+          },
+          {
+            "codigo": "PTEC2050",
+            "altura_mm": 2000,
+            "profundidade_mm": 500,
+            "acabamento": "Galvanizado ou RAL 5005 / 7035",
+            "peso_kg": 8.71
+          },
+          {
+            "codigo": "PTEC2060",
+            "altura_mm": 2000,
+            "profundidade_mm": 600,
+            "acabamento": "Galvanizado ou RAL 5005 / 7035",
+            "peso_kg": 8.82
+          },
+          {
+            "codigo": "PTEC2070",
+            "altura_mm": 2000,
+            "profundidade_mm": 700,
+            "acabamento": "Galvanizado ou RAL 5005 / 7035",
+            "peso_kg": 9.06
+          },
+          {
+            "codigo": "PTEC2080",
+            "altura_mm": 2000,
+            "profundidade_mm": 800,
+            "acabamento": "Galvanizado ou RAL 5005 / 7035",
+            "peso_kg": 9.24
+          },
+          {
+            "codigo": "PTEC2090",
+            "altura_mm": 2000,
+            "profundidade_mm": 900,
+            "acabamento": "Galvanizado ou RAL 5005 / 7035",
+            "peso_kg": 9.46
+          },
+          {
+            "codigo": "PTEC20100",
+            "altura_mm": 2000,
+            "profundidade_mm": 1000,
+            "acabamento": "Galvanizado ou RAL 5005 / 7035",
+            "peso_kg": 9.63
+          },
+          {
+            "codigo": "PTEC20110",
+            "altura_mm": 2000,
+            "profundidade_mm": 1100,
+            "acabamento": "Galvanizado ou RAL 5005 / 7035",
+            "peso_kg": 9.85
+          },
+          {
+            "codigo": "PTEC20120",
+            "altura_mm": 2000,
+            "profundidade_mm": 1200,
+            "acabamento": "Galvanizado ou RAL 5005 / 7035",
+            "peso_kg": 10.04
+          },
+          {
+            "codigo": "PTEC3040",
+            "altura_mm": 3000,
+            "profundidade_mm": 400,
+            "acabamento": "Galvanizado ou RAL 5005 / 7035",
+            "peso_kg": 11.4
+          },
+          {
+            "codigo": "PTEC3050",
+            "altura_mm": 3000,
+            "profundidade_mm": 500,
+            "acabamento": "Galvanizado ou RAL 5005 / 7035",
+            "peso_kg": 11.6
+          },
+          {
+            "codigo": "PTEC3060",
+            "altura_mm": 3000,
+            "profundidade_mm": 600,
+            "acabamento": "Galvanizado ou RAL 5005 / 7035",
+            "peso_kg": 11.8
+          },
+          {
+            "codigo": "PTEC3070",
+            "altura_mm": 3000,
+            "profundidade_mm": 700,
+            "acabamento": "Galvanizado ou RAL 5005 / 7035",
+            "peso_kg": 12.05
+          },
+          {
+            "codigo": "PTEC3080",
+            "altura_mm": 3000,
+            "profundidade_mm": 800,
+            "acabamento": "Galvanizado ou RAL 5005 / 7035",
+            "peso_kg": 12.3
+          },
+          {
+            "codigo": "PTEC3090",
+            "altura_mm": 3000,
+            "profundidade_mm": 900,
+            "acabamento": "Galvanizado ou RAL 5005 / 7035",
+            "peso_kg": 12.5
+          },
+          {
+            "codigo": "PTEC30100",
+            "altura_mm": 3000,
+            "profundidade_mm": 1000,
+            "acabamento": "Galvanizado ou RAL 5005 / 7035",
+            "peso_kg": 12.7
+          },
+          {
+            "codigo": "PTEC30110",
+            "altura_mm": 3000,
+            "profundidade_mm": 1100,
+            "acabamento": "Galvanizado ou RAL 5005 / 7035",
+            "peso_kg": 12.9
+          },
+          {
+            "codigo": "PTEC30120",
+            "altura_mm": 3000,
+            "profundidade_mm": 1200,
+            "acabamento": "Galvanizado ou RAL 5005 / 7035",
+            "peso_kg": 13.1
+          },
+          {
+            "codigo": "PTEC4040",
+            "altura_mm": 4000,
+            "profundidade_mm": 400,
+            "acabamento": "Galvanizado ou RAL 5005 / 7035",
+            "peso_kg": 14.3
+          },
+          {
+            "codigo": "PTEC4050",
+            "altura_mm": 4000,
+            "profundidade_mm": 500,
+            "acabamento": "Galvanizado ou RAL 5005 / 7035",
+            "peso_kg": 14.6
+          },
+          {
+            "codigo": "PTEC4060",
+            "altura_mm": 4000,
+            "profundidade_mm": 600,
+            "acabamento": "Galvanizado ou RAL 5005 / 7035",
+            "peso_kg": 14.8
+          },
+          {
+            "codigo": "PTEC4070",
+            "altura_mm": 4000,
+            "profundidade_mm": 700,
+            "acabamento": "Galvanizado ou RAL 5005 / 7035",
+            "peso_kg": 15.1
+          },
+          {
+            "codigo": "PTEC4080",
+            "altura_mm": 4000,
+            "profundidade_mm": 800,
+            "acabamento": "Galvanizado ou RAL 5005 / 7035",
+            "peso_kg": 15.4
+          },
+          {
+            "codigo": "PTEC4090",
+            "altura_mm": 4000,
+            "profundidade_mm": 900,
+            "acabamento": "Galvanizado ou RAL 5005 / 7035",
+            "peso_kg": 15.7
+          },
+          {
+            "codigo": "PTEC40100",
+            "altura_mm": 4000,
+            "profundidade_mm": 1000,
+            "acabamento": "Galvanizado ou RAL 5005 / 7035",
+            "peso_kg": 16.0
+          },
+          {
+            "codigo": "PTEC40110",
+            "altura_mm": 4000,
+            "profundidade_mm": 1100,
+            "acabamento": "Galvanizado ou RAL 5005 / 7035",
+            "peso_kg": 16.3
+          },
+          {
+            "codigo": "PTEC40120",
+            "altura_mm": 4000,
+            "profundidade_mm": 1200,
+            "acabamento": "Galvanizado ou RAL 5005 / 7035",
+            "peso_kg": 16.5
+          },
+          {
+            "codigo": "PTEC5040",
+            "altura_mm": 5000,
+            "profundidade_mm": 400,
+            "acabamento": "Galvanizado ou RAL 5005 / 7035",
+            "peso_kg": 16.9
+          },
+          {
+            "codigo": "PTEC5050",
+            "altura_mm": 5000,
+            "profundidade_mm": 500,
+            "acabamento": "Galvanizado ou RAL 5005 / 7035",
+            "peso_kg": 17.2
+          },
+          {
+            "codigo": "PTEC5060",
+            "altura_mm": 5000,
+            "profundidade_mm": 600,
+            "acabamento": "Galvanizado ou RAL 5005 / 7035",
+            "peso_kg": 17.5
+          },
+          {
+            "codigo": "PTEC5070",
+            "altura_mm": 5000,
+            "profundidade_mm": 700,
+            "acabamento": "Galvanizado ou RAL 5005 / 7035",
+            "peso_kg": 17.9
+          },
+          {
+            "codigo": "PTEC5080",
+            "altura_mm": 5000,
+            "profundidade_mm": 800,
+            "acabamento": "Galvanizado ou RAL 5005 / 7035",
+            "peso_kg": 18.2
+          },
+          {
+            "codigo": "PTEC5090",
+            "altura_mm": 5000,
+            "profundidade_mm": 900,
+            "acabamento": "Galvanizado ou RAL 5005 / 7035",
+            "peso_kg": 18.5
+          },
+          {
+            "codigo": "PTEC50100",
+            "altura_mm": 5000,
+            "profundidade_mm": 1000,
+            "acabamento": "Galvanizado ou RAL 5005 / 7035",
+            "peso_kg": 18.8
+          },
+          {
+            "codigo": "PTEC50110",
+            "altura_mm": 5000,
+            "profundidade_mm": 1100,
+            "acabamento": "Galvanizado ou RAL 5005 / 7035",
+            "peso_kg": 19.1
+          },
+          {
+            "codigo": "PTEC50120",
+            "altura_mm": 5000,
+            "profundidade_mm": 1200,
+            "acabamento": "Galvanizado ou RAL 5005 / 7035",
+            "peso_kg": 19.4
+          }
+        ]
       },
       {
         "id": "estante-carga-ligeira",
         "image": "/prateleira inteira.png",
-        "text": "Light Duty Shelving",
+        "text": "Light Load Shelving",
+        "width": 220,
+        "maxWidth": 450,
+        "height": 280,
         "images": [
           "/prateleira inteira.png",
-          "/racks.png",
-          "/cacifo.png"
+          "/produtos/2-prateleiras-ligeiras/i1.jpg",
+          "/produtos/2-prateleiras-ligeiras/i2.png",
+          "/produtos/2-prateleiras-ligeiras/i3.png",
+          "/produtos/2-prateleiras-ligeiras/i4.png"
         ],
-        "materialText": "Material:",
-        "material": "High strength steel with electrostatic powder coating finish.",
-        "medidasText": "Dimensions:",
-        "medidas": "Height: 2m to 8m | Width: 1m to 3m | Depth: 0.6m to 1.2m."
+        "tabela": [
+          {
+            "nome": "Shelf",
+            "comprimento_mm": 750,
+            "largura_mm": 300,
+            "peso_kg": 2
+          },
+          {
+            "nome": "Shelf",
+            "comprimento_mm": 750,
+            "largura_mm": 400,
+            "peso_kg": 2.5
+          },
+          {
+            "nome": "Shelf",
+            "comprimento_mm": 1000,
+            "largura_mm": 300,
+            "peso_kg": 2.4
+          },
+          {
+            "nome": "Shelf",
+            "comprimento_mm": 1000,
+            "largura_mm": 400,
+            "peso_kg": 3
+          },
+          {
+            "nome": "Shelf with 1 Reinforcement",
+            "comprimento_mm": 750,
+            "largura_mm": 400,
+            "peso_kg": 2.8
+          },
+          {
+            "nome": "Shelf with 1 Reinforcement",
+            "comprimento_mm": 750,
+            "largura_mm": 500,
+            "peso_kg": 3.6
+          },
+          {
+            "nome": "Shelf with 1 Reinforcement",
+            "comprimento_mm": 1000,
+            "largura_mm": 400,
+            "peso_kg": 3.5
+          },
+          {
+            "nome": "Shelf with 1 Reinforcement",
+            "comprimento_mm": 1000,
+            "largura_mm": 500,
+            "peso_kg": 5
+          },
+          {
+            "nome": "Shelf with 2 Reinforcements",
+            "comprimento_mm": 750,
+            "largura_mm": 600,
+            "peso_kg": 4.2
+          },
+          {
+            "nome": "Shelf with 2 Reinforcements",
+            "comprimento_mm": 1000,
+            "largura_mm": 600,
+            "peso_kg": 5.75
+          },
+          {
+            "nome": "Frame",
+            "comprimento_mm": 750,
+            "largura_mm": 300,
+            "peso_kg": 3
+          },
+          {
+            "nome": "Frame",
+            "comprimento_mm": 750,
+            "largura_mm": 400,
+            "peso_kg": 3.5
+          },
+          {
+            "nome": "Frame",
+            "comprimento_mm": 750,
+            "largura_mm": 500,
+            "peso_kg": 4
+          },
+          {
+            "nome": "Frame",
+            "comprimento_mm": 750,
+            "largura_mm": 600,
+            "peso_kg": 4.5
+          },
+          {
+            "nome": "Frame",
+            "comprimento_mm": 1000,
+            "largura_mm": 300,
+            "peso_kg": 3.5
+          },
+          {
+            "nome": "Frame",
+            "comprimento_mm": 1000,
+            "largura_mm": 400,
+            "peso_kg": 4
+          },
+          {
+            "nome": "Frame",
+            "comprimento_mm": 1000,
+            "largura_mm": 500,
+            "peso_kg": 4.5
+          },
+          {
+            "nome": "Frame",
+            "comprimento_mm": 1000,
+            "largura_mm": 600,
+            "peso_kg": 5
+          },
+          {
+            "nome": "Frame",
+            "comprimento_mm": 1500,
+            "largura_mm": 300,
+            "peso_kg": 5
+          },
+          {
+            "nome": "Frame",
+            "comprimento_mm": 1500,
+            "largura_mm": 400,
+            "peso_kg": 5.5
+          },
+          {
+            "nome": "Frame",
+            "comprimento_mm": 1500,
+            "largura_mm": 500,
+            "peso_kg": 6
+          },
+          {
+            "nome": "Frame",
+            "comprimento_mm": 1500,
+            "largura_mm": 600,
+            "peso_kg": 6.5
+          },
+          {
+            "nome": "Frame",
+            "comprimento_mm": 2000,
+            "largura_mm": 300,
+            "peso_kg": 6
+          },
+          {
+            "nome": "Frame",
+            "comprimento_mm": 2000,
+            "largura_mm": 400,
+            "peso_kg": 6.5
+          },
+          {
+            "nome": "Frame",
+            "comprimento_mm": 2000,
+            "largura_mm": 500,
+            "peso_kg": 7
+          },
+          {
+            "nome": "Frame",
+            "comprimento_mm": 2000,
+            "largura_mm": 600,
+            "peso_kg": 7.5
+          },
+          {
+            "nome": "Frame",
+            "comprimento_mm": 2500,
+            "largura_mm": 300,
+            "peso_kg": 6.5
+          },
+          {
+            "nome": "Frame",
+            "comprimento_mm": 2500,
+            "largura_mm": 400,
+            "peso_kg": 7
+          },
+          {
+            "nome": "Frame",
+            "comprimento_mm": 2500,
+            "largura_mm": 500,
+            "peso_kg": 7.5
+          },
+          {
+            "nome": "Frame",
+            "comprimento_mm": 2500,
+            "largura_mm": 600,
+            "peso_kg": 8
+          },
+          {
+            "nome": "Frame",
+            "comprimento_mm": 3000,
+            "largura_mm": 300,
+            "peso_kg": 8.5
+          },
+          {
+            "nome": "Frame",
+            "comprimento_mm": 3000,
+            "largura_mm": 400,
+            "peso_kg": 9
+          },
+          {
+            "nome": "Frame",
+            "comprimento_mm": 3000,
+            "largura_mm": 500,
+            "peso_kg": 9.5
+          },
+          {
+            "nome": "Frame",
+            "comprimento_mm": 3000,
+            "largura_mm": 600,
+            "peso_kg": 10
+          }
+        ],
+        "description": "<span class='label'>Material:</span> Galvanized or RAL 5005 / 7035<br/><span class='label'>Height:</span>  2000 to 5000 mm <br/><span class='label'>Depth:</span> 400 to 1200 mm. <br/><span class='label'>Description:</span> Boltless clip-in metal shelving is a practical and resistant solution for spaces that require efficient organization and high load capacity, such as warehouses, archives, or industrial areas. The modular system allows easy adjustment of shelf heights, adapting the structure to specific usage needs. Assembly is quick and secure, thanks to reinforced clips that ensure stability and prevent unwanted movement. Manufactured from robust steel, these shelves offer durability, flexibility, and an excellent response for different storage configurations, and can be sized to fit the available space."
+      },
+      {
+        "id": "porta-paletes-eletrico",
+        "image": "/produtos/5-porta-paletes-eletrico/i2.png",
+        "text": "Electric Pallet Truck",
+        "width": 230,
+        "height": 220,
+        "images": [
+          "/produtos/5-porta-paletes-eletrico/i1.png",
+          "/produtos/5-porta-paletes-eletrico/i2.png",
+          "/produtos/5-porta-paletes-eletrico/i3.png",
+          "/produtos/5-porta-paletes-eletrico/i4.png",
+          "/produtos/5-porta-paletes-eletrico/i5.png",
+          "/produtos/5-porta-paletes-eletrico/i6.png",
+          "/produtos/5-porta-paletes-eletrico/i7.png"
+        ],
+
+        "description": "<span class='label'>Capacity:</span> 1500 Kg<br/ ><span class='label'>Weight without battery:</span> 110 Kg<br/><span class='label'>Weight with battery:</span> 116 Kg<br/><span class='label'>Voltage:</span> 25.6 V<br/><span class='label'>Battery capacity:</span> 20 Ah <span class='label'>Description:</span> Our 1500 Kg electric pallet truck is ideal for fast and safe movement of loads in warehouses, logistics centers, or factories. Equipped with an electric motor and high-capacity battery, it allows precise maneuvering with minimal effort, increasing operational efficiency and reducing operator strain. The reinforced steel structure ensures robustness and durability, while the ergonomic design guarantees comfort and safety during the transportation of heavy loads. A reliable solution to optimize internal logistics and increase productivity."
+      },
+      {
+        "id": "porta-paletes-manual",
+        "image": "/produtos/6-porta-paletes-manual/i1.png",
+        "text": "Manual Pallet Truck",
+        "width": 150,
+        "height": 220,
+        "images": [
+          "/produtos/6-porta-paletes-manual/i1.png",
+          "/produtos/6-porta-paletes-manual/i2.png",
+          "/produtos/6-porta-paletes-manual/i3.png"
+        ],
+
+        "description": "<span class='label'>Capacity:</span> 3000 Kg<br/ ><span class='label'>Description:</span> Our high-capacity manual pallet truck solutions are ideal for moving and safely transporting heavy loads in warehouses, factories, or logistics centers. This model supports up to 3000 kg, ensuring robustness and reliability, with a reinforced structure made of resistant steel. Operation is practical and efficient, allowing precise maneuvering even in tight spaces. An essential piece of equipment to optimize internal logistics and increase productivity, while always maintaining operator and goods safety."
       },
       {
         "id": "cacifos-metalicos",
         "image": "/cacifo.png",
         "text": "Metal Lockers",
-        "images": [
-          "/cacifo.png",
-          "/racks.png",
-          "/prateleira inteira.png"
-        ],
-        "materialText": "Material:",
-        "material": "High strength steel with electrostatic powder coating finish.",
-        "medidasText": "Dimensions:",
-        "medidas": "Height: 2m to 8m | Width: 1m to 3m | Depth: 0.6m to 1.2m."
+        "width": 200,
+        "height": 200,
+        "images": ["/cacifo.png", "/racks.png", "/prateleira inteira.png"],
+        "description": "<span class='label'>Material:</span> High-strength steel with electrostatic paint finish.<br/><span class='label'>Dimensions:</span> Height: 2 m to 8 m | Width: 1 m to 3 m | Depth: 0.6 m to 1.2 m."
       },
       {
-        "id": "empilhadores",
-        "image": "/empilhador.png",
-        "text": "Manual and Electric Stackers",
+        "id": "arrumacao-vertical",
+        "image": "/produtos/7-Arrumação Vertical (Vertical Storage)/i1.png",
+        "text": "Vertical Storage",
+        "width": 250,
+        "height": 200,
         "images": [
-          "/racks.png",
-          "/prateleira inteira.png",
-          "/cacifo.png"
+          "/produtos/7-Arrumação Vertical (Vertical Storage)/i1.jpg",
+          "/produtos/7-Arrumação Vertical (Vertical Storage)/i2.jpg",
+          "/produtos/7-Arrumação Vertical (Vertical Storage)/i3.jpg",
+          "/produtos/7-Arrumação Vertical (Vertical Storage)/i4.jpg",
+          "/produtos/7-Arrumação Vertical (Vertical Storage)/i5.jpg",
+          "/produtos/7-Arrumação Vertical (Vertical Storage)/i6.jpg",
+          "/produtos/7-Arrumação Vertical (Vertical Storage)/i7.jpg",
+          "/produtos/7-Arrumação Vertical (Vertical Storage)/i8.jpg",
+          "/produtos/7-Arrumação Vertical (Vertical Storage)/i9.jpg",
+          "/produtos/7-Arrumação Vertical (Vertical Storage)/i10.jpg"
         ],
-        "materialText": "Material:",
-        "material": "High strength steel with electrostatic powder coating finish.",
-        "medidasText": "Dimensions:",
-        "medidas": "Height: 2m to 8m | Width: 1m to 3m | Depth: 0.6m to 1.2m."
+
+        "description": "<span class='label'>Material:</span> RAL 5005 / 7035<br/><span class='label'>Height:</span>  2400 mm <br/><span class='label'>Width:</span> 1500 to 1750 mm <br/><span class='label'>Description:</span> PORTECO shelving for vertical storage, composed of a starting module and continuation modules. <br/>Z beams at ground level and at the top to ensure structure stability. <br/>2 beams in 50x30 tube, applied to the back of the shelving, where the separation arms are supported and slide. Includes 4 separation arms per module. <br/>Each module features a 22mm OSB base."
+      },
+      {
+        "id": "cantilever-medio-simples",
+        "image": "/produtos/8-Cantilever Médio (Medium Cantilever)/i1.png",
+        "text": "Medium Cantilever - Single Sided Access",
+        "width": 250,
+        "maxWidth": 430,
+        "height": 200,
+        "images": [
+          "/produtos/8-Cantilever Médio (Medium Cantilever)/i1.jpg",
+          "/produtos/8-Cantilever Médio (Medium Cantilever)/i2.jpg",
+          "/produtos/8-Cantilever Médio (Medium Cantilever)/i3.jpg",
+          "/produtos/8-Cantilever Médio (Medium Cantilever)/i4.jpg",
+          "/produtos/8-Cantilever Médio (Medium Cantilever)/i5.jpg",
+          "/produtos/8-Cantilever Médio (Medium Cantilever)/i6.jpg",
+          "/produtos/8-Cantilever Médio (Medium Cantilever)/i7.jpg",
+          "/produtos/8-Cantilever Médio (Medium Cantilever)/i8.jpg",
+          "/produtos/8-Cantilever Médio (Medium Cantilever)/i9.jpg",
+          "/produtos/8-Cantilever Médio (Medium Cantilever)/i10.jpg",
+          "/produtos/8-Cantilever Médio (Medium Cantilever)/i11.jpg"
+        ],
+        "description": "<span class='label'>Description:</span> Medium load cantilever with single-sided access, suitable for horizontal storage of pipes, profiles, and other heavy objects. Evolutionary system composed of columns placed side by side at maximum intervals of 1000mm. Columns and feet in blue RAL 5005, arms and locking parts in gray RAL 7035. Has 4 levels (base + 3 levels) with possibility of extension to 5 levels. Mandatory floor fixing.",
+        "tabela": [
+          {
+            "altura_mm": 2400,
+            "largura_mm": 800,
+            "bracos_mm": 400,
+            "peso_kg": 275,
+            "codigo": "CASF0840"
+          },
+          {
+            "altura_mm": 2400,
+            "largura_mm": 800,
+            "bracos_mm": 500,
+            "peso_kg": 250,
+            "codigo": "CASF0850"
+          },
+          {
+            "altura_mm": 2400,
+            "largura_mm": 800,
+            "bracos_mm": 600,
+            "peso_kg": 225,
+            "codigo": "CASF0860"
+          },
+          {
+            "altura_mm": 2400,
+            "largura_mm": 1000,
+            "bracos_mm": 400,
+            "peso_kg": 250,
+            "codigo": "CASF1040"
+          },
+          {
+            "altura_mm": 2400,
+            "largura_mm": 1000,
+            "bracos_mm": 500,
+            "peso_kg": 225,
+            "codigo": "CASF1050"
+          },
+          {
+            "altura_mm": 2400,
+            "largura_mm": 1000,
+            "bracos_mm": 600,
+            "peso_kg": 200,
+            "codigo": "CASF1060"
+          }
+        ]
+      },
+      {
+        "id": "porteco-z60",
+        "image": "/produtos/9-Porteco Z60/i1.png",
+        "width": 190,
+        "text": "Porteco Z60",
+        "images": [
+          "/produtos/9-Porteco Z60/i1.png",
+          "/produtos/9-Porteco Z60/i2.jpg",
+          "/produtos/9-Porteco Z60/i3.jpg",
+          "/produtos/9-Porteco Z60/i4.jpg",
+          "/produtos/9-Porteco Z60/i5.jpg",
+          "/produtos/9-Porteco Z60/i6.jpg",
+          "/produtos/9-Porteco Z60/i7.jpg",
+          "/produtos/9-Porteco Z60/i8.jpg",
+          "/produtos/9-Porteco Z60/i9.jpg",
+          "/produtos/9-Porteco Z60/i10.jpg",
+          "/produtos/9-Porteco Z60/i12.jpg",
+          "/produtos/9-Porteco Z60/i13.jpg",
+          "/produtos/9-Porteco Z60/i14.jpg",
+          "/produtos/9-Porteco Z60/i15.jpg",
+          "/produtos/9-Porteco Z60/i16.jpg",
+          "/produtos/9-Porteco Z60/i17.jpg"
+        ],
+
+        "description": "<span class='label'>Frames:</span> The frames are composed of two omega-shaped pillars with a 50x50mm section, with frontal holes spaced 50mm apart. The connection between pillars is ensured by beams and diagonals bolted into the side holes of the pillar. Ground support is guaranteed through a bolted metal base plate. The base plate has holes to allow floor fixing using HST type metal anchors.<br/ ><span class='label'>Beams:</span> The beams of the PORTECO system are Z-shaped, with a recess to allow the application of 19mm thick particle board or metal panels. At the end of each beam, a connector with 3 claws is welded, allowing easy and quick clipping into the frontal holes of the pillar. The connector has dedicated holes for applying a safety brake, which functions as a mechanical fuse. We have two types of beams: Z60 or Z100, which can be used depending on the load to be stored. <br/ ><span class='label'>Shelves:</span> The PORTECO system can use two types of shelves: 19mm thick particle board or modular metal panels, with a galvanized finish.",
+        "tabela": [
+          {
+            "altura_mm": 2000,
+            "profundidade_mm": 400,
+            "modulo_inicial_mm": 1550,
+            "modulo_seguinte_mm": 1500,
+            "modulo_seguinte_2_mm": 1500,
+            "comprimento_util_mm": 1450
+          },
+          {
+            "altura_mm": 2500,
+            "profundidade_mm": 500,
+            "modulo_inicial_mm": 1800,
+            "modulo_seguinte_mm": 1750,
+            "modulo_seguinte_2_mm": 1750,
+            "comprimento_util_mm": 1700
+          },
+          {
+            "altura_mm": 3000,
+            "profundidade_mm": 600,
+            "modulo_inicial_mm": 2050,
+            "modulo_seguinte_mm": 2000,
+            "modulo_seguinte_2_mm": 2000,
+            "comprimento_util_mm": 1950
+          },
+          {
+            "altura_mm": 3500,
+            "profundidade_mm": 800,
+            "modulo_inicial_mm": 2300,
+            "modulo_seguinte_mm": 2250,
+            "modulo_seguinte_2_mm": 2250,
+            "comprimento_util_mm": 2200
+          },
+          {
+            "altura_mm": 4000,
+            "profundidade_mm": 1000,
+            "modulo_inicial_mm": null,
+            "modulo_seguinte_mm": null,
+            "modulo_seguinte_2_mm": null,
+            "comprimento_util_mm": null
+          },
+          {
+            "altura_mm": 4500,
+            "profundidade_mm": 1200,
+            "modulo_inicial_mm": null,
+            "modulo_seguinte_mm": null,
+            "modulo_seguinte_2_mm": null,
+            "comprimento_util_mm": null
+          },
+          {
+            "altura_mm": 5000,
+            "profundidade_mm": null,
+            "modulo_inicial_mm": null,
+            "modulo_seguinte_mm": null,
+            "modulo_seguinte_2_mm": null,
+            "comprimento_util_mm": null
+          }
+        ]
+      },
+      {
+        "id": "cantilever-ligeiro",
+        "image": "/produtos/13-Cantilever Ligeiro (Light Cantilever)/i10.png",
+        "width": 330,
+        "text": "Light Cantilever Single and Double",
+        "images": [
+          "/produtos/13-Cantilever Ligeiro (Light Cantilever)/i1.jpg",
+          "/produtos/13-Cantilever Ligeiro (Light Cantilever)/i2.jpg",
+          "/produtos/13-Cantilever Ligeiro (Light Cantilever)/i3.jpg",
+          "/produtos/13-Cantilever Ligeiro (Light Cantilever)/i4.jpg",
+          "/produtos/13-Cantilever Ligeiro (Light Cantilever)/i5.jpg",
+          "/produtos/13-Cantilever Ligeiro (Light Cantilever)/i6.jpg",
+          "/produtos/13-Cantilever Ligeiro (Light Cantilever)/i7.jpg",
+          "/produtos/13-Cantilever Ligeiro (Light Cantilever)/i8.jpg",
+          "/produtos/13-Cantilever Ligeiro (Light Cantilever)/i9.jpg",
+          "/produtos/13-Cantilever Ligeiro (Light Cantilever)/i10.jpg",
+          "/produtos/13-Cantilever Ligeiro (Light Cantilever)/i11.jpg"
+        ],
+
+        "description": "<span class='label'>Load per arm:</span> up to 40Kg uniformly distributed (80Kg per pair of arms).<br/ ><span class='label'>Description:</span> Light cantilever, for manual loading, single-sided type (access from one side only). Base bolted to the cantilever column, with holes to allow floor fixing. Arm height adjustment in 50mm increments. The arms feature anti-drop tops. Load per arm: up to 40Kg uniformly distributed (80Kg per pair of arms). Pillars and base with epoxy paint finish in blue, RAL 5005, arms in light gray, RAL 7035, beams and diagonals galvanized. Includes floor fixing. Dimensions: 800x400x2000mm (WxDxH) or 800x500x2000mm (WxDxH).",
+        "tabela": [
+          {
+            "nome": "PORTECO LIGHT CANTILEVER SINGLE",
+            "medidas_mm": "Light cantilever single base + 3 levels 800x400x2000",
+            "acabamento": "Pillars/Base: blue RAL 5005; Arms: gray RAL 7035; Beams/Diagonals: galvanized",
+            "peso_kg": 36.35
+          },
+          {
+            "nome": "PORTECO LIGHT CANTILEVER SINGLE",
+            "medidas_mm": "Light cantilever single base + 3 levels 800x500x2000",
+            "acabamento": "Pillars/Base: blue RAL 5005; Arms: gray RAL 7035; Beams/Diagonals: galvanized",
+            "peso_kg": 38.4
+          },
+          {
+            "nome": "PORTECO LIGHT CANTILEVER SINGLE",
+            "medidas_mm": "Additional 400mm arm",
+            "acabamento": "Arm: gray RAL 7035",
+            "peso_kg": 1.35
+          },
+          {
+            "nome": "PORTECO LIGHT CANTILEVER SINGLE",
+            "medidas_mm": "Additional 500mm arm",
+            "acabamento": "Arm: gray RAL 7035",
+            "peso_kg": 1.69
+          },
+          {
+            "nome": "PORTECO LIGHT CANTILEVER DOUBLE",
+            "medidas_mm": "800x400x2000",
+            "acabamento": "Pillars/Base: blue RAL 5005; Arms: gray RAL 7035; Beams/Diagonals: galvanized",
+            "peso_kg": 51.95
+          },
+          {
+            "nome": "PORTECO LIGHT CANTILEVER DOUBLE",
+            "medidas_mm": "800x500x2000",
+            "acabamento": "Pillars/Base: blue RAL 5005; Arms: gray RAL 7035; Beams/Diagonals: galvanized",
+            "peso_kg": 56.05
+          },
+          {
+            "nome": "PORTECO LIGHT CANTILEVER DOUBLE",
+            "medidas_mm": "Additional 400mm arm",
+            "acabamento": "Arm: gray RAL 7035",
+            "peso_kg": 1.35
+          },
+          {
+            "nome": "PORTECO LIGHT CANTILEVER DOUBLE",
+            "medidas_mm": "Additional 500mm arm",
+            "acabamento": "Arm: gray RAL 7035",
+            "peso_kg": 1.69
+          }
+        ]
+      },
+      {
+        "id": "porteco-z100",
+        "image": "/produtos/10-Porteco Z100/i1.png",
+        "text": "Porteco Z100",
+        "width": 250,
+        "images": [
+          "/produtos/10-Porteco Z100/i1.jpg",
+          "/produtos/10-Porteco Z100/i2.jpg",
+          "/produtos/10-Porteco Z100/i3.jpg",
+          "/produtos/10-Porteco Z100/i4.jpg",
+          "/produtos/10-Porteco Z100/i5.jpg",
+          "/produtos/10-Porteco Z100/i6.jpg"
+        ],
+
+        "description": "<span class='label'>Capacity:</span> Up to 850Kg per level.<br/ ><span class='label'>Description:</span> Medium load storage system, very versatile and resistant. It is the ideal solution for storing heavy and bulky goods, which are moved manually. Available in two versions: Z100 and Z60",
+        "tabela": [
+          {
+            "codigo": "PTLZ1000-100",
+            "comprimento_mm": "Z100 Beam with 1000mm (LxD) 3-claw connector",
+            "acabamento": "RAL 7035",
+            "peso_kg": 1.62
+          },
+          {
+            "codigo": "PTLZ1250-100",
+            "comprimento_mm": "Z100 Beam with 1250mm (LxD) 3-claw connector",
+            "acabamento": "RAL 7035",
+            "peso_kg": 1.94
+          },
+          {
+            "codigo": "PTLZ1500-100",
+            "comprimento_mm": "Z100 Beam with 1500mm (LxD) 3-claw connector",
+            "acabamento": "RAL 7035",
+            "peso_kg": 2.26
+          },
+          {
+            "codigo": "PTLZ1750-100",
+            "comprimento_mm": "Z100 Beam with 1750mm (LxD) 3-claw connector",
+            "acabamento": "RAL 7035",
+            "peso_kg": 2.58
+          },
+          {
+            "codigo": "PTLZ2000-100",
+            "comprimento_mm": "Z100 Beam with 2000mm (LxD) 3-claw connector",
+            "acabamento": "RAL 7035",
+            "peso_kg": 2.9
+          },
+          {
+            "codigo": "PTLZ2250-100",
+            "comprimento_mm": "Z100 Beam with 2250mm (LxD) 3-claw connector",
+            "acabamento": "RAL 7035",
+            "peso_kg": 3.22
+          },
+          {
+            "codigo": "PTLZ2500-100",
+            "comprimento_mm": "Z100 Beam with 2500mm (LxD) 3-claw connector",
+            "acabamento": "RAL 7035",
+            "peso_kg": 3.54
+          },
+          {
+            "codigo": "PTLZ2750-100",
+            "comprimento_mm": "Z100 Beam with 2750mm (LxD) 3-claw connector",
+            "acabamento": "RAL 7035",
+            "peso_kg": 4.14
+          }
+        ]
+      },
+      {
+        "id": "rangeco-pneus",
+        "image": "/produtos/11-Rangeco Pneus (Rangeco Tires)/i2.png",
+        "width": 220,
+        "text": "Rangeco Tires",
+        "images": [
+          "/produtos/11-Rangeco Pneus (Rangeco Tires)/i2.jpg",
+          "/produtos/11-Rangeco Pneus (Rangeco Tires)/i1.jpg",
+          "/produtos/11-Rangeco Pneus (Rangeco Tires)/i3.jpg",
+          "/produtos/11-Rangeco Pneus (Rangeco Tires)/i4.jpg",
+          "/produtos/11-Rangeco Pneus (Rangeco Tires)/i5.jpg",
+          "/produtos/11-Rangeco Pneus (Rangeco Tires)/i6.jpg"
+        ],
+        "tabela": [
+          {
+            "codigo": "PND2010",
+            "medidas_mm": "1000x500x2000",
+            "acabamento": "Pillars: blue 5005; Beams: gray 7035",
+            "peso_kg": 18.2
+          },
+          {
+            "codigo": "PNS2010",
+            "medidas_mm": "1000x500x2000",
+            "acabamento": "Pillars: blue 5005; Beams: gray 7035",
+            "peso_kg": 12.1
+          },
+          {
+            "codigo": "PND2012",
+            "medidas_mm": "1250x500x2000",
+            "acabamento": "Pillars: blue 5005; Beams: gray 7035",
+            "peso_kg": 19.4
+          },
+          {
+            "codigo": "PNS2012",
+            "medidas_mm": "1250x500x2000",
+            "acabamento": "Pillars: blue 5005; Beams: gray 7035",
+            "peso_kg": 13.3
+          },
+          {
+            "codigo": "PND2015",
+            "medidas_mm": "1500x500x2000",
+            "acabamento": "Pillars: blue 5005; Beams: gray 7035",
+            "peso_kg": 22.5
+          },
+          {
+            "codigo": "PNS2015",
+            "medidas_mm": "1500x500x2000",
+            "acabamento": "Pillars: blue 5005; Beams: gray 7035",
+            "peso_kg": 15.2
+          },
+          {
+            "codigo": "PND2510",
+            "medidas_mm": "1000x500x2400",
+            "acabamento": "Pillars: blue 5005; Beams: gray 7035",
+            "peso_kg": 22.5
+          },
+          {
+            "codigo": "PNS2510",
+            "medidas_mm": "1000x500x2400",
+            "acabamento": "Pillars: blue 5005; Beams: gray 7035",
+            "peso_kg": 15.25
+          },
+          {
+            "codigo": "PND2512",
+            "medidas_mm": "1250x500x2400",
+            "acabamento": "Pillars: blue 5005; Beams: gray 7035",
+            "peso_kg": 24.1
+          },
+          {
+            "codigo": "PNS2512",
+            "medidas_mm": "1250x500x2400",
+            "acabamento": "Pillars: blue 5005; Beams: gray 7035",
+            "peso_kg": 16.85
+          },
+          {
+            "codigo": "PND2515",
+            "medidas_mm": "1500x500x2400",
+            "acabamento": "Pillars: blue 5005; Beams: gray 7035",
+            "peso_kg": 26.65
+          },
+          {
+            "codigo": "PNS2515",
+            "medidas_mm": "1500x500x2400",
+            "acabamento": "Pillars: blue 5005; Beams: gray 7035",
+            "peso_kg": 19.4
+          }
+        ],
+
+        "description": "<span class='label'>Description:</span> Rang'Eco Tires shelving kits, which include: frames (beams and diagonals welded), and main beams in oval tube. There are two types of Kits: Starting module (individual) and following module, which connects to the starting module, sharing one of the frames. They can have 3 levels (frame with 2000mm height) or 4 levels (frame with 2400mm height) per module. Level height adjustment is done in 50mm increments. Considers one reinforcement beam per level."
+      },
+      {
+        "id": "rangeco-plus",
+        "image": "/produtos/12-Rangeco Plus/i1.png",
+        "width": 155,
+        "text": "Rangeco Plus",
+        "images": [
+          "/produtos/12-Rangeco Plus/i1.jpg",
+          "/produtos/12-Rangeco Plus/i2.jpg",
+          "/produtos/12-Rangeco Plus/i3.jpg",
+          "/produtos/12-Rangeco Plus/i4.jpg",
+          "/produtos/12-Rangeco Plus/i5.jpg",
+          "/produtos/12-Rangeco Plus/i6.jpg",
+          "/produtos/12-Rangeco Plus/i7.jpg",
+          "/produtos/12-Rangeco Plus/i8.jpg",
+          "/produtos/12-Rangeco Plus/i9.jpg",
+          "/produtos/12-Rangeco Plus/i10.jpg",
+          "/produtos/12-Rangeco Plus/i11.jpg",
+          "/produtos/12-Rangeco Plus/i2.jpg",
+          "/produtos/12-Rangeco Plus/i13.jpg",
+          "/produtos/12-Rangeco Plus/i14.jpg",
+          "/produtos/12-Rangeco Plus/i15.jpg",
+          "/produtos/12-Rangeco Plus/i16.jpg"
+        ],
+
+        "description": "<span class='label'>Max weight per level:</span> Up to 303kg <br/ ><span class='label'>Max number of levels:</span> Up to 7 levels <br/ ><span class='label'>Number of available depths:</span> Up to 6 different depths <br/ ><span class='label'>Number of available lengths:</span> Up to 4 different lengths MAX HEIGHT: Up to 3 meters </span> <br/ > <span class='label'> Description:</span> Rang'Eco Plus is a robust solution for loads up to 303 kgs per level. It offers greater capacity and durability, ideal for warehouses, workshops, and facilities that need a reliable structure."
+      },
+      {
+        "id": "bancadas",
+        "image": "/produtos/14-Bancadas (Workbench)/i2.png",
+        "text": "Workbenches",
+        "width": 350,
+        "images": [
+          "/produtos/14-Bancadas (Workbench)/i2.jpg",
+          "/produtos/14-Bancadas (Workbench)/i1.jpg",
+          "/produtos/14-Bancadas (Workbench)/i3.jpg",
+          "/produtos/14-Bancadas (Workbench)/i4.jpg",
+          "/produtos/14-Bancadas (Workbench)/i5.jpg"
+        ],
+
+        "description": "<span class='label'>Description:</span> Multipurpose workbench, built with PORTECO frames, with metal legs and Z beams. Top in white melamine 22mm thick with a perimeter edge. Possibility of having a lower shelf. Length: 1200, 1600 and 2000mm. Depth: 800mm. Standard colors: blue RAL 5005 (legs) and gray RAL 7035 (beams). It is possible to have it entirely in blue or gray.",
+        "tabela": [
+          {
+            "nome": "Workbench without shelf",
+            "medidas_mm": "1200x800x820",
+            "acabamento": "RAL 5005 / 7035",
+            "peso_kg": 27.0
+          },
+          {
+            "nome": "Workbench without shelf",
+            "medidas_mm": "1200x800x920",
+            "acabamento": "RAL 5005 / 7035",
+            "peso_kg": 27.7
+          },
+          {
+            "nome": "Workbench without shelf",
+            "medidas_mm": "1200x800x1020",
+            "acabamento": "RAL 5005 / 7035",
+            "peso_kg": 28.4
+          },
+          {
+            "nome": "Workbench without shelf",
+            "medidas_mm": "1600x800x820",
+            "acabamento": "RAL 5005 / 7035",
+            "peso_kg": 33.0
+          },
+          {
+            "nome": "Workbench without shelf",
+            "medidas_mm": "1600x800x920",
+            "acabamento": "RAL 5005 / 7035",
+            "peso_kg": 33.7
+          },
+          {
+            "nome": "Workbench without shelf",
+            "medidas_mm": "1600x800x1020",
+            "acabamento": "RAL 5005 / 7035",
+            "peso_kg": 34.4
+          },
+          {
+            "nome": "Workbench without shelf",
+            "medidas_mm": "2000x800x820",
+            "acabamento": "RAL 5005 / 7035",
+            "peso_kg": 42.0
+          },
+          {
+            "nome": "Workbench without shelf",
+            "medidas_mm": "2000x800x920",
+            "acabamento": "RAL 5005 / 7035",
+            "peso_kg": 42.7
+          },
+          {
+            "nome": "Workbench without shelf",
+            "medidas_mm": "2000x800x1020",
+            "acabamento": "RAL 5005 / 7035",
+            "peso_kg": 43.4
+          },
+          {
+            "nome": "Workbench with shelf",
+            "medidas_mm": "1200x800x820",
+            "acabamento": "RAL 5005 / 7035",
+            "peso_kg": 37.0
+          },
+          {
+            "nome": "Workbench with shelf",
+            "medidas_mm": "1200x800x920",
+            "acabamento": "RAL 5005 / 7035",
+            "peso_kg": 37.7
+          },
+          {
+            "nome": "Workbench with shelf",
+            "medidas_mm": "1200x800x1020",
+            "acabamento": "RAL 5005 / 7035",
+            "peso_kg": 38.4
+          },
+          {
+            "nome": "Workbench with shelf",
+            "medidas_mm": "1600x800x820",
+            "acabamento": "RAL 5005 / 7035",
+            "peso_kg": 46.0
+          },
+          {
+            "nome": "Workbench with shelf",
+            "medidas_mm": "1600x800x920",
+            "acabamento": "RAL 5005 / 7035",
+            "peso_kg": 46.7
+          },
+          {
+            "nome": "Workbench with shelf",
+            "medidas_mm": "1600x800x1020",
+            "acabamento": "RAL 5005 / 7035",
+            "peso_kg": 47.4
+          },
+          {
+            "nome": "Workbench with shelf",
+            "medidas_mm": "2000x800x820",
+            "acabamento": "RAL 5005 / 7035",
+            "peso_kg": 61.0
+          },
+          {
+            "nome": "Workbench with shelf",
+            "medidas_mm": "2000x800x920",
+            "acabamento": "RAL 5005 / 7035",
+            "peso_kg": 61.7
+          },
+          {
+            "nome": "Workbench with shelf",
+            "medidas_mm": "2000x800x1020",
+            "acabamento": "RAL 5005 / 7035",
+            "peso_kg": 62.4
+          }
+        ]
+      },
+
+      {
+        "id": "kits-rangeco",
+        "image": "/produtos/17-Kits Rangeco (Rangeco Kits)/i1.png",
+        "width": 350,
+        "text": "Rangeco Kits",
+        "images": [
+          "/produtos/17-Kits Rangeco (Rangeco Kits)/i1.jpg",
+          "/produtos/17-Kits Rangeco (Rangeco Kits)/i2.jpg",
+          "/produtos/17-Kits Rangeco (Rangeco Kits)/i3.jpg"
+        ],
+
+        "description": "<span class='label'>Description:</span> Rang'Eco shelving kits, which include pillars, feet, shelf structure, which we consider as integral: the two main beams, two cross beams and reinforcement tube(s) (300 and 400mm - 1 tube, 500 and 600mm - 2 tubes, 800mm - 3 tubes). There are two types of Kits: Starting module (individual) and following module, which connects to the starting module, sharing two of the pillars. To complete the Kits you must select the type of covering to place on the shelf structure, considering two options: platex or metal sheet. Individual packaging in thermo-retractable plastic film."
       }
     ]
   },
   "orcamento": {
     "title": "Request Your 100% Free Quote Now",
     "nome": "Name | Company",
-    "phone": "Mobile Phone",
+    "phone": "Mobile",
     "mail": "Email",
     "body": "Message Text",
-    "anexo": "Attach",
+    "anexo": "Attach File",
     "submit": "Send",
     "send": "Sending Quote",
     "success": "Quote Sent Successfully!",
-    "return": "Return to homepage"
+    "return": "Back to home page"
   },
   "sobreNos": {
     "title": "ABOUT VASTO IMPÉRIO LDA.",
     "p1t": "Over 20 years of experience in storage solutions",
-    "p1": "Vasto Império Lda. has been operating for over 20 years in the sector of shelving, racks, light duty shelving, manual and electric stackers, pallet trucks and other storage equipment. Over the years, we have earned the trust of numerous clients in Portugal by providing quality products and professional services.",
+    "p1": "Vasto Império Lda. has been operating for over 20 years in the shelving, racks, light shelving, manual and electric stackers, pallet trucks, and other storage equipment sector. Over these years, we have earned the trust of numerous clients in Portugal, offering quality products and professional services.",
     "p2t": "Presence in Benedita and Viseu",
-    "p2": "Headquartered in Benedita, Vasto Império Lda. has recently expanded its activity to Viseu, strengthening proximity to our clients and responsiveness to market needs.",
+    "p2": "Based in Benedita, Vasto Império Lda. recently expanded its activity to Viseu, strengthening proximity with our clients and the ability to respond to market needs.",
     "vinte": "20",
     "anos": "YEARS",
-    "p3t": "Complete and personalised service",
-    "p3": "In addition to equipment sales, we offer assembly and delivery services, ensuring complete solutions tailored to each storage project. Our commitment is to provide safe, durable and efficient products, with maximum attention to customer satisfaction.",
+    "p3t": "Complete and personalized service",
+    "p3": "In addition to equipment sales, we offer assembly and delivery services, ensuring complete solutions tailored to each storage project. Our commitment is to provide safe, long-lasting, and efficient products, with maximum attention to customer satisfaction.",
     "p4t": "Commitment to quality and trust",
-    "p4": "Our accumulated experience and constant updating with the latest trends and technologies allow us to offer innovative and competitive solutions. Vasto Império Lda. is the right choice for companies, independent professionals and individuals looking for quality, reliability and specialised service."
+    "p4": "Our accumulated experience and constant updating with the latest trends and technologies allow us to offer innovative and competitive solutions. Vasto Império Lda. is the right choice for companies, independent professionals, and individuals looking for quality, reliability, and specialized service."
   }
 }

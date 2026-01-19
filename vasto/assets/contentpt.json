@@ -30,7 +30,7 @@
     "tools": "/tools.png",
     "text": [
       {
-        "title": "Racks e Prateleiras em <span class='bg-clip-text text-transparent bg-gradient-to-r from-[var(--blue)] to-[var(--orange)]'>Viseu e Benedita</span>",
+        "title": "Racks e Prateleiras em <span class='bg-clip-text text-transparent bg-gradient-to-r from-[var(--blue)] to-[var(--orange)]'>Benedita e Viseu</span>",
         "subTitle": "Soluções locais para organização e armazenamento de alta qualidade.",
         "button": "Ver Produtos",
         "url": "/produtos"
@@ -38,16 +38,16 @@
     ]
   },
   "homeInfoCards": {
-    "title": "Racks, Prateleiras e Soluções de Arrumação em Viseu e Benedita",
+    "title": "Racks, Prateleiras e Soluções de Arrumação em Benedita e Viseu",
     "text": [
       {
         "icon": "TbTruckDelivery",
         "title": "Entregas Rápidas",
-        "subTitle": "Stock permanente disponível para envio rápido em Viseu, Benedita e em todo o país."
+        "subTitle": "Stock permanente disponível para envio rápido em Benedita, Viseu e em todo o país."
       },
       {
         "icon": "FaMapMarkedAlt",
-        "title": "Centros em Viseu e Benedita",
+        "title": "Centros em Benedita e Viseu",
         "subTitle": "Armazéns locais para melhor suporte e disponibilidade dos nossos produtos."
       },
       {
@@ -58,7 +58,7 @@
       {
         "icon": "FaRankingStar",
         "title": "Qualidade e Fiabilidade",
-        "subTitle": "Produtos robustos e duradouros, ideais para empresas em Viseu, Benedita e arredores."
+        "subTitle": "Produtos robustos e duradouros, ideais para empresas em Benedita, Viseu e arredores."
       }
     ]
   },
@@ -74,9 +74,9 @@
         "image2": "/montagemrack.png"
       },
       {
-        "pageTitle": "Descubra os Nossos Produtos em Viseu e Benedita",
+        "pageTitle": "Descubra os Nossos Produtos em Benedita e Viseu",
         "title": "Racks, Prateleiras, Cacifos e Mais",
-        "subTitle": "Explore a nossa gama completa de soluções de arrumação, incluindo empilhadores manuais e elétricos, disponíveis para entrega rápida nas regiões de Viseu e Benedita.",
+        "subTitle": "Explore a nossa gama completa de soluções de arrumação, incluindo empilhadores manuais e elétricos, disponíveis para entrega rápida nas regiões de Benedita e Viseu.",
         "button": "Ver Produtos",
         "url": "/produtos",
         "image": "/prateleiras.png"
@@ -84,7 +84,7 @@
     ]
   },
   "homeContacts": {
-    "title": "Contacte a Vasto Império em Viseu e Benedita",
+    "title": "Contacte a Vasto Império em Benedita e Viseu",
     "subTitle": "Soluções com orçamento 100% Gratuito",
     "button": "Pedir",
     "url": "/orcamento",
@@ -109,63 +109,1104 @@
   "productsShowcase": {
     "produtoNe": "Produto não encontrado",
     "caracteristicas": "Caracteristicas",
-    "title": "Contacte a Vasto Império em Viseu e Benedita",
+    "title": "Contacte a Vasto Império em Benedita e Viseu",
     "products": [
       {
         "id": "racks-industriais",
-        "image": "/racks.png",
+        "image": "/recorte_DSC4798-1_c_laranja.png",
         "text": "Racks Industriais para Paletes",
+        "width": 240,
+        "height": 240,
         "images": [
-          "/racks.png",
-          "/prateleira inteira.png",
-          "/cacifo.png"
+          "/produtos/1-Paleco/i1.jpg",
+          "/produtos/1-Paleco/i2.jpg",
+          "/produtos/1-Paleco/i3.jpg",
+          "/produtos/1-Paleco/i4.jpg",
+          "/produtos/1-Paleco/i5.jpg",
+          "/produtos/1-Paleco/i6.jpg",
+          "/produtos/1-Paleco/i7.jpg"
         ],
-        "materialText": "Material:",
-        "material": "Aço de alta resistência com acabamento em pintura eletrostática.",
-        "medidasText": "Medidas:",
-        "medidas": "Altura: 2m a 8m | Largura: 1m a 3m | Profundidade: 0,6m a 1,2m." 
+        "description": "<span class='label'>Material:</span> Galvanizado ou RAL 5005 / 7035<br/><span class='label'>Altura:</span>  2000 a 5000 mm <br/><span class='label'>Profundidade:</span> 400 a 1200 mm. <br/><span class='label'>Descrição:</span> Bastidor metálico com sapata, indicado para sistemas de armazenagem e estruturas industriais. Fabricado em aço de elevada resistência, permite múltiplas configurações de altura e profundidade, adaptando-se a diferentes necessidades de carga e espaço. Disponível em acabamento galvanizado ou pintado, garantindo durabilidade e proteção anticorrosão em ambientes industriais.",
+        "tabela": [
+          {
+            "codigo": "PTEC2040",
+            "altura_mm": 2000,
+            "profundidade_mm": 400,
+            "acabamento": "Galvanizado ou RAL 5005 / 7035",
+            "peso_kg": 8.55
+          },
+          {
+            "codigo": "PTEC2050",
+            "altura_mm": 2000,
+            "profundidade_mm": 500,
+            "acabamento": "Galvanizado ou RAL 5005 / 7035",
+            "peso_kg": 8.71
+          },
+          {
+            "codigo": "PTEC2060",
+            "altura_mm": 2000,
+            "profundidade_mm": 600,
+            "acabamento": "Galvanizado ou RAL 5005 / 7035",
+            "peso_kg": 8.82
+          },
+          {
+            "codigo": "PTEC2070",
+            "altura_mm": 2000,
+            "profundidade_mm": 700,
+            "acabamento": "Galvanizado ou RAL 5005 / 7035",
+            "peso_kg": 9.06
+          },
+          {
+            "codigo": "PTEC2080",
+            "altura_mm": 2000,
+            "profundidade_mm": 800,
+            "acabamento": "Galvanizado ou RAL 5005 / 7035",
+            "peso_kg": 9.24
+          },
+          {
+            "codigo": "PTEC2090",
+            "altura_mm": 2000,
+            "profundidade_mm": 900,
+            "acabamento": "Galvanizado ou RAL 5005 / 7035",
+            "peso_kg": 9.46
+          },
+          {
+            "codigo": "PTEC20100",
+            "altura_mm": 2000,
+            "profundidade_mm": 1000,
+            "acabamento": "Galvanizado ou RAL 5005 / 7035",
+            "peso_kg": 9.63
+          },
+          {
+            "codigo": "PTEC20110",
+            "altura_mm": 2000,
+            "profundidade_mm": 1100,
+            "acabamento": "Galvanizado ou RAL 5005 / 7035",
+            "peso_kg": 9.85
+          },
+          {
+            "codigo": "PTEC20120",
+            "altura_mm": 2000,
+            "profundidade_mm": 1200,
+            "acabamento": "Galvanizado ou RAL 5005 / 7035",
+            "peso_kg": 10.04
+          },
+          {
+            "codigo": "PTEC3040",
+            "altura_mm": 3000,
+            "profundidade_mm": 400,
+            "acabamento": "Galvanizado ou RAL 5005 / 7035",
+            "peso_kg": 11.4
+          },
+          {
+            "codigo": "PTEC3050",
+            "altura_mm": 3000,
+            "profundidade_mm": 500,
+            "acabamento": "Galvanizado ou RAL 5005 / 7035",
+            "peso_kg": 11.6
+          },
+          {
+            "codigo": "PTEC3060",
+            "altura_mm": 3000,
+            "profundidade_mm": 600,
+            "acabamento": "Galvanizado ou RAL 5005 / 7035",
+            "peso_kg": 11.8
+          },
+          {
+            "codigo": "PTEC3070",
+            "altura_mm": 3000,
+            "profundidade_mm": 700,
+            "acabamento": "Galvanizado ou RAL 5005 / 7035",
+            "peso_kg": 12.05
+          },
+          {
+            "codigo": "PTEC3080",
+            "altura_mm": 3000,
+            "profundidade_mm": 800,
+            "acabamento": "Galvanizado ou RAL 5005 / 7035",
+            "peso_kg": 12.3
+          },
+          {
+            "codigo": "PTEC3090",
+            "altura_mm": 3000,
+            "profundidade_mm": 900,
+            "acabamento": "Galvanizado ou RAL 5005 / 7035",
+            "peso_kg": 12.5
+          },
+          {
+            "codigo": "PTEC30100",
+            "altura_mm": 3000,
+            "profundidade_mm": 1000,
+            "acabamento": "Galvanizado ou RAL 5005 / 7035",
+            "peso_kg": 12.7
+          },
+          {
+            "codigo": "PTEC30110",
+            "altura_mm": 3000,
+            "profundidade_mm": 1100,
+            "acabamento": "Galvanizado ou RAL 5005 / 7035",
+            "peso_kg": 12.9
+          },
+          {
+            "codigo": "PTEC30120",
+            "altura_mm": 3000,
+            "profundidade_mm": 1200,
+            "acabamento": "Galvanizado ou RAL 5005 / 7035",
+            "peso_kg": 13.1
+          },
+          {
+            "codigo": "PTEC4040",
+            "altura_mm": 4000,
+            "profundidade_mm": 400,
+            "acabamento": "Galvanizado ou RAL 5005 / 7035",
+            "peso_kg": 14.3
+          },
+          {
+            "codigo": "PTEC4050",
+            "altura_mm": 4000,
+            "profundidade_mm": 500,
+            "acabamento": "Galvanizado ou RAL 5005 / 7035",
+            "peso_kg": 14.6
+          },
+          {
+            "codigo": "PTEC4060",
+            "altura_mm": 4000,
+            "profundidade_mm": 600,
+            "acabamento": "Galvanizado ou RAL 5005 / 7035",
+            "peso_kg": 14.8
+          },
+          {
+            "codigo": "PTEC4070",
+            "altura_mm": 4000,
+            "profundidade_mm": 700,
+            "acabamento": "Galvanizado ou RAL 5005 / 7035",
+            "peso_kg": 15.1
+          },
+          {
+            "codigo": "PTEC4080",
+            "altura_mm": 4000,
+            "profundidade_mm": 800,
+            "acabamento": "Galvanizado ou RAL 5005 / 7035",
+            "peso_kg": 15.4
+          },
+          {
+            "codigo": "PTEC4090",
+            "altura_mm": 4000,
+            "profundidade_mm": 900,
+            "acabamento": "Galvanizado ou RAL 5005 / 7035",
+            "peso_kg": 15.7
+          },
+          {
+            "codigo": "PTEC40100",
+            "altura_mm": 4000,
+            "profundidade_mm": 1000,
+            "acabamento": "Galvanizado ou RAL 5005 / 7035",
+            "peso_kg": 16.0
+          },
+          {
+            "codigo": "PTEC40110",
+            "altura_mm": 4000,
+            "profundidade_mm": 1100,
+            "acabamento": "Galvanizado ou RAL 5005 / 7035",
+            "peso_kg": 16.3
+          },
+          {
+            "codigo": "PTEC40120",
+            "altura_mm": 4000,
+            "profundidade_mm": 1200,
+            "acabamento": "Galvanizado ou RAL 5005 / 7035",
+            "peso_kg": 16.5
+          },
+          {
+            "codigo": "PTEC5040",
+            "altura_mm": 5000,
+            "profundidade_mm": 400,
+            "acabamento": "Galvanizado ou RAL 5005 / 7035",
+            "peso_kg": 16.9
+          },
+          {
+            "codigo": "PTEC5050",
+            "altura_mm": 5000,
+            "profundidade_mm": 500,
+            "acabamento": "Galvanizado ou RAL 5005 / 7035",
+            "peso_kg": 17.2
+          },
+          {
+            "codigo": "PTEC5060",
+            "altura_mm": 5000,
+            "profundidade_mm": 600,
+            "acabamento": "Galvanizado ou RAL 5005 / 7035",
+            "peso_kg": 17.5
+          },
+          {
+            "codigo": "PTEC5070",
+            "altura_mm": 5000,
+            "profundidade_mm": 700,
+            "acabamento": "Galvanizado ou RAL 5005 / 7035",
+            "peso_kg": 17.9
+          },
+          {
+            "codigo": "PTEC5080",
+            "altura_mm": 5000,
+            "profundidade_mm": 800,
+            "acabamento": "Galvanizado ou RAL 5005 / 7035",
+            "peso_kg": 18.2
+          },
+          {
+            "codigo": "PTEC5090",
+            "altura_mm": 5000,
+            "profundidade_mm": 900,
+            "acabamento": "Galvanizado ou RAL 5005 / 7035",
+            "peso_kg": 18.5
+          },
+          {
+            "codigo": "PTEC50100",
+            "altura_mm": 5000,
+            "profundidade_mm": 1000,
+            "acabamento": "Galvanizado ou RAL 5005 / 7035",
+            "peso_kg": 18.8
+          },
+          {
+            "codigo": "PTEC50110",
+            "altura_mm": 5000,
+            "profundidade_mm": 1100,
+            "acabamento": "Galvanizado ou RAL 5005 / 7035",
+            "peso_kg": 19.1
+          },
+          {
+            "codigo": "PTEC50120",
+            "altura_mm": 5000,
+            "profundidade_mm": 1200,
+            "acabamento": "Galvanizado ou RAL 5005 / 7035",
+            "peso_kg": 19.4
+          }
+        ]
       },
       {
         "id": "estante-carga-ligeira",
         "image": "/prateleira inteira.png",
         "text": "Estante de carga ligeira",
+        "width": 220,
+        "maxWidth": 450,
+        "height": 280,
         "images": [
           "/prateleira inteira.png",
-          "/racks.png",
-          "/cacifo.png"
+          "/produtos/2-prateleiras-ligeiras/i1.jpg",
+          "/produtos/2-prateleiras-ligeiras/i2.png",
+          "/produtos/2-prateleiras-ligeiras/i3.png",
+          "/produtos/2-prateleiras-ligeiras/i4.png"
         ],
-        "materialText": "Material:",
-        "material": "Aço de alta resistência com acabamento em pintura eletrostática.",
-        "medidasText": "Medidas:",
-        "medidas": "Altura: 2m a 8m | Largura: 1m a 3m | Profundidade: 0,6m a 1,2m." 
+        "tabela": [
+          {
+            "nome": "Prateleira",
+            "comprimento_mm": 750,
+            "largura_mm": 300,
+            "peso_kg": 2
+          },
+          {
+            "nome": "Prateleira",
+            "comprimento_mm": 750,
+            "largura_mm": 400,
+            "peso_kg": 2.5
+          },
+          {
+            "nome": "Prateleira",
+            "comprimento_mm": 1000,
+            "largura_mm": 300,
+            "peso_kg": 2.4
+          },
+          {
+            "nome": "Prateleira",
+            "comprimento_mm": 1000,
+            "largura_mm": 400,
+            "peso_kg": 3
+          },
+          {
+            "nome": "Prateleira com 1 Reforço",
+            "comprimento_mm": 750,
+            "largura_mm": 400,
+            "peso_kg": 2.8
+          },
+          {
+            "nome": "Prateleira com 1 Reforço",
+            "comprimento_mm": 750,
+            "largura_mm": 500,
+            "peso_kg": 3.6
+          },
+          {
+            "nome": "Prateleira com 1 Reforço",
+            "comprimento_mm": 1000,
+            "largura_mm": 400,
+            "peso_kg": 3.5
+          },
+          {
+            "nome": "Prateleira com 1 Reforço",
+            "comprimento_mm": 1000,
+            "largura_mm": 500,
+            "peso_kg": 5
+          },
+          {
+            "nome": "Prateleira com 2 Reforços",
+            "comprimento_mm": 750,
+            "largura_mm": 600,
+            "peso_kg": 4.2
+          },
+          {
+            "nome": "Prateleira com 2 Reforços",
+            "comprimento_mm": 1000,
+            "largura_mm": 600,
+            "peso_kg": 5.75
+          },
+          {
+            "nome": "Bastidor",
+            "comprimento_mm": 750,
+            "largura_mm": 300,
+            "peso_kg": 3
+          },
+          {
+            "nome": "Bastidor",
+            "comprimento_mm": 750,
+            "largura_mm": 400,
+            "peso_kg": 3.5
+          },
+          {
+            "nome": "Bastidor",
+            "comprimento_mm": 750,
+            "largura_mm": 500,
+            "peso_kg": 4
+          },
+          {
+            "nome": "Bastidor",
+            "comprimento_mm": 750,
+            "largura_mm": 600,
+            "peso_kg": 4.5
+          },
+          {
+            "nome": "Bastidor",
+            "comprimento_mm": 1000,
+            "largura_mm": 300,
+            "peso_kg": 3.5
+          },
+          {
+            "nome": "Bastidor",
+            "comprimento_mm": 1000,
+            "largura_mm": 400,
+            "peso_kg": 4
+          },
+          {
+            "nome": "Bastidor",
+            "comprimento_mm": 1000,
+            "largura_mm": 500,
+            "peso_kg": 4.5
+          },
+          {
+            "nome": "Bastidor",
+            "comprimento_mm": 1000,
+            "largura_mm": 600,
+            "peso_kg": 5
+          },
+          {
+            "nome": "Bastidor",
+            "comprimento_mm": 1500,
+            "largura_mm": 300,
+            "peso_kg": 5
+          },
+          {
+            "nome": "Bastidor",
+            "comprimento_mm": 1500,
+            "largura_mm": 400,
+            "peso_kg": 5.5
+          },
+          {
+            "nome": "Bastidor",
+            "comprimento_mm": 1500,
+            "largura_mm": 500,
+            "peso_kg": 6
+          },
+          {
+            "nome": "Bastidor",
+            "comprimento_mm": 1500,
+            "largura_mm": 600,
+            "peso_kg": 6.5
+          },
+          {
+            "nome": "Bastidor",
+            "comprimento_mm": 2000,
+            "largura_mm": 300,
+            "peso_kg": 6
+          },
+          {
+            "nome": "Bastidor",
+            "comprimento_mm": 2000,
+            "largura_mm": 400,
+            "peso_kg": 6.5
+          },
+          {
+            "nome": "Bastidor",
+            "comprimento_mm": 2000,
+            "largura_mm": 500,
+            "peso_kg": 7
+          },
+          {
+            "nome": "Bastidor",
+            "comprimento_mm": 2000,
+            "largura_mm": 600,
+            "peso_kg": 7.5
+          },
+          {
+            "nome": "Bastidor",
+            "comprimento_mm": 2500,
+            "largura_mm": 300,
+            "peso_kg": 6.5
+          },
+          {
+            "nome": "Bastidor",
+            "comprimento_mm": 2500,
+            "largura_mm": 400,
+            "peso_kg": 7
+          },
+          {
+            "nome": "Bastidor",
+            "comprimento_mm": 2500,
+            "largura_mm": 500,
+            "peso_kg": 7.5
+          },
+          {
+            "nome": "Bastidor",
+            "comprimento_mm": 2500,
+            "largura_mm": 600,
+            "peso_kg": 8
+          },
+          {
+            "nome": "Bastidor",
+            "comprimento_mm": 3000,
+            "largura_mm": 300,
+            "peso_kg": 8.5
+          },
+          {
+            "nome": "Bastidor",
+            "comprimento_mm": 3000,
+            "largura_mm": 400,
+            "peso_kg": 9
+          },
+          {
+            "nome": "Bastidor",
+            "comprimento_mm": 3000,
+            "largura_mm": 500,
+            "peso_kg": 9.5
+          },
+          {
+            "nome": "Bastidor",
+            "comprimento_mm": 3000,
+            "largura_mm": 600,
+            "peso_kg": 10
+          }
+        ],
+        "description": "<span class='label'>Material:</span> Galvanizado ou RAL 5005 / 7035<br/><span class='label'>Altura:</span>  2000 a 5000 mm <br/><span class='label'>Profundidade:</span> 400 a 1200 mm. <br/><span class='label'>Descrição:</span> As estantes metálicas de encaixe sem parafusos são uma solução prática e resistente para espaços que exigem organização eficiente e elevada capacidade de carga, como armazéns, arquivos ou zonas industriais. O sistema modular permite ajustar facilmente a altura das prateleiras, adaptando a estrutura às necessidades específicas de cada utilização. A montagem é rápida e segura, através de encaixes reforçados que garantem estabilidade e evitam deslocações indesejadas. Fabricadas em aço robusto, estas estantes oferecem durabilidade, flexibilidade e uma excelente resposta para diferentes configurações de armazenamento, podendo ser dimensionadas à medida do espaço disponível."
+      },
+      {
+        "id": "porta-paletes-eletrico",
+        "image": "/produtos/5-porta-paletes-eletrico/i2.png",
+        "text": "Porta Paletes Elétrico",
+        "width": 230,
+        "height": 220,
+        "images": [
+          "/produtos/5-porta-paletes-eletrico/i1.png",
+          "/produtos/5-porta-paletes-eletrico/i2.png",
+          "/produtos/5-porta-paletes-eletrico/i3.png",
+          "/produtos/5-porta-paletes-eletrico/i4.png",
+          "/produtos/5-porta-paletes-eletrico/i5.png",
+          "/produtos/5-porta-paletes-eletrico/i6.png",
+          "/produtos/5-porta-paletes-eletrico/i7.png"
+        ],
+
+        "description": "<span class='label'>Capacidade:</span> 1500 Kg<br/ ><span class='label'>Peso sem bateria:</span> 110 Kg<br/><span class='label'>Peso com bateria:</span> 116 Kg<br/><span class='label'>Voltagem:</span> 25.6 V<br/><span class='label'>Capacidade da bateria:</span> 20 Ah <span class='label'>Descrição:</span> O nosso porta-paletes elétrico de 1500 Kg é ideal para movimentação rápida e segura de cargas em armazéns, centros logísticos ou fábricas. Equipado com motor elétrico e bateria de alta capacidade, permite manobras precisas com esforço mínimo, aumentando a eficiência operacional e reduzindo o esforço do operador. A estrutura em aço reforçado garante robustez e durabilidade, enquanto o design ergonómico assegura conforto e segurança durante o transporte de cargas pesadas. Uma solução confiável para otimizar a logística interna e aumentar a produtividade."
+      },
+      {
+        "id": "porta-paletes-manual",
+        "image": "/produtos/6-porta-paletes-manual/i1.png",
+        "text": "Porta Paletes Manual",
+        "width": 150,
+        "height": 220,
+        "images": [
+          "/produtos/6-porta-paletes-manual/i1.png",
+          "/produtos/6-porta-paletes-manual/i2.png",
+          "/produtos/6-porta-paletes-manual/i3.png"
+        ],
+
+        "description": "<span class='label'>Capacidade:</span> 3000 Kg<br/ ><span class='label'>Descrição:</span> As nossas soluções de porta-paletes manuais de alta capacidade são ideais para movimentação e transporte seguro de cargas pesadas em armazéns, fábricas ou centros logísticos. Este modelo suporta até 3000 kg, garantindo robustez e fiabilidade, com estrutura reforçada em aço resistente. A operação é prática e eficiente, permitindo manobras precisas mesmo em espaços reduzidos. Um equipamento essencial para otimizar a logística interna e aumentar a produtividade, mantendo sempre a segurança do operador e das mercadorias."
       },
       {
         "id": "cacifos-metalicos",
         "image": "/cacifo.png",
         "text": "Cacifos Metálicos",
-        "images": [
-          "/cacifo.png",
-          "/racks.png",
-          "/prateleira inteira.png"
-        ],
-        "materialText": "Material:",
-        "material": "Aço de alta resistência com acabamento em pintura eletrostática.",
-        "medidasText": "Medidas:",
-        "medidas": "Altura: 2m a 8m | Largura: 1m a 3m | Profundidade: 0,6m a 1,2m." 
+        "width": 200,
+        "height": 200,
+        "images": ["/cacifo.png", "/racks.png", "/prateleira inteira.png"],
+        "description": "<span class='label'>Material:</span> Aço de alta resistência com acabamento em pintura eletrostática.<br/><span class='label'>Medidas:</span> Altura: 2 m a 8 m | Largura: 1 m a 3 m | Profundidade: 0,6 m a 1,2 m."
       },
       {
-        "id": "empilhadores",
-        "image": "/empilhador.png",
-        "text": "Empilhadores Manuais e Elétricos",
+        "id": "arrumacao-vertical",
+        "image": "/produtos/7-Arrumação Vertical (Vertical Storage)/i1.png",
+        "text": "Arrumação Vertical",
+        "width": 250,
+        "height": 200,
         "images": [
-          "/racks.png",
-          "/prateleira inteira.png",
-          "/cacifo.png"
+          "/produtos/7-Arrumação Vertical (Vertical Storage)/i1.jpg",
+          "/produtos/7-Arrumação Vertical (Vertical Storage)/i2.jpg",
+          "/produtos/7-Arrumação Vertical (Vertical Storage)/i3.jpg",
+          "/produtos/7-Arrumação Vertical (Vertical Storage)/i4.jpg",
+          "/produtos/7-Arrumação Vertical (Vertical Storage)/i5.jpg",
+          "/produtos/7-Arrumação Vertical (Vertical Storage)/i6.jpg",
+          "/produtos/7-Arrumação Vertical (Vertical Storage)/i7.jpg",
+          "/produtos/7-Arrumação Vertical (Vertical Storage)/i8.jpg",
+          "/produtos/7-Arrumação Vertical (Vertical Storage)/i9.jpg",
+          "/produtos/7-Arrumação Vertical (Vertical Storage)/i10.jpg"
         ],
-        "materialText": "Material:",
-        "material": "Aço de alta resistência com acabamento em pintura eletrostática.",
-        "medidasText": "Medidas:",
-        "medidas": "Altura: 2m a 8m | Largura: 1m a 3m | Profundidade: 0,6m a 1,2m." 
+
+        "description": "<span class='label'>Material:</span> RAL 5005 / 7035<br/><span class='label'>Altura:</span>  2400 mm <br/><span class='label'>Largura:</span> 1500 a 1750 mm <br/><span class='label'>Descrição:</span> Estante PORTECO para arrumação vertical, composta por módulo inicial e módulos de continuidade. <br/>Vigas Z junto ao solo e no topo para garantir estabilidade da estrutura. <br/>2 vigas em tubo 50x30, aplicadas nas costas da estante, onde ficam apoiados e deslizam os braços de separação. Contempla 4 braços de separação por módulo. <br/>Cada módulo apresenta uma base em OSB de 22mm."
+      },
+      {
+        "id": "cantilever-medio-simples",
+        "image": "/produtos/8-Cantilever Médio (Medium Cantilever)/i1.png",
+        "text": "Cantilever Médio - Acesso Simples",
+        "width": 250,
+        "maxWidth": 430,
+        "height": 200,
+        "images": [
+          "/produtos/8-Cantilever Médio (Medium Cantilever)/i1.jpg",
+          "/produtos/8-Cantilever Médio (Medium Cantilever)/i2.jpg",
+          "/produtos/8-Cantilever Médio (Medium Cantilever)/i3.jpg",
+          "/produtos/8-Cantilever Médio (Medium Cantilever)/i4.jpg",
+          "/produtos/8-Cantilever Médio (Medium Cantilever)/i5.jpg",
+          "/produtos/8-Cantilever Médio (Medium Cantilever)/i6.jpg",
+          "/produtos/8-Cantilever Médio (Medium Cantilever)/i7.jpg",
+          "/produtos/8-Cantilever Médio (Medium Cantilever)/i8.jpg",
+          "/produtos/8-Cantilever Médio (Medium Cantilever)/i9.jpg",
+          "/produtos/8-Cantilever Médio (Medium Cantilever)/i10.jpg",
+          "/produtos/8-Cantilever Médio (Medium Cantilever)/i11.jpg"
+        ],
+        "description": "<span class='label'>Descrição:</span> Cantilever de carga média com acesso simples, indicado para arrumação horizontal de tubos, perfis e outros objetos pesados. Sistema evolutivo composto por colunas que se colocam lado a lado em intervalos máximos de 1000mm. Colunas e pés em azul RAL 5005, braços e travamentos em cinza RAL 7035. Possui 4 níveis (base + 3 níveis) com possibilidade de extensão para 5 níveis. Fixação ao solo obrigatória.",
+        "tabela": [
+          {
+            "altura_mm": 2400,
+            "largura_mm": 800,
+            "bracos_mm": 400,
+            "peso_kg": 275,
+            "codigo": "CASF0840"
+          },
+          {
+            "altura_mm": 2400,
+            "largura_mm": 800,
+            "bracos_mm": 500,
+            "peso_kg": 250,
+            "codigo": "CASF0850"
+          },
+          {
+            "altura_mm": 2400,
+            "largura_mm": 800,
+            "bracos_mm": 600,
+            "peso_kg": 225,
+            "codigo": "CASF0860"
+          },
+          {
+            "altura_mm": 2400,
+            "largura_mm": 1000,
+            "bracos_mm": 400,
+            "peso_kg": 250,
+            "codigo": "CASF1040"
+          },
+          {
+            "altura_mm": 2400,
+            "largura_mm": 1000,
+            "bracos_mm": 500,
+            "peso_kg": 225,
+            "codigo": "CASF1050"
+          },
+          {
+            "altura_mm": 2400,
+            "largura_mm": 1000,
+            "bracos_mm": 600,
+            "peso_kg": 200,
+            "codigo": "CASF1060"
+          }
+        ]
+      },
+      {
+        "id": "porteco-z60",
+        "image": "/produtos/9-Porteco Z60/i1.png",
+        "width": 190,
+        "text": "Porteco Z60",
+        "images": [
+          "/produtos/9-Porteco Z60/i1.png",
+          "/produtos/9-Porteco Z60/i2.jpg",
+          "/produtos/9-Porteco Z60/i3.jpg",
+          "/produtos/9-Porteco Z60/i4.jpg",
+          "/produtos/9-Porteco Z60/i5.jpg",
+          "/produtos/9-Porteco Z60/i6.jpg",
+          "/produtos/9-Porteco Z60/i7.jpg",
+          "/produtos/9-Porteco Z60/i8.jpg",
+          "/produtos/9-Porteco Z60/i9.jpg",
+          "/produtos/9-Porteco Z60/i10.jpg",
+          "/produtos/9-Porteco Z60/i12.jpg",
+          "/produtos/9-Porteco Z60/i13.jpg",
+          "/produtos/9-Porteco Z60/i14.jpg",
+          "/produtos/9-Porteco Z60/i15.jpg",
+          "/produtos/9-Porteco Z60/i16.jpg",
+          "/produtos/9-Porteco Z60/i17.jpg"
+        ],
+
+        "description": "<span class='label'>Bastidores:</span> Os bastidores são compostos por dois pilares em formato ómega de secção 50x50mm, com furação frontal espaçada de 50 em 50mm. A ligação entre os pilares é assegurada por travessas e diagonais aparafusadas na furação lateral do pilar. O apoio ao solo é garantido através de sapata metálica aparafusada. A sapata dispõe de furação para permitir a fixação ao solo através de buchas metálicas tipo HST.<br/ ><span class='label'>Vigas:</span> As vigas do sistema PORTECO são em formato Z, com rebaixe para permitir a aplicação de placas de aglomerado ou painéis metálicos de 19mm de espessura. Na extremidade de cada viga é soldado um conector com 3 garras, que permite o encaixe fácil e rápido na furação frontal do pilar. O conector dispõe de furação dedicada para aplicação de freio de segurança, que funciona como fusível mecânico. Dispomos de dois tipos de vigas: Z60 ou Z100, que podem ser utilizadas em função da carga a armazenar. <br/ ><span class='label'>Prateleiras:</span> O sistema PORTECO pode utilizar dois tipos de prateleiras: placas de aglomerado de 19mm de espessura ou painéis metálicos modulares, com acabamento galvanizado.",
+        "tabela": [
+          {
+            "altura_mm": 2000,
+            "profundidade_mm": 400,
+            "modulo_inicial_mm": 1550,
+            "modulo_seguinte_mm": 1500,
+            "modulo_seguinte_2_mm": 1500,
+            "comprimento_util_mm": 1450
+          },
+          {
+            "altura_mm": 2500,
+            "profundidade_mm": 500,
+            "modulo_inicial_mm": 1800,
+            "modulo_seguinte_mm": 1750,
+            "modulo_seguinte_2_mm": 1750,
+            "comprimento_util_mm": 1700
+          },
+          {
+            "altura_mm": 3000,
+            "profundidade_mm": 600,
+            "modulo_inicial_mm": 2050,
+            "modulo_seguinte_mm": 2000,
+            "modulo_seguinte_2_mm": 2000,
+            "comprimento_util_mm": 1950
+          },
+          {
+            "altura_mm": 3500,
+            "profundidade_mm": 800,
+            "modulo_inicial_mm": 2300,
+            "modulo_seguinte_mm": 2250,
+            "modulo_seguinte_2_mm": 2250,
+            "comprimento_util_mm": 2200
+          },
+          {
+            "altura_mm": 4000,
+            "profundidade_mm": 1000,
+            "modulo_inicial_mm": null,
+            "modulo_seguinte_mm": null,
+            "modulo_seguinte_2_mm": null,
+            "comprimento_util_mm": null
+          },
+          {
+            "altura_mm": 4500,
+            "profundidade_mm": 1200,
+            "modulo_inicial_mm": null,
+            "modulo_seguinte_mm": null,
+            "modulo_seguinte_2_mm": null,
+            "comprimento_util_mm": null
+          },
+          {
+            "altura_mm": 5000,
+            "profundidade_mm": null,
+            "modulo_inicial_mm": null,
+            "modulo_seguinte_mm": null,
+            "modulo_seguinte_2_mm": null,
+            "comprimento_util_mm": null
+          }
+        ]
+      },
+      {
+        "id": "cantilever-ligeiro",
+        "image": "/produtos/13-Cantilever Ligeiro (Light Cantilever)/i10.png",
+        "width": 330,
+        "text": "Cantilever Ligeiro Simples e Duplo",
+        "images": [
+          "/produtos/13-Cantilever Ligeiro (Light Cantilever)/i1.jpg",
+          "/produtos/13-Cantilever Ligeiro (Light Cantilever)/i2.jpg",
+          "/produtos/13-Cantilever Ligeiro (Light Cantilever)/i3.jpg",
+          "/produtos/13-Cantilever Ligeiro (Light Cantilever)/i4.jpg",
+          "/produtos/13-Cantilever Ligeiro (Light Cantilever)/i5.jpg",
+          "/produtos/13-Cantilever Ligeiro (Light Cantilever)/i6.jpg",
+          "/produtos/13-Cantilever Ligeiro (Light Cantilever)/i7.jpg",
+          "/produtos/13-Cantilever Ligeiro (Light Cantilever)/i8.jpg",
+          "/produtos/13-Cantilever Ligeiro (Light Cantilever)/i9.jpg",
+          "/produtos/13-Cantilever Ligeiro (Light Cantilever)/i10.jpg",
+          "/produtos/13-Cantilever Ligeiro (Light Cantilever)/i11.jpg"
+        ],
+
+        "description": "<span class='label'>Carga por braço:</span> até 40Kg distribuídos uniformemente (80Kg por par de braços).<br/ ><span class='label'>Descrição:</span> Cantilever ligeiro, para carga manual, tipologia simples (acesso apenas de um lado). Base aparafusada à coluna do cantilever, com furação para permitir a fixação ao solo. Ajuste da altura dos bragos de 50mm em 50mm. Os braços apresentam topo anti-queda. Carga por braço: até 40Kg distribuídos uniformemente (80Kg por par de braços). Pilares e base com acabamento a pintura epoxy de cor azul, RAL 5005, braços em cinza claro, RAL 7035, travessas e diagonais galvanizadas. Inclui fixação ao solo. Dimensões: 800x400x2000mm (CxPxA) ou 800x500x2000mm (CxPxA).",
+        "tabela": [
+          {
+            "nome": "CANTILEVER LIGEIRO PORTECO SIMPLES",
+            "medidas_mm": "Cant. ligeiro simples base + 3 niveis 800x400x2000",
+            "acabamento": "Pilares/Base: azul RAL 5005; Braços: cinza RAL 7035; Travessas/Diagonais: galvanizadas",
+            "peso_kg": 36.35
+          },
+          {
+            "nome": "CANTILEVER LIGEIRO PORTECO SIMPLES",
+            "medidas_mm": "Cant. ligeiro simples base + 3 niveis 800x500x2000",
+            "acabamento": "Pilares/Base: azul RAL 5005; Braços: cinza RAL 7035; Travessas/Diagonais: galvanizadas",
+            "peso_kg": 38.4
+          },
+          {
+            "nome": "CANTILEVER LIGEIRO PORTECO SIMPLES",
+            "medidas_mm": "Braço adicional com 400",
+            "acabamento": "Braço: cinza RAL 7035",
+            "peso_kg": 1.35
+          },
+          {
+            "nome": "CANTILEVER LIGEIRO PORTECO SIMPLES",
+            "medidas_mm": "Braço adicional com 500",
+            "acabamento": "Braço: cinza RAL 7035",
+            "peso_kg": 1.69
+          },
+          {
+            "nome": "CANTILEVER LIGEIRO PORTECO DUPLO",
+            "medidas_mm": "800x400x2000",
+            "acabamento": "Pilares/Base: azul RAL 5005; Braços: cinza RAL 7035; Travessas/Diagonais: galvanizadas",
+            "peso_kg": 51.95
+          },
+          {
+            "nome": "CANTILEVER LIGEIRO PORTECO DUPLO",
+            "medidas_mm": "800x500x2000",
+            "acabamento": "Pilares/Base: azul RAL 5005; Braços: cinza RAL 7035; Travessas/Diagonais: galvanizadas",
+            "peso_kg": 56.05
+          },
+          {
+            "nome": "CANTILEVER LIGEIRO PORTECO DUPLO",
+            "medidas_mm": "Braço adicional com 400",
+            "acabamento": "Braço: cinza RAL 7035",
+            "peso_kg": 1.35
+          },
+          {
+            "nome": "CANTILEVER LIGEIRO PORTECO DUPLO",
+            "medidas_mm": "Braço adicional com 500",
+            "acabamento": "Braço: cinza RAL 7035",
+            "peso_kg": 1.69
+          }
+        ]
+      },
+      {
+        "id": "porteco-z100",
+        "image": "/produtos/10-Porteco Z100/i1.png",
+        "text": "Porteco Z100",
+        "width": 250,
+        "images": [
+          "/produtos/10-Porteco Z100/i1.jpg",
+          "/produtos/10-Porteco Z100/i2.jpg",
+          "/produtos/10-Porteco Z100/i3.jpg",
+          "/produtos/10-Porteco Z100/i4.jpg",
+          "/produtos/10-Porteco Z100/i5.jpg",
+          "/produtos/10-Porteco Z100/i6.jpg"
+        ],
+
+        "description": "<span class='label'>Capacidade:</span> Até 850Kg por nível.<br/ ><span class='label'>Descrição:</span> Sistema de armazenagem carga média, muito versátil  e resistente. É a solução indicada para armazenar mercadorias pesadas e volumosas, que são movimentadas de forma manual. Disponível em duas versões: Z100 e Z60",
+        "tabela": [
+          {
+            "codigo": "PTLZ1000-100",
+            "comprimento_mm": "Viga Z100 c/ 1000mm (AxP) conector 3 garras",
+            "acabamento": "RAL 7035",
+            "peso_kg": 1.62
+          },
+          {
+            "codigo": "PTLZ1250-100",
+            "comprimento_mm": "Viga Z100 c/ 1250mm (AxP) conector 3 garras",
+            "acabamento": "RAL 7035",
+            "peso_kg": 1.94
+          },
+          {
+            "codigo": "PTLZ1500-100",
+            "comprimento_mm": "Viga Z100 c/ 1500mm (AxP) conector 3 garras",
+            "acabamento": "RAL 7035",
+            "peso_kg": 2.26
+          },
+          {
+            "codigo": "PTLZ1750-100",
+            "comprimento_mm": "Viga Z100 c/ 1750mm (AxP) conector 3 garras",
+            "acabamento": "RAL 7035",
+            "peso_kg": 2.58
+          },
+          {
+            "codigo": "PTLZ2000-100",
+            "comprimento_mm": "Viga Z100 c/ 2000mm (AxP) conector 3 garras",
+            "acabamento": "RAL 7035",
+            "peso_kg": 2.9
+          },
+          {
+            "codigo": "PTLZ2250-100",
+            "comprimento_mm": "Viga Z100 c/ 2250mm (AxP) conector 3 garras",
+            "acabamento": "RAL 7035",
+            "peso_kg": 3.22
+          },
+          {
+            "codigo": "PTLZ2500-100",
+            "comprimento_mm": "Viga Z100 c/ 2500mm (AxP) conector 3 garras",
+            "acabamento": "RAL 7035",
+            "peso_kg": 3.54
+          },
+          {
+            "codigo": "PTLZ2750-100",
+            "comprimento_mm": "Viga Z100 c/ 2750mm (AxP) conector 3 garras",
+            "acabamento": "RAL 7035",
+            "peso_kg": 4.14
+          }
+        ]
+      },
+      {
+        "id": "rangeco-pneus",
+        "image": "/produtos/11-Rangeco Pneus (Rangeco Tires)/i2.png",
+        "width": 220,
+        "text": "Rangeco Pneus",
+        "images": [
+          "/produtos/11-Rangeco Pneus (Rangeco Tires)/i2.jpg",
+          "/produtos/11-Rangeco Pneus (Rangeco Tires)/i1.jpg",
+          "/produtos/11-Rangeco Pneus (Rangeco Tires)/i3.jpg",
+          "/produtos/11-Rangeco Pneus (Rangeco Tires)/i4.jpg",
+          "/produtos/11-Rangeco Pneus (Rangeco Tires)/i5.jpg",
+          "/produtos/11-Rangeco Pneus (Rangeco Tires)/i6.jpg"
+        ],
+        "tabela": [
+          {
+            "codigo": "PND2010",
+            "medidas_mm": "1000x500x2000",
+            "acabamento": "Pilares: azul 5005; Vigas: cinza 7035",
+            "peso_kg": 18.2
+          },
+          {
+            "codigo": "PNS2010",
+            "medidas_mm": "1000x500x2000",
+            "acabamento": "Pilares: azul 5005; Vigas: cinza 7035",
+            "peso_kg": 12.1
+          },
+          {
+            "codigo": "PND2012",
+            "medidas_mm": "1250x500x2000",
+            "acabamento": "Pilares: azul 5005; Vigas: cinza 7035",
+            "peso_kg": 19.4
+          },
+          {
+            "codigo": "PNS2012",
+            "medidas_mm": "1250x500x2000",
+            "acabamento": "Pilares: azul 5005; Vigas: cinza 7035",
+            "peso_kg": 13.3
+          },
+          {
+            "codigo": "PND2015",
+            "medidas_mm": "1500x500x2000",
+            "acabamento": "Pilares: azul 5005; Vigas: cinza 7035",
+            "peso_kg": 22.5
+          },
+          {
+            "codigo": "PNS2015",
+            "medidas_mm": "1500x500x2000",
+            "acabamento": "Pilares: azul 5005; Vigas: cinza 7035",
+            "peso_kg": 15.2
+          },
+          {
+            "codigo": "PND2510",
+            "medidas_mm": "1000x500x2400",
+            "acabamento": "Pilares: azul 5005; Vigas: cinza 7035",
+            "peso_kg": 22.5
+          },
+          {
+            "codigo": "PNS2510",
+            "medidas_mm": "1000x500x2400",
+            "acabamento": "Pilares: azul 5005; Vigas: cinza 7035",
+            "peso_kg": 15.25
+          },
+          {
+            "codigo": "PND2512",
+            "medidas_mm": "1250x500x2400",
+            "acabamento": "Pilares: azul 5005; Vigas: cinza 7035",
+            "peso_kg": 24.1
+          },
+          {
+            "codigo": "PNS2512",
+            "medidas_mm": "1250x500x2400",
+            "acabamento": "Pilares: azul 5005; Vigas: cinza 7035",
+            "peso_kg": 16.85
+          },
+          {
+            "codigo": "PND2515",
+            "medidas_mm": "1500x500x2400",
+            "acabamento": "Pilares: azul 5005; Vigas: cinza 7035",
+            "peso_kg": 26.65
+          },
+          {
+            "codigo": "PNS2515",
+            "medidas_mm": "1500x500x2400",
+            "acabamento": "Pilares: azul 5005; Vigas: cinza 7035",
+            "peso_kg": 19.4
+          }
+        ],
+
+        "description": "<span class='label'>Descrição:</span> Kits de estantes Rang'Eco Pneus, que incluem: bastidores (travessas e diagonais soldadas), e vigas principais em tubo ovalizado. Existem duas tipologias de Kits: módulo Inicial (individual) e módulo seguinte, que liga ao módulo inicial, partilhando um dos bastidores. Podem apresentar 3 níveis (bastidor com 2000mm altura) ou 4 níveis (bastidor com 2400mm altura) por cada modulo. O ajuste da altura dos níveis é feito de 50mm em 50mm. Considera-se uma travessa de reforço por cada nível."
+      },
+      {
+        "id": "rangeco-plus",
+        "image": "/produtos/12-Rangeco Plus/i1.png",
+        "width": 155,
+        "text": "Rangeco Plus",
+        "images": [
+          "/produtos/12-Rangeco Plus/i1.jpg",
+          "/produtos/12-Rangeco Plus/i2.jpg",
+          "/produtos/12-Rangeco Plus/i3.jpg",
+          "/produtos/12-Rangeco Plus/i4.jpg",
+          "/produtos/12-Rangeco Plus/i5.jpg",
+          "/produtos/12-Rangeco Plus/i6.jpg",
+          "/produtos/12-Rangeco Plus/i7.jpg",
+          "/produtos/12-Rangeco Plus/i8.jpg",
+          "/produtos/12-Rangeco Plus/i9.jpg",
+          "/produtos/12-Rangeco Plus/i10.jpg",
+          "/produtos/12-Rangeco Plus/i11.jpg",
+          "/produtos/12-Rangeco Plus/i2.jpg",
+          "/produtos/12-Rangeco Plus/i13.jpg",
+          "/produtos/12-Rangeco Plus/i14.jpg",
+          "/produtos/12-Rangeco Plus/i15.jpg",
+          "/produtos/12-Rangeco Plus/i16.jpg"
+        ],
+
+        "description": "<span class='label'>Peso máx por nível:</span> Até 303kg <br/ ><span class='label'>Número máx de níveis:</span> Até 7 níveis <br/ ><span class='label'>Número de profundidades dispiníveis:</span> Até 6 profundidades diferentes <br/ ><span class='label'>Número de comprimentos dispiníveis:</span> Até 4 comprimentos diferentes ALTURA MÁXIMA: Até 3 metros </span> <br/ > <span class='label'> Descrição:</span> A Rang'Eco Plus é uma solução robusta para cargas até 303 kgs por nível. Oferece maior capacidade e durabilidade, é ideal para armazéns, oficinas e instalações que necessitam de uma estrutura confiável."
+      },
+      {
+        "id": "bancadas",
+        "image": "/produtos/14-Bancadas (Workbench)/i2.png",
+        "text": "Bancadas",
+        "width": 350,
+        "images": [
+          "/produtos/14-Bancadas (Workbench)/i2.jpg",
+          "/produtos/14-Bancadas (Workbench)/i1.jpg",
+          "/produtos/14-Bancadas (Workbench)/i3.jpg",
+          "/produtos/14-Bancadas (Workbench)/i4.jpg",
+          "/produtos/14-Bancadas (Workbench)/i5.jpg"
+        ],
+
+        "description": "<span class='label'>Descrição:</span> Bancada multiusos, construída com bastidores PORTECO, com pés metálicos e vigas Z. Tampo superior em melamina de cor branca de 22mm de espessura e orla perimetral. Possibilidade de ter prateleira inferior. Comprimento: 1200, 1600 e 2000mm. Profundidade: 800mm. Cores standard: azul RAL 5005 (pernas) e cinza RAL 7035 (vigas). É possível ter em totalmente em azul ou cinza.",
+        "tabela": [
+          {
+            "nome": "Bancada sem prateleira",
+            "medidas_mm": "1200x800x820",
+            "acabamento": "RAL 5005 / 7035",
+            "peso_kg": 27.0
+          },
+          {
+            "nome": "Bancada sem prateleira",
+            "medidas_mm": "1200x800x920",
+            "acabamento": "RAL 5005 / 7035",
+            "peso_kg": 27.7
+          },
+          {
+            "nome": "Bancada sem prateleira",
+            "medidas_mm": "1200x800x1020",
+            "acabamento": "RAL 5005 / 7035",
+            "peso_kg": 28.4
+          },
+          {
+            "nome": "Bancada sem prateleira",
+            "medidas_mm": "1600x800x820",
+            "acabamento": "RAL 5005 / 7035",
+            "peso_kg": 33.0
+          },
+          {
+            "nome": "Bancada sem prateleira",
+            "medidas_mm": "1600x800x920",
+            "acabamento": "RAL 5005 / 7035",
+            "peso_kg": 33.7
+          },
+          {
+            "nome": "Bancada sem prateleira",
+            "medidas_mm": "1600x800x1020",
+            "acabamento": "RAL 5005 / 7035",
+            "peso_kg": 34.4
+          },
+          {
+            "nome": "Bancada sem prateleira",
+            "medidas_mm": "2000x800x820",
+            "acabamento": "RAL 5005 / 7035",
+            "peso_kg": 42.0
+          },
+          {
+            "nome": "Bancada sem prateleira",
+            "medidas_mm": "2000x800x920",
+            "acabamento": "RAL 5005 / 7035",
+            "peso_kg": 42.7
+          },
+          {
+            "nome": "Bancada sem prateleira",
+            "medidas_mm": "2000x800x1020",
+            "acabamento": "RAL 5005 / 7035",
+            "peso_kg": 43.4
+          },
+          {
+            "nome": "Bancada com prateleira",
+            "medidas_mm": "1200x800x820",
+            "acabamento": "RAL 5005 / 7035",
+            "peso_kg": 37.0
+          },
+          {
+            "nome": "Bancada com prateleira",
+            "medidas_mm": "1200x800x920",
+            "acabamento": "RAL 5005 / 7035",
+            "peso_kg": 37.7
+          },
+          {
+            "nome": "Bancada com prateleira",
+            "medidas_mm": "1200x800x1020",
+            "acabamento": "RAL 5005 / 7035",
+            "peso_kg": 38.4
+          },
+          {
+            "nome": "Bancada com prateleira",
+            "medidas_mm": "1600x800x820",
+            "acabamento": "RAL 5005 / 7035",
+            "peso_kg": 46.0
+          },
+          {
+            "nome": "Bancada com prateleira",
+            "medidas_mm": "1600x800x920",
+            "acabamento": "RAL 5005 / 7035",
+            "peso_kg": 46.7
+          },
+          {
+            "nome": "Bancada com prateleira",
+            "medidas_mm": "1600x800x1020",
+            "acabamento": "RAL 5005 / 7035",
+            "peso_kg": 47.4
+          },
+          {
+            "nome": "Bancada com prateleira",
+            "medidas_mm": "2000x800x820",
+            "acabamento": "RAL 5005 / 7035",
+            "peso_kg": 61.0
+          },
+          {
+            "nome": "Bancada com prateleira",
+            "medidas_mm": "2000x800x920",
+            "acabamento": "RAL 5005 / 7035",
+            "peso_kg": 61.7
+          },
+          {
+            "nome": "Bancada com prateleira",
+            "medidas_mm": "2000x800x1020",
+            "acabamento": "RAL 5005 / 7035",
+            "peso_kg": 62.4
+          }
+        ]
+      },
+
+      {
+        "id": "kits-rangeco",
+        "image": "/produtos/17-Kits Rangeco (Rangeco Kits)/i1.png",
+        "width": 350,
+        "text": "Kits Rangeco (Rangeco Kits)",
+        "images": [
+          "/produtos/17-Kits Rangeco (Rangeco Kits)/i1.jpg",
+          "/produtos/17-Kits Rangeco (Rangeco Kits)/i2.jpg",
+          "/produtos/17-Kits Rangeco (Rangeco Kits)/i3.jpg"
+        ],
+
+        "description": "<span class='label'>Descrição:</span> Kits de estantes Rang'Eco, que incluem pilares, pés, estrutura das prateleiras, que consideramos como integrante: as duas vigas principais, duas travessas e tubo (s) de reforço (300 e 400mm - 1 tubo, 500 e 600mm - 2 tubos, 800mm - 3 tubos). Existem duas tipologias de Kits: módulo Inicial (individual) e módulo seguinte, que liga ao módulo inicial, partilhando dois dos pilares. Para completar os Kits deve selecionar o tipo de revestimento a colocar sobre a estrutura da prateleira, considerando duas opções: platex ou chapa metálica. Embalagem individual em película plástica termoretráctil."
       }
     ]
   },

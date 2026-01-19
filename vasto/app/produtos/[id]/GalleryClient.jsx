@@ -6,9 +6,10 @@ import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
 import { IoClose } from "react-icons/io5";
 
 export default function GalleryClient({ product, text }) {
-  const images = product.images && product.images.length > 0
-    ? product.images
-    : [product.image];
+  const images =
+    product.images && product.images.length > 0
+      ? product.images
+      : [product.image];
 
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -35,13 +36,13 @@ export default function GalleryClient({ product, text }) {
   return (
     <>
       <div className="flex w-full items-center max-w-450 m-auto justify-center md:justify-start md:gap-5 lg:gap-10 xl:gap-30 md:items-start flex-col md:flex-row gap-5">
-        <div className="flex p-4 flex-col items-center md:flex-row justify-center bg-(--gray) w-100 h-100 md:min-w-100 lg:min-w-150 lg:min-h-160 shadow-lg rounded-[35px] relative">
+        <div className="flex p-4 flex-col items-center md:flex-row justify-center bg-white w-100 h-100 md:min-w-100 lg:min-w-150 lg:min-h-160 shadow-lg rounded-[35px] relative">
           <Image
             src={images[currentImageIndex]}
             alt={product.text}
             width={600}
             height={600}
-            className="cursor-pointer"
+            className="cursor-pointer w-auto max-h-100 lg:max-h-150"
             onClick={() => openModal(currentImageIndex)}
           />
 
@@ -76,22 +77,12 @@ export default function GalleryClient({ product, text }) {
           </p>
 
           <div className="text-center max-w-150 gap-2 m-auto flex flex-col items-start bg-(--gray) p-5 rounded-[35px]">
-            {product.material && (
-              <div className="flex gap-1 text-left">
-                <p className="font-medium text-(--orange)">
-                  {product.materialText}
-                </p>
-                <p>{product.material}</p>
-              </div>
-            )}
 
-            {product.medidas && (
-              <div className="flex gap-1 text-left">
-                <p className="font-medium text-(--orange)">
-                  {product.medidasText}
-                </p>
-                <p>{product.medidas}</p>
-              </div>
+            {product.description && (
+              <div
+                className="text-left"
+                dangerouslySetInnerHTML={{ __html: product.description }}
+              />
             )}
           </div>
         </div>
@@ -102,10 +93,7 @@ export default function GalleryClient({ product, text }) {
           className="fixed inset-0 z-50 flex items-center justify-center bg-white"
           onClick={closeModal}
         >
-          <div
-            className="relative"
-            onClick={(e) => e.stopPropagation()}
-          >
+          <div className="relative" onClick={(e) => e.stopPropagation()}>
             <Image
               src={images[currentImageIndex]}
               alt={product.text}

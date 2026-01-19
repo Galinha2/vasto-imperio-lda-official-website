@@ -26,7 +26,7 @@ function ProductBanner() {
             width={2000}
             height={50}
             priority
-            className="z-1 absolute top-10 w-full max-w-[140px] md:max-w-[200px] lg:max-w-[220px] xl:max-w-[270px] h-auto"
+            className="z-2 absolute top-10 w-full max-w-[140px] md:max-w-[200px] lg:max-w-[220px] xl:max-w-[270px] h-auto"
           />
         </div>
 

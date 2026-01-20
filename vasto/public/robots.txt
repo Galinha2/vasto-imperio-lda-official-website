@@ -1,0 +1,9 @@
+# *
+User-agent: *
+Allow: /
+
+# Host
+Host: https://vastoimperio.pt
+
+# Sitemaps
+Sitemap: https://vastoimperio.pt/sitemap.xml

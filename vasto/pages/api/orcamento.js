@@ -3,79 +3,74 @@ import formidable from "formidable";
 import fs from "fs";
 
 export const config = {
-  api: {
-    bodyParser: false,
-  },
+  api: { bodyParser: false },
 };
 
+// Função utilitária para parsear formulário multipart
+function parseForm(req) {
+  const form = formidable({ multiples: false });
+  return new Promise((resolve, reject) => {
+    form.parse(req, (err, fields, files) => {
+      if (err) reject(err);
+      else resolve({ fields, files });
+    });
+  });
+}
+
 export default async function handler(req, res) {
-  console.log('SMTP_HOST:', process.env.SMTP_HOST);
-  console.log('SMTP_USER:', process.env.SMTP_USER);
+  if (req.method !== "POST") {
+    return res.status(405).json({ error: "Method Not Allowed" });
+  }
 
-  if (req.method !== "POST")
-    return res.status(405).json({ error: "Method not allowed" });
-
-  const form = formidable({ multiples: true });
-
-  form.parse(req, async (err, fields, files) => {
-    if (err) {
-      console.error(err);
-      return res.status(500).json({ error: "Erro ao processar o formulário" });
-    }
-
+  try {
+    const { fields, files } = await parseForm(req); // agora fields e files existem
     const { name, email, phone, body } = fields;
 
-    if (!name || !email || !phone || !body)
-      return res.status(400).json({ error: "Todos os campos são obrigatórios" });
+    // Configura transporte SMTP
+    const transporter = nodemailer.createTransport({
+      host: process.env.SMTP_HOST,
+      port: Number(process.env.SMTP_PORT) || 587,
+      secure: false,
+      auth: {
+        user: process.env.SMTP_USER,
+        pass: process.env.SMTP_PASS,
+      },
+    });
 
-    try {
-      // Configuração SMTP Hostinger
-      const transporter = nodemailer.createTransport({
-        host: process.env.SMTP_HOST,
-        port: Number(process.env.SMTP_PORT),
-        secure: Number(process.env.SMTP_PORT) === 465,
-        auth: {
-          user: process.env.SMTP_USER, // Email do teu domínio Hostinger
-          pass: process.env.SMTP_PASS,
-        },
-      });
-
-      let attachments = [];
-
-      if (files) {
-        let fileArray = [];
-
-        if (Array.isArray(files.files)) {
-          fileArray = files.files.slice(0, 3);
-        } else if (files.files) {
-          fileArray = [files.files];
-        }
-
-        for (const file of fileArray) {
-          attachments.push({
-            filename: file.originalFilename || file.newFilename || "attachment",
-            path: file.filepath,
-          });
-        }
+    // Anexos
+    let attachments = [];
+    if (files.attachment) {
+      if (Array.isArray(files.attachment)) {
+        attachments = await Promise.all(
+          files.attachment
+            .filter((file) => file.size > 0)
+            .map(async (file) => ({
+              filename: file.originalFilename,
+              content: await fs.promises.readFile(file.filepath),
+            }))
+        );
+      } else if (files.attachment.filepath && files.attachment.size > 0) {
+        attachments = [
+          {
+            filename: files.attachment.originalFilename,
+            content: await fs.promises.readFile(files.attachment.filepath),
+          },
+        ];
       }
-
-      const mailOptions = {
-        from: `"Orçamento Website" <${process.env.SMTP_USER}>`, // usar email do domínio
-        replyTo: email, // email do cliente
-        to: process.env.RECEIVER_EMAIL, 
-        subject: `Novo orçamento de ${name}`,
-        text: `Nome: ${name}\nEmail: ${email}\nTelefone: ${phone}\nMensagem:\n${body}`,
-        attachments,
-      };
-
-      await transporter.sendMail(mailOptions);
-
-      return res.status(200).json({ success: true });
-    } catch (err) {
-      console.error("SMTP ERROR FULL:", err);
-      console.error("SMTP ERROR MESSAGE:", err.message);
-      console.error("SMTP ERROR CODE:", err.code);
-      return res.status(500).json({ error: err.message });
     }
-  });
+
+    await transporter.sendMail({
+      from: `"Orçamento Website" <${process.env.SMTP_USER}>`,
+      to: process.env.RECEIVER_EMAIL || process.env.SMTP_USER,
+      replyTo: email,
+      subject: `Novo orçamento de ${name}`,
+      text: `Nome: ${name}\nEmail: ${email}\nTelefone: ${phone}\nMensagem:\n${body}`,
+      attachments,
+    });
+
+    res.status(200).json({ message: "Enviado com sucesso" });
+  } catch (error) {
+    console.error("Erro ao enviar e-mail:", error);
+    res.status(500).json({ error: error.message || "Falha ao enviar o e-mail" });
+  }
 }

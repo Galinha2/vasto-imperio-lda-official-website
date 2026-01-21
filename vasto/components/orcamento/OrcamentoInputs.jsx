@@ -1,5 +1,6 @@
 "use client";
-import { useState, useRef, useEffect } from "react";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import Spinner from "../loadings/Spinner";
 import contentpt from "@/assets/contentpt.json";
 import contenten from "@/assets/contenten.json";
@@ -14,18 +15,25 @@ export default function OrcamentoInputs() {
   const [files, setFiles] = useState([]);
   const [fileError, setFileError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const fileInputRef = useRef(null);
-  const nameInputRef = useRef(null);
+  const [formDataState, setFormDataState] = useState({
+    name: "",
+    phone: "",
+    email: "",
+    body: "",
+  });
   const [mounted, setMounted] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
-  async function handleSubmit(event) {
-    event.preventDefault();
+  function handleInputChange(e) {
+    const { name, value } = e.target;
+    setFormDataState((prev) => ({ ...prev, [name]: value }));
+  }
 
-    // Validate file count and size
+  async function handleSubmit() {
     if (files.length > 1) {
       alert("Apenas é permitido um ficheiro (imagem ou PDF).");
       return;
@@ -39,10 +47,10 @@ export default function OrcamentoInputs() {
 
     try {
       const formData = new FormData();
-      formData.append("name", nameInputRef.current.value);
-      formData.append("phone", event.target.phone.value);
-      formData.append("email", event.target.email.value);
-      formData.append("body", event.target.body.value);
+      formData.append("name", formDataState.name);
+      formData.append("phone", formDataState.phone);
+      formData.append("email", formDataState.email);
+      formData.append("body", formDataState.body);
       if (files.length === 1) {
         formData.append("attachment", files[0]);
       }
@@ -53,7 +61,7 @@ export default function OrcamentoInputs() {
       });
 
       if (response.ok) {
-        window.location.href = "/sucesso";
+        router.replace("/sucesso?enviado=true");
       } else {
         throw new Error("Erro ao enviar o formulário.");
       }
@@ -64,7 +72,6 @@ export default function OrcamentoInputs() {
   }
 
   if (!mounted) return null;
-  // Only render the component after mount
   return (
     <div className="p-5 pt-20 w-full max-w-200 m-auto relative">
       {isSubmitting && (
@@ -78,19 +85,20 @@ export default function OrcamentoInputs() {
         </div>
       )}
       <h1 className="title mb-5 text-center">{item.title}</h1>
-      <form
+      <div
+        id="orcamento-form"
         className="p-5 bg-(--gray) w-auto rounded-[35px] flex gap-5 flex-col"
-        onSubmit={handleSubmit}
-        encType="multipart/form-data"
+        autoComplete="off"
       >
         <div className="flex gap-5">
           <input
-            ref={nameInputRef}
             className="input"
             type="text"
             name="name"
             placeholder={item.nome}
             required
+            value={formDataState.name}
+            onChange={handleInputChange}
           />
           <input
             className="input"
@@ -98,6 +106,8 @@ export default function OrcamentoInputs() {
             name="phone"
             placeholder={item.phone}
             required
+            value={formDataState.phone}
+            onChange={handleInputChange}
           />
         </div>
         <input
@@ -106,12 +116,16 @@ export default function OrcamentoInputs() {
           name="email"
           placeholder={item.mail}
           required
+          value={formDataState.email}
+          onChange={handleInputChange}
         />
         <textarea
           className="h-70 pt-5 input resize-none align-top"
           name="body"
           placeholder={item.body}
           required
+          value={formDataState.body}
+          onChange={handleInputChange}
         />
         {files.length < 1 && (
           <label className="bg-white shadow-sm px-5 py-2 rounded-full w-fit cursor-pointer">
@@ -120,7 +134,6 @@ export default function OrcamentoInputs() {
               {item.anexo}
             </div>
             <input
-              ref={fileInputRef}
               type="file"
               name="attachment"
               className="hidden"
@@ -173,13 +186,14 @@ export default function OrcamentoInputs() {
         </div>
 
         <button
-          type="submit"
+          type="button"
           className="-mt-5 bg-(--orange) text-white px-5 py-2 rounded-full shadow-md w-fit cursor-pointer self-end"
           disabled={isSubmitting}
+          onClick={handleSubmit}
         >
           {item.submit}
         </button>
-      </form>
+      </div>
     </div>
   );
 }

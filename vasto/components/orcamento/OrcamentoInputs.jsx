@@ -52,8 +52,9 @@ export default function OrcamentoInputs() {
       formData.append("phone", formDataState.phone);
       formData.append("email", formDataState.email);
       formData.append("body", formDataState.body);
-      files.forEach((file, index) => {
-        formData.append(`attachment${index}`, file);
+      files.forEach((file) => {
+        // Todos os ficheiros enviados com o mesmo nome 'attachment'
+        formData.append("attachment", file);
       });
 
       const response = await fetch("/api/orcamento", {

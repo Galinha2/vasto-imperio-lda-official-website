@@ -22,6 +22,8 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: "Method Not Allowed" });
   }
 
+  console.log("NODE_ENV:", process.env.NODE_ENV);
+
   try {
     const { fields, files } = await parseForm(req); // agora fields e files existem
     const { name, email, phone, body } = fields;

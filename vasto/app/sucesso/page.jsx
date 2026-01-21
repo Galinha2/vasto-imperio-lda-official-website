@@ -1,8 +1,8 @@
+"use client";
 
 import { useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Sucesso from "@/components/sucesso/Sucesso";
-
 
 export default function Page() {
   const router = useRouter();
@@ -11,7 +11,6 @@ export default function Page() {
 
   useEffect(() => {
     if (enviado !== "true") {
-      // redireciona para o formulário se o query param não estiver presente
       router.replace("/orcamento");
     }
   }, [enviado, router]);

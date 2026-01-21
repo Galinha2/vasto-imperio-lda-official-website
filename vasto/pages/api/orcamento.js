@@ -73,6 +73,9 @@ export default async function handler(req, res) {
     res.status(200).json({ message: "Enviado com sucesso" });
   } catch (error) {
     console.error("Erro ao enviar e-mail:", error);
-    res.status(500).json({ error: error.message || "Falha ao enviar o e-mail" });
+    res.status(500).json({
+      error: true,
+      message: error.message || "Erro interno ao enviar o e-mail",
+    });
   }
 }

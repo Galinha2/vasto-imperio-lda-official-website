@@ -63,7 +63,8 @@ export default function OrcamentoInputs() {
       if (response.ok) {
         router.replace("/sucesso?enviado=true");
       } else {
-        throw new Error("Erro ao enviar o formulário.");
+        const data = await response.json();
+        throw new Error(data.message || "Erro ao enviar o formulário.");
       }
     } catch (error) {
       alert(error.message || "Erro ao enviar o formulário.");

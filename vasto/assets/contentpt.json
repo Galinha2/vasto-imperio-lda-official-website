@@ -125,259 +125,378 @@
           "/produtos/1-Paleco/i6.jpg",
           "/produtos/1-Paleco/i7.jpg"
         ],
-        "description": "<span class='label'>Material:</span> Galvanizado ou RAL 5005 / 7035<br/><span class='label'>Altura:</span>  2000 a 5000 mm <br/><span class='label'>Profundidade:</span> 400 a 1200 mm. <br/><span class='label'>Descrição:</span> Bastidor metálico com sapata, indicado para sistemas de armazenagem e estruturas industriais. Fabricado em aço de elevada resistência, permite múltiplas configurações de altura e profundidade, adaptando-se a diferentes necessidades de carga e espaço. Disponível em acabamento galvanizado ou pintado, garantindo durabilidade e proteção anticorrosão em ambientes industriais.",
+        "description": "<span class='label'>Material:</span> Galvanizado ou RAL 5005 / 7035<br/><span class='label'>Altura dos Bastidores:</span>  2000 a 5000 mm <br/><span class='label'>Profundidade dos Bastidores:</span> 400 a 1200 mm. <br/><span class='label'>Comprimento das Vigas:</span> 1200 a 2750 mm. <br/><span class='label'>Descrição:</span> Bastidor metálico com sapata, indicado para sistemas de armazenagem e estruturas industriais. Fabricado em aço de elevada resistência, permite múltiplas configurações de altura e profundidade, adaptando-se a diferentes necessidades de carga e espaço. Disponível em acabamento galvanizado ou pintado, garantindo durabilidade e proteção anticorrosão em ambientes industriais.",
         "tabela": [
           {
-            "codigo": "PTEC2040",
+            "nome": "Bastidores",
             "altura_mm": 2000,
             "profundidade_mm": 400,
             "acabamento": "Galvanizado ou RAL 5005 / 7035",
             "peso_kg": 8.55
           },
           {
-            "codigo": "PTEC2050",
+            "nome": "Bastidores",
             "altura_mm": 2000,
             "profundidade_mm": 500,
             "acabamento": "Galvanizado ou RAL 5005 / 7035",
             "peso_kg": 8.71
           },
           {
-            "codigo": "PTEC2060",
+            "nome": "Bastidores",
             "altura_mm": 2000,
             "profundidade_mm": 600,
             "acabamento": "Galvanizado ou RAL 5005 / 7035",
             "peso_kg": 8.82
           },
           {
-            "codigo": "PTEC2070",
+            "nome": "Bastidores",
             "altura_mm": 2000,
             "profundidade_mm": 700,
             "acabamento": "Galvanizado ou RAL 5005 / 7035",
             "peso_kg": 9.06
           },
           {
-            "codigo": "PTEC2080",
+            "nome": "Bastidores",
             "altura_mm": 2000,
             "profundidade_mm": 800,
             "acabamento": "Galvanizado ou RAL 5005 / 7035",
             "peso_kg": 9.24
           },
           {
-            "codigo": "PTEC2090",
+            "nome": "Bastidores",
             "altura_mm": 2000,
             "profundidade_mm": 900,
             "acabamento": "Galvanizado ou RAL 5005 / 7035",
             "peso_kg": 9.46
           },
           {
-            "codigo": "PTEC20100",
+            "nome": "Bastidores",
             "altura_mm": 2000,
             "profundidade_mm": 1000,
             "acabamento": "Galvanizado ou RAL 5005 / 7035",
             "peso_kg": 9.63
           },
           {
-            "codigo": "PTEC20110",
+            "nome": "Bastidores",
             "altura_mm": 2000,
             "profundidade_mm": 1100,
             "acabamento": "Galvanizado ou RAL 5005 / 7035",
             "peso_kg": 9.85
           },
           {
-            "codigo": "PTEC20120",
+            "nome": "Bastidores",
             "altura_mm": 2000,
             "profundidade_mm": 1200,
             "acabamento": "Galvanizado ou RAL 5005 / 7035",
             "peso_kg": 10.04
           },
           {
-            "codigo": "PTEC3040",
+            "nome": "Bastidores",
             "altura_mm": 3000,
             "profundidade_mm": 400,
             "acabamento": "Galvanizado ou RAL 5005 / 7035",
             "peso_kg": 11.4
           },
           {
-            "codigo": "PTEC3050",
+            "nome": "Bastidores",
             "altura_mm": 3000,
             "profundidade_mm": 500,
             "acabamento": "Galvanizado ou RAL 5005 / 7035",
             "peso_kg": 11.6
           },
           {
-            "codigo": "PTEC3060",
+            "nome": "Bastidores",
             "altura_mm": 3000,
             "profundidade_mm": 600,
             "acabamento": "Galvanizado ou RAL 5005 / 7035",
             "peso_kg": 11.8
           },
           {
-            "codigo": "PTEC3070",
+            "nome": "Bastidores",
             "altura_mm": 3000,
             "profundidade_mm": 700,
             "acabamento": "Galvanizado ou RAL 5005 / 7035",
             "peso_kg": 12.05
           },
           {
-            "codigo": "PTEC3080",
+            "nome": "Bastidores",
             "altura_mm": 3000,
             "profundidade_mm": 800,
             "acabamento": "Galvanizado ou RAL 5005 / 7035",
             "peso_kg": 12.3
           },
           {
-            "codigo": "PTEC3090",
+            "nome": "Bastidores",
             "altura_mm": 3000,
             "profundidade_mm": 900,
             "acabamento": "Galvanizado ou RAL 5005 / 7035",
             "peso_kg": 12.5
           },
           {
-            "codigo": "PTEC30100",
+            "nome": "Bastidores",
             "altura_mm": 3000,
             "profundidade_mm": 1000,
             "acabamento": "Galvanizado ou RAL 5005 / 7035",
             "peso_kg": 12.7
           },
           {
-            "codigo": "PTEC30110",
+            "nome": "Bastidores",
             "altura_mm": 3000,
             "profundidade_mm": 1100,
             "acabamento": "Galvanizado ou RAL 5005 / 7035",
             "peso_kg": 12.9
           },
           {
-            "codigo": "PTEC30120",
+            "nome": "Bastidores",
             "altura_mm": 3000,
             "profundidade_mm": 1200,
             "acabamento": "Galvanizado ou RAL 5005 / 7035",
             "peso_kg": 13.1
           },
           {
-            "codigo": "PTEC4040",
+            "nome": "Bastidores",
             "altura_mm": 4000,
             "profundidade_mm": 400,
             "acabamento": "Galvanizado ou RAL 5005 / 7035",
             "peso_kg": 14.3
           },
           {
-            "codigo": "PTEC4050",
+            "nome": "Bastidores",
             "altura_mm": 4000,
             "profundidade_mm": 500,
             "acabamento": "Galvanizado ou RAL 5005 / 7035",
             "peso_kg": 14.6
           },
           {
-            "codigo": "PTEC4060",
+            "nome": "Bastidores",
             "altura_mm": 4000,
             "profundidade_mm": 600,
             "acabamento": "Galvanizado ou RAL 5005 / 7035",
             "peso_kg": 14.8
           },
           {
-            "codigo": "PTEC4070",
+            "nome": "Bastidores",
             "altura_mm": 4000,
             "profundidade_mm": 700,
             "acabamento": "Galvanizado ou RAL 5005 / 7035",
             "peso_kg": 15.1
           },
           {
-            "codigo": "PTEC4080",
+            "nome": "Bastidores",
             "altura_mm": 4000,
             "profundidade_mm": 800,
             "acabamento": "Galvanizado ou RAL 5005 / 7035",
             "peso_kg": 15.4
           },
           {
-            "codigo": "PTEC4090",
+            "nome": "Bastidores",
             "altura_mm": 4000,
             "profundidade_mm": 900,
             "acabamento": "Galvanizado ou RAL 5005 / 7035",
             "peso_kg": 15.7
           },
           {
-            "codigo": "PTEC40100",
+            "nome": "Bastidores",
             "altura_mm": 4000,
             "profundidade_mm": 1000,
             "acabamento": "Galvanizado ou RAL 5005 / 7035",
             "peso_kg": 16.0
           },
           {
-            "codigo": "PTEC40110",
+            "nome": "Bastidores",
             "altura_mm": 4000,
             "profundidade_mm": 1100,
             "acabamento": "Galvanizado ou RAL 5005 / 7035",
             "peso_kg": 16.3
           },
           {
-            "codigo": "PTEC40120",
+            "nome": "Bastidores",
             "altura_mm": 4000,
             "profundidade_mm": 1200,
             "acabamento": "Galvanizado ou RAL 5005 / 7035",
             "peso_kg": 16.5
           },
           {
-            "codigo": "PTEC5040",
+            "nome": "Bastidores",
             "altura_mm": 5000,
             "profundidade_mm": 400,
             "acabamento": "Galvanizado ou RAL 5005 / 7035",
             "peso_kg": 16.9
           },
           {
-            "codigo": "PTEC5050",
+            "nome": "Bastidores",
             "altura_mm": 5000,
             "profundidade_mm": 500,
             "acabamento": "Galvanizado ou RAL 5005 / 7035",
             "peso_kg": 17.2
           },
           {
-            "codigo": "PTEC5060",
+            "nome": "Bastidores",
             "altura_mm": 5000,
             "profundidade_mm": 600,
             "acabamento": "Galvanizado ou RAL 5005 / 7035",
             "peso_kg": 17.5
           },
           {
-            "codigo": "PTEC5070",
+            "nome": "Bastidores",
             "altura_mm": 5000,
             "profundidade_mm": 700,
             "acabamento": "Galvanizado ou RAL 5005 / 7035",
             "peso_kg": 17.9
           },
           {
-            "codigo": "PTEC5080",
+            "nome": "Bastidores",
             "altura_mm": 5000,
             "profundidade_mm": 800,
             "acabamento": "Galvanizado ou RAL 5005 / 7035",
             "peso_kg": 18.2
           },
           {
-            "codigo": "PTEC5090",
+            "nome": "Bastidores",
             "altura_mm": 5000,
             "profundidade_mm": 900,
             "acabamento": "Galvanizado ou RAL 5005 / 7035",
             "peso_kg": 18.5
           },
           {
-            "codigo": "PTEC50100",
+            "nome": "Bastidores",
             "altura_mm": 5000,
             "profundidade_mm": 1000,
             "acabamento": "Galvanizado ou RAL 5005 / 7035",
             "peso_kg": 18.8
           },
           {
-            "codigo": "PTEC50110",
+            "nome": "Bastidores",
             "altura_mm": 5000,
             "profundidade_mm": 1100,
             "acabamento": "Galvanizado ou RAL 5005 / 7035",
             "peso_kg": 19.1
           },
           {
-            "codigo": "PTEC50120",
+            "nome": "Bastidores",
             "altura_mm": 5000,
             "profundidade_mm": 1200,
             "acabamento": "Galvanizado ou RAL 5005 / 7035",
             "peso_kg": 19.4
+          },
+          {
+            "nome": "Vigas Z60",
+            "altura_mm": "-",
+            "profundidade_mm": 1000,
+            "acabamento": "RAL 7035",
+            "peso_kg": 1.62
+          },
+          {
+            "nome": "Vigas Z60",
+            "altura_mm": "-",
+            "profundidade_mm": 1250,
+            "acabamento": "RAL 7035",
+            "peso_kg": 1.94
+          },
+          {
+            "nome": "Vigas Z60",
+            "altura_mm": "-",
+            "profundidade_mm": 1500,
+            "acabamento": "RAL 7035",
+            "peso_kg": 2.26
+          },
+          {
+            "nome": "Vigas Z60",
+            "altura_mm": "-",
+            "profundidade_mm": 1750,
+            "acabamento": "RAL 7035",
+            "peso_kg": 2.58
+          },
+          {
+            "nome": "Vigas Z60",
+            "altura_mm": "-",
+            "profundidade_mm": 2000,
+            "acabamento": "RAL 7035",
+            "peso_kg": 2.90
+          },
+          {
+            "nome": "Vigas Z60",
+            "altura_mm": "-",
+            "profundidade_mm": 2250,
+            "acabamento": "RAL 7035",
+            "peso_kg": 3.22
+          },
+          {
+            "nome": "Vigas Z60",
+            "altura_mm": "-",
+            "profundidade_mm": 2500,
+            "acabamento": "RAL 7035",
+            "peso_kg": 3.54
+          },
+          {
+            "nome": "Vigas Z60",
+            "altura_mm": "-",
+            "profundidade_mm": 2750,
+            "acabamento": "RAL 7035",
+            "peso_kg": 4.14
+          },
+          {
+            "nome": "Vigas Z100",
+            "altura_mm": "-",
+            "profundidade_mm": 1000,
+            "acabamento": "RAL 7035",
+            "peso_kg": 2.65
+          },
+          {
+            "nome": "Vigas Z100",
+            "altura_mm": "-",
+            "profundidade_mm": 1250,
+            "acabamento": "RAL 7035",
+            "peso_kg": 3.25
+          },
+          {
+            "nome": "Vigas Z100",
+            "altura_mm": "-",
+            "profundidade_mm": 1500,
+            "acabamento": "RAL 7035",
+            "peso_kg": 3.84
+          },
+          {
+            "nome": "Vigas Z100",
+            "altura_mm": "-",
+            "profundidade_mm": 1750,
+            "acabamento": "RAL 7035",
+            "peso_kg": 4.43
+          },
+          {
+            "nome": "Vigas Z100",
+            "altura_mm": "-",
+            "profundidade_mm": 2000,
+            "acabamento": "RAL 7035",
+            "peso_kg": 5.02
+          },
+          {
+            "nome": "Vigas Z100",
+            "altura_mm": "-",
+            "profundidade_mm": 2250,
+            "acabamento": "RAL 7035",
+            "peso_kg": 5.62
+          },
+          {
+            "nome": "Vigas Z100",
+            "altura_mm": "-",
+            "profundidade_mm": 2500,
+            "acabamento": "RAL 7035",
+            "peso_kg": 6.21
+          },
+          {
+            "nome": "Vigas Z100",
+            "altura_mm": "-",
+            "profundidade_mm": 2600,
+            "acabamento": "RAL 7035",
+            "peso_kg": 6.45
+          },
+          {
+            "nome": "Vigas Z100",
+            "altura_mm": "-",
+            "profundidade_mm": 2750,
+            "acabamento": "RAL 7035",
+            "peso_kg": 6.80
           }
         ]
       },
@@ -601,7 +720,7 @@
             "peso_kg": 10
           }
         ],
-        "description": "<span class='label'>Material:</span> Galvanizado ou RAL 5005 / 7035<br/><span class='label'>Altura:</span>  2000 a 5000 mm <br/><span class='label'>Profundidade:</span> 400 a 1200 mm. <br/><span class='label'>Descrição:</span> As estantes metálicas de encaixe sem parafusos são uma solução prática e resistente para espaços que exigem organização eficiente e elevada capacidade de carga, como armazéns, arquivos ou zonas industriais. O sistema modular permite ajustar facilmente a altura das prateleiras, adaptando a estrutura às necessidades específicas de cada utilização. A montagem é rápida e segura, através de encaixes reforçados que garantem estabilidade e evitam deslocações indesejadas. Fabricadas em aço robusto, estas estantes oferecem durabilidade, flexibilidade e uma excelente resposta para diferentes configurações de armazenamento, podendo ser dimensionadas à medida do espaço disponível."
+        "description": "<span class='label'>Material:</span> Galvanizado ou RAL 5005 / 7035<br/><span class='label'>Altura dos Bastidores:</span>  2000 a 5000 mm <br/><span class='label'>Profundidade dos Bastidores:</span> 400 a 1200 mm. <br/><span class='label'>Comprimento das Prateleiras:</span>  750 a 1000 mm <br/><span class='label'>Largura das Prateleiras:</span>  300 a 600 mm <br/><span class='label'>Descrição:</span> As estantes metálicas de encaixe sem parafusos são uma solução prática e resistente para espaços que exigem organização eficiente e elevada capacidade de carga, como armazéns, arquivos ou zonas industriais. O sistema modular permite ajustar facilmente a altura das prateleiras, adaptando a estrutura às necessidades específicas de cada utilização. A montagem é rápida e segura, através de encaixes reforçados que garantem estabilidade e evitam deslocações indesejadas. Fabricadas em aço robusto, estas estantes oferecem durabilidade, flexibilidade e uma excelente resposta para diferentes configurações de armazenamento, podendo ser dimensionadas à medida do espaço disponível."
       },
       {
         "id": "porta-paletes-eletrico",

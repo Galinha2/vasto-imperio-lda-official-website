@@ -94,6 +94,10 @@ export default async function handler(req, res) {
       error: true,
       message: error.message || "Erro interno ao enviar o e-mail",
       stack: error.stack || null,
+      smtpHost: process.env.SMTP_HOST || null,
+      smtpPort: process.env.SMTP_PORT || null,
+      smtpUser: process.env.SMTP_USER ? "****" : null,
+      receiverEmail: process.env.RECEIVER_EMAIL || null,
     });
   }
 }

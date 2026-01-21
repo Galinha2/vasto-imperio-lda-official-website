@@ -34,12 +34,13 @@ export default function OrcamentoInputs() {
   }
 
   async function handleSubmit() {
-    if (files.length > 1) {
-      alert("Apenas é permitido um ficheiro (imagem ou PDF).");
+    if (files.length > 3) {
+      alert("Apenas é permitido até três ficheiros (imagem ou PDF).");
       return;
     }
-    if (files.length === 1 && files[0].size > 10 * 1024 * 1024) {
-      alert(`O ficheiro "${files[0].name}" excede 10MB e não será enviado.`);
+    if (files.some(file => file.size > 10 * 1024 * 1024)) {
+      const largeFile = files.find(file => file.size > 10 * 1024 * 1024);
+      alert(`O ficheiro "${largeFile.name}" excede 10MB e não será enviado.`);
       return;
     }
 
@@ -51,9 +52,9 @@ export default function OrcamentoInputs() {
       formData.append("phone", formDataState.phone);
       formData.append("email", formDataState.email);
       formData.append("body", formDataState.body);
-      if (files.length === 1) {
-        formData.append("attachment", files[0]);
-      }
+      files.forEach((file, index) => {
+        formData.append(`attachment${index}`, file);
+      });
 
       const response = await fetch("/api/orcamento", {
         method: "POST",
@@ -64,10 +65,13 @@ export default function OrcamentoInputs() {
         router.replace("/sucesso?enviado=true");
       } else {
         const data = await response.json();
-        throw new Error(data.message || "Erro ao enviar o formulário.");
+        console.error("Erro do backend:", data);
+        alert("Erro ao enviar o formulário. Por favor, tente novamente.");
+        setIsSubmitting(false);
       }
     } catch (error) {
-      alert(error.message || "Erro ao enviar o formulário.");
+      console.error("Erro no envio:", error);
+      alert("Erro ao enviar o formulário. Por favor, tente novamente.");
       setIsSubmitting(false);
     }
   }
@@ -128,7 +132,7 @@ export default function OrcamentoInputs() {
           value={formDataState.body}
           onChange={handleInputChange}
         />
-        {files.length < 1 && (
+        {files.length < 3 && (
           <label className="bg-white shadow-sm px-5 py-2 rounded-full w-fit cursor-pointer">
             <div>
               <FiUpload className="inline mr-2" />
@@ -138,23 +142,23 @@ export default function OrcamentoInputs() {
               type="file"
               name="attachment"
               className="hidden"
+              multiple
               onChange={(e) => {
                 setFileError("");
                 const selected = Array.from(e.target.files);
-                if (selected.length > 1) {
-                  setFileError("Apenas é permitido um ficheiro (imagem ou PDF).");
+                if (files.length + selected.length > 3) {
+                  setFileError("Apenas é permitido até três ficheiros (imagem ou PDF).");
                   e.target.value = "";
                   return;
                 }
-                if (selected.length === 1) {
-                  const file = selected[0];
+                for (const file of selected) {
                   if (file.size > 10 * 1024 * 1024) {
                     setFileError(`O ficheiro "${file.name}" excede 10MB e não será adicionado.`);
                     e.target.value = "";
                     return;
                   }
-                  setFiles([file]);
                 }
+                setFiles((prev) => [...prev, ...selected]);
                 e.target.value = "";
               }}
             />

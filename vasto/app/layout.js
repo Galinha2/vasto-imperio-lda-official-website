@@ -8,7 +8,7 @@ const interTight = Inter_Tight({
   subsets: ['latin'],
   display: 'swap',
   variable: '--font-inter-tight',
-});
+})
 
 export const metadata = {
   title: {

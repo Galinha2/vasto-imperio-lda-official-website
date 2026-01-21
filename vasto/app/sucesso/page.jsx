@@ -1,11 +1,8 @@
-"use client"; // torna este componente um Client Component
+
 import { useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Sucesso from "@/components/sucesso/Sucesso";
 
-export const metadata = {
-  title: "Sucesso | Vasto Império",
-};
 
 export default function Page() {
   const router = useRouter();

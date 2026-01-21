@@ -1,7 +1,9 @@
 import Page from "./home/page";
 
 export const metadata = {
-    title: "Home | Vasto Império",
+    default: "Racks e Prateleiras Metálicas em Viseu e Benedita | Vasto Império",
+  description:
+    "A Vasto Império Lda fornece racks e prateleiras metálicas em Viseu e em todo o distrito. Soluções profissionais de armazenamento para empresas, armazéns e indústria, com entregas em todo o país."
 };
 
 export default function Home() {

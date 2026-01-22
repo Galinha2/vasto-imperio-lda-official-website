@@ -3,6 +3,7 @@ import contenten from "@/assets/contenten.json";
 import GalleryClient from "./GalleryClient";
 import ContactCard from "@/components/contacts/ContactCard";
 import ProductTabela from "@/components/produtos/ProductTabela";
+import Galeria from "@/components/galeria/Galeria";
 
 // Geração estática de todos os IDs para pt e en
 export function generateStaticParams() {
@@ -52,6 +53,12 @@ export default function Page({ params }) {
       {tabela && (
         <div className={`border-b border-(--horizontal-line) pb-5 mb-15`}>
           <ProductTabela product={product} />
+        </div>
+      )}
+      {product.galeria && product.galeria.length > 0 && (
+        <div className="mb-20 border-b border-(--horizontal-line) -mt-15 py-20 bg-(--gray) p-5">
+          <h1 className="title m-auto max-w-200 text-center mb-5">{product.galeriaTitle}</h1>
+          <Galeria productId={product.id} />
         </div>
       )}
       <ContactCard />

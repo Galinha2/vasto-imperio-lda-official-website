@@ -125,6 +125,15 @@
           "/produtos/1-Paleco/i6.jpg",
           "/produtos/1-Paleco/i7.jpg"
         ],
+        "galeriaTitle": "Os nossos Clientes",
+        "galeria": [
+          "/produtos/1-Paleco/a1.jpg",
+          "/produtos/1-Paleco/a2.jpg",
+          "/produtos/1-Paleco/a3.jpg",
+          "/produtos/1-Paleco/a4.jpg",
+          "/produtos/1-Paleco/a5.jpg",
+          "/produtos/1-Paleco/a6.jpg"
+        ],
         "description": "<span class='label'>Material:</span> Galvanizado ou RAL 5005 / 7035<br/><span class='label'>Altura dos Bastidores:</span>  2000 a 5000 mm <br/><span class='label'>Profundidade dos Bastidores:</span> 400 a 1200 mm. <br/><span class='label'>Comprimento das Vigas:</span> 1200 a 2750 mm. <br/><span class='label'>Descrição:</span> Bastidor metálico com sapata, indicado para sistemas de armazenagem e estruturas industriais. Fabricado em aço de elevada resistência, permite múltiplas configurações de altura e profundidade, adaptando-se a diferentes necessidades de carga e espaço. Disponível em acabamento galvanizado ou pintado, garantindo durabilidade e proteção anticorrosão em ambientes industriais.",
         "tabela": [
           {
@@ -513,6 +522,12 @@
           "/produtos/2-prateleiras-ligeiras/i2.png",
           "/produtos/2-prateleiras-ligeiras/i3.png",
           "/produtos/2-prateleiras-ligeiras/i4.png"
+        ],
+        "galeriaTitle": "Os nossos clientes",
+        "galeria": [
+          "/produtos/2-prateleiras-ligeiras/a2.jpg",
+          "/produtos/2-prateleiras-ligeiras/a1.jpg",
+          "/produtos/2-prateleiras-ligeiras/a3.jpg"
         ],
         "tabela": [
           {

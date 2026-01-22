@@ -125,6 +125,15 @@
           "/produtos/1-Paleco/i6.jpg",
           "/produtos/1-Paleco/i7.jpg"
         ],
+        "galeriaTitle": "Our Clients",
+        "galeria": [
+          "/produtos/1-Paleco/a1.jpg",
+          "/produtos/1-Paleco/a2.jpg",
+          "/produtos/1-Paleco/a3.jpg",
+          "/produtos/1-Paleco/a4.jpg",
+          "/produtos/1-Paleco/a5.jpg",
+          "/produtos/1-Paleco/a6.jpg"
+        ],
         "description": "<span class='label'>Material:</span> Galvanized or RAL 5005 / 7035<br/><span class='label'>Frame Height:</span>  2000 to 5000 mm <br/><span class='label'>Frame Depth:</span> 400 to 1200 mm. <br/><span class='label'>Beam Length:</span> 1200 to 2750 mm. <br/><span class='label'>Description:</span> Metal frame with footplate, suitable for storage systems and industrial structures. Made from high-strength steel, it allows multiple height and depth configurations, adapting to different load and space requirements. Available in galvanized or painted finish, ensuring durability and anti-corrosion protection in industrial environments.",
         "tabela": [
           {
@@ -513,6 +522,12 @@
           "/produtos/2-prateleiras-ligeiras/i2.png",
           "/produtos/2-prateleiras-ligeiras/i3.png",
           "/produtos/2-prateleiras-ligeiras/i4.png"
+        ],
+        "galeriaTitle": "Our Clients",
+        "galeria": [
+          "/produtos/2-prateleiras-ligeiras/a2.jpg",
+          "/produtos/2-prateleiras-ligeiras/a1.jpg",
+          "/produtos/2-prateleiras-ligeiras/a3.jpg"
         ],
         "tabela": [
           {

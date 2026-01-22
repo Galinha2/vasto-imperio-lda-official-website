@@ -109,6 +109,7 @@ export default function GalleryClient({ product, text }) {
           </div>
         </div>
       )}
+      
     </>
   );
 }

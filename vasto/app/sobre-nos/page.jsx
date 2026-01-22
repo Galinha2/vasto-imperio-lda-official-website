@@ -7,9 +7,9 @@ export const metadata = {
 
 function page() {
     return (
-        <div className="mt-17 max-w-450">
+        <div className="mt-17 m-auto">
             <Sobre />
-            <div className="m-auto -mt-30 w-screen">
+            <div className="m-auto -mt-30 w-full">
                 <ContactCard />
             </div>
         </div>

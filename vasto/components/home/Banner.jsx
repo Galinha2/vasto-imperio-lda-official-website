@@ -26,11 +26,11 @@ function Banner() {
                 width={2000}
                 height={50}
                 priority
-                className="z-1 relative w-full max-w-[100px] md:max-w-[250px] lg:max-w-[450px] h-auto"
+                className="z-1 relative w-full max-w-[100px] md:max-w-[250px] lg:max-w-[350px] xl:max-w-[400px] h-auto"
               />
-            <div className="flex flex-col md:items-start text-center md:text-left items-center gap-4 justify-end z-1 relative bg-[var(--gray-transparent)] backdrop-blur-[5px] w-110 h-60 md:h-58 pt-5 px-5 pb-6 md:pb-4 rounded-[0px_0px_35px_35px] md:rounded-[35px_35px_0px_0px]">
+            <div className="flex flex-col md:items-start text-center md:text-left items-center gap-4 justify-end z-1 relative bg-[var(--gray-transparent)] backdrop-blur-[5px] w-110 h-57 md:h-68 pt-5 px-5 pb-6 md:pb-4 rounded-[0px_0px_35px_35px] md:rounded-[35px_35px_0px_0px]">
               <h1
-                className="text-4xl font-black text-[var(--blue)]"
+                className="text-3xl md:text-4xl font-black text-[var(--blue)]"
                 dangerouslySetInnerHTML={{ __html: item.title }}
               ></h1>
               <p className="text-[var(--blue)] w-90">{item.subTitle}</p>
@@ -50,7 +50,7 @@ function Banner() {
           width={2000}
           height={100}
           priority
-          className="z-1 relative w-full max-w-[400px] md:max-w-[300px] lg:max-w-[800px] h-auto"
+          className="z-1 relative w-full max-w-[400px] md:max-w-[300px] lg:max-w-[500px] xl:max-w-[800px] h-auto"
         />
       </div>
     </div>

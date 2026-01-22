@@ -107,7 +107,7 @@
   },
   "productsShowcase": {
     "produtoNe": "Produto não encontrado",
-    "caracteristicas": "Caracteristicas",
+    "caracteristicas": "Características",
     "title": "Contacte a Vasto Império em Benedita e Viseu",
     "products": [
       {
@@ -738,7 +738,7 @@
           "/produtos/5-porta-paletes-eletrico/i7.png"
         ],
 
-        "description": "<span class='label'>Capacidade:</span> 1500 Kg<br/ ><span class='label'>Peso sem bateria:</span> 110 Kg<br/><span class='label'>Peso com bateria:</span> 116 Kg<br/><span class='label'>Voltagem:</span> 25.6 V<br/><span class='label'>Capacidade da bateria:</span> 20 Ah <span class='label'>Descrição:</span> O nosso porta-paletes elétrico de 1500 Kg é ideal para movimentação rápida e segura de cargas em armazéns, centros logísticos ou fábricas. Equipado com motor elétrico e bateria de alta capacidade, permite manobras precisas com esforço mínimo, aumentando a eficiência operacional e reduzindo o esforço do operador. A estrutura em aço reforçado garante robustez e durabilidade, enquanto o design ergonómico assegura conforto e segurança durante o transporte de cargas pesadas. Uma solução confiável para otimizar a logística interna e aumentar a produtividade."
+        "description": "<span class='label'>Capacidade:</span> 1500 Kg<br/><span class='label'>Peso sem bateria:</span> 110 Kg<br/><span class='label'>Peso com bateria:</span> 116 Kg<br/><span class='label'>Voltagem:</span> 25.6 V<br/><span class='label'>Capacidade da bateria:</span> 20 Ah <span class='label'>Descrição:</span> O nosso porta-paletes elétrico de 1500 Kg é ideal para movimentação rápida e segura de cargas em armazéns, centros logísticos ou fábricas. Equipado com motor elétrico e bateria de alta capacidade, permite manobras precisas com esforço mínimo, aumentando a eficiência operacional e reduzindo o esforço do operador. A estrutura em aço reforçado garante robustez e durabilidade, enquanto o design ergonómico assegura conforto e segurança durante o transporte de cargas pesadas. Uma solução confiável para otimizar a logística interna e aumentar a produtividade."
       },
       {
         "id": "porta-paletes-manual",
@@ -752,7 +752,7 @@
           "/produtos/6-porta-paletes-manual/i3.png"
         ],
 
-        "description": "<span class='label'>Capacidade:</span> 3000 Kg<br/ ><span class='label'>Descrição:</span> As nossas soluções de porta-paletes manuais de alta capacidade são ideais para movimentação e transporte seguro de cargas pesadas em armazéns, fábricas ou centros logísticos. Este modelo suporta até 3000 kg, garantindo robustez e fiabilidade, com estrutura reforçada em aço resistente. A operação é prática e eficiente, permitindo manobras precisas mesmo em espaços reduzidos. Um equipamento essencial para otimizar a logística interna e aumentar a produtividade, mantendo sempre a segurança do operador e das mercadorias."
+        "description": "<span class='label'>Capacidade:</span> 3000 Kg<br/><span class='label'>Descrição:</span> As nossas soluções de porta-paletes manuais de alta capacidade são ideais para movimentação e transporte seguro de cargas pesadas em armazéns, fábricas ou centros logísticos. Este modelo suporta até 3000 kg, garantindo robustez e fiabilidade, com estrutura reforçada em aço resistente. A operação é prática e eficiente, permitindo manobras precisas mesmo em espaços reduzidos. Um equipamento essencial para otimizar a logística interna e aumentar a produtividade, mantendo sempre a segurança do operador e das mercadorias."
       },
       {
         "id": "cacifos-metalicos",
@@ -874,7 +874,7 @@
           "/produtos/9-Porteco Z60/i17.jpg"
         ],
 
-        "description": "<span class='label'>Bastidores:</span> Os bastidores são compostos por dois pilares em formato ómega de secção 50x50mm, com furação frontal espaçada de 50 em 50mm. A ligação entre os pilares é assegurada por travessas e diagonais aparafusadas na furação lateral do pilar. O apoio ao solo é garantido através de sapata metálica aparafusada. A sapata dispõe de furação para permitir a fixação ao solo através de buchas metálicas tipo HST.<br/ ><span class='label'>Vigas:</span> As vigas do sistema PORTECO são em formato Z, com rebaixe para permitir a aplicação de placas de aglomerado ou painéis metálicos de 19mm de espessura. Na extremidade de cada viga é soldado um conector com 3 garras, que permite o encaixe fácil e rápido na furação frontal do pilar. O conector dispõe de furação dedicada para aplicação de freio de segurança, que funciona como fusível mecânico. Dispomos de dois tipos de vigas: Z60 ou Z100, que podem ser utilizadas em função da carga a armazenar. <br/ ><span class='label'>Prateleiras:</span> O sistema PORTECO pode utilizar dois tipos de prateleiras: placas de aglomerado de 19mm de espessura ou painéis metálicos modulares, com acabamento galvanizado.",
+        "description": "<span class='label'>Bastidores:</span> Os bastidores são compostos por dois pilares em formato ómega de secção 50x50mm, com furação frontal espaçada de 50 em 50mm. A ligação entre os pilares é assegurada por travessas e diagonais aparafusadas na furação lateral do pilar. O apoio ao solo é garantido através de sapata metálica aparafusada. A sapata dispõe de furação para permitir a fixação ao solo através de buchas metálicas tipo HST.<br/><span class='label'>Vigas:</span> As vigas do sistema PORTECO são em formato Z, com rebaixe para permitir a aplicação de placas de aglomerado ou painéis metálicos de 19mm de espessura. Na extremidade de cada viga é soldado um conector com 3 garras, que permite o encaixe fácil e rápido na furação frontal do pilar. O conector dispõe de furação dedicada para aplicação de freio de segurança, que funciona como fusível mecânico. Dispomos de dois tipos de vigas: Z60 ou Z100, que podem ser utilizadas em função da carga a armazenar. <br/><span class='label'>Prateleiras:</span> O sistema PORTECO pode utilizar dois tipos de prateleiras: placas de aglomerado de 19mm de espessura ou painéis metálicos modulares, com acabamento galvanizado.",
         "tabela": [
           {
             "altura_mm": 2000,
@@ -953,17 +953,17 @@
           "/produtos/13-Cantilever Ligeiro (Light Cantilever)/i11.jpg"
         ],
 
-        "description": "<span class='label'>Carga por braço:</span> até 40Kg distribuídos uniformemente (80Kg por par de braços).<br/ ><span class='label'>Descrição:</span> Cantilever ligeiro, para carga manual, tipologia simples (acesso apenas de um lado). Base aparafusada à coluna do cantilever, com furação para permitir a fixação ao solo. Ajuste da altura dos bragos de 50mm em 50mm. Os braços apresentam topo anti-queda. Carga por braço: até 40Kg distribuídos uniformemente (80Kg por par de braços). Pilares e base com acabamento a pintura epoxy de cor azul, RAL 5005, braços em cinza claro, RAL 7035, travessas e diagonais galvanizadas. Inclui fixação ao solo. Dimensões: 800x400x2000mm (CxPxA) ou 800x500x2000mm (CxPxA).",
+        "description": "<span class='label'>Carga por braço:</span> até 40Kg distribuídos uniformemente (80Kg por par de braços).<br/><span class='label'>Descrição:</span> Cantilever ligeiro, para carga manual, tipologia simples (acesso apenas de um lado). Base aparafusada à coluna do cantilever, com furação para permitir a fixação ao solo. Ajuste da altura dos braços de 50mm em 50mm. Os braços apresentam topo anti-queda. Carga por braço: até 40Kg distribuídos uniformemente (80Kg por par de braços). Pilares e base com acabamento a pintura epoxy de cor azul, RAL 5005, braços em cinza claro, RAL 7035, travessas e diagonais galvanizadas. Inclui fixação ao solo. Dimensões: 800x400x2000mm (CxPxA) ou 800x500x2000mm (CxPxA).",
         "tabela": [
           {
             "nome": "CANTILEVER LIGEIRO PORTECO SIMPLES",
-            "medidas_mm": "Cant. ligeiro simples base + 3 niveis 800x400x2000",
+            "medidas_mm": "Cant. ligeiro simples base + 3 níveis 800x400x2000",
             "acabamento": "Pilares/Base: azul RAL 5005; Braços: cinza RAL 7035; Travessas/Diagonais: galvanizadas",
             "peso_kg": 36.35
           },
           {
             "nome": "CANTILEVER LIGEIRO PORTECO SIMPLES",
-            "medidas_mm": "Cant. ligeiro simples base + 3 niveis 800x500x2000",
+            "medidas_mm": "Cant. ligeiro simples base + 3 níveis 800x500x2000",
             "acabamento": "Pilares/Base: azul RAL 5005; Braços: cinza RAL 7035; Travessas/Diagonais: galvanizadas",
             "peso_kg": 38.4
           },
@@ -1019,7 +1019,7 @@
           "/produtos/10-Porteco Z100/i6.jpg"
         ],
 
-        "description": "<span class='label'>Capacidade:</span> Até 850Kg por nível.<br/ ><span class='label'>Descrição:</span> Sistema de armazenagem carga média, muito versátil  e resistente. É a solução indicada para armazenar mercadorias pesadas e volumosas, que são movimentadas de forma manual. Disponível em duas versões: Z100 e Z60",
+        "description": "<span class='label'>Capacidade:</span> Até 850Kg por nível.<br/><span class='label'>Descrição:</span> Sistema de armazenagem carga média, muito versátil e resistente. É a solução indicada para armazenar mercadorias pesadas e volumosas, que são movimentadas de forma manual. Disponível em duas versões: Z100 e Z60",
         "tabela": [
           {
             "codigo": "PTLZ1000-100",
@@ -1159,7 +1159,7 @@
           }
         ],
 
-        "description": "<span class='label'>Descrição:</span> Kits de estantes Rang'Eco Pneus, que incluem: bastidores (travessas e diagonais soldadas), e vigas principais em tubo ovalizado. Existem duas tipologias de Kits: módulo Inicial (individual) e módulo seguinte, que liga ao módulo inicial, partilhando um dos bastidores. Podem apresentar 3 níveis (bastidor com 2000mm altura) ou 4 níveis (bastidor com 2400mm altura) por cada modulo. O ajuste da altura dos níveis é feito de 50mm em 50mm. Considera-se uma travessa de reforço por cada nível."
+        "description": "<span class='label'>Descrição:</span> Kits de estantes Rang'Eco Pneus, que incluem: bastidores (travessas e diagonais soldadas), e vigas principais em tubo ovalizado. Existem duas tipologias de Kits: módulo Inicial (individual) e módulo seguinte, que liga ao módulo inicial, partilhando um dos bastidores. Podem apresentar 3 níveis (bastidor com 2000mm altura) ou 4 níveis (bastidor com 2400mm altura) por cada módulo. O ajuste da altura dos níveis é feito de 50mm em 50mm. Considera-se uma travessa de reforço por cada nível."
       },
       {
         "id": "rangeco-plus",
@@ -1185,7 +1185,7 @@
           "/produtos/12-Rangeco Plus/i16.jpg"
         ],
 
-        "description": "<span class='label'>Peso máx por nível:</span> Até 303kg <br/ ><span class='label'>Número máx de níveis:</span> Até 7 níveis <br/ ><span class='label'>Número de profundidades dispiníveis:</span> Até 6 profundidades diferentes <br/ ><span class='label'>Número de comprimentos dispiníveis:</span> Até 4 comprimentos diferentes ALTURA MÁXIMA: Até 3 metros </span> <br/ > <span class='label'> Descrição:</span> A Rang'Eco Plus é uma solução robusta para cargas até 303 kgs por nível. Oferece maior capacidade e durabilidade, é ideal para armazéns, oficinas e instalações que necessitam de uma estrutura confiável."
+        "description": "<span class='label'>Peso máx por nível:</span> Até 303kg <br/><span class='label'>Número máx de níveis:</span> Até 7 níveis <br/><span class='label'>Número de profundidades disponíveis:</span> Até 6 profundidades diferentes <br/><span class='label'>Número de comprimentos disponíveis:</span> Até 4 comprimentos diferentes <span class='label'>Altura máxima:</span> Até 3 metros <br/><span class='label'>Descrição:</span> A Rang'Eco Plus é uma solução robusta para cargas até 303 kgs por nível. Oferece maior capacidade e durabilidade, é ideal para armazéns, oficinas e instalações que necessitam de uma estrutura confiável."
       },
       {
         "id": "bancadas",
@@ -1200,7 +1200,7 @@
           "/produtos/14-Bancadas (Workbench)/i5.jpg"
         ],
 
-        "description": "<span class='label'>Descrição:</span> Bancada multiusos, construída com bastidores PORTECO, com pés metálicos e vigas Z. Tampo superior em melamina de cor branca de 22mm de espessura e orla perimetral. Possibilidade de ter prateleira inferior. Comprimento: 1200, 1600 e 2000mm. Profundidade: 800mm. Cores standard: azul RAL 5005 (pernas) e cinza RAL 7035 (vigas). É possível ter em totalmente em azul ou cinza.",
+        "description": "<span class='label'>Descrição:</span> Bancada multiusos, construída com bastidores PORTECO, com pés metálicos e vigas Z. Tampo superior em melamina de cor branca de 22mm de espessura e orla perimetral. Possibilidade de ter prateleira inferior. Comprimento: 1200, 1600 e 2000mm. Profundidade: 800mm. Cores standard: azul RAL 5005 (pernas) e cinza RAL 7035 (vigas). É possível ter totalmente em azul ou cinza.",
         "tabela": [
           {
             "nome": "Bancada sem prateleira",
@@ -1324,7 +1324,7 @@
           "/produtos/17-Kits Rangeco (Rangeco Kits)/i3.jpg"
         ],
 
-        "description": "<span class='label'>Descrição:</span> Kits de estantes Rang'Eco, que incluem pilares, pés, estrutura das prateleiras, que consideramos como integrante: as duas vigas principais, duas travessas e tubo (s) de reforço (300 e 400mm - 1 tubo, 500 e 600mm - 2 tubos, 800mm - 3 tubos). Existem duas tipologias de Kits: módulo Inicial (individual) e módulo seguinte, que liga ao módulo inicial, partilhando dois dos pilares. Para completar os Kits deve selecionar o tipo de revestimento a colocar sobre a estrutura da prateleira, considerando duas opções: platex ou chapa metálica. Embalagem individual em película plástica termoretráctil."
+        "description": "<span class='label'>Descrição:</span> Kits de estantes Rang'Eco, que incluem pilares, pés, estrutura das prateleiras, que consideramos como integrante: as duas vigas principais, duas travessas e tubo(s) de reforço (300 e 400mm - 1 tubo, 500 e 600mm - 2 tubos, 800mm - 3 tubos). Existem duas tipologias de Kits: módulo Inicial (individual) e módulo seguinte, que liga ao módulo inicial, partilhando dois dos pilares. Para completar os Kits deve selecionar o tipo de revestimento a colocar sobre a estrutura da prateleira, considerando duas opções: platex ou chapa metálica. Embalagem individual em película plástica termoretráctil."
       }
     ]
   },
@@ -1341,7 +1341,7 @@
     "return": "Voltar à página inicial"
   },
   "sobreNos": {
-    "title": "SOBRE A VASTO IMÉRIO LDA.",
+    "title": "SOBRE A VASTO IMPÉRIO LDA.",
     "p1t": "Mais de 20 anos de experiência em soluções de armazenagem",
     "p1": "A Vasto Império Lda. atua há mais de 20 anos no sector de prateleiras, racks, estantes ligeiras, empilhadores manuais e elétricos, porta-paletes e outros equipamentos de armazenagem. Ao longo destes anos, conquistámos a confiança de inúmeros clientes em Portugal, oferecendo produtos de qualidade e serviços profissionais.",
     "p2t": "Presença em Benedita e Viseu",

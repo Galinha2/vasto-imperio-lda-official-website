@@ -2,29 +2,37 @@ import contentpt from "@/assets/contentpt.json";
 import contenten from "@/assets/contenten.json";
 import GalleryClient from "./GalleryClient";
 import ContactCard from "@/components/contacts/ContactCard";
-import Image from "next/image";
 import ProductTabela from "@/components/produtos/ProductTabela";
 
-// Geração estática de todos os IDs
+// Geração estática de todos os IDs para pt e en
 export function generateStaticParams() {
-  const products = contentpt.productsShowcase.products;
-  return products.map((product) => ({
-    id: String(product.id),
-  }));
+  const langs = ['pt', 'en'];
+  const params = [];
+
+  langs.forEach((lang) => {
+    const content = lang === 'pt' ? contentpt : contenten;
+    const products = content.productsShowcase.products;
+    products.forEach((product) => {
+      params.push({
+        lang,
+        id: String(product.id),
+      });
+    });
+  });
+
+  return params;
 }
 
-export default async function Page({ params }) {
-  // Se params for Promise, podemos usar await
-  const { id } = await params;
-  
-  const lang = "pt"; // Export estático, apenas pt por build
+export default function Page({ params }) {
+  const { lang, id } = params;
+
   const content = lang === "pt" ? contentpt : contenten;
   const text = content.productsShowcase;
-  
+
   const product = content.productsShowcase.products.find(
     (item) => String(item.id) === String(id)
   );
-  const tabela = product.tabela;
+  const tabela = product?.tabela;
 
   if (!product) {
     return (
@@ -43,7 +51,7 @@ export default async function Page({ params }) {
       </div>
       {tabela && (
         <div className={`border-b border-(--horizontal-line) pb-5 mb-15`}>
-          <ProductTabela lang={lang} product={product} />
+          <ProductTabela product={product} />
         </div>
       )}
       <ContactCard />

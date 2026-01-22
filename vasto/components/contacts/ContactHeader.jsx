@@ -4,7 +4,7 @@ function ContactHeader() {
             <img className="z-2 relativew-70 w-70 md:w-80 lg:w-90" src="/logo.png" alt="logo" />
             <img className="z-2 relativew-70 w-70 md:w-80 lg:w-90" src="/pricing-dots.png" alt="dots" />
             <img className="z-2 relativew-70 w-70 md:w-80 lg:w-90" src="/phone.png" alt="phone" />
-            <img className="z-1 absolute w-screen h-146 lg:h-181 -top-0" src="/background.png" alt="background" />
+            <img className="z-1 absolute w-screen h-146 lg:h-181 -top-0" src="/Background.png" alt="background" />
         </div>
     )
 }

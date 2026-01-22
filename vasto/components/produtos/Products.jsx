@@ -32,7 +32,7 @@ function Products() {
         {showcase.products.map((product, index) => (
           <Link
             key={index}
-            href={`/produtos/${product.id}`}
+            href={`/produtos/${language}/${product.id}`}
             className={`bg-(--gray) rounded-[35px] justify-between hover:shadow-lg cursor-pointer flex flex-col px-10 ${
               gridClasses[index]
             } ${

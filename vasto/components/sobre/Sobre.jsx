@@ -28,7 +28,7 @@ function Sobre() {
               alt="Factory Image"
               width={2000}
               height={400}
-              className="my-5 mx-auto drop-shadow-[0_8px_8px_rgba(0,0,0,0.35)] w-full max-w-110"
+              className="my-5 px-5 mx-auto drop-shadow-[0_8px_8px_rgba(0,0,0,0.35)] w-auto max-w-100 md:max-w-110"
             />
         </div>
         <div className="flex gap-5 text-justify items-center justify-center text-[5em] md:text-[6em] lg:text-[7em] xl:text-[8em] 2xl:text-[9em] font-black bg-(--gray)">

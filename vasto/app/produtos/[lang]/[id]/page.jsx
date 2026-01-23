@@ -24,8 +24,8 @@ export function generateStaticParams() {
   return params;
 }
 
-export default function Page({ params }) {
-  const { lang, id } = params;
+export default async function Page({ params }) {
+  const { lang, id } = await params;
 
   const content = lang === "pt" ? contentpt : contenten;
   const text = content.productsShowcase;

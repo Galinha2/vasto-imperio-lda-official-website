@@ -13,7 +13,7 @@ const iconMap = {
   FaMapMarkedAlt: FaMapMarkedAlt,
   MdOutlineWorkspacePremium: MdOutlineWorkspacePremium,
   FaRankingStar: FaRankingStar,
-};
+}
 
 function InfoIconsCards() {
   const { language } = useLanguage();

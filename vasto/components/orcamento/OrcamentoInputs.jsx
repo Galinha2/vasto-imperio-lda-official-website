@@ -14,6 +14,7 @@ export default function OrcamentoInputs() {
 
   const [files, setFiles] = useState([]);
   const [fileError, setFileError] = useState("");
+  const [formError, setFormError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formDataState, setFormDataState] = useState({
     name: "",
@@ -34,6 +35,15 @@ export default function OrcamentoInputs() {
   }
 
   async function handleSubmit() {
+    // Validação de campos obrigatórios
+    const { name, phone, email, body } = formDataState;
+    if (!name.trim() || !email.trim() || !body.trim()) {
+      setFormError("Por favor, preencha todos os campos obrigatórios: Nome, Email e Mensagem.");
+      return;
+    } else {
+      setFormError("");
+    }
+
     if (files.length > 3) {
       alert("Apenas é permitido até três ficheiros (imagem ou PDF).");
       return;
@@ -167,6 +177,10 @@ export default function OrcamentoInputs() {
         )}
         {fileError && (
           <div className="text-red-500 text-sm mb-2">{fileError}</div>
+        )}
+
+        {formError && (
+          <div className="text-red-500 text-sm mb-2">{formError}</div>
         )}
 
         <div className="flex flex-wrap gap-5">

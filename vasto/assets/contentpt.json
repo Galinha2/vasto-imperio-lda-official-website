@@ -775,8 +775,8 @@
         "text": "Cacifos Metálicos",
         "width": 200,
         "height": 200,
-        "images": ["/cacifo.png", "/racks.png", "/prateleira inteira.png"],
-        "description": "<span class='label'>Material:</span> Aço de alta resistência com acabamento em pintura eletrostática.<br/><span class='label'>Medidas:</span> Altura: 2 m a 8 m | Largura: 1 m a 3 m | Profundidade: 0,6 m a 1,2 m."
+        "images": ["/produtos/4-cacifos/i3.jpg","/produtos/4-cacifos/i2.jpg","/produtos/4-cacifos/i1.jpg"],
+        "description": "Para mais informações contacte-nos."
       },
       {
         "id": "arrumacao-vertical",

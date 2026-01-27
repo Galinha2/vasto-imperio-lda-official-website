@@ -775,8 +775,8 @@
         "text": "Metal Lockers",
         "width": 200,
         "height": 200,
-        "images": ["/cacifo.png", "/racks.png", "/prateleira inteira.png"],
-        "description": "<span class='label'>Material:</span> High-strength steel with electrostatic paint finish.<br/><span class='label'>Dimensions:</span> Height: 2 m to 8 m | Width: 1 m to 3 m | Depth: 0.6 m to 1.2 m."
+        "images": ["/produtos/4-cacifos/i3.jpg","/produtos/4-cacifos/i2.jpg","/produtos/4-cacifos/i1.jpg"],
+        "description": "For more information, please contact us."
       },
       {
         "id": "arrumacao-vertical",

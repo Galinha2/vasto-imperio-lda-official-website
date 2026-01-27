@@ -24,6 +24,62 @@ export function generateStaticParams() {
   return params;
 }
 
+export async function generateMetadata({ params }) {
+  const { lang, id } = await params;
+
+  const content = lang === "pt" ? contentpt : contenten;
+  const product = content.productsShowcase.products.find(
+    (item) => item.id === decodeURIComponent(String(id))
+  );
+
+  if (!product) {
+    return {
+      title: "Produto não encontrado | Vasto Império",
+      description: "Produto não encontrado no catálogo da Vasto Império."
+    };
+  }
+
+  const title =
+    lang === "pt"
+      ? `${product.text} em Viseu | Vasto Império`
+      : `${product.text} in Portugal | Vasto Império`;
+
+  const description =
+    lang === "pt"
+      ? `Soluções profissionais de ${product.text.toLowerCase()} em Viseu e Benedita. Mais de 20 anos de experiência em sistemas de armazenagem. Peça orçamento gratuito.`
+      : `Professional solutions for ${product.text.toLowerCase()} in Portugal. Over 20 years of experience. Request a free quote.`;
+
+  return {
+    title,
+    description,
+    keywords: [
+      product.text,
+      "racks metálicos",
+      "prateleiras metálicas",
+      "armazenagem industrial",
+      "Viseu",
+      "Benedita",
+      "Vasto Império"
+    ],
+    openGraph: {
+      title,
+      description,
+      url: `https://vastoimperio.pt/produtos/${lang}/${id}`,
+      siteName: "Vasto Império",
+      images: [
+        {
+          url: product.image,
+          width: 800,
+          height: 600,
+          alt: product.text
+        }
+      ],
+      locale: lang === "pt" ? "pt_PT" : "en_US",
+      type: "website"
+    }
+  };
+}
+
 export default async function Page({ params }) {
   const { lang, id } = await params;
 
@@ -31,7 +87,7 @@ export default async function Page({ params }) {
   const text = content.productsShowcase;
 
   const product = content.productsShowcase.products.find(
-    (item) => String(item.id) === String(id)
+    (item) => item.id === decodeURIComponent(String(id))
   );
   const tabela = product?.tabela;
 

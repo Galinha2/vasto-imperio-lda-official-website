@@ -16,7 +16,7 @@ export default function Orcamento() {
       <div
         className="absolute inset-0 -z-10"
         style={{
-          backgroundImage: "url('/background.png')",
+          backgroundImage: "url('/Background.png')",
           backgroundRepeat: "no-repeat",
           backgroundSize: "cover",
           backgroundPosition: "bottom",

@@ -30,7 +30,7 @@
     @apply p-2 text-[2em] cursor-pointer bg-(--back-gray) shadow-[0px_4px_3px_#1e1e1e48] text-(--back-black) rounded-full;
   }
   .input {
-    @apply bg-white shadow-sm rounded-[35px] p-2 px-5 w-full;
+    @apply bg-(--gray-transparent) md:bg-white shadow-sm rounded-[35px] p-2 px-5 w-full;
   }
 }
 

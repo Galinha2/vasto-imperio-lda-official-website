@@ -89,7 +89,7 @@ export default function OrcamentoInputs() {
 
   if (!mounted) return null;
   return (
-    <div className="p-5 pt-20 w-full max-w-200 m-auto relative">
+    <div className="md:p-5 md:pt-30 w-full max-w-200 m-auto relative">
       {isSubmitting && (
         <div className="fixed inset-0 bg-white bg-opacity-50 flex items-center justify-center z-50">
           <div className="flex flex-col items-center justify-center gap-5">
@@ -103,7 +103,7 @@ export default function OrcamentoInputs() {
       <h1 className="title mb-5 text-center">{item.title}</h1>
       <div
         id="orcamento-form"
-        className="p-5 bg-(--gray) w-auto rounded-[35px] flex gap-5 flex-col"
+        className="p-5 bg-white md:bg-(--gray) w-auto md:rounded-[35px] flex gap-5 flex-col"
         autoComplete="off"
       >
         <div className="flex gap-5">

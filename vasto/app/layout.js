@@ -3,6 +3,7 @@ import "./globals.css";
 import Header from "@/components/header/Header";
 import { LanguageProvider } from "@/components/header/LanguageContext";
 import Footer from '@/components/footer/Footer';
+import { Analytics } from '@vercel/analytics/react';
 
 const interTight = Inter_Tight({
   subsets: ['latin'],
@@ -56,6 +57,7 @@ export default function RootLayout({ children }) {
           </main>
           <Footer />
         </LanguageProvider>
+        <Analytics />
       </body>
     </html>
   );

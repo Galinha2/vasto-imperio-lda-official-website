@@ -134,378 +134,67 @@
           "/produtos/1-Paleco/a5.jpg",
           "/produtos/1-Paleco/a6.jpg"
         ],
-        "description": "<span class='label'>Material:</span> Galvanizado ou RAL 5005 / 7035<br/><span class='label'>Altura dos Bastidores:</span>  2000 a 5500 mm <br/><span class='label'>Profundidade dos Bastidores:</span> 400 a 1200 mm. <br/><span class='label'>Comprimento das Vigas:</span> 1200 a 2750 mm. <br/><span class='label'>Descrição:</span> Bastidor metálico com sapata, indicado para sistemas de armazenagem e estruturas industriais. Fabricado em aço de elevada resistência, permite múltiplas configurações de altura e profundidade, adaptando-se a diferentes necessidades de carga e espaço. Disponível em acabamento galvanizado ou pintado, garantindo durabilidade e proteção anticorrosão em ambientes industriais.",
+        "description": "<span class='label'>Material:</span> Galvanizado ou RAL 5005 / 7035<br/><span class='label'>Peso Suportado:</span> 3300Kg par de vigas<br/><span class='label'>Altura dos Bastidores:</span>  2000 a 5500 mm <br/><span class='label'>Profundidade dos Bastidores:</span> 400 a 1200 mm. <br/><span class='label'>Comprimento das Vigas:</span> 1200 a 2750 mm. <br/><span class='label'>Descrição:</span> Bastidor metálico com sapata, indicado para sistemas de armazenagem e estruturas industriais. Fabricado em aço de elevada resistência, permite múltiplas configurações de altura e profundidade, adaptando-se a diferentes necessidades de carga e espaço. Disponível em acabamento galvanizado ou pintado, garantindo durabilidade e proteção anticorrosão em ambientes industriais.",
         "tabela": [
           {
             "nome": "Bastidores",
             "altura_mm": 2000,
-            "profundidade_mm": 400,
-            "acabamento": "Galvanizado ou RAL 5005 / 7035",
-            "peso_kg": 8.55
+            "profundidade_mm": "400 | 500 | 600 | 700 | 800 | 900 | 1000 | 1100 | 1200",
+            "acabamento": "Galvanizado ou RAL 5005 / 7035"
           },
           {
             "nome": "Bastidores",
-            "altura_mm": 2000,
-            "profundidade_mm": 500,
-            "acabamento": "Galvanizado ou RAL 5005 / 7035",
-            "peso_kg": 8.71
-          },
-          {
-            "nome": "Bastidores",
-            "altura_mm": 2000,
-            "profundidade_mm": 600,
-            "acabamento": "Galvanizado ou RAL 5005 / 7035",
-            "peso_kg": 8.82
-          },
-          {
-            "nome": "Bastidores",
-            "altura_mm": 2000,
-            "profundidade_mm": 700,
-            "acabamento": "Galvanizado ou RAL 5005 / 7035",
-            "peso_kg": 9.06
-          },
-          {
-            "nome": "Bastidores",
-            "altura_mm": 2000,
-            "profundidade_mm": 800,
-            "acabamento": "Galvanizado ou RAL 5005 / 7035",
-            "peso_kg": 9.24
-          },
-          {
-            "nome": "Bastidores",
-            "altura_mm": 2000,
-            "profundidade_mm": 900,
-            "acabamento": "Galvanizado ou RAL 5005 / 7035",
-            "peso_kg": 9.46
-          },
-          {
-            "nome": "Bastidores",
-            "altura_mm": 2000,
-            "profundidade_mm": 1000,
-            "acabamento": "Galvanizado ou RAL 5005 / 7035",
-            "peso_kg": 9.63
-          },
-          {
-            "nome": "Bastidores",
-            "altura_mm": 2000,
-            "profundidade_mm": 1100,
-            "acabamento": "Galvanizado ou RAL 5005 / 7035",
-            "peso_kg": 9.85
-          },
-          {
-            "nome": "Bastidores",
-            "altura_mm": 2000,
-            "profundidade_mm": 1200,
-            "acabamento": "Galvanizado ou RAL 5005 / 7035",
-            "peso_kg": 10.04
+            "altura_mm": 2500,
+            "profundidade_mm": "400 | 500 | 600 | 700 | 800 | 900 | 1000 | 1100 | 1200",
+            "acabamento": "Galvanizado ou RAL 5005 / 7035"
           },
           {
             "nome": "Bastidores",
             "altura_mm": 3000,
-            "profundidade_mm": 400,
-            "acabamento": "Galvanizado ou RAL 5005 / 7035",
-            "peso_kg": 11.4
+            "profundidade_mm": "400 | 500 | 600 | 700 | 800 | 900 | 1000 | 1100 | 1200",
+            "acabamento": "Galvanizado ou RAL 5005 / 7035"
           },
           {
             "nome": "Bastidores",
-            "altura_mm": 3000,
-            "profundidade_mm": 500,
-            "acabamento": "Galvanizado ou RAL 5005 / 7035",
-            "peso_kg": 11.6
-          },
-          {
-            "nome": "Bastidores",
-            "altura_mm": 3000,
-            "profundidade_mm": 600,
-            "acabamento": "Galvanizado ou RAL 5005 / 7035",
-            "peso_kg": 11.8
-          },
-          {
-            "nome": "Bastidores",
-            "altura_mm": 3000,
-            "profundidade_mm": 700,
-            "acabamento": "Galvanizado ou RAL 5005 / 7035",
-            "peso_kg": 12.05
-          },
-          {
-            "nome": "Bastidores",
-            "altura_mm": 3000,
-            "profundidade_mm": 800,
-            "acabamento": "Galvanizado ou RAL 5005 / 7035",
-            "peso_kg": 12.3
-          },
-          {
-            "nome": "Bastidores",
-            "altura_mm": 3000,
-            "profundidade_mm": 900,
-            "acabamento": "Galvanizado ou RAL 5005 / 7035",
-            "peso_kg": 12.5
-          },
-          {
-            "nome": "Bastidores",
-            "altura_mm": 3000,
-            "profundidade_mm": 1000,
-            "acabamento": "Galvanizado ou RAL 5005 / 7035",
-            "peso_kg": 12.7
-          },
-          {
-            "nome": "Bastidores",
-            "altura_mm": 3000,
-            "profundidade_mm": 1100,
-            "acabamento": "Galvanizado ou RAL 5005 / 7035",
-            "peso_kg": 12.9
-          },
-          {
-            "nome": "Bastidores",
-            "altura_mm": 3000,
-            "profundidade_mm": 1200,
-            "acabamento": "Galvanizado ou RAL 5005 / 7035",
-            "peso_kg": 13.1
+            "altura_mm": 3500,
+            "profundidade_mm": "400 | 500 | 600 | 700 | 800 | 900 | 1000 | 1100 | 1200",
+            "acabamento": "Galvanizado ou RAL 5005 / 7035"
           },
           {
             "nome": "Bastidores",
             "altura_mm": 4000,
-            "profundidade_mm": 400,
-            "acabamento": "Galvanizado ou RAL 5005 / 7035",
-            "peso_kg": 14.3
+            "profundidade_mm": "400 | 500 | 600 | 700 | 800 | 900 | 1000 | 1100 | 1200",
+            "acabamento": "Galvanizado ou RAL 5005 / 7035"
           },
           {
             "nome": "Bastidores",
-            "altura_mm": 4000,
-            "profundidade_mm": 500,
-            "acabamento": "Galvanizado ou RAL 5005 / 7035",
-            "peso_kg": 14.6
-          },
-          {
-            "nome": "Bastidores",
-            "altura_mm": 4000,
-            "profundidade_mm": 600,
-            "acabamento": "Galvanizado ou RAL 5005 / 7035",
-            "peso_kg": 14.8
-          },
-          {
-            "nome": "Bastidores",
-            "altura_mm": 4000,
-            "profundidade_mm": 700,
-            "acabamento": "Galvanizado ou RAL 5005 / 7035",
-            "peso_kg": 15.1
-          },
-          {
-            "nome": "Bastidores",
-            "altura_mm": 4000,
-            "profundidade_mm": 800,
-            "acabamento": "Galvanizado ou RAL 5005 / 7035",
-            "peso_kg": 15.4
-          },
-          {
-            "nome": "Bastidores",
-            "altura_mm": 4000,
-            "profundidade_mm": 900,
-            "acabamento": "Galvanizado ou RAL 5005 / 7035",
-            "peso_kg": 15.7
-          },
-          {
-            "nome": "Bastidores",
-            "altura_mm": 4000,
-            "profundidade_mm": 1000,
-            "acabamento": "Galvanizado ou RAL 5005 / 7035",
-            "peso_kg": 16.0
-          },
-          {
-            "nome": "Bastidores",
-            "altura_mm": 4000,
-            "profundidade_mm": 1100,
-            "acabamento": "Galvanizado ou RAL 5005 / 7035",
-            "peso_kg": 16.3
-          },
-          {
-            "nome": "Bastidores",
-            "altura_mm": 4000,
-            "profundidade_mm": 1200,
-            "acabamento": "Galvanizado ou RAL 5005 / 7035",
-            "peso_kg": 16.5
+            "altura_mm": 4500,
+            "profundidade_mm": "400 | 500 | 600 | 700 | 800 | 900 | 1000 | 1100 | 1200",
+            "acabamento": "Galvanizado ou RAL 5005 / 7035"
           },
           {
             "nome": "Bastidores",
             "altura_mm": 5000,
-            "profundidade_mm": 400,
-            "acabamento": "Galvanizado ou RAL 5005 / 7035",
-            "peso_kg": 16.9
+            "profundidade_mm": "400 | 500 | 600 | 700 | 800 | 900 | 1000 | 1100 | 1200",
+            "acabamento": "Galvanizado ou RAL 5005 / 7035"
           },
           {
             "nome": "Bastidores",
-            "altura_mm": 5000,
-            "profundidade_mm": 500,
-            "acabamento": "Galvanizado ou RAL 5005 / 7035",
-            "peso_kg": 17.2
+            "altura_mm": 5500,
+            "profundidade_mm": "400 | 500 | 600 | 700 | 800 | 900 | 1000 | 1100 | 1200",
+            "acabamento": "Galvanizado ou RAL 5005 / 7035"
           },
           {
-            "nome": "Bastidores",
-            "altura_mm": 5000,
-            "profundidade_mm": 600,
-            "acabamento": "Galvanizado ou RAL 5005 / 7035",
-            "peso_kg": 17.5
-          },
-          {
-            "nome": "Bastidores",
-            "altura_mm": 5000,
-            "profundidade_mm": 700,
-            "acabamento": "Galvanizado ou RAL 5005 / 7035",
-            "peso_kg": 17.9
-          },
-          {
-            "nome": "Bastidores",
-            "altura_mm": 5000,
-            "profundidade_mm": 800,
-            "acabamento": "Galvanizado ou RAL 5005 / 7035",
-            "peso_kg": 18.2
-          },
-          {
-            "nome": "Bastidores",
-            "altura_mm": 5000,
-            "profundidade_mm": 900,
-            "acabamento": "Galvanizado ou RAL 5005 / 7035",
-            "peso_kg": 18.5
-          },
-          {
-            "nome": "Bastidores",
-            "altura_mm": 5000,
-            "profundidade_mm": 1000,
-            "acabamento": "Galvanizado ou RAL 5005 / 7035",
-            "peso_kg": 18.8
-          },
-          {
-            "nome": "Bastidores",
-            "altura_mm": 5000,
-            "profundidade_mm": 1100,
-            "acabamento": "Galvanizado ou RAL 5005 / 7035",
-            "peso_kg": 19.1
-          },
-          {
-            "nome": "Bastidores",
-            "altura_mm": 5000,
-            "profundidade_mm": 1200,
-            "acabamento": "Galvanizado ou RAL 5005 / 7035",
-            "peso_kg": 19.4
-          },
-          {
-            "nome": "Vigas Z60",
+            "nome": "Vigas",
             "altura_mm": "-",
-            "profundidade_mm": 1000,
-            "acabamento": "RAL 7035",
-            "peso_kg": 1.62
+            "profundidade_mm": 2200,
+            "acabamento": "RAL 7035"
           },
           {
-            "nome": "Vigas Z60",
-            "altura_mm": "-",
-            "profundidade_mm": 1250,
-            "acabamento": "RAL 7035",
-            "peso_kg": 1.94
-          },
-          {
-            "nome": "Vigas Z60",
-            "altura_mm": "-",
-            "profundidade_mm": 1500,
-            "acabamento": "RAL 7035",
-            "peso_kg": 2.26
-          },
-          {
-            "nome": "Vigas Z60",
-            "altura_mm": "-",
-            "profundidade_mm": 1750,
-            "acabamento": "RAL 7035",
-            "peso_kg": 2.58
-          },
-          {
-            "nome": "Vigas Z60",
-            "altura_mm": "-",
-            "profundidade_mm": 2000,
-            "acabamento": "RAL 7035",
-            "peso_kg": 2.90
-          },
-          {
-            "nome": "Vigas Z60",
-            "altura_mm": "-",
-            "profundidade_mm": 2250,
-            "acabamento": "RAL 7035",
-            "peso_kg": 3.22
-          },
-          {
-            "nome": "Vigas Z60",
-            "altura_mm": "-",
-            "profundidade_mm": 2500,
-            "acabamento": "RAL 7035",
-            "peso_kg": 3.54
-          },
-          {
-            "nome": "Vigas Z60",
+            "nome": "Vigas",
             "altura_mm": "-",
             "profundidade_mm": 2750,
-            "acabamento": "RAL 7035",
-            "peso_kg": 4.14
-          },
-          {
-            "nome": "Vigas Z100",
-            "altura_mm": "-",
-            "profundidade_mm": 1000,
-            "acabamento": "RAL 7035",
-            "peso_kg": 2.65
-          },
-          {
-            "nome": "Vigas Z100",
-            "altura_mm": "-",
-            "profundidade_mm": 1250,
-            "acabamento": "RAL 7035",
-            "peso_kg": 3.25
-          },
-          {
-            "nome": "Vigas Z100",
-            "altura_mm": "-",
-            "profundidade_mm": 1500,
-            "acabamento": "RAL 7035",
-            "peso_kg": 3.84
-          },
-          {
-            "nome": "Vigas Z100",
-            "altura_mm": "-",
-            "profundidade_mm": 1750,
-            "acabamento": "RAL 7035",
-            "peso_kg": 4.43
-          },
-          {
-            "nome": "Vigas Z100",
-            "altura_mm": "-",
-            "profundidade_mm": 2000,
-            "acabamento": "RAL 7035",
-            "peso_kg": 5.02
-          },
-          {
-            "nome": "Vigas Z100",
-            "altura_mm": "-",
-            "profundidade_mm": 2250,
-            "acabamento": "RAL 7035",
-            "peso_kg": 5.62
-          },
-          {
-            "nome": "Vigas Z100",
-            "altura_mm": "-",
-            "profundidade_mm": 2500,
-            "acabamento": "RAL 7035",
-            "peso_kg": 6.21
-          },
-          {
-            "nome": "Vigas Z100",
-            "altura_mm": "-",
-            "profundidade_mm": 2600,
-            "acabamento": "RAL 7035",
-            "peso_kg": 6.45
-          },
-          {
-            "nome": "Vigas Z100",
-            "altura_mm": "-",
-            "profundidade_mm": 2750,
-            "acabamento": "RAL 7035",
-            "peso_kg": 6.80
+            "acabamento": "RAL 7035"
           }
         ]
       },
@@ -533,206 +222,68 @@
           {
             "nome": "Prateleira",
             "comprimento_mm": 750,
-            "largura_mm": 300,
-            "peso_kg": 2
-          },
-          {
-            "nome": "Prateleira",
-            "comprimento_mm": 750,
-            "largura_mm": 400,
-            "peso_kg": 2.5
+            "largura_mm": "300 | 400",
+            "peso_kg": ""
           },
           {
             "nome": "Prateleira",
             "comprimento_mm": 1000,
-            "largura_mm": 300,
-            "peso_kg": 2.4
-          },
-          {
-            "nome": "Prateleira",
-            "comprimento_mm": 1000,
-            "largura_mm": 400,
-            "peso_kg": 3
+            "largura_mm": "300 | 400",
+            "peso_kg": ""
           },
           {
             "nome": "Prateleira com 1 Reforço",
             "comprimento_mm": 750,
-            "largura_mm": 400,
-            "peso_kg": 2.8
-          },
-          {
-            "nome": "Prateleira com 1 Reforço",
-            "comprimento_mm": 750,
-            "largura_mm": 500,
-            "peso_kg": 3.6
+            "largura_mm": "400 | 500",
+            "peso_kg": ""
           },
           {
             "nome": "Prateleira com 1 Reforço",
             "comprimento_mm": 1000,
-            "largura_mm": 400,
-            "peso_kg": 3.5
-          },
-          {
-            "nome": "Prateleira com 1 Reforço",
-            "comprimento_mm": 1000,
-            "largura_mm": 500,
-            "peso_kg": 5
+            "largura_mm": "400 | 500",
+            "peso_kg": ""
           },
           {
             "nome": "Prateleira com 2 Reforços",
-            "comprimento_mm": 750,
+            "comprimento_mm": "750 | 1000",
             "largura_mm": 600,
-            "peso_kg": 4.2
-          },
-          {
-            "nome": "Prateleira com 2 Reforços",
-            "comprimento_mm": 1000,
-            "largura_mm": 600,
-            "peso_kg": 5.75
+            "peso_kg": ""
           },
           {
             "nome": "Bastidor",
             "comprimento_mm": 750,
-            "largura_mm": 300,
-            "peso_kg": 3
-          },
-          {
-            "nome": "Bastidor",
-            "comprimento_mm": 750,
-            "largura_mm": 400,
-            "peso_kg": 3.5
-          },
-          {
-            "nome": "Bastidor",
-            "comprimento_mm": 750,
-            "largura_mm": 500,
-            "peso_kg": 4
-          },
-          {
-            "nome": "Bastidor",
-            "comprimento_mm": 750,
-            "largura_mm": 600,
-            "peso_kg": 4.5
+            "largura_mm": "300 | 400 | 500 | 600",
+            "peso_kg": ""
           },
           {
             "nome": "Bastidor",
             "comprimento_mm": 1000,
-            "largura_mm": 300,
-            "peso_kg": 3.5
-          },
-          {
-            "nome": "Bastidor",
-            "comprimento_mm": 1000,
-            "largura_mm": 400,
-            "peso_kg": 4
-          },
-          {
-            "nome": "Bastidor",
-            "comprimento_mm": 1000,
-            "largura_mm": 500,
-            "peso_kg": 4.5
-          },
-          {
-            "nome": "Bastidor",
-            "comprimento_mm": 1000,
-            "largura_mm": 600,
-            "peso_kg": 5
+            "largura_mm": "300 | 400 | 500 | 600",
+            "peso_kg": ""
           },
           {
             "nome": "Bastidor",
             "comprimento_mm": 1500,
-            "largura_mm": 300,
-            "peso_kg": 5
-          },
-          {
-            "nome": "Bastidor",
-            "comprimento_mm": 1500,
-            "largura_mm": 400,
-            "peso_kg": 5.5
-          },
-          {
-            "nome": "Bastidor",
-            "comprimento_mm": 1500,
-            "largura_mm": 500,
-            "peso_kg": 6
-          },
-          {
-            "nome": "Bastidor",
-            "comprimento_mm": 1500,
-            "largura_mm": 600,
-            "peso_kg": 6.5
+            "largura_mm": "300 | 400 | 500 | 600",
+            "peso_kg": ""
           },
           {
             "nome": "Bastidor",
             "comprimento_mm": 2000,
-            "largura_mm": 300,
-            "peso_kg": 6
-          },
-          {
-            "nome": "Bastidor",
-            "comprimento_mm": 2000,
-            "largura_mm": 400,
-            "peso_kg": 6.5
-          },
-          {
-            "nome": "Bastidor",
-            "comprimento_mm": 2000,
-            "largura_mm": 500,
-            "peso_kg": 7
-          },
-          {
-            "nome": "Bastidor",
-            "comprimento_mm": 2000,
-            "largura_mm": 600,
-            "peso_kg": 7.5
+            "largura_mm": "300 | 400 | 500 | 600",
+            "peso_kg": ""
           },
           {
             "nome": "Bastidor",
             "comprimento_mm": 2500,
-            "largura_mm": 300,
-            "peso_kg": 6.5
-          },
-          {
-            "nome": "Bastidor",
-            "comprimento_mm": 2500,
-            "largura_mm": 400,
-            "peso_kg": 7
-          },
-          {
-            "nome": "Bastidor",
-            "comprimento_mm": 2500,
-            "largura_mm": 500,
-            "peso_kg": 7.5
-          },
-          {
-            "nome": "Bastidor",
-            "comprimento_mm": 2500,
-            "largura_mm": 600,
-            "peso_kg": 8
+            "largura_mm": "300 | 400 | 500 | 600",
+            "peso_kg": ""
           },
           {
             "nome": "Bastidor",
             "comprimento_mm": 3000,
-            "largura_mm": 300,
-            "peso_kg": 8.5
-          },
-          {
-            "nome": "Bastidor",
-            "comprimento_mm": 3000,
-            "largura_mm": 400,
-            "peso_kg": 9
-          },
-          {
-            "nome": "Bastidor",
-            "comprimento_mm": 3000,
-            "largura_mm": 500,
-            "peso_kg": 9.5
-          },
-          {
-            "nome": "Bastidor",
-            "comprimento_mm": 3000,
-            "largura_mm": 600,
-            "peso_kg": 10
+            "largura_mm": "300 | 400 | 500 | 600",
+            "peso_kg": ""
           }
         ],
         "description": "<span class='label'>Material:</span> Galvanizado ou RAL 5005 / 7035<br/><span class='label'>Altura dos Bastidores:</span>  1000 a 3000 mm <br/><span class='label'>Profundidade dos Bastidores:</span> 400 a 1200 mm. <br/><span class='label'>Comprimento das Prateleiras:</span>  750 a 1000 mm <br/><span class='label'>Largura das Prateleiras:</span>  300 a 600 mm <br/><span class='label'>Descrição:</span> As estantes metálicas de encaixe sem parafusos são uma solução prática e resistente para espaços que exigem organização eficiente e elevada capacidade de carga, como armazéns, arquivos ou zonas industriais. O sistema modular permite ajustar facilmente a altura das prateleiras, adaptando a estrutura às necessidades específicas de cada utilização. A montagem é rápida e segura, através de encaixes reforçados que garantem estabilidade e evitam deslocações indesejadas. Fabricadas em aço robusto, estas estantes oferecem durabilidade, flexibilidade e uma excelente resposta para diferentes configurações de armazenamento, podendo ser dimensionadas à medida do espaço disponível."
@@ -775,7 +326,11 @@
         "text": "Cacifos Metálicos",
         "width": 200,
         "height": 200,
-        "images": ["/produtos/4-cacifos/i3.jpg","/produtos/4-cacifos/i2.jpg","/produtos/4-cacifos/i1.jpg"],
+        "images": [
+          "/produtos/4-cacifos/i3.jpg",
+          "/produtos/4-cacifos/i2.jpg",
+          "/produtos/4-cacifos/i1.jpg"
+        ],
         "description": "Para mais informações contacte-nos."
       },
       {

@@ -96,7 +96,7 @@ function ProductTabela({ product }) {
                     </td>
                   )}
                   <td className="border border-(--horizontal-line) px-4 py-2">
-                    {item.peso_kg != null ? item.peso_kg.toFixed(2) : "-"}
+                    {item.peso_kg ? item.peso_kg : "-"}
                   </td>
                 </tr>
               ))}

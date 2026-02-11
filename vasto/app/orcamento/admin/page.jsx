@@ -12,7 +12,7 @@ function page() {
   // Todos os hooks primeiro
   const [pinDigitado, setPinDigitado] = useState("");
   const [autenticado, setAutenticado] = useState(false);
-  const PIN_CORRETO = "5824";
+  const PIN_CORRETO = "1248";
   const [erroPin, setErroPin] = useState(false);
 
   const [linhas, setLinhas] = useState([

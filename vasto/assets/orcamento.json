@@ -2,128 +2,153 @@
         "produtos": [
         {
             "ref": 1,
-            "produto": "Tabuleiro 1000x300 mm até 80Kg",
-            "preço": 7.98
-        },
-        {
-            "ref": 1,
-            "produto": "Tabuleiro 1000x400 mm até 120Kg",
-            "preço": 10.51
-        },
-        {
-            "ref": 1,
-            "produto": "Tabuleiro c/ 1 reforço central 1000x400 mm até 170Kg",
-            "preço": 12.32
-        },
-        {
-            "ref": 1,
-            "produto": "Tabuleiro c/ 1 reforço central 1000x500 mm até 200Kg",
-            "preço": 13.32
-        },
-        {
-            "ref": 1,
-            "produto": "Tabuleiro c/ 2 reforços centrais 1000x600 mm até 210Kg",
-            "preço": 16.72
-        },
-        {
-            "ref": 1,
             "produto": "Bastidor Ligeiro 2000x300 mm",
-            "preço": 15.73
+            "preço": 15.73,
+            "image": "/orcamento/bastidor ligeiro.png"
         },
         {
             "ref": 1,
             "produto": "Bastidor Ligeiro 2000x400 mm",
-            "preço": 16.43
+            "preço": 16.43,
+            "image": "/orcamento/bastidor ligeiro.png"
         },
         {
             "ref": 1,
             "produto": "Bastidor Ligeiro 2000x500 mm",
-            "preço": 17.09
+            "preço": 17.09,
+            "image": "/orcamento/bastidor ligeiro.png"
         },
         {
             "ref": 1,
             "produto": "Bastidor Ligeiro 2000x600 mm",
-            "preço": 17.78
+            "preço": 17.78,
+            "image": "/orcamento/bastidor ligeiro.png"
         },
         {
             "ref": 1,
             "produto": "Bastidor Ligeiro 2500x500 mm",
-            "preço": 22.17
+            "preço": 22.17,
+            "image": "/orcamento/bastidor ligeiro.png"
         },
         {
             "ref": 1,
             "produto": "Bastidor Ligeiro 2500x600 mm",
-            "preço": 22.95
+            "preço": 22.95,
+            "image": "/orcamento/bastidor ligeiro.png"
+        },
+        {
+            "ref": 1,
+            "produto": "Tabuleiro 1000x300 mm até 80Kg",
+            "preço": 7.98,
+            "image": "/orcamento/tabuleiro.png"
+        },
+        {
+            "ref": 1,
+            "produto": "Tabuleiro 1000x400 mm até 120Kg",
+            "preço": 10.51,
+            "image": "/orcamento/tabuleiro.png"
+        },
+        {
+            "ref": 1,
+            "produto": "Tabuleiro c/ 1 reforço central 1000x400 mm até 170Kg",
+            "preço": 12.32,
+            "image": "/orcamento/tabuleiro1.png"
+        },
+        {
+            "ref": 1,
+            "produto": "Tabuleiro c/ 1 reforço central 1000x500 mm até 200Kg",
+            "preço": 13.32,
+            "image": "/orcamento/tabuleiro1.png"
+        },
+        {
+            "ref": 1,
+            "produto": "Tabuleiro c/ 2 reforços centrais 1000x600 mm até 210Kg",
+            "preço": 16.72,
+            "image": "/orcamento/tabuleiro2.png"
         },
         {
             "ref": 1,
             "produto": "Travamento 1000 mm",
-            "preço": 4.98
-        },
-        {
-            "ref": 2,
-            "produto": "Vigas 2200 mm suporta + de 3300Kg par de Vigas",
-            "preço": 42.14
-        },
-        {
-            "ref": 2,
-            "produto": "Vigas 2700 mm suporta 3300Kg par de Vigas",
-            "preço": 53.06
+            "preço": 4.98,
+            "image": "/orcamento/travamento.png"
         },
         {
             "ref": 2,
             "produto": "Bastidor Industrial 5500x1100 mm",
-            "preço": 176.55
+            "preço": 176.55,
+            "image": "/orcamento/bastidor industrial.png"
         },
         {
             "ref": 2,
             "produto": "Bastidor Industrial 5000x1100 mm",
-            "preço": 160.50
+            "preço": 160.50,
+            "image": "/orcamento/bastidor industrial.png"
         },
         {
             "ref": 2,
             "produto": "Bastidor Industrial 4500x1100 mm",
-            "preço": 144.45
+            "preço": 144.45,
+            "image": "/orcamento/bastidor industrial.png"
         },
         {
             "ref": 2,
             "produto": "Bastidor Industrial 4000x1100 mm",
-            "preço": 128.40
+            "preço": 128.40,
+            "image": "/orcamento/bastidor industrial.png"
         },
         {
             "ref": 2,
             "produto": "Bastidor Industrial 5500x1100 mm",
-            "preço": 176.55
+            "preço": 176.55,
+            "image": "/orcamento/bastidor industrial.png"
         },
         {
             "ref": 2,
             "produto": "Bastidor Industrial 3500x1100 mm",
-            "preço": 112.35
+            "preço": 112.35,
+            "image": "/orcamento/bastidor industrial.png"
         },
         {
             "ref": 2,
             "produto": "Bastidor Industrial 3000x1100 mm",
-            "preço": 96.30
+            "preço": 96.30,
+            "image": "/orcamento/bastidor industrial.png"
         },
         {
             "ref": 2,
             "produto": "Bastidor Industrial 2500x1100 mm",
-            "preço": 80.25
+            "preço": 80.25,
+            "image": "/orcamento/bastidor industrial.png"
         },
         {
             "ref": 2,
             "produto": "Bastidor Industrial 2000x1100 mm",
-            "preço": 64.20
+            "preço": 64.20,
+            "image": "/orcamento/bastidor industrial.png"
+        },
+        {
+            "ref": 2,
+            "produto": "Vigas 2200 mm suporta + de 3300Kg par de Vigas",
+            "preço": 42.14,
+            "image": "/orcamento/viga.png"
+        },
+        {
+            "ref": 2,
+            "produto": "Vigas 2700 mm suporta 3300Kg par de Vigas",
+            "preço": 53.06,
+            "image": "/orcamento/viga.png"
         },
         {
             "ref": 2,
             "produto": "Freio de segurança",
-            "preço": 0.45
+            "preço": 0.45,
+            "image": "/orcamento/.png"
         },
         {
             "ref": 2,
             "produto": "Parafuso de Fixação c/Bucha",
-            "preço": 0.45
+            "preço": 0.45,
+            "image": "/orcamento/.png"
         }
     ],
     "descontos": [

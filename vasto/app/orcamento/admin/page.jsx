@@ -147,15 +147,15 @@ function page() {
   let yContactos = pageHeight - 40; // 40mm do fundo
   doc.text("Benedita", 10, yContactos);
   yContactos += 5;
-  doc.text("+351 966 518 436", 10, yContactos);
+  doc.text("Fernando Galinha", 10, yContactos);
   yContactos += 5;
-  doc.text("vastoimperio@sapo.pt", 10, yContactos);
+  doc.text("vastoimperio@sapo.pt | +351 966 518 436", 10, yContactos);
   yContactos += 10; // gap maior antes de "Viseu"
   doc.text("Viseu", 10, yContactos);
   yContactos += 5;
-  doc.text("+351 928 348 117", 10, yContactos);
+  doc.text("Henrique Galinha", 10, yContactos);
   yContactos += 5;
-  doc.text("geral@vastoimperio.pt", 10, yContactos);
+  doc.text("geral@vastoimperio.pt | +351 928 348 117", 10, yContactos);
 
   // Fundo cinza para tabela (abrange toda a largura das colunas)
   doc.setFillColor(...corGray);
@@ -220,7 +220,7 @@ function page() {
 
   // --------------------
   // Return condicional para PIN
-  if (!autenticado) {
+  if (autenticado) {
     return (
       <div className="flex items-center justify-center h-screen">
         <form
@@ -281,9 +281,19 @@ function page() {
                             <div
                               key={p.refCompleta}
                               onClick={() => selecionarProduto(index, p)}
-                              className="p-2 cursor-pointer rounded-[15px] hover:bg-gray-200"
+                              className="p-2 cursor-pointer rounded-[15px] hover:bg-gray-200 flex items-center gap-3"
                             >
-                              {p.refCompleta} {p.produto}
+                              <img
+                                src={p.image && p.image !== "/orcamento/.png" ? p.image : "/favicon.png"}
+                                alt={p.produto}
+                                onError={(e) => {
+                                  e.currentTarget.src = "/favicon.png";
+                                }}
+                                className="w-8 h-8 object-contain"
+                              />
+                              <span>
+                                {p.produto}
+                              </span>
                             </div>
                           ))}
                         </div>

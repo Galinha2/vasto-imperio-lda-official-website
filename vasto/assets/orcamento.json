@@ -1,0 +1,155 @@
+{
+        "produtos": [
+        {
+            "ref": 1,
+            "produto": "Tabuleiro 1000x300 mm até 80Kg",
+            "preço": 7.98
+        },
+        {
+            "ref": 1,
+            "produto": "Tabuleiro 1000x400 mm até 120Kg",
+            "preço": 10.51
+        },
+        {
+            "ref": 1,
+            "produto": "Tabuleiro c/ 1 reforço central 1000x400 mm até 170Kg",
+            "preço": 12.32
+        },
+        {
+            "ref": 1,
+            "produto": "Tabuleiro c/ 1 reforço central 1000x500 mm até 200Kg",
+            "preço": 13.32
+        },
+        {
+            "ref": 1,
+            "produto": "Tabuleiro c/ 2 reforços centrais 1000x600 mm até 210Kg",
+            "preço": 16.72
+        },
+        {
+            "ref": 1,
+            "produto": "Bastidor Ligeiro 2000x300 mm",
+            "preço": 15.73
+        },
+        {
+            "ref": 1,
+            "produto": "Bastidor Ligeiro 2000x400 mm",
+            "preço": 16.43
+        },
+        {
+            "ref": 1,
+            "produto": "Bastidor Ligeiro 2000x500 mm",
+            "preço": 17.09
+        },
+        {
+            "ref": 1,
+            "produto": "Bastidor Ligeiro 2000x600 mm",
+            "preço": 17.78
+        },
+        {
+            "ref": 1,
+            "produto": "Bastidor Ligeiro 2500x500 mm",
+            "preço": 22.17
+        },
+        {
+            "ref": 1,
+            "produto": "Bastidor Ligeiro 2500x600 mm",
+            "preço": 22.95
+        },
+        {
+            "ref": 1,
+            "produto": "Travamento 1000 mm",
+            "preço": 4.98
+        },
+        {
+            "ref": 2,
+            "produto": "Vigas 2200 mm suporta + de 3300Kg par de Vigas",
+            "preço": 42.14
+        },
+        {
+            "ref": 2,
+            "produto": "Vigas 2700 mm suporta 3300Kg par de Vigas",
+            "preço": 53.06
+        },
+        {
+            "ref": 2,
+            "produto": "Bastidor Industrial 5500x1100 mm",
+            "preço": 176.55
+        },
+        {
+            "ref": 2,
+            "produto": "Bastidor Industrial 5000x1100 mm",
+            "preço": 160.50
+        },
+        {
+            "ref": 2,
+            "produto": "Bastidor Industrial 4500x1100 mm",
+            "preço": 144.45
+        },
+        {
+            "ref": 2,
+            "produto": "Bastidor Industrial 4000x1100 mm",
+            "preço": 128.40
+        },
+        {
+            "ref": 2,
+            "produto": "Bastidor Industrial 5500x1100 mm",
+            "preço": 176.55
+        },
+        {
+            "ref": 2,
+            "produto": "Bastidor Industrial 3500x1100 mm",
+            "preço": 112.35
+        },
+        {
+            "ref": 2,
+            "produto": "Bastidor Industrial 3000x1100 mm",
+            "preço": 96.30
+        },
+        {
+            "ref": 2,
+            "produto": "Bastidor Industrial 2500x1100 mm",
+            "preço": 80.25
+        },
+        {
+            "ref": 2,
+            "produto": "Bastidor Industrial 2000x1100 mm",
+            "preço": 64.20
+        },
+        {
+            "ref": 2,
+            "produto": "Cavilha de segurança",
+            "preço": 0.45
+        },
+        {
+            "ref": 2,
+            "produto": "Parafuso de Fixação c/Bucha",
+            "preço": 0.45
+        }
+    ],
+    "descontos": [
+        {
+            "desconto": "0"
+        },
+        {
+            "desconto": "5"
+        },
+        {
+            "desconto": "10"
+        },
+        {
+            "desconto": "15"
+        },
+        {
+            "desconto": "20"
+        },
+        {
+            "desconto": "25"
+        },
+        {
+            "desconto": "30"
+        },
+        {
+            "desconto": "35"
+        }
+    ]
+}

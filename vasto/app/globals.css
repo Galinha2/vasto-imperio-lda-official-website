@@ -33,7 +33,7 @@
     @apply bg-(--gray-transparent) md:bg-white shadow-sm rounded-[35px] p-2 px-5 w-full;
   }
   .orca {
-    @apply bg-white shadow-sm rounded-[35px] h-10 px-3 items-center justify-between;
+    @apply bg-white shadow-sm rounded-[35px] h-auto min-h-10 md:h-10 px-3 items-center justify-between;
   }
 }
 

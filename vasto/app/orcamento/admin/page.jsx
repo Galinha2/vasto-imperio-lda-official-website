@@ -278,13 +278,13 @@ function page() {
   return (
     <div
       onCopy={handleCopy}
-      className="flex items-center justify-center h-screen p-5"
+      className="flex items-center justify-center h-screen p-0 md:p-5"
     >
-      <div className="bg-(--gray) p-5 rounded-[35px] flex flex-col gap-5 shadow-md min-h-100 justify-between">
+      <div className="md:bg-(--gray) px-2 py-10 md:p-5 md:rounded-[35px] w-full md:w-auto flex flex-col gap-5 md:shadow-md min-h-150 md:min-h-100 justify-between">
         <div className="flex flex-col gap-5 items-start">
           {linhas.map((linha, index) => (
-            <div key={index} className="flex gap-5 items-center relative">
-              <div data-produto-dropdown className="relative">
+            <div key={index} className="flex gap-2 md:gap-5 w-full items-center relative">
+              <div data-produto-dropdown className="relative ">
                 <button
                   type="button"
                   onClick={() =>
@@ -292,7 +292,7 @@ function page() {
                       openProdutoIndex === index ? null : index,
                     )
                   }
-                  className="flex cursor-pointer orca w-auto md:w-100 lg:w-120"
+                  className="flex cursor-pointer orca rounded-[25px] w-full md:w-100 lg:w-120"
                 >
                   <p>{linha.produto || "Produto"}</p>
                   <IoIosArrowDown />

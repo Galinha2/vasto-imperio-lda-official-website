@@ -21,6 +21,7 @@ function page() {
   const [openProdutoIndex, setOpenProdutoIndex] = useState(null);
   const [openDesc, setOpenDesc] = useState(false);
   const [descontoSelecionado, setDescontoSelecionado] = useState(0);
+  const [copiado, setCopiado] = useState(false);
   const descRef = useRef(null);
 
   useEffect(() => {
@@ -101,6 +102,31 @@ function page() {
       "text/plain",
       `${linhasFormatadas}\n\n${totaisTexto}`,
     );
+  };
+
+  const copiarManual = async () => {
+    const linhasFormatadas = linhas
+      .filter((l) => l.produto && l.unidades > 0)
+      .map((l) => {
+        let nomeCompacto = l.produto
+          .replace(/\s+/g, " ")
+          .replace(/ x /g, "x")
+          .replace(/c\/ /g, "c/");
+        return `- ${nomeCompacto}: ${l.unidades}un x ${l.preco.toFixed(2)}€ = ${l.total.toFixed(2)}€`;
+      })
+      .join("\n");
+
+    let totaisTexto = `Total Bruto: ${totalSemDesconto.toFixed(2)}€`;
+    if (descontoSelecionado > 0)
+      totaisTexto += `\nTotal c/${descontoSelecionado}% Desc: ${totalComDesconto.toFixed(2)}€`;
+    totaisTexto += `\nTotal c/IVA: ${totalComIVA.toFixed(2)}€`;
+
+    const textoFinal = `${linhasFormatadas}\n\n${totaisTexto}`;
+    await navigator.clipboard.writeText(textoFinal);
+    setCopiado(true);
+    setTimeout(() => {
+      setCopiado(false);
+    }, 1000);
   };
 
   const gerarPDF = async () => {
@@ -383,13 +409,25 @@ function page() {
             <h2 className="text-(--blue)">
               Total c/IVA: {totalComIVA.toFixed(2)}€
             </h2>
-          <button
-            type="button"
-            onClick={gerarPDF}
-            className="bg-(--orange) cursor-pointer text-white px-5 text-[0.8em] py-1 rounded-full mt-4"
-          >
-            Gerar PDF
-          </button>
+           <div className="flex gap-5 justify-end mt-4">
+            <button
+              type="button"
+              onClick={copiarManual}
+              className={`${
+                copiado ? "bg-blue-600" : "bg-(--blue)"
+              } cursor-pointer text-white px-5 text-[0.8em] py-1 rounded-full transition-all duration-200`}
+            >
+              {copiado ? "Texto copiado" : "Copiar Texto"}
+            </button>
+
+            <button
+              type="button"
+              onClick={gerarPDF}
+              className="bg-(--orange) cursor-pointer text-white px-5 text-[0.8em] py-1 rounded-full"
+            >
+              Gerar PDF
+            </button>
+          </div>
           </div>
         </div>
       </div>

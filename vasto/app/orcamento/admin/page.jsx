@@ -22,6 +22,7 @@ function page() {
   const [openDesc, setOpenDesc] = useState(false);
   const [descontoSelecionado, setDescontoSelecionado] = useState(0);
   const [copiado, setCopiado] = useState(false);
+  const [pesquisaProduto, setPesquisaProduto] = useState("");
   const descRef = useRef(null);
 
   useEffect(() => {
@@ -56,6 +57,7 @@ function page() {
     novasLinhas[index].total = novasLinhas[index].unidades * produtoObj.preço;
     setLinhas(novasLinhas);
     setOpenProdutoIndex(null);
+    setPesquisaProduto("");
   };
 
   const alterarUnidades = (index, valor) => {
@@ -285,45 +287,66 @@ function page() {
           {linhas.map((linha, index) => (
             <div key={index} className="flex gap-2 md:gap-5 w-full items-center relative">
               <div data-produto-dropdown className="relative ">
-                <button
-                  type="button"
-                  onClick={() =>
-                    setOpenProdutoIndex(
-                      openProdutoIndex === index ? null : index,
-                    )
-                  }
-                  className="flex cursor-pointer orca rounded-[25px] w-full md:w-100 lg:w-120"
+                <div
+                  className="flex items-center orca rounded-[25px] w-full md:w-100 lg:w-120 px-3"
                 >
-                  <p>{linha.produto || "Produto"}</p>
-                  <IoIosArrowDown />
-                </button>
+                  <input
+                    type="text"
+                    value={openProdutoIndex === index ? pesquisaProduto : (linha.produto || "")}
+                    onFocus={() => setOpenProdutoIndex(index)}
+                    onChange={(e) => {
+                      setPesquisaProduto(e.target.value);
+                    }}
+                    placeholder="Pesquisar produto..."
+                    className="flex-1 outline-none bg-transparent"
+                  />
+                  <IoIosArrowDown
+                    className="cursor-pointer"
+                    onClick={() =>
+                      setOpenProdutoIndex(
+                        openProdutoIndex === index ? null : index
+                      )
+                    }
+                  />
+                </div>
 
                 {openProdutoIndex === index && (
                   <div className="absolute bg-white shadow-md rounded-[20px] mt-1 w-120 z-10 max-h-100 overflow-y-auto">
-                    {[...new Set(orcamento.produtos.map((p) => p.ref))].map(
-                      (refFamilia) => (
-                        <div key={refFamilia}>
-                          {gerarRefCompleta(refFamilia).map((p) => (
-                            <div
-                              key={p.refCompleta}
-                              onClick={() => selecionarProduto(index, p)}
-                              className="p-2 cursor-pointer rounded-[15px] hover:bg-gray-200 flex items-center gap-3"
-                            >
-                              <img
-                                src={p.image && p.image !== "/orcamento/.png" ? p.image : "/favicon.png"}
-                                alt={p.produto}
-                                onError={(e) => {
-                                  e.currentTarget.src = "/favicon.png";
-                                }}
-                                className="w-8 h-8 object-contain"
-                              />
-                              <span>
-                                {p.produto}
-                              </span>
-                            </div>
-                          ))}
-                        </div>
-                      ),
+                    {[...new Set(
+                      orcamento.produtos
+                        .filter((p) =>
+                          p.produto.toLowerCase().includes(pesquisaProduto.toLowerCase()) ||
+                          String(p.ref).toLowerCase().includes(pesquisaProduto.toLowerCase())
+                        )
+                        .map((p) => p.ref)
+                    )].map((refFamilia) =>
+                      gerarRefCompleta(refFamilia)
+                        .filter((p) =>
+                          p.produto.toLowerCase().includes(pesquisaProduto.toLowerCase()) ||
+                          String(p.refCompleta).toLowerCase().includes(pesquisaProduto.toLowerCase())
+                        )
+                        .map((p) => (
+                          <div
+                            key={p.refCompleta}
+                            onClick={() => selecionarProduto(index, p)}
+                            className="p-2 cursor-pointer rounded-[15px] hover:bg-gray-200 flex items-center gap-3"
+                          >
+                            <span className="text-sm w-5">
+                              {p.refCompleta}
+                            </span>
+                            <img
+                              src={p.image && p.image !== "/orcamento/.png" ? p.image : "/favicon.png"}
+                              alt={p.produto}
+                              onError={(e) => {
+                                e.currentTarget.src = "/favicon.png";
+                              }}
+                              className="w-8 h-8 object-contain"
+                            />
+                            <span>
+                              {p.produto}
+                            </span>
+                          </div>
+                        ))
                     )}
                   </div>
                 )}

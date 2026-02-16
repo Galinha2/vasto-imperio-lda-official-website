@@ -286,7 +286,7 @@ function page() {
         <div className="flex flex-col gap-5 items-start">
           {linhas.map((linha, index) => (
             <div key={index} className="flex gap-2 md:gap-5 w-full items-center relative">
-              <div data-produto-dropdown className="relative ">
+              <div data-produto-dropdown className="relative w-full">
                 <div
                   className="flex items-center orca rounded-[25px] w-full md:w-100 lg:w-120 px-3"
                 >
@@ -298,7 +298,7 @@ function page() {
                       setPesquisaProduto(e.target.value);
                     }}
                     placeholder="Pesquisar produto..."
-                    className="flex-1 outline-none bg-transparent"
+                    className="flex-1 outline-none bg-transparent w-10"
                   />
                   <IoIosArrowDown
                     className="cursor-pointer"

@@ -16,7 +16,7 @@ function page() {
   const [erroPin, setErroPin] = useState(false);
 
   const [linhas, setLinhas] = useState([
-    { produto: null, preco: 0, unidades: 0, total: 0 },
+    { produto: null, preco: 0, unidades: 0, total: 0, refCompleta: "" },
   ]);
   const [openProdutoIndex, setOpenProdutoIndex] = useState(null);
   const [openDesc, setOpenDesc] = useState(false);
@@ -36,6 +36,20 @@ function page() {
   }, []);
 
   // --------------------
+  // Função para formatar números com espaços (ex: 1000 -> 1 000)
+  const formatarNumero = (valor) => {
+    // Separar parte inteira e decimal
+    const partes = valor.toFixed(2).split(".");
+    const parteInteira = partes[0];
+    const parteDecimal = partes[1];
+    
+    // Adicionar espaços a cada 3 dígitos na parte inteira
+    const parteInteiraFormatada = parteInteira.replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+    
+    // Juntar com a parte decimal
+    return `${parteInteiraFormatada},${parteDecimal}`;
+  };
+
   // Funções
   const verificarPin = (e) => {
     e.preventDefault();
@@ -48,12 +62,13 @@ function page() {
   };
 
   const adicionarLinha = () =>
-    setLinhas([...linhas, { produto: null, preco: 0, unidades: 0, total: 0 }]);
+    setLinhas([...linhas, { produto: null, preco: 0, unidades: 0, total: 0, refCompleta: "" }]);
 
   const selecionarProduto = (index, produtoObj) => {
     const novasLinhas = [...linhas];
     novasLinhas[index].produto = produtoObj.produto;
     novasLinhas[index].preco = produtoObj.preço;
+    novasLinhas[index].refCompleta = produtoObj.refCompleta;
     novasLinhas[index].total = novasLinhas[index].unidades * produtoObj.preço;
     setLinhas(novasLinhas);
     setOpenProdutoIndex(null);
@@ -73,7 +88,7 @@ function page() {
     setLinhas(
       novasLinhas.length
         ? novasLinhas
-        : [{ produto: null, preco: 0, unidades: 0, total: 0 }],
+        : [{ produto: null, preco: 0, unidades: 0, total: 0, refCompleta: "" }],
     );
   };
 
@@ -91,14 +106,14 @@ function page() {
           .replace(/\s+/g, " ")
           .replace(/ x /g, "x")
           .replace(/c\/ /g, "c/");
-        return `- ${nomeCompacto}: ${l.unidades}un x ${l.preco.toFixed(2)}€ = ${l.total.toFixed(2)}€`;
+        return `- ${nomeCompacto}: ${l.unidades}un x ${l.preco.toFixed(2).replace(".", ",")}€ = ${l.total.toFixed(2).replace(".", ",")}€`;
       })
       .join("\n");
 
-    let totaisTexto = `Total Bruto: ${totalSemDesconto.toFixed(2)}€`;
+    let totaisTexto = `Total Bruto: ${totalSemDesconto.toFixed(2).replace(".", ",")}€`;
     if (descontoSelecionado > 0)
-      totaisTexto += `\nTotal c/${descontoSelecionado}% Desc: ${totalComDesconto.toFixed(2)}€`;
-    totaisTexto += `\nTotal c/IVA: ${totalComIVA.toFixed(2)}€`;
+      totaisTexto += `\nTotal c/${descontoSelecionado}% Desc: ${totalComDesconto.toFixed(2).replace(".", ",")}€`;
+    totaisTexto += `\nTotal c/IVA: ${totalComIVA.toFixed(2).replace(".", ",")}€`;
 
     e.clipboardData.setData(
       "text/plain",
@@ -114,14 +129,14 @@ function page() {
           .replace(/\s+/g, " ")
           .replace(/ x /g, "x")
           .replace(/c\/ /g, "c/");
-        return `- ${nomeCompacto}: ${l.unidades}un x ${l.preco.toFixed(2)}€ = ${l.total.toFixed(2)}€`;
+        return `- ${nomeCompacto}: ${l.unidades}un x ${l.preco.toFixed(2).replace(".", ",")}€ = ${l.total.toFixed(2).replace(".", ",")}€`;
       })
       .join("\n");
 
-    let totaisTexto = `Total Bruto: ${totalSemDesconto.toFixed(2)}€`;
+    let totaisTexto = `Total Bruto: ${totalSemDesconto.toFixed(2).replace(".", ",")}€`;
     if (descontoSelecionado > 0)
-      totaisTexto += `\nTotal c/${descontoSelecionado}% Desc: ${totalComDesconto.toFixed(2)}€`;
-    totaisTexto += `\nTotal c/IVA: ${totalComIVA.toFixed(2)}€`;
+      totaisTexto += `\nTotal c/${descontoSelecionado}% Desc: ${totalComDesconto.toFixed(2).replace(".", ",")}€`;
+    totaisTexto += `\nTotal c/IVA: ${totalComIVA.toFixed(2).replace(".", ",")}€`;
 
     const textoFinal = `${linhasFormatadas}\n\n${totaisTexto}`;
     await navigator.clipboard.writeText(textoFinal);
@@ -131,114 +146,378 @@ function page() {
     }, 1000);
   };
 
+  // Função gerarPDF com formatação de números
   const gerarPDF = async () => {
-  const doc = new jsPDF();
-  const corBlue = [8, 121, 192]; // azul para total IVA
-  const corOrange = [255, 85, 0]; // laranja para cabeçalho
-  const corGray = [240, 240, 240]; // cinza claro para fundo da tabela
+    const { default: autoTable } = await import("jspdf-autotable");
+    const doc = new jsPDF();
+    const corPretaFooter = [100, 100, 100];
+    const corBlue = [8, 121, 192];
+    const corOrange = [255, 85, 0];
+    const corGray = [255, 255, 255];
+    const corBlack = [0, 0, 0];
 
-  // Adicionar logo centrado
-  const logo = new Image();
-  logo.src = "/logo.png";
-  await new Promise((resolve) => (logo.onload = resolve));
+    function drawTopoDireito(tipoFolha, doc, pageWidth) {
+      const x = pageWidth - 12;
+      let y = 15;
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(17);
+      doc.setTextColor(...corPretaFooter);
+      doc.text("Orçamento", x, y, { align: "right" });
+      y += 3;
+      doc.setDrawColor(...corBlack);
+      doc.setLineWidth(0.05);
+      doc.line(x - 40, y, x, y);
+      y += 7;
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(10);
+      doc.setTextColor(...corPretaFooter);
+      const tipoUpper = tipoFolha || "";
+      doc.text(`Folha Nº 1 de 1 ${tipoUpper}`, x, y, { align: "right" });
+      y += 7;
+      doc.text("Natureza: Orçamento", x, y, { align: "right" });
+    }
 
-  const maxWidth = 50;
-  const maxHeight = 25;
-  let logoWidth = logo.width;
-  let logoHeight = logo.height;
-  const ratio = Math.min(maxWidth / logoWidth, maxHeight / logoHeight);
-  logoWidth *= ratio;
-  logoHeight *= ratio;
+    const desenharPagina = (tipoFolha, logoPreload) => {
+      const logo = logoPreload;
+      const maxWidth = 55;
+      const maxHeight = 22;
+      let logoWidth = logo.width;
+      let logoHeight = logo.height;
+      if (!logoWidth || !logoHeight) {
+        logoWidth = maxWidth;
+        logoHeight = maxHeight;
+      }
+      const ratio = Math.min(maxWidth / logoWidth, maxHeight / logoHeight);
+      logoWidth *= ratio;
+      logoHeight *= ratio;
+      const pageWidth = doc.internal.pageSize.getWidth();
+      const pageHeight = doc.internal.pageSize.getHeight();
+      const logoX = (pageWidth - logoWidth) / 2;
+      doc.addImage(logo, "PNG", logoX, 12, logoWidth, logoHeight);
 
-  const pageWidth = doc.internal.pageSize.getWidth();
-  const pageHeight = doc.internal.pageSize.getHeight();
-  const logoX = (pageWidth - logoWidth) / 2;
-  doc.addImage(logo, "PNG", logoX, 10, logoWidth, logoHeight);
+      drawTopoDireito(tipoFolha, doc, pageWidth);
 
-  let y = 10 + logoHeight + 10;
+      let y = 12 + logoHeight + 6;
+      doc.setFontSize(14);
+      doc.setFont("helvetica", "normal");
+      doc.setTextColor(...corPretaFooter);
+      doc.text("VASTO IMPÉRIO, LDA", 12, y);
+      doc.setFontSize(10);
+      y += 6;
+      doc.text("NIF 516 032 778", 12, y);
+      y += 5;
+      doc.text(
+        "RUA PRINCIPAL N 31 CABECINHA BENEDITA 2475-014 BENEDITA",
+        12,
+        y,
+      );
+      y += 5;
+      doc.text(
+        "Benedita: Telefone: +351 966 518 436 | Email: vastoimperio@sapo.pt",
+        12,
+        y,
+      );
+      y += 5;
+      doc.text(
+        "Viseu: Telefone: +351 928 348 117 | Email: geral@vastoimperio.pt",
+        12,
+        y,
+      );
+      y += 5;
 
-  // Cabeçalho (sem título de orçamento)
-  // Data em horário português
-  doc.setFontSize(12);
-  doc.setFont("helvetica", "normal");
-  const agora = new Date();
-  doc.text(
-    `Data: ${agora.toLocaleDateString("pt-PT")} ${agora.toLocaleTimeString("pt-PT")}`,
-    10,
-    y
-  );
-  y += 10;
+      const boxHeight = 6;
+      const caixaX = 12;
+      const caixaY = y;
+      const caixaWidth = 80;
+      const agora = new Date();
+      const dataEmissao = agora.toLocaleDateString("pt-PT");
+      const dataVenc = new Date(agora.getTime() + 30 * 24 * 60 * 60 * 1000);
 
-  // contactos no canto inferior esquerdo
-  doc.setFontSize(10);
-  doc.setFont("helvetica", "normal");
-  let yContactos = pageHeight - 40; // 40mm do fundo
-  doc.text("Benedita", 10, yContactos);
-  yContactos += 5;
-  doc.text("Fernando Galinha", 10, yContactos);
-  yContactos += 5;
-  doc.text("vastoimperio@sapo.pt | +351 966 518 436", 10, yContactos);
-  yContactos += 10; // gap maior antes de "Viseu"
-  doc.text("Viseu", 10, yContactos);
-  yContactos += 5;
-  doc.text("Henrique Galinha", 10, yContactos);
-  yContactos += 5;
-  doc.text("geral@vastoimperio.pt | +351 928 348 117", 10, yContactos);
+      const text = "Dados Bancários";
+      doc.setFont("helvetica", "normal");
+      const textWidth = doc.getTextWidth(text) + 4;
+      doc.setFillColor(200, 200, 200);
+      doc.rect(caixaX, caixaY, textWidth, boxHeight, "F");
+      doc.setTextColor(...corPretaFooter);
+      doc.text(text, caixaX + 2, caixaY + 4);
+      doc.text("EuroBic", caixaX + 2, caixaY + 10);
+      doc.text("IBAN: PT50 0036 0164 99100014741 60", caixaX + 2, caixaY + 15);
 
-  // Fundo cinza para tabela (abrange toda a largura das colunas)
-  doc.setFillColor(...corGray);
-  const tabelaAltura = 8 + (linhas.filter(l => l.produto && l.unidades > 0).length * 8);
-  doc.rect(10, y, 190, tabelaAltura, "F");
+      const textEmissao = "Data Emissão:";
+      doc.setFont("helvetica", "normal");
+      const textWidthEmissao = doc.getTextWidth(textEmissao) + 4;
+      const emissaoX = caixaX + caixaWidth + 5;
+      doc.setFillColor(200, 200, 200);
+      doc.rect(emissaoX, caixaY, textWidthEmissao, boxHeight, "F");
+      doc.setTextColor(...corPretaFooter);
+      doc.text(textEmissao, emissaoX + 2, caixaY + 4);
+      doc.text(dataEmissao, emissaoX + 2, caixaY + 4 + boxHeight);
 
-  // Cabeçalho da tabela (topo laranja)
-  const colX = [15, 140, 170, 195]; // Produto, Unidades, Preço/un, Total
-  doc.setFont("helvetica", "bold");
-  doc.setFillColor(...corOrange);
-  doc.setTextColor(255);
-  doc.rect(10, y - 6, 190, 8, "F"); // fundo laranja
-  doc.text("Produto", colX[0], y);
-  doc.text("Un", colX[1], y, { align: "right" });
-  doc.text("Preço /un", colX[2], y, { align: "right" });
-  doc.text("Total", colX[3], y, { align: "right" });
-  y += 8;
+      const textVenc = "Data Vencimento:";
+      doc.setFont("helvetica", "normal");
+      const textWidthVenc = doc.getTextWidth(textVenc) + 4;
+      const vencX = emissaoX + 50;
+      doc.setFillColor(200, 200, 200);
+      doc.rect(vencX, caixaY, textWidthVenc, boxHeight, "F");
+      doc.setTextColor(...corPretaFooter);
+      doc.text(textVenc, vencX + 2, caixaY + 4);
+      doc.text(
+        dataVenc.toLocaleDateString("pt-PT"),
+        vencX + 2,
+        caixaY + 4 + boxHeight,
+      );
 
-  // Linhas da tabela
-  doc.setFont("helvetica", "normal");
-  doc.setTextColor(0);
-  linhas.filter(l => l.produto && l.unidades > 0).forEach(l => {
-    // incluir a referência completa como no dropdown
-    let linhaProduto = orcamento.produtos.find(
-      p => p.produto === l.produto && l.refCompleta === p.refCompleta
-    );
-    let refCompleta = linhaProduto?.refCompleta || "";
-    let nomeCompacto = `${refCompleta} ${l.produto}`.replace(/\s+/g, " ").replace(/ x /g, "x").replace(/c\/ /g, "c/");
-    doc.text(nomeCompacto, colX[0], y);
-    doc.text(`${l.unidades}un`, colX[1], y, { align: "right" });
-    doc.text(`${l.preco.toFixed(2)}€`, colX[2], y, { align: "right" });
-    doc.text(`${l.total.toFixed(2)}€`, colX[3], y, { align: "right" });
-    y += 8;
-  });
+      y += boxHeight * 2 + 8;
 
-  // Totais no canto inferior direito da página
-  const rightX = pageWidth - 10;
-  let yTotais = pageHeight - 30; // posição a 30mm do fundo
-  doc.setFont("helvetica", "bold");
-  doc.setFontSize(16);
-  doc.setTextColor(0);
-  doc.text(`Total Bruto: ${totalSemDesconto.toFixed(2)}€`, rightX, yTotais, { align: "right" });
-  yTotais += 8;
-  if (descontoSelecionado > 0) {
-    doc.setTextColor(...corOrange);
-    doc.text(`Total c/${descontoSelecionado}% Desc: ${totalComDesconto.toFixed(2)}€`, rightX, yTotais, { align: "right" });
-    yTotais += 8;
-  }
-  doc.setTextColor(...corBlue);
-  doc.text(`Total c/IVA: ${totalComIVA.toFixed(2)}€`, rightX, yTotais, { align: "right" });
+      const tableCols = [
+        { title: "REF", dataKey: "referencia", width: 22 },
+        { title: "DESCRIÇÃO", dataKey: "descricao", width: 67 },
+        { title: "QUANT.", dataKey: "quantidade", width: 15 },
+        { title: "UNI", dataKey: "uni", width: 13 },
+        { title: "P. VENDA S/IVA", dataKey: "pvenda", width: 25 },
+        { title: "DESC", dataKey: "desc", width: 13 },
+        { title: "VALOR LIQUIDO", dataKey: "valorliq", width: 22 },
+        { title: "IVA", dataKey: "iva", width: 15 },
+      ];
 
-  doc.save("orcamento.pdf");
-};
+      // Usar a refCompleta que já está armazenada no estado linhas
+      const linhasProdutos = linhas
+        .filter((l) => l.produto)
+        .map((l) => {
+          const unidade = "un";
+          const descLinha = descontoSelecionado > 0 ? descontoSelecionado : 0;
+          const valorDesc = (l.total * descLinha) / 100;
+          const valorLiquido = l.total - valorDesc;
 
+          return {
+            referencia: l.refCompleta || "",
+            descricao: l.produto,
+            quantidade: l.unidades > 0 ? l.unidades : "",
+            uni: unidade,
+            pvenda: formatarNumero(l.preco) + "€",
+            desc: descLinha > 0 ? descLinha + "%" : "",
+            valorliq: formatarNumero(valorLiquido) + "€",
+            iva: "23%",
+          };
+        });
 
+      autoTable(doc, {
+        startY: y,
+        head: [
+          tableCols.map((col, idx) => ({
+            content: col.title,
+            halign: idx === 1 ? "left" : "center",
+          })),
+        ],
+        body: linhasProdutos.map((row) =>
+          tableCols.map((col) => row[col.dataKey]),
+        ),
+        theme: "plain",
+        styles: {
+          font: "helvetica",
+          fontStyle: "normal",
+          fontSize: 9,
+          cellPadding: 0.5,
+          minCellHeight: 1,
+          halign: "right",
+          valign: "middle",
+          textColor: corPretaFooter,
+          overflow: "hidden",
+          lineWidth: 0,
+        },
+        headStyles: {
+          fillColor: [200, 200, 200],
+          textColor: corPretaFooter,
+          fontStyle: "normal",
+          font: "helvetica",
+          halign: "center",
+          lineWidth: 0.1,
+          lineColor: corGray,
+          cellPadding: 2,
+        },
+        bodyStyles: {
+          fillColor: [255, 255, 255],
+          textColor: corPretaFooter,
+          fontStyle: "normal",
+          font: "helvetica",
+          lineWidth: 0,
+          cellPadding: 0.5,
+        },
+        columnStyles: {
+          0: { halign: "left" },
+          1: { halign: "left" },
+          2: { halign: "right" },
+          3: { halign: "left" },
+          4: { halign: "right" },
+          5: { halign: "center" },
+          6: { halign: "right" },
+          7: { halign: "right" },
+        },
+        margin: { left: 12, right: 8 },
+        tableWidth: "auto",
+        columnWidth: "auto",
+      });
+
+      const totalBruto = linhas.reduce((acc, l) => acc + l.total, 0);
+      const totalDescLinha = linhas.reduce(
+        (acc, l) =>
+          acc +
+          (l.total * (descontoSelecionado > 0 ? descontoSelecionado : 0)) / 100,
+        0,
+      );
+      const totalLiquido = totalBruto - totalDescLinha;
+      const totalIVA = totalLiquido * 0.23;
+      const totalFinal = totalLiquido + totalIVA;
+
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(8);
+      doc.setTextColor(...corBlack);
+      let yFooter = pageHeight - 24;
+      doc.setDrawColor(...corPretaFooter);
+      doc.setLineWidth(0.05);
+      doc.line(12, yFooter - 3, pageWidth - 8, yFooter - 3);
+      doc.text(
+        "RUA PRINCIPAL N 31 CABECINHA BENEDITA 2475-014 BENEDITA",
+        12,
+        yFooter,
+      );
+      yFooter += 4;
+      doc.text(
+        "Telefone: +351 966 518 436 | Email: vastoimperio@sapo.pt",
+        12,
+        yFooter,
+      );
+      yFooter += 4;
+      doc.text(
+        "Telefone: +351 928 348 117 | Email: geral@vastoimperio.pt",
+        12,
+        yFooter,
+      );
+      yFooter += 4;
+      const anoAtual = new Date().getFullYear();
+      doc.text(
+        `© ${anoAtual} Vasto Império. Todos os direitos reservados.`,
+        12,
+        yFooter,
+      );
+
+      const totaisAltura = 6 * 5 + 7 + 7;
+      const margemFooter = 8;
+      let yTot = pageHeight - 24 - margemFooter - totaisAltura;
+      let yAfterTable = doc.lastAutoTable.finalY + 4;
+      if (yTot < yAfterTable + 4) yTot = yAfterTable + 4;
+      doc.setDrawColor(...corBlack);
+      doc.setLineWidth(0.05);
+      doc.line(8, yTot - 5, pageWidth - 8, yTot - 5);
+
+      const xIncidencia = 12;
+      const yIncidencia = yTot;
+      const spacingY = 5;
+      const spacingX = 30;
+
+      doc.setFont("helvetica", "normal");
+      doc.setTextColor(...corPretaFooter);
+      doc.setFontSize(10);
+      doc.text("Incidência", xIncidencia, yIncidencia, { align: "left" });
+      doc.text("Taxa", xIncidencia + spacingX, yIncidencia, { align: "left" });
+      doc.text("IVA", xIncidencia + 2 * spacingX, yIncidencia, {
+        align: "left",
+      });
+
+      doc.setFont("helvetica", "normal");
+      doc.text(
+        formatarNumero(totalLiquido) + "€",
+        xIncidencia,
+        yIncidencia + spacingY,
+        { align: "left" },
+      );
+      doc.text("23%", xIncidencia + spacingX, yIncidencia + spacingY, {
+        align: "left",
+      });
+      doc.text(
+        formatarNumero(totalIVA) + "€",
+        xIncidencia + 2 * spacingX,
+        yIncidencia + spacingY,
+        { align: "left" },
+      );
+
+      const xTotais = 125;
+      doc.setFontSize(10);
+      doc.setFont("helvetica", "normal");
+      doc.setTextColor(...corPretaFooter);
+      doc.text("Total Bruto:", xTotais, yTot, { align: "left" });
+      doc.text(formatarNumero(totalBruto) + "€", 200, yTot, {
+        align: "right",
+      });
+      yTot += 6;
+      doc.setFont("helvetica", "normal");
+      doc.setTextColor(...corPretaFooter);
+      doc.text("Desconto Linha:", xTotais, yTot, { align: "left" });
+      doc.setTextColor(...corOrange);
+      doc.text(
+        "-" + formatarNumero(totalDescLinha) + "€",
+        200,
+        yTot,
+        { align: "right" },
+      );
+      yTot += 6;
+      doc.setFont("helvetica", "normal");
+      doc.setTextColor(...corPretaFooter);
+      doc.text("Desconto Global:", xTotais, yTot, { align: "left" });
+      doc.setTextColor(...corOrange);
+      doc.text(`${descontoSelecionado}%`, 200, yTot, { align: "right" });
+      yTot += 6;
+      doc.setFont("helvetica", "normal");
+      doc.setTextColor(...corPretaFooter);
+      doc.text("Total Líquido:", xTotais, yTot, { align: "left" });
+      doc.setTextColor(...corOrange);
+      doc.text(formatarNumero(totalLiquido) + "€", 200, yTot, {
+        align: "right",
+      });
+      yTot += 6;
+      doc.setFont("helvetica", "normal");
+      doc.setTextColor(...corPretaFooter);
+      doc.text("Total IVA:", xTotais, yTot, { align: "left" });
+      doc.text(formatarNumero(totalIVA) + "€", 200, yTot, {
+        align: "right",
+      });
+
+      yTot += 3;
+      doc.setLineWidth(0.05);
+      doc.line(xTotais, yTot, 200, yTot);
+      const yLinhaTotal = yTot;
+      yTot += 5;
+
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(13);
+      doc.setTextColor(...corBlack);
+      doc.text("TOTAL:", xTotais, yTot, { align: "left" });
+      doc.setTextColor(...corBlue);
+      doc.text(formatarNumero(totalFinal) + "€", 200, yTot, {
+        align: "right",
+      });
+
+      doc.setDrawColor(...corBlack);
+      doc.setLineWidth(0.05);
+      doc.line(12, yLinhaTotal, 90, yLinhaTotal);
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(9);
+      doc.setTextColor(...corBlack);
+      doc.text("Este documento não serve de fatura", 12, yLinhaTotal + 12);
+    };
+
+    const logoPreload = new window.Image();
+    logoPreload.src = "/logo.png";
+    await new Promise((resolve) => (logoPreload.onload = resolve));
+
+    desenharPagina("Original", logoPreload);
+    doc.addPage();
+    desenharPagina("Duplicado", logoPreload);
+
+    doc.save("orcamento.pdf");
+  };
+
+  // Mantém a função para o dropdown: gerar refCompleta por família
   const gerarRefCompleta = (refFamilia) => {
     let contador = 1;
     return orcamento.produtos
@@ -285,14 +564,19 @@ function page() {
       <div className="md:bg-(--gray) px-2 py-10 md:p-5 md:rounded-[35px] w-full md:w-auto flex flex-col gap-5 md:shadow-md min-h-150 md:min-h-100 justify-between">
         <div className="flex flex-col gap-5 items-start">
           {linhas.map((linha, index) => (
-            <div key={index} className="flex gap-2 md:gap-5 w-full items-center relative">
+            <div
+              key={index}
+              className="flex gap-2 md:gap-5 w-full items-center relative"
+            >
               <div data-produto-dropdown className="relative w-full">
-                <div
-                  className="flex items-center orca rounded-[25px] w-full md:w-100 lg:w-120 px-3"
-                >
+                <div className="flex items-center orca rounded-[25px] w-full md:w-100 lg:w-120 px-3">
                   <input
                     type="text"
-                    value={openProdutoIndex === index ? pesquisaProduto : (linha.produto || "")}
+                    value={
+                      openProdutoIndex === index
+                        ? pesquisaProduto
+                        : linha.produto || ""
+                    }
                     onFocus={() => setOpenProdutoIndex(index)}
                     onChange={(e) => {
                       setPesquisaProduto(e.target.value);
@@ -300,11 +584,12 @@ function page() {
                     placeholder="Pesquisar produto..."
                     className="flex-1 outline-none bg-transparent w-10"
                   />
+
                   <IoIosArrowDown
                     className="cursor-pointer"
                     onClick={() =>
                       setOpenProdutoIndex(
-                        openProdutoIndex === index ? null : index
+                        openProdutoIndex === index ? null : index,
                       )
                     }
                   />
@@ -312,18 +597,30 @@ function page() {
 
                 {openProdutoIndex === index && (
                   <div className="absolute bg-white shadow-md rounded-[20px] mt-1 w-120 z-10 max-h-100 overflow-y-auto">
-                    {[...new Set(
-                      orcamento.produtos
-                        .filter((p) =>
-                          p.produto.toLowerCase().includes(pesquisaProduto.toLowerCase()) ||
-                          String(p.ref).toLowerCase().includes(pesquisaProduto.toLowerCase())
-                        )
-                        .map((p) => p.ref)
-                    )].map((refFamilia) =>
+                    {[
+                      ...new Set(
+                        orcamento.produtos
+                          .filter(
+                            (p) =>
+                              p.produto
+                                .toLowerCase()
+                                .includes(pesquisaProduto.toLowerCase()) ||
+                              String(p.ref)
+                                .toLowerCase()
+                                .includes(pesquisaProduto.toLowerCase()),
+                          )
+                          .map((p) => p.ref),
+                      ),
+                    ].map((refFamilia) =>
                       gerarRefCompleta(refFamilia)
-                        .filter((p) =>
-                          p.produto.toLowerCase().includes(pesquisaProduto.toLowerCase()) ||
-                          String(p.refCompleta).toLowerCase().includes(pesquisaProduto.toLowerCase())
+                        .filter(
+                          (p) =>
+                            p.produto
+                              .toLowerCase()
+                              .includes(pesquisaProduto.toLowerCase()) ||
+                            String(p.refCompleta)
+                              .toLowerCase()
+                              .includes(pesquisaProduto.toLowerCase()),
                         )
                         .map((p) => (
                           <div
@@ -331,22 +628,22 @@ function page() {
                             onClick={() => selecionarProduto(index, p)}
                             className="p-2 cursor-pointer rounded-[15px] hover:bg-gray-200 flex items-center gap-3"
                           >
-                            <span className="text-sm w-5">
-                              {p.refCompleta}
-                            </span>
+                            <span className="text-sm w-5">{p.refCompleta}</span>
                             <img
-                              src={p.image && p.image !== "/orcamento/.png" ? p.image : "/favicon.png"}
+                              src={
+                                p.image && p.image !== "/orcamento/.png"
+                                  ? p.image
+                                  : "/favicon.png"
+                              }
                               alt={p.produto}
                               onError={(e) => {
                                 e.currentTarget.src = "/favicon.png";
                               }}
                               className="w-8 h-8 object-contain"
                             />
-                            <span>
-                              {p.produto}
-                            </span>
+                            <span>{p.produto}</span>
                           </div>
-                        ))
+                        )),
                     )}
                   </div>
                 )}
@@ -363,12 +660,16 @@ function page() {
                 placeholder="0un"
               />
 
-              <div className="orca flex">
-                <p className="text-center">{linha.preco.toFixed(2)}€ /un</p>
+              <div className="orca flex w-full">
+                <p className="text-center">
+                  {linha.preco.toFixed(2).replace(".", ",")}€ /un
+                </p>
               </div>
 
               <div className="orca flex">
-                <p className="text-center">{linha.total.toFixed(2)}€</p>
+                <p className="text-center">
+                  {linha.total.toFixed(2).replace(".", ",")}€
+                </p>
               </div>
 
               <button
@@ -422,35 +723,37 @@ function page() {
           </div>
 
           <div className="text-[1.5em] text-right">
-            <h2>Total Bruto: {totalSemDesconto.toFixed(2)}€</h2>
+            <h2>
+              Total Bruto: {totalSemDesconto.toFixed(2).replace(".", ",")}€
+            </h2>
             {descontoSelecionado > 0 && (
               <h2 className="text-(--orange)">
                 Total c/ {descontoSelecionado}% Desc:{" "}
-                {totalComDesconto.toFixed(2)}€
+                {totalComDesconto.toFixed(2).replace(".", ",")}€
               </h2>
             )}
             <h2 className="text-(--blue)">
-              Total c/IVA: {totalComIVA.toFixed(2)}€
+              Total c/IVA: {totalComIVA.toFixed(2).replace(".", ",")}€
             </h2>
-           <div className="flex gap-5 justify-end mt-4">
-            <button
-              type="button"
-              onClick={copiarManual}
-              className={`${
-                copiado ? "bg-blue-600" : "bg-(--blue)"
-              } cursor-pointer text-white px-5 text-[0.8em] py-1 rounded-full transition-all duration-200`}
-            >
-              {copiado ? "Texto copiado" : "Copiar Texto"}
-            </button>
+            <div className="flex gap-5 justify-end mt-4">
+              <button
+                type="button"
+                onClick={copiarManual}
+                className={`${
+                  copiado ? "bg-blue-600" : "bg-(--blue)"
+                } cursor-pointer text-white px-5 text-[0.8em] py-1 rounded-full transition-all duration-200`}
+              >
+                {copiado ? "Texto copiado" : "Copiar Texto"}
+              </button>
 
-            <button
-              type="button"
-              onClick={gerarPDF}
-              className="bg-(--orange) cursor-pointer text-white px-5 text-[0.8em] py-1 rounded-full"
-            >
-              Gerar PDF
-            </button>
-          </div>
+              <button
+                type="button"
+                onClick={gerarPDF}
+                className="bg-(--orange) cursor-pointer text-white px-5 text-[0.8em] py-1 rounded-full"
+              >
+                Gerar PDF
+              </button>
+            </div>
           </div>
         </div>
       </div>

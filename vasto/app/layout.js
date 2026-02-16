@@ -33,9 +33,9 @@ export const metadata = {
     icon: "/favicon.ico",
   },
   openGraph: {
-    title: "Racks e Prateleiras Metálicas em Viseu | Vasto Império",
+    title: "Racks, Estantes e Prateleiras Metálicas em Viseu | Vasto Império",
     description:
-      "Soluções profissionais em racks e prateleiras metálicas para empresas em Viseu e distrito. Qualidade, segurança e entregas rápidas.",
+      "Soluções profissionais em racks, Estantes e Prateleiras Metálicas para empresas em Viseu e distrito. Qualidade, segurança e entregas rápidas.",
     url: "https://www.vastimperio.pt",
     siteName: "Vasto Império",
     locale: "pt_PT",

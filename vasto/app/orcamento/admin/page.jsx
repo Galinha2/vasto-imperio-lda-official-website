@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
+import Image from "next/image";
 import { IoIosArrowDown } from "react-icons/io";
 import { IoIosAdd } from "react-icons/io";
 import orcamento from "../../../assets/orcamento.json";
@@ -12,6 +13,7 @@ function page() {
   // Todos os hooks primeiro
   const [pinDigitado, setPinDigitado] = useState("");
   const [autenticado, setAutenticado] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const PIN_CORRETO = "1248";
   const [erroPin, setErroPin] = useState(false);
 
@@ -35,6 +37,12 @@ function page() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  useEffect(() => {
+    const auth = localStorage.getItem("admin_auth") === "true";
+    setAutenticado(auth);
+    setMounted(true);
+  }, []);
+
   // --------------------
   // Função para formatar números com espaços (ex: 1000 -> 1 000)
   const formatarNumero = (valor) => {
@@ -56,6 +64,7 @@ function page() {
     if (pinDigitado === PIN_CORRETO) {
       setAutenticado(true);
       setErroPin(false);
+      localStorage.setItem("admin_auth", "true");
     } else {
       setErroPin(true);
     }
@@ -527,24 +536,28 @@ function page() {
 
   // --------------------
   // Return condicional para PIN
-  if (autenticado) {
+  if (!mounted) {
+    return null;
+  }
+  if (!autenticado) {
     return (
       <div className="flex items-center justify-center h-screen">
         <form
           onSubmit={verificarPin}
           className="flex flex-col items-center gap-3"
         >
+            <Image src="/favicon.png" alt="Logo" width={150} height={60} className="mb-4" />
           <label className="text-lg font-bold">Insira o PIN de 4 dígitos</label>
           <input
             type="password"
             maxLength={4}
             value={pinDigitado}
             onChange={(e) => setPinDigitado(e.target.value)}
-            className="border p-2 rounded text-center w-20"
+            className="border p-2 rounded-full text-center w-20"
           />
           <button
             type="submit"
-            className="bg-(--orange) text-white px-5 py-2 rounded-full"
+            className="bg-(--orange) cursor-pointer text-white px-5 py-2 rounded-full"
           >
             Entrar
           </button>

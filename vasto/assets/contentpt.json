@@ -134,54 +134,54 @@
           "/produtos/1-Paleco/a5.jpg",
           "/produtos/1-Paleco/a6.jpg"
         ],
-        "description": "<span class='label'>Material:</span> Galvanizado ou RAL 5005 / 7035<br/><span class='label'>Peso Suportado:</span> 3300Kg par de vigas<br/><span class='label'>Altura dos Bastidores:</span>  2000 a 5500 mm <br/><span class='label'>Profundidade dos Bastidores:</span> 400 a 1200 mm. <br/><span class='label'>Comprimento das Vigas:</span> 1200 a 2750 mm. <br/><span class='label'>Descrição:</span> Bastidor metálico com sapata, indicado para sistemas de armazenagem e estruturas industriais. Fabricado em aço de elevada resistência, permite múltiplas configurações de altura e profundidade, adaptando-se a diferentes necessidades de carga e espaço. Disponível em acabamento galvanizado ou pintado, garantindo durabilidade e proteção anticorrosão em ambientes industriais.",
+        "description": "<span class='label'>Material:</span> Galvanizado ou RAL 5005 / 7035<br/><span class='label'>Peso Suportado:</span> 3300Kg par de vigas<br/><span class='label'>Altura dos Bastidores:</span>  2000 a 5500 mm <br/><span class='label'>Profundidade dos Bastidores:</span> 800 a 1100 mm. <br/><span class='label'>Comprimento das Vigas:</span> 2200 a 2750 mm. <br/><span class='label'>Descrição:</span> Bastidor metálico com sapata, indicado para sistemas de armazenagem e estruturas industriais. Fabricado em aço de elevada resistência, permite múltiplas configurações de altura e profundidade, adaptando-se a diferentes necessidades de carga e espaço. Disponível em acabamento galvanizado ou pintado, garantindo durabilidade e proteção anticorrosão em ambientes industriais.",
         "tabela": [
           {
             "nome": "Bastidores",
             "altura_mm": 2000,
-            "profundidade_mm": "400 | 500 | 600 | 700 | 800 | 900 | 1000 | 1100 | 1200",
+            "profundidade_mm": "800 | 900 | 1000 | 1100",
             "acabamento": "Galvanizado ou RAL 5005 / 7035"
           },
           {
             "nome": "Bastidores",
             "altura_mm": 2500,
-            "profundidade_mm": "400 | 500 | 600 | 700 | 800 | 900 | 1000 | 1100 | 1200",
+            "profundidade_mm": "800 | 900 | 1000 | 1100",
             "acabamento": "Galvanizado ou RAL 5005 / 7035"
           },
           {
             "nome": "Bastidores",
             "altura_mm": 3000,
-            "profundidade_mm": "400 | 500 | 600 | 700 | 800 | 900 | 1000 | 1100 | 1200",
+            "profundidade_mm": "800 | 900 | 1000 | 1100",
             "acabamento": "Galvanizado ou RAL 5005 / 7035"
           },
           {
             "nome": "Bastidores",
             "altura_mm": 3500,
-            "profundidade_mm": "400 | 500 | 600 | 700 | 800 | 900 | 1000 | 1100 | 1200",
+            "profundidade_mm": "800 | 900 | 1000 | 1100",
             "acabamento": "Galvanizado ou RAL 5005 / 7035"
           },
           {
             "nome": "Bastidores",
             "altura_mm": 4000,
-            "profundidade_mm": "400 | 500 | 600 | 700 | 800 | 900 | 1000 | 1100 | 1200",
+            "profundidade_mm": "800 | 900 | 1000 | 1100",
             "acabamento": "Galvanizado ou RAL 5005 / 7035"
           },
           {
             "nome": "Bastidores",
             "altura_mm": 4500,
-            "profundidade_mm": "400 | 500 | 600 | 700 | 800 | 900 | 1000 | 1100 | 1200",
+            "profundidade_mm": "800 | 900 | 1000 | 1100",
             "acabamento": "Galvanizado ou RAL 5005 / 7035"
           },
           {
             "nome": "Bastidores",
             "altura_mm": 5000,
-            "profundidade_mm": "400 | 500 | 600 | 700 | 800 | 900 | 1000 | 1100 | 1200",
+            "profundidade_mm": "800 | 900 | 1000 | 1100",
             "acabamento": "Galvanizado ou RAL 5005 / 7035"
           },
           {
             "nome": "Bastidores",
             "altura_mm": 5500,
-            "profundidade_mm": "400 | 500 | 600 | 700 | 800 | 900 | 1000 | 1100 | 1200",
+            "profundidade_mm": "800 | 900 | 1000 | 1100",
             "acabamento": "Galvanizado ou RAL 5005 / 7035"
           },
           {
@@ -251,12 +251,6 @@
           },
           {
             "nome": "Bastidor",
-            "comprimento_mm": 750,
-            "largura_mm": "300 | 400 | 500 | 600",
-            "peso_kg": ""
-          },
-          {
-            "nome": "Bastidor",
             "comprimento_mm": 1000,
             "largura_mm": "300 | 400 | 500 | 600",
             "peso_kg": ""
@@ -286,7 +280,7 @@
             "peso_kg": ""
           }
         ],
-        "description": "<span class='label'>Material:</span> Galvanizado ou RAL 5005 / 7035<br/><span class='label'>Altura dos Bastidores:</span>  1000 a 3000 mm <br/><span class='label'>Profundidade dos Bastidores:</span> 400 a 1200 mm. <br/><span class='label'>Comprimento das Prateleiras:</span>  750 a 1000 mm <br/><span class='label'>Largura das Prateleiras:</span>  300 a 600 mm <br/><span class='label'>Descrição:</span> As estantes metálicas de encaixe sem parafusos são uma solução prática e resistente para espaços que exigem organização eficiente e elevada capacidade de carga, como armazéns, arquivos ou zonas industriais. O sistema modular permite ajustar facilmente a altura das prateleiras, adaptando a estrutura às necessidades específicas de cada utilização. A montagem é rápida e segura, através de encaixes reforçados que garantem estabilidade e evitam deslocações indesejadas. Fabricadas em aço robusto, estas estantes oferecem durabilidade, flexibilidade e uma excelente resposta para diferentes configurações de armazenamento, podendo ser dimensionadas à medida do espaço disponível."
+        "description": "<span class='label'>Altura dos Bastidores:</span>  1000 a 3000 mm <br/><span class='label'>Profundidade dos Bastidores:</span> 300 a 500 mm. <br/><span class='label'>Comprimento das Prateleiras:</span>  750 a 1000 mm <br/><span class='label'>Largura das Prateleiras:</span>  300 a 600 mm <br/><span class='label'>Descrição:</span> As estantes metálicas de encaixe sem parafusos são uma solução prática e resistente para espaços que exigem organização eficiente e elevada capacidade de carga, como armazéns, arquivos ou zonas industriais. O sistema modular permite ajustar facilmente a altura das prateleiras, adaptando a estrutura às necessidades específicas de cada utilização. A montagem é rápida e segura, através de encaixes reforçados que garantem estabilidade e evitam deslocações indesejadas. Fabricadas em aço robusto, estas estantes oferecem durabilidade, flexibilidade e uma excelente resposta para diferentes configurações de armazenamento, podendo ser dimensionadas à medida do espaço disponível."
       },
       {
         "id": "porta-paletes-eletrico",

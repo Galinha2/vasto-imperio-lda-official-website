@@ -13,11 +13,11 @@ const interTight = Inter_Tight({
 
 export const metadata = {
   title: {
-    default: "Racks e Prateleiras Metálicas em Viseu | Vasto Império",
+    default: "Racks, Estantes e Prateleiras Metálicas em Viseu e Portugal | Vasto Império",
     template: "%s | Vasto Império",
   },
   description:
-    "A Vasto Império Lda fornece racks e prateleiras metálicas em Viseu e em todo o distrito. Soluções profissionais de armazenamento para empresas, armazéns e indústria, com entregas em todo o país.",
+    "A Vasto Império Lda fornece racks, estantes e prateleiras metálicas em Viseu e resto de Portugal. Soluções profissionais de armazenamento para empresas, armazéns e indústria, com entregas em todo o país.",
   keywords: [
     "racks Viseu",
     "prateleiras Viseu",

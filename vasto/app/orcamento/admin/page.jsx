@@ -103,8 +103,17 @@ function page() {
 
   const totalSemDesconto = linhas.reduce((acc, linha) => acc + linha.total, 0);
   const totalComDesconto =
-    totalSemDesconto - (totalSemDesconto * descontoSelecionado) / 100;
-  const totalComIVA = totalComDesconto * 1.23;
+    linhas.reduce((acc, l) => {
+      if (l.produto === "Portes de envio") return acc + l.total;
+      return acc + l.total * (1 - descontoSelecionado / 100);
+    }, 0);
+
+  // Portes de envio têm IVA mas não têm desconto. Aplicar IVA a todos, desconto só aos outros.
+  const totalComIVA = linhas.reduce((acc, l) => {
+    const valorDesc = l.produto === "Portes de envio" ? 0 : descontoSelecionado > 0 ? (l.total * descontoSelecionado) / 100 : 0;
+    const valorLiquido = l.total - valorDesc;
+    return acc + valorLiquido * 1.23;
+  }, 0);
 
   const handleCopy = (e) => {
     e.preventDefault();
@@ -294,17 +303,17 @@ function page() {
         .filter((l) => l.produto)
         .map((l) => {
           const unidade = "un";
-          const descLinha = descontoSelecionado > 0 ? descontoSelecionado : 0;
-          const valorDesc = (l.total * descLinha) / 100;
+          // Para Portes de envio, desconto é sempre vazio na coluna "DESC"
+          const descLinha = l.produto === "Portes de envio" ? "" : (descontoSelecionado > 0 ? descontoSelecionado : 0);
+          const valorDesc = l.produto === "Portes de envio" ? 0 : (descontoSelecionado > 0 ? (l.total * descontoSelecionado) / 100 : 0);
           const valorLiquido = l.total - valorDesc;
-
           return {
             referencia: l.refCompleta || "",
             descricao: l.produto,
             quantidade: l.unidades > 0 ? l.unidades : "",
             uni: unidade,
             pvenda: formatarNumero(l.preco) + "€",
-            desc: descLinha > 0 ? descLinha + "%" : "",
+            desc: descLinha !== "" && descLinha > 0 ? descLinha + "%" : "",
             valorliq: formatarNumero(valorLiquido) + "€",
             iva: "23%",
           };
@@ -371,11 +380,27 @@ function page() {
       const totalDescLinha = linhas.reduce(
         (acc, l) =>
           acc +
-          (l.total * (descontoSelecionado > 0 ? descontoSelecionado : 0)) / 100,
+          (l.produto === "Portes de envio" ? 0 :
+            (descontoSelecionado > 0 ? (l.total * descontoSelecionado) / 100 : 0)
+          ),
         0,
       );
-      const totalLiquido = totalBruto - totalDescLinha;
-      const totalIVA = totalLiquido * 0.23;
+      // Para Portes de envio, não há desconto, mas há IVA
+      const totalLiquido = linhas.reduce(
+        (acc, l) =>
+          acc +
+          (l.total - (l.produto === "Portes de envio" ? 0 : (descontoSelecionado > 0 ? (l.total * descontoSelecionado) / 100 : 0))),
+        0,
+      );
+      // IVA sobre todos os produtos, incluindo Portes de envio
+      const totalIVA = linhas.reduce(
+        (acc, l) => {
+          const valorDesc = l.produto === "Portes de envio" ? 0 : (descontoSelecionado > 0 ? (l.total * descontoSelecionado) / 100 : 0);
+          const valorLiquido = l.total - valorDesc;
+          return acc + valorLiquido * 0.23;
+        },
+        0,
+      );
       const totalFinal = totalLiquido + totalIVA;
 
       doc.setFont("helvetica", "normal");
@@ -674,9 +699,24 @@ function page() {
               />
 
               <div className="orca flex w-full">
-                <p className="text-center">
-                  {linha.preco.toFixed(2).replace(".", ",")}€ /un
-                </p>
+                {linha.produto === "Portes de envio" ? (
+                  <input
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    value={linha.preco || ""}
+                    onChange={(e) => {
+                      const novasLinhas = [...linhas];
+                      novasLinhas[index].preco = Number(e.target.value) || 0;
+                      novasLinhas[index].total = novasLinhas[index].unidades * novasLinhas[index].preco;
+                      setLinhas(novasLinhas);
+                    }}
+                    className="text-center w-full border rounded px-1"
+                    placeholder="Preço"
+                  />
+                ) : (
+                  <p className="text-center">{linha.preco?.toFixed(2).replace(".", ",")}€ /un</p>
+                )}
               </div>
 
               <div className="orca flex">

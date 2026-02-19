@@ -987,6 +987,120 @@
       "produto": "Bastidor Picking 5000x1200mm (AxP) RAL 5005 / 7035",
       "preço": 88.53,
       "image": "/orcamento/Bastidor Porteco ISO.jpg"
+    },
+    {
+      "ref": 3,
+      "produto": "Reforço lateral c/ 400mm (AxP) Galvanizado",
+      "preço": 2.57,
+      "image": "/orcamento/reforco lateral.png"
+    },
+    {
+      "ref": 3,
+      "produto": "Reforço lateral c/ 500mm (AxP)",
+      "preço": 2.87,
+      "image": "/orcamento/reforco lateral.png"
+    },
+    {
+      "ref": 3,
+      "produto": "Reforço lateral c/ 600mm (AxP)",
+      "preço": 3.08,
+      "image": "/orcamento/reforco lateral.png"
+    },
+    {
+      "ref": 3,
+      "produto": "Reforço lateral c/ 700mm (AxP)",
+      "preço": 3.29,
+      "image": "/orcamento/reforco lateral.png"
+    },
+    {
+      "ref": 3,
+      "produto": "Reforço lateral c/ 800mm (AxP)",
+      "preço": 3.50,
+      "image": "/orcamento/reforco lateral.png"
+    },
+    {
+      "ref": 3,
+      "produto": "Reforço lateral c/ 900mm (AxP)",
+      "preço": 3.71,
+      "image": "/orcamento/reforco lateral.png"
+    },
+    {
+      "ref": 3,
+      "produto": "Reforço lateral c/ 1000mm (AxP)",
+      "preço": 3.91,
+      "image": "/orcamento/reforco lateral.png"
+    },
+    {
+      "ref": 3,
+      "produto": "Reforço lateral c/ 1100mm (AxP)",
+      "preço": 4.13,
+      "image": "/orcamento/reforco lateral.png"
+    },
+    {
+      "ref": 3,
+      "produto": "Reforço lateral c/ 1200mm (AxP)",
+      "preço": 4.33,
+      "image": "/orcamento/reforco lateral.png"
+    },
+    {
+      "ref": 3,
+      "produto": "Reforço central c/ 400mm (AxP) Galvanizado",
+      "preço": 3.13,
+      "image": "/orcamento/reforco central.png"
+    },
+    {
+      "ref": 3,
+      "produto": "Reforço central c/ 500mm (AxP)",
+      "preço": 3.36,
+      "image": "/orcamento/reforco central.png"
+    },
+    {
+      "ref": 3,
+      "produto": "Reforço central c/ 600mm (AxP)",
+      "preço": 3.61,
+      "image": "/orcamento/reforco central.png"
+    },
+    {
+      "ref": 3,
+      "produto": "Reforço central c/ 700mm (AxP)",
+      "preço": 3.87,
+      "image": "/orcamento/reforco central.png"
+    },
+    {
+      "ref": 3,
+      "produto": "Reforço central c/ 800mm (AxP)",
+      "preço": 4.10,
+      "image": "/orcamento/reforco central.png"
+    },
+    {
+      "ref": 3,
+      "produto": "Reforço central c/ 900mm (AxP)",
+      "preço": 4.34,
+      "image": "/orcamento/reforco central.png"
+    },
+    {
+      "ref": 3,
+      "produto": "Reforço central c/ 1000mm (AxP)",
+      "preço": 4.60,
+      "image": "/orcamento/reforco central.png"
+    },
+    {
+      "ref": 3,
+      "produto": "Reforço central c/ 1100mm (AxP)",
+      "preço": 4.85,
+      "image": "/orcamento/reforco central.png"
+    },
+    {
+      "ref": 3,
+      "produto": "Reforço central c/ 1200mm (AxP)",
+      "preço": 5.09,
+      "image": "/orcamento/reforco central.png"
+    },
+    {
+      "ref": 3,
+      "produto": "Prat. Madeira. Aglom. 1750x600x19mm (CxPxA)",
+      "preço": 20.34,
+      "image": "/orcamento/tampo madeira.png"
     }
   ],
   "descontos": [

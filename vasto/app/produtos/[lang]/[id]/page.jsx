@@ -27,45 +27,34 @@ export function generateStaticParams() {
 export async function generateMetadata({ params }) {
   const { lang, id } = await params;
 
-  const content = lang === "pt" ? contentpt : contenten;
-  const product = content.productsShowcase.products.find(
+  const contentData = lang === "pt" ? contentpt : contenten;
+
+  const product = contentData.productsShowcase.products.find(
     (item) => item.id === decodeURIComponent(String(id))
   );
 
   if (!product) {
     return {
       title: "Produto não encontrado | Vasto Império",
-      description: "Produto não encontrado no catálogo da Vasto Império."
+      description: "O produto que procura não foi encontrado."
     };
   }
 
-  const title =
-    lang === "pt"
-      ? `${product.text} em Viseu | Vasto Império`
-      : `${product.text} in Portugal | Vasto Império`;
-
-  const description =
-    lang === "pt"
-      ? `Soluções profissionais de ${product.text.toLowerCase()} em Viseu e Benedita. Mais de 20 anos de experiência em sistemas de armazenagem. Peça orçamento gratuito.`
-      : `Professional solutions for ${product.text.toLowerCase()} in Portugal. Over 20 years of experience. Request a free quote.`;
+  const canonicalUrl = `https://www.vastoimperio.pt/produtos/${lang}/${id}`;
 
   return {
-    title,
-    description,
-    keywords: [
-      product.text,
-      "racks metálicos",
-      "prateleiras metálicas",
-      "armazenagem industrial",
-      "Viseu",
-      "Benedita",
-      "Vasto Império"
-    ],
+    title: `${product.text} | Vasto Império`,
+    description: product.description,
+    alternates: {
+      canonical: canonicalUrl
+    },
     openGraph: {
-      title,
-      description,
-      url: `https://vastoimperio.pt/produtos/${lang}/${id}`,
+      title: `${product.text} | Vasto Império`,
+      description: product.description,
+      url: canonicalUrl,
       siteName: "Vasto Império",
+      locale: lang === "pt" ? "pt_PT" : "en_US",
+      type: "website",
       images: [
         {
           url: product.image,
@@ -73,9 +62,7 @@ export async function generateMetadata({ params }) {
           height: 600,
           alt: product.text
         }
-      ],
-      locale: lang === "pt" ? "pt_PT" : "en_US",
-      type: "website"
+      ]
     }
   };
 }

@@ -259,7 +259,7 @@ function page() {
       doc.setTextColor(...corPretaFooter);
       doc.text(text, caixaX + 2, caixaY + 4);
       doc.text("EuroBic", caixaX + 2, caixaY + 10);
-      doc.text("IBAN: PT50 0036 0164 99100014741 60", caixaX + 2, caixaY + 15);
+      doc.text("IBAN:  PT50 0079 0000 4766 1251 1016 4", caixaX + 2, caixaY + 15);
 
       const textEmissao = "Data Emissão:";
       doc.setFont("helvetica", "normal");

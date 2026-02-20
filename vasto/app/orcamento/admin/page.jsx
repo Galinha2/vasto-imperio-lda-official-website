@@ -29,6 +29,7 @@ function page() {
   const [nif, setNif] = useState("");
   const [dadosEmpresa, setDadosEmpresa] = useState(null);
   const [loadingNif, setLoadingNif] = useState(false);
+  const [popupMensagem, setPopupMensagem] = useState(null);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -57,13 +58,13 @@ function page() {
       const res = await fetch(`/api/nifs?nif=${valorNif}`);
       const data = await res.json();
 
-      if (!res.ok) {
-        setDadosEmpresa(null);
+      if (!res.ok || !data) {
+        setDadosEmpresa({ nome: "NIF não encontrado", nif: "", codigoPostal: "" });
       } else {
         setDadosEmpresa(data);
       }
     } catch (err) {
-      setDadosEmpresa(null);
+      setDadosEmpresa({ nome: "NIF não encontrado", nif: "", codigoPostal: "" });
     } finally {
       setLoadingNif(false);
     }
@@ -310,11 +311,28 @@ function page() {
       doc.setFont("helvetica", "bold");
       doc.setFontSize(12);
       doc.setTextColor(0, 0, 0); // nome do cliente em preto
-      doc.text(clienteNome, offsetClienteX, yCliente, { align: "left" });
+      // Se o nome do cliente for maior que 38 caracteres, dividir em duas linhas
+      // Nome do cliente: cortar por palavras, nunca cortar palavra ao meio
+      const maxLen = 38;
+      const words = clienteNome.split(" ");
+      let line = "";
+      for (let i = 0; i < words.length; i++) {
+        const testLine = line ? line + " " + words[i] : words[i];
+        if (testLine.length > maxLen) {
+          doc.text(line, offsetClienteX, yCliente, { align: "left" });
+          yCliente += 5;
+          line = words[i];
+        } else {
+          line = testLine;
+        }
+      }
+      if (line) {
+        doc.text(line, offsetClienteX, yCliente, { align: "left" });
+        yCliente += 5;
+      }
       doc.setFont("helvetica", "normal");
       doc.setFontSize(10);
       doc.setTextColor(...corPretaFooter); // voltar à cor original para morada e NIF
-      yCliente += 5;
       // Inserir duas linhas com o local antes do código postal
       // Extrair o local do clienteMorada (depois do espaço). Exemplo: '5110-161 Armamar' -> 'Armamar'
       const local = clienteMorada.split(" ").slice(1).join(" ") || clienteMorada;
@@ -843,7 +861,7 @@ function page() {
         </div>
 
         <div className="flex justify-between relative">
-          <div data-desc-dropdown className="relative flex gap-5">
+          <div data-desc-dropdown className="relative flex flex-col md:flex-row gap-5">
             <button
               type="button"
               onClick={() => setOpenDesc(!openDesc)}
@@ -921,7 +939,13 @@ function page() {
 
               <button
                 type="button"
-                onClick={gerarPDF}
+                onClick={() => {
+                  if (dadosEmpresa?.nome === "NIF não encontrado") {
+                    setPopupMensagem("Não é possível gerar PDF: NIF não encontrado.");
+                    return;
+                  }
+                  gerarPDF();
+                }}
                 className="bg-(--orange) cursor-pointer text-white px-5 text-[0.8em] py-1 rounded-full"
               >
                 Gerar PDF
@@ -930,6 +954,21 @@ function page() {
           </div>
         </div>
       </div>
+
+      {/* Popup do NIF */}
+      {popupMensagem ? (
+        <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
+          <div className="bg-white rounded-lg shadow-lg p-5 w-80 relative">
+            <button
+              className="absolute top-2 right-2 cursor-pointer text-(--orange) w-5 h-5 bg-white rounded-full shadow-sm hover:text-gray-700"
+              onClick={() => setPopupMensagem(null)}
+            >
+              ×
+            </button>
+            <p className="text-center">{popupMensagem}</p>
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }

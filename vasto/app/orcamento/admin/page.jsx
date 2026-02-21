@@ -48,6 +48,7 @@ function page() {
   }, []);
 
   const procurarNif = async (valorNif) => {
+    // Se o NIF estiver vazio ou inválido, apenas limpar
     if (!/^\d{9}$/.test(valorNif)) {
       setDadosEmpresa(null);
       return;
@@ -57,20 +58,23 @@ function page() {
     setDadosEmpresa(null); // limpar enquanto aguarda resposta
 
     try {
+      // Chamada correta à API de NIFs
       const res = await fetch(`/api/nifs?nif=${valorNif}`);
       const data = await res.json();
 
-      if (!res.ok || !data || data.error) {
-        setDadosEmpresa({ nome: "NIF não encontrado", nif: "", codigoPostal: "" });
-      } else {
-        setDadosEmpresa({
-          nome: data.nome || "Cliente",
-          nif: data.nif || valorNif,
-          codigoPostal: data.codigoPostal || "V/ Morada",
-        });
-      }
+      // Se a API devolve erro ou não há nome, usar fallback
+      setDadosEmpresa({
+        nome: data?.nome || "Cliente",
+        nif: data?.nif || valorNif,
+        codigoPostal: data?.codigoPostal || "V/ Morada",
+      });
     } catch (err) {
-      setDadosEmpresa({ nome: "NIF não encontrado", nif: "", codigoPostal: "" });
+      // Em caso de erro de rede ou exceção, usar fallback
+      setDadosEmpresa({
+        nome: "Cliente",
+        nif: valorNif,
+        codigoPostal: "V/ Morada",
+      });
     } finally {
       setLoadingNif(false);
     }

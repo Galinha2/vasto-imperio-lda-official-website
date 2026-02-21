@@ -1,4 +1,3 @@
-
 import chromium from "@sparticuz/chromium";
 import puppeteerCore from "puppeteer-core";
 import puppeteer from "puppeteer";
@@ -37,7 +36,7 @@ export default async function handler(req, res) {
 
       await page.goto(`https://www.nif.pt/${nif}/`, {
         waitUntil: "networkidle2",
-        timeout: 30000,
+        timeout: 60000, // aumentar timeout para 60s
       });
 
 
@@ -80,6 +79,7 @@ export default async function handler(req, res) {
         codigoPostal: dados.codigoPostal || "V/ Morada",
       });
     } catch (err) {
+      console.error("Erro Puppeteer:", err);
       if (browser) await browser.close();
       return res.status(200).json({
         nome: "Cliente",
@@ -88,6 +88,7 @@ export default async function handler(req, res) {
       });
     }
   } catch (err) {
+    console.error("Erro Puppeteer:", err);
     return res.status(200).json({
       nome: "Cliente",
       nif: "",

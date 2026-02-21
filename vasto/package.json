@@ -31,5 +31,8 @@
     "eslint": "^10.0.1",
     "eslint-config-next": "^0.2.4",
     "tailwindcss": "^4"
+  },
+  "engines": {
+    "node": "20.x"
   }
 }

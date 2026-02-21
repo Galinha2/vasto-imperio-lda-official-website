@@ -53,15 +53,21 @@ function page() {
       return;
     }
 
+    setLoadingNif(true);
+    setDadosEmpresa(null); // limpar enquanto aguarda resposta
+
     try {
-      setLoadingNif(true);
       const res = await fetch(`/api/nifs?nif=${valorNif}`);
       const data = await res.json();
 
-      if (!res.ok || !data) {
+      if (!res.ok || !data || data.error) {
         setDadosEmpresa({ nome: "NIF não encontrado", nif: "", codigoPostal: "" });
       } else {
-        setDadosEmpresa(data);
+        setDadosEmpresa({
+          nome: data.nome || "Cliente",
+          nif: data.nif || valorNif,
+          codigoPostal: data.codigoPostal || "V/ Morada",
+        });
       }
     } catch (err) {
       setDadosEmpresa({ nome: "NIF não encontrado", nif: "", codigoPostal: "" });
@@ -880,13 +886,17 @@ function page() {
                 onChange={(e) => {
                   const valor = e.target.value.replace(/[^0-9]/g, "");
                   setNif(valor);
-                  procurarNif(valor);
+                  if (valor.length === 9) {
+                    procurarNif(valor);
+                  } else {
+                    setDadosEmpresa(null);
+                  }
                 }}
               />
               {loadingNif && (
                 <span className="text-xs mt-1">A procurar dados...</span>
               )}
-              {dadosEmpresa && (
+              {dadosEmpresa && !loadingNif && (
                 <div className="text-xs mt-1 bg-white p-2 rounded shadow">
                   <p><strong>{dadosEmpresa.nome}</strong></p>
                   <p>NIF: {dadosEmpresa.nif}</p>

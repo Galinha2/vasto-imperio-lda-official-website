@@ -18,25 +18,37 @@ export default async function handler(req, res) {
     const html = await response.text();
     const $ = cheerio.load(html);
 
-    const nome = $("span.search-title").text().trim() || "Cliente";
-    const nifFormatado = $("h1.big-nif").text().replace(/\s+/g, "").trim() || nif;
+    // Nome da empresa
+    const nome = $("span.search-title").first().text().trim() || "Cliente";
 
-    let codigoPostal = "";
-    $("div.detail").each((i, el) => {
-      const linhas = $(el).text().split("\n");
-      for (let linha of linhas) {
-        const match = linha.trim().match(/^\d{4}-\d{3}\s+[A-Za-zÀ-ÿ\s]+$/);
-        if (match) {
-          codigoPostal = match[0].trim();
-          break;
-        }
+    // NIF formatado
+    const nifFormatado = $("h1.big-nif").first().text().replace(/\s+/g, "").trim() || nif;
+
+    // Morada (código postal + local) - Extração correta da morada e códigoPostal
+    let codigoPostal = "V/ Morada";
+    let morada = "";
+    // A morada e código postal normalmente aparecem em <div class="detail"><br>Morada<br>...</div>
+    // Vamos buscar o HTML, não só o texto, para analisar as quebras de linha (<br>)
+    const detailHtml = $("div.detail").first().html() || "";
+    // Separar por <br>
+    const moradaLines = detailHtml.split(/<br\s*\/?>/i).map((l) => l.replace(/\s+/g, " ").trim()).filter(Boolean);
+    // Procurar a linha com código postal (formato xxxx-xxx)
+    let foundCP = "";
+    for (const line of moradaLines) {
+      const cpMatch = line.match(/\d{4}-\d{3}\s+[A-Za-zÀ-ÿ\s]+/);
+      if (cpMatch) {
+        foundCP = cpMatch[0].trim();
+        break;
       }
-    });
+    }
+    if (foundCP) {
+      codigoPostal = foundCP;
+    }
 
     return res.status(200).json({
       nome,
       nif: nifFormatado,
-      codigoPostal: codigoPostal || "V/ Morada",
+      codigoPostal,
     });
   } catch (err) {
     console.error("Erro ao obter NIF:", err);

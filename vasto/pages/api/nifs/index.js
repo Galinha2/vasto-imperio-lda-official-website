@@ -1,88 +1,48 @@
-import puppeteer from "puppeteer";
+import fetch from "node-fetch";
+import * as cheerio from "cheerio";
 
 // Next.js Pages Router API Route
 export default async function handler(req, res) {
-  try {
-    const { nif } = req.query;
+  const { nif } = req.query;
 
-    if (!nif || !/^\d{9}$/.test(nif)) {
-      return res.status(200).json({
-        nome: "Cliente",
-        nif: nif || "",
-        codigoPostal: "V/ Morada",
-      });
-    }
-
-    let browser;
-    try {
-      browser = await puppeteer.launch({
-        args: ["--no-sandbox", "--disable-setuid-sandbox"],
-        headless: true,
-      });
-
-      const page = await browser.newPage();
-      await page.setUserAgent(
-        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
-      );
-
-      await page.goto(`https://www.nif.pt/${nif}/`, {
-        waitUntil: "networkidle2",
-        timeout: 60000, // aumentar timeout para 60s
-      });
-
-
-
-      const dados = await page.evaluate(() => {
-        const nomeEl = document.querySelector("span.search-title");
-        const nifEl = document.querySelector("h1.big-nif");
-
-        let nome = nomeEl ? nomeEl.innerText.trim() : "";
-        let nifFormatado = nifEl ? nifEl.innerText.replace(/\s+/g, "").trim() : "";
-
-        // Extrair apenas a linha exata do código postal + local
-        const detailDiv = document.querySelector("div.detail");
-        let codigoPostal = "";
-
-        if (detailDiv) {
-          const linhas = detailDiv.innerText.split("\n");
-          for (let linha of linhas) {
-            const limpa = linha.trim();
-            const match = limpa.match(/^\d{4}-\d{3}\s+[A-Za-zÀ-ÿ\s]+$/);
-            if (match) {
-              codigoPostal = match[0].trim();
-              break; // apenas a primeira ocorrência válida
-            }
-          }
-        }
-
-        return {
-          nome,
-          nif: nifFormatado,
-          codigoPostal,
-        };
-      });
-
-      await browser.close();
-
-      return res.status(200).json({
-        nome: dados.nome || "Cliente",
-        nif: dados.nif || nif,
-        codigoPostal: dados.codigoPostal || "V/ Morada",
-      });
-    } catch (err) {
-      console.error("Erro Puppeteer:", err);
-      if (browser) await browser.close();
-      return res.status(200).json({
-        nome: "Cliente",
-        nif,
-        codigoPostal: "V/ Morada",
-      });
-    }
-  } catch (err) {
-    console.error("Erro Puppeteer:", err);
+  if (!nif || !/^\d{9}$/.test(nif)) {
     return res.status(200).json({
       nome: "Cliente",
-      nif: "",
+      nif: nif || "",
+      codigoPostal: "V/ Morada",
+    });
+  }
+
+  try {
+    const response = await fetch(`https://www.nif.pt/${nif}/`);
+    const html = await response.text();
+    const $ = cheerio.load(html);
+
+    const nome = $("span.search-title").text().trim() || "Cliente";
+    const nifFormatado = $("h1.big-nif").text().replace(/\s+/g, "").trim() || nif;
+
+    let codigoPostal = "";
+    $("div.detail").each((i, el) => {
+      const linhas = $(el).text().split("\n");
+      for (let linha of linhas) {
+        const match = linha.trim().match(/^\d{4}-\d{3}\s+[A-Za-zÀ-ÿ\s]+$/);
+        if (match) {
+          codigoPostal = match[0].trim();
+          break;
+        }
+      }
+    });
+
+    return res.status(200).json({
+      nome,
+      nif: nifFormatado,
+      codigoPostal: codigoPostal || "V/ Morada",
+    });
+  } catch (err) {
+    console.error("Erro ao obter NIF:", err);
+    return res.status(200).json({
+      nome: "Cliente",
+      nif,
       codigoPostal: "V/ Morada",
     });
   }

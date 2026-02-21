@@ -1,5 +1,3 @@
-import chromium from "@sparticuz/chromium";
-import puppeteerCore from "puppeteer-core";
 import puppeteer from "puppeteer";
 
 // Next.js Pages Router API Route
@@ -15,19 +13,12 @@ export default async function handler(req, res) {
       });
     }
 
-    const isProduction = process.env.VERCEL === "1";
     let browser;
     try {
-      if (isProduction) {
-        browser = await puppeteerCore.launch({
-          args: chromium.args,
-          defaultViewport: chromium.defaultViewport,
-          executablePath: await chromium.executablePath(),
-          headless: true,
-        });
-      } else {
-        browser = await puppeteer.launch({ headless: true });
-      }
+      browser = await puppeteer.launch({
+        args: ["--no-sandbox", "--disable-setuid-sandbox"],
+        headless: true,
+      });
 
       const page = await browser.newPage();
       await page.setUserAgent(

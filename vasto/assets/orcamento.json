@@ -168,6 +168,12 @@
     },
     {
       "ref": 1,
+      "produto": "Travamento em T",
+      "preço": 4.89,
+      "image": "/orcamento/travamento.png"
+    },
+    {
+      "ref": 1,
       "produto": "Travamento 750 mm",
       "preço": 4.18,
       "image": "/orcamento/travamento.png"

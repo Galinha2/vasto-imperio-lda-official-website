@@ -672,7 +672,17 @@ function page() {
     doc.addPage();
     desenharPagina("Duplicado", logoPreload);
 
-    doc.save("orcamento.pdf");
+    // Definir título do PDF dinamicamente consoante o NIF encontrado
+    const nomeEmpresaPDF =
+      dadosEmpresa && dadosEmpresa.nome && dadosEmpresa.nome !== "Cliente"
+        ? `Orçamento | ${dadosEmpresa.nome}`
+        : "Orçamento";
+
+    doc.setProperties({
+      title: nomeEmpresaPDF,
+    });
+    const nomeFicheiro = `${nomeEmpresaPDF}.pdf`;
+    doc.save(nomeFicheiro);
   };
 
   // Mantém a função para o dropdown: gerar refCompleta por família

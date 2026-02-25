@@ -81,7 +81,7 @@ function PromotionalPage({ produto }) {
       </section>
 
       {tabelaFinal.length > 0 && (
-        <section className="mb-10 mt-5 border-y -m-10 border-(horizontal-line)">
+        <section className="mb-10 mt-5 border-y -m-10 border-(--horizontal-line)">
           <h2 className="text-2xl font-semibold my-4 text-center">Especificações Técnicas</h2>
           <ProductTabela tabela={tabelaFinal} />
         </section>

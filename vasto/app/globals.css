@@ -43,9 +43,6 @@
   transition: all 0.3s ease;
 }
 
-*:hover {
-  transition: none;
-}
 
 @theme inline {
   --color-background: var(--background);

@@ -9,10 +9,30 @@ function Cards() {
   const { language } = useLanguage();
   const content = language === "pt" ? contentpt : contenten;
   const item = content.homeCards.text;
+  const promotionalPages = content.promotionalPages || [];
 
   return (
     <div className="mb-0 pb-0">
       <div>
+        <h1 className="text-center title mb-5">Artigos mais vendidos</h1>
+        <div className="flex flex md:flex-row gap-10 justify-center items-center mb-10 px-5 m-auto border-b border-(--horizontal-line) pb-10">
+          {promotionalPages.slice(0, 2).map((promo, index) => (
+            <Link href={promo.id} key={index} className="flex flex-col items-center text-center">
+              {promo.mainImage && (
+                <div className="w-50 h-50 flex flex-col items-center justify-center p-5 rounded-[35px] shadow-sm bg-(--gray)">
+                  <img
+                    src={promo.mainImage}
+                    alt={promo.title}
+                    className="w-auto h-50 p-5"
+                  />
+                </div>
+              )}
+              <h2 className="mt-2 text-[1em] font-normal text-(--black)">
+                {promo.title}
+              </h2>
+            </Link>
+          ))}
+        </div>
         {item.map((card, index) => (
           <div key={index} className="border-b pb-10 mb-5 border-(--horizontal-line)">
             <div className="p-5">

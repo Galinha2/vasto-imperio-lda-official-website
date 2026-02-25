@@ -2,19 +2,19 @@
 import { useState } from "react";
 import { useLanguage } from "../header/LanguageContext";
 
-function ProductTabela({ product }) {
+function ProductTabela({ tabela = [] }) {
   const { language } = useLanguage();
   const isPT = language === "pt";
   const [showTable, setShowTable] = useState(false);
 
-  if (!product.tabela || product.tabela.length === 0) return null;
+  if (!Array.isArray(tabela) || tabela.length === 0) return null;
 
-  const hasAcabamento = product.tabela.some((item) => item.acabamento);
-  const hasCodigo = product.tabela.some((item) => item.codigo);
-  const hasAltura = product.tabela.some((item) => item.altura_mm);
-  const hasComprimentos = product.tabela.some((item) => item.comprimento_mm);
-  const hasMedidas = product.tabela.some((item) => item.medidas_mm);
-  const hasLargura = product.tabela.some((item) => item.largura_mm || item.profundidade_mm);
+  const hasAcabamento = tabela.some((item) => item.acabamento);
+  const hasCodigo = tabela.some((item) => item.codigo);
+  const hasAltura = tabela.some((item) => item.altura_mm);
+  const hasComprimentos = tabela.some((item) => item.comprimento_mm);
+  const hasMedidas = tabela.some((item) => item.medidas_mm);
+  const hasLargura = tabela.some((item) => item.largura_mm || item.profundidade_mm);
 
   return (
     <div className="p-5 max-w-450 m-auto">
@@ -76,7 +76,7 @@ function ProductTabela({ product }) {
               </tr>
             </thead>
             <tbody>
-              {product.tabela.map((item, idx) => (
+              {tabela.map((item, idx) => (
                 <tr
                   key={idx}
                   className={idx % 2 === 0 ? "bg-white" : "bg-gray-50"}

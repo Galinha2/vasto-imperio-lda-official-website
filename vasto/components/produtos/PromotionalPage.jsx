@@ -6,9 +6,20 @@ import { FaArrowRight } from "react-icons/fa";
 import ProductTabela from "../../components/produtos/ProductTabela";
 import GalleryScroll from "../../components/galeria/GalleryScroll";
 import ContactCard from "../../components/contacts/ContactCard";
+import content from "../../assets/contentpt.json";
 
 function PromotionalPage({ produto }) {
   if (!produto) return <p>Produto não encontrado</p>;
+
+  // Buscar tabela a partir de productsShowcase pelo mesmo id
+  const produtoCompleto = content.productsShowcase.products.find(
+    (p) => p.id === produto.id
+  );
+
+  const tabelaFinal =
+    produto.tabela && produto.tabela.length > 0
+      ? produto.tabela
+      : produtoCompleto?.tabela || [];
 
   return (
     <main className="py-12 px-5 md:px-10 flex flex-col justify-center w-screen">
@@ -18,10 +29,10 @@ function PromotionalPage({ produto }) {
             <h1 className="text-4xl font-bold text-(--black) mb-6">
               {produto.title}
             </h1>
-            <div className="flex gap-4 items-center justify-center px-2 py-2 pl-5 h-15 rounded-full bg-gray-100/80 text-(--black) font-[600] w-fit">
-              <Link href="/orcamento">Pedir Orçamento</Link>
-              <FaArrowRight className="bg-(--blue) rounded-full p-2 h-10 w-10 text-white" />
-            </div>
+            <Link href="/orcamento" className="flex gap-4 items-center justify-center px-2 py-2 pl-5 h-15 rounded-full bg-gray-100/80 text-(--black) font-[600] w-fit">
+              <p>Pedir Orçamento</p>
+              <FaArrowRight className="bg-(--blue) cursor-pointer rounded-full p-2 h-10 w-10 text-white" />
+            </Link>
           </div>
 
           <Image
@@ -69,10 +80,10 @@ function PromotionalPage({ produto }) {
         <GalleryScroll images={produto.gallery} />
       </section>
 
-      {produto.tabela && produto.tabela.length > 0 && (
+      {tabelaFinal.length > 0 && (
         <section className="mb-10 mt-5 border-y -m-10 border-(horizontal-line)">
           <h2 className="text-2xl font-semibold my-4 text-center">Especificações Técnicas</h2>
-          <ProductTabela tabela={produto.tabela} />
+          <ProductTabela tabela={tabelaFinal} />
         </section>
       )}
 

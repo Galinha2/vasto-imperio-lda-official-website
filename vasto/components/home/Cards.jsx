@@ -24,11 +24,11 @@ function Cards() {
                 className="flex flex-col items-center text-center"
               >
                 {promo.mainImage && (
-                  <div className="w-50 h-50 flex flex-col items-center justify-center p-5 rounded-[35px] shadow-sm bg-(--gray)">
+                  <div className="w-40 md:w-50 h-auto max-h-50 flex flex-col items-center justify-center p-5 rounded-[35px] shadow-sm bg-(--gray)">
                     <img
                       src={promo.mainImage}
                       alt={promo.title}
-                      className="w-auto h-50 p-5 transition-transform duration-300 hover:scale-110"
+                      className="w-auto h-50 md:h-50 p-2 transition-transform duration-300 hover:scale-110"
                     />
                   </div>
                 )}

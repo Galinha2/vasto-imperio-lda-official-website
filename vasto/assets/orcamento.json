@@ -318,6 +318,12 @@
     },
     {
       "ref": 2,
+      "produto": "Reforço Central 1000 mm Carga Pesada",
+      "preço": 10.00,
+      "image": "/orcamento/reforco central.png"
+    },
+    {
+      "ref": 2,
       "produto": "Freio de segurança",
       "preço": 0.45,
       "image": "/orcamento/.png"

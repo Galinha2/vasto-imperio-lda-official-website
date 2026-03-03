@@ -100,7 +100,7 @@
       }
     ]
   },
-  
+
   "promotionalPages": [
     {
       "id": "racks-industriais",
@@ -115,18 +115,33 @@
       "description": "<span class='label'>Material:</span> Galvanizado ou RAL 5005 / 7035<br/><span class='label'>Peso Suportado:</span> 3300Kg par de vigas<br/><span class='label'>Altura dos Bastidores:</span>  2000 a 5500 mm <br/><span class='label'>Profundidade dos Bastidores:</span> 800 a 1100 mm. <br/><span class='label'>Comprimento das Vigas:</span> 2200 a 2750 mm. <br/><span class='label'>Descrição:</span> Bastidor metálico com sapata, indicado para sistemas de armazenagem e estruturas industriais. Fabricado em aço de elevada resistência, permite múltiplas configurações de altura e profundidade, adaptando-se a diferentes necessidades de carga e espaço. Disponível em acabamento galvanizado ou pintado, garantindo durabilidade e proteção anticorrosão em ambientes industriais.",
       "galleryTitle": "Os nossos Clientes",
       "gallery": [
-        "/produtos/1-Paleco/a1.jpg",
-        "/produtos/1-Paleco/a2.jpg",
-        "/produtos/1-Paleco/a3.jpg",
+        "/produtos/1-Paleco/a1.jpeg",
+        "/produtos/1-Paleco/a2.jpeg",
+        "/produtos/1-Paleco/a3.jpeg",
         "/produtos/1-Paleco/a4.jpg",
         "/produtos/1-Paleco/a5.jpg",
-        "/produtos/1-Paleco/a6.jpg"
+        "/produtos/1-Paleco/a6.jpg",
+        "/produtos/1-Paleco/a7.jpg",
+        "/produtos/1-Paleco/a8.jpg",
+        "/produtos/1-Paleco/a9.jpg"
       ],
       "faq": [
-        { "q": "Qual a carga máxima suportada?", "a": "Até 3300Kg por par de vigas, dependendo da configuração escolhida." },
-        { "q": "Que alturas estão disponíveis?", "a": "2000mm a 5500mm, adaptáveis às necessidades do seu armazém." },
-        { "q": "Qual o acabamento dos racks?", "a": "Disponível em galvanizado ou pintura RAL 5005 / 7035." },
-        { "q": "Oferecem montagem e transporte?", "a": "Sim, a Vasto Império oferece serviços completos de entrega e montagem." }
+        {
+          "q": "Qual a carga máxima suportada?",
+          "a": "Até 3300Kg por par de vigas, dependendo da configuração escolhida."
+        },
+        {
+          "q": "Que alturas estão disponíveis?",
+          "a": "2000mm a 5500mm, adaptáveis às necessidades do seu armazém."
+        },
+        {
+          "q": "Qual o acabamento dos racks?",
+          "a": "Disponível em galvanizado ou pintura RAL 5005 / 7035."
+        },
+        {
+          "q": "Oferecem montagem e transporte?",
+          "a": "Sim, a Vasto Império oferece serviços completos de entrega e montagem."
+        }
       ]
     },
     {
@@ -142,18 +157,30 @@
       "description": "<span class='label'>Altura dos Bastidores:</span>  1000 a 3000 mm <br/><span class='label'>Profundidade dos Bastidores:</span> 300 a 600 mm. <br/><span class='label'>Comprimento das Prateleiras:</span>  750 a 1000 mm <br/><span class='label'>Largura das Prateleiras:</span>  300 a 600 mm <br/><span class='label'>Descrição:</span> As estantes metálicas de encaixe sem parafusos são uma solução prática e resistente para espaços que exigem organização eficiente e elevada capacidade de carga, como armazéns, arquivos ou zonas industriais. O sistema modular permite ajustar facilmente a altura das prateleiras, adaptando a estrutura às necessidades específicas de cada utilização. A montagem é rápida e segura, através de encaixes reforçados que garantem estabilidade e evitam deslocações indesejadas. Fabricadas em aço robusto, estas estantes oferecem durabilidade, flexibilidade e uma excelente resposta para diferentes configurações de armazenamento, podendo ser dimensionadas à medida do espaço disponível.",
       "galleryTitle": "Os nossos Clientes",
       "gallery": [
-        "/produtos/prateleiras-ligeiras/a1.jpg",
-        "/produtos/prateleiras-ligeiras/a2.jpg",
-        "/produtos/prateleiras-ligeiras/a3.jpg"
+        "/produtos/prateleiras-ligeiras/a1.jpeg",
+        "/produtos/prateleiras-ligeiras/a2.jpeg",
+        "/produtos/prateleiras-ligeiras/a3.jpeg",
+        "/produtos/prateleiras-ligeiras/a4.jpg",
+        "/produtos/prateleiras-ligeiras/a5.jpg",
+        "/produtos/prateleiras-ligeiras/a6.jpg"
       ],
       "faq": [
-        { "q": "Qual a carga máxima suportada?", "a": "Até 210Kg por tabuleiro ou nivel, dependendo da configuração escolhida." },
-        { "q": "Que alturas estão disponíveis?", "a": "1000mm a 3000mm, adaptáveis às necessidades do seu armazém." },
-        { "q": "Oferecem montagem e transporte?", "a": "Sim, a Vasto Império oferece serviços completos de entrega e montagem." }
+        {
+          "q": "Qual a carga máxima suportada?",
+          "a": "Até 210Kg por tabuleiro ou nivel, dependendo da configuração escolhida."
+        },
+        {
+          "q": "Que alturas estão disponíveis?",
+          "a": "1000mm a 3000mm, adaptáveis às necessidades do seu armazém."
+        },
+        {
+          "q": "Oferecem montagem e transporte?",
+          "a": "Sim, a Vasto Império oferece serviços completos de entrega e montagem."
+        }
       ]
     }
   ],
-  
+
   "productBanner": {
     "background": "/product banner.png",
     "logo": "/logo.png",
@@ -181,12 +208,15 @@
         ],
         "galeriaTitle": "Os nossos Clientes",
         "galeria": [
-          "/produtos/1-Paleco/a1.jpg",
-          "/produtos/1-Paleco/a2.jpg",
-          "/produtos/1-Paleco/a3.jpg",
+          "/produtos/1-Paleco/a1.jpeg",
+          "/produtos/1-Paleco/a2.jpeg",
+          "/produtos/1-Paleco/a3.jpeg",
           "/produtos/1-Paleco/a4.jpg",
           "/produtos/1-Paleco/a5.jpg",
-          "/produtos/1-Paleco/a6.jpg"
+          "/produtos/1-Paleco/a6.jpg",
+          "/produtos/1-Paleco/a7.jpg",
+          "/produtos/1-Paleco/a8.jpg",
+          "/produtos/1-Paleco/a9.jpg"
         ],
         "description": "<span class='label'>Material:</span> Galvanizado ou RAL 5005 / 7035<br/><span class='label'>Peso Suportado:</span> 3300Kg par de vigas<br/><span class='label'>Altura dos Bastidores:</span>  2000 a 5500 mm <br/><span class='label'>Profundidade dos Bastidores:</span> 800 a 1100 mm. <br/><span class='label'>Comprimento das Vigas:</span> 2200 a 2750 mm. <br/><span class='label'>Descrição:</span> Bastidor metálico com sapata, indicado para sistemas de armazenagem e estruturas industriais. Fabricado em aço de elevada resistência, permite múltiplas configurações de altura e profundidade, adaptando-se a diferentes necessidades de carga e espaço. Disponível em acabamento galvanizado ou pintado, garantindo durabilidade e proteção anticorrosão em ambientes industriais.",
         "tabela": [
@@ -268,9 +298,12 @@
         ],
         "galeriaTitle": "Os nossos clientes",
         "galeria": [
-          "/produtos/prateleiras-ligeiras/a2.jpg",
-          "/produtos/prateleiras-ligeiras/a1.jpg",
-          "/produtos/prateleiras-ligeiras/a3.jpg"
+          "/produtos/prateleiras-ligeiras/a2.jpeg",
+          "/produtos/prateleiras-ligeiras/a1.jpeg",
+          "/produtos/prateleiras-ligeiras/a4.jpg",
+          "/produtos/prateleiras-ligeiras/a5.jpg",
+          "/produtos/prateleiras-ligeiras/a3.jpeg",
+          "/produtos/prateleiras-ligeiras/a6.jpg"
         ],
         "tabela": [
           {

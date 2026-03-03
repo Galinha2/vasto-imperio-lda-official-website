@@ -8,7 +8,7 @@ import { MdOutlineDelete } from "react-icons/md";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
 
-function page() {
+function Page() {
   // --------------------
   // Todos os hooks primeiro
   const [pinDigitado, setPinDigitado] = useState("");
@@ -18,7 +18,7 @@ function page() {
   const [erroPin, setErroPin] = useState(false);
 
   const [linhas, setLinhas] = useState([
-    { produto: null, preco: 0, unidades: 0, total: 0, refCompleta: "" },
+    { produto: null, preco: 0, unidades: 0, total: 0, refCompleta: "", isPortes: false },
   ]);
   const [openProdutoIndex, setOpenProdutoIndex] = useState(null);
   const [openDesc, setOpenDesc] = useState(false);
@@ -108,14 +108,17 @@ function page() {
   };
 
   const adicionarLinha = () =>
-    setLinhas([...linhas, { produto: null, preco: 0, unidades: 0, total: 0, refCompleta: "" }]);
+    setLinhas([...linhas, { produto: null, preco: 0, unidades: 0, total: 0, refCompleta: "", isPortes: false }]);
 
   const selecionarProduto = (index, produtoObj) => {
     const novasLinhas = [...linhas];
+    const isPortes = produtoObj.ref === "0" || produtoObj.refCompleta?.startsWith("0.");
+    
     novasLinhas[index].produto = produtoObj.produto;
-    novasLinhas[index].preco = produtoObj.preço;
+    novasLinhas[index].preco = isPortes ? 0 : produtoObj.preço;
     novasLinhas[index].refCompleta = produtoObj.refCompleta;
-    novasLinhas[index].total = novasLinhas[index].unidades * produtoObj.preço;
+    novasLinhas[index].isPortes = isPortes;
+    novasLinhas[index].total = novasLinhas[index].unidades * (isPortes ? 0 : produtoObj.preço);
     setLinhas(novasLinhas);
     setOpenProdutoIndex(null);
     setPesquisaProduto("");
@@ -129,25 +132,33 @@ function page() {
     setLinhas(novasLinhas);
   };
 
+  const alterarPrecoPortes = (index, valor) => {
+    const novasLinhas = [...linhas];
+    const preco = Number(valor) || 0;
+    novasLinhas[index].preco = preco;
+    novasLinhas[index].total = novasLinhas[index].unidades * preco;
+    setLinhas(novasLinhas);
+  };
+
   const removerLinha = (index) => {
     const novasLinhas = linhas.filter((_, i) => i !== index);
     setLinhas(
       novasLinhas.length
         ? novasLinhas
-        : [{ produto: null, preco: 0, unidades: 0, total: 0, refCompleta: "" }],
+        : [{ produto: null, preco: 0, unidades: 0, total: 0, refCompleta: "", isPortes: false }],
     );
   };
 
   const totalSemDesconto = linhas.reduce((acc, linha) => acc + linha.total, 0);
   const totalComDesconto =
     linhas.reduce((acc, l) => {
-      if (l.produto === "Portes de envio") return acc + l.total;
+      if (l.isPortes) return acc + l.total;
       return acc + l.total * (1 - descontoSelecionado / 100);
     }, 0);
 
   // Portes de envio têm IVA mas não têm desconto. Aplicar IVA a todos, desconto só aos outros.
   const totalComIVA = linhas.reduce((acc, l) => {
-    const valorDesc = l.produto === "Portes de envio" ? 0 : descontoSelecionado > 0 ? (l.total * descontoSelecionado) / 100 : 0;
+    const valorDesc = l.isPortes ? 0 : descontoSelecionado > 0 ? (l.total * descontoSelecionado) / 100 : 0;
     const valorLiquido = l.total - valorDesc;
     return acc + valorLiquido * 1.23;
   }, 0);
@@ -427,8 +438,8 @@ function page() {
         .map((l) => {
           const unidade = "un";
           // Para Portes de envio, desconto é sempre vazio na coluna "DESC"
-          const descLinha = l.produto === "Portes de envio" ? "" : (descontoSelecionado > 0 ? descontoSelecionado : 0);
-          const valorDesc = l.produto === "Portes de envio" ? 0 : (descontoSelecionado > 0 ? (l.total * descontoSelecionado) / 100 : 0);
+          const descLinha = l.isPortes ? "" : (descontoSelecionado > 0 ? descontoSelecionado : 0);
+          const valorDesc = l.isPortes ? 0 : (descontoSelecionado > 0 ? (l.total * descontoSelecionado) / 100 : 0);
           const valorLiquido = l.total - valorDesc;
           return {
             referencia: l.refCompleta || "",
@@ -504,7 +515,7 @@ function page() {
       const totalDescLinha = linhas.reduce(
         (acc, l) =>
           acc +
-          (l.produto === "Portes de envio" ? 0 :
+          (l.isPortes ? 0 :
             (descontoSelecionado > 0 ? (l.total * descontoSelecionado) / 100 : 0)
           ),
         0,
@@ -513,13 +524,13 @@ function page() {
       const totalLiquido = linhas.reduce(
         (acc, l) =>
           acc +
-          (l.total - (l.produto === "Portes de envio" ? 0 : (descontoSelecionado > 0 ? (l.total * descontoSelecionado) / 100 : 0))),
+          (l.total - (l.isPortes ? 0 : (descontoSelecionado > 0 ? (l.total * descontoSelecionado) / 100 : 0))),
         0,
       );
       // IVA sobre todos os produtos, incluindo Portes de envio
       const totalIVA = linhas.reduce(
         (acc, l) => {
-          const valorDesc = l.produto === "Portes de envio" ? 0 : (descontoSelecionado > 0 ? (l.total * descontoSelecionado) / 100 : 0);
+          const valorDesc = l.isPortes ? 0 : (descontoSelecionado > 0 ? (l.total * descontoSelecionado) / 100 : 0);
           const valorLiquido = l.total - valorDesc;
           return acc + valorLiquido * 0.23;
         },
@@ -833,23 +844,20 @@ function page() {
               />
 
               <div className="orca flex w-full">
-                {linha.produto === "Portes de envio" ? (
+                {linha.isPortes ? (
                   <input
                     type="number"
                     min="0"
                     step="0.01"
                     value={linha.preco || ""}
                     onChange={(e) => {
-                      const novasLinhas = [...linhas];
-                      novasLinhas[index].preco = Number(e.target.value) || 0;
-                      novasLinhas[index].total = novasLinhas[index].unidades * novasLinhas[index].preco;
-                      setLinhas(novasLinhas);
+                      alterarPrecoPortes(index, e.target.value);
                     }}
                     className="text-center w-full border rounded px-1"
                     placeholder="Preço"
                   />
                 ) : (
-                  <p className="text-center">{linha.preco?.toFixed(2).replace(".", ",")}€ /un</p>
+                  <p className="text-center w-full">{linha.preco?.toFixed(2).replace(".", ",")}€ /un</p>
                 )}
               </div>
 
@@ -924,7 +932,7 @@ function page() {
                 {orcamento.descontos.map((d, i) => (
                   <div
                     key={i}
-                    onClick={() => {  
+                    onClick={() => {  
                       setDescontoSelecionado(Number(d.desconto));
                       setOpenDesc(false);
                     }}
@@ -997,4 +1005,4 @@ function page() {
   );
 }
 
-export default page;
+export default Page;

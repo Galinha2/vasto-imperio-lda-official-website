@@ -38,14 +38,14 @@ function Galeria({ productId }) {
   if (!product || images.length === 0) return null;
 
   return (
-    <div className="flex px-2 flex-col items-center md:flex-row justify-center bg-white lg:max-w-200 shadow-lg rounded-[35px] max-w-120 md:max-w-120 h-110 md:h-130 relative m-auto">
+    <div className="flex px-2 flex-col items-center md:flex-row justify-center bg-white lg:max-w-200 shadow-lg w-full md:max-w-120 h-110 md:h-130 relative m-auto">
 
       <Image
         src={images[currentImageIndex]}
         alt={product.text}
         width={600}
         height={600}
-        className="cursor-pointer w-auto max-h-[400px] lg:max-h-[500px] rounded-[35px]"
+        className="cursor-pointer w-auto max-h-110 lg:max-h-130"
       />
 
       {hasMultipleImages && (

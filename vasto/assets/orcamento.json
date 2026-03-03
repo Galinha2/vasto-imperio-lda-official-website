@@ -5,6 +5,10 @@
       "produto": "Portes de envio"
     },
     {
+      "ref": 0,
+      "produto": "Montagem"
+    },
+    {
       "ref": 1,
       "produto": "Bastidor Ligeiro 1000x400 mm",
       "preço": 9.86,

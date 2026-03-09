@@ -1495,6 +1495,12 @@
       "produto": "Prat. Madeira. Aglom. 2750x1000x19mm (CxPxA)",
       "preço": 53.29,
       "image": "/orcamento/tampo madeira.png"
+    },
+    {
+      "ref": 3,
+      "produto": "Freio de segurança",
+      "preço": 0.40,
+      "image": "/orcamento/.png"
     }
   ],
   "descontos": [

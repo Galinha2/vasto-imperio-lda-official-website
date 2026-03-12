@@ -2001,6 +2001,18 @@
       "produto": "Reforço para prateleiras metálicas c/ 1200mm",
       "preço": 5.09,
       "image": "/orcamento/reforco.png"
+    },
+    {
+      "ref": 4,
+      "produto": "Vestiário Triplo 3 Cacifos",
+      "preço": 325,
+      "image": "/orcamento/cacifo.png"
+    },
+    {
+      "ref": 4,
+      "produto": "Vestiário Triplo 6 Cacifos",
+      "preço": 388,
+      "image": "/orcamento/cacifo.png"
     }
   ],
   "descontos": [

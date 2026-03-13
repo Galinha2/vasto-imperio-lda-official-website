@@ -31,7 +31,7 @@ function PromotionalPage({ produto }) {
             </h1>
             <Link href="/orcamento" className="flex gap-4 items-center justify-center px-2 py-2 pl-5 h-15 rounded-full bg-gray-100/80 text-(--black) font-[600] w-fit">
               <p>Pedir Orçamento</p>
-              <FaArrowRight className="bg-(--blue) cursor-pointer rounded-full p-2 h-10 w-10 text-white" />
+              <FaArrowRight className="bg-(--orange) cursor-pointer rounded-full p-2 h-10 w-10 text-white" />
             </Link>
           </div>
 

@@ -14,37 +14,6 @@ function Cards() {
   return (
     <div className="mb-0 pb-0">
       <div>
-        <h1 className="text-center title mb-5">Artigos mais vendidos</h1>
-        <div className="border-b border-(--horizontal-line) pb-10 flex flex-col items-center justify-center">
-          <div className="flex flex md:flex-row gap-10 justify-center items-center mb-5 px-5 m-auto">
-            {promotionalPages.slice(0, 2).map((promo, index) => (
-              <Link
-                href={promo.id}
-                key={index}
-                className="flex flex-col items-center text-center"
-              >
-                {promo.mainImage && (
-                  <div className="w-40 md:w-50 h-auto max-h-50 flex flex-col items-center justify-center p-5 rounded-[35px] shadow-sm bg-(--gray)">
-                    <img
-                      src={promo.mainImage}
-                      alt={promo.title}
-                      className="w-auto h-50 md:h-50 p-2 transition-transform duration-300 hover:scale-110"
-                    />
-                  </div>
-                )}
-                <h2 className="mt-2 text-[1em] font-normal text-(--black)">
-                  {promo.title}
-                </h2>
-              </Link>
-            ))}
-          </div>
-          <Link
-            href="/produtos"
-            className="rounded-full bg-(--orange) m-auto text-center px-4 py-2 text-white"
-          >
-            Ver todos os produtos
-          </Link>
-        </div>
         {item.map((card, index) => (
           <div
             key={index}
@@ -84,6 +53,37 @@ function Cards() {
             </div>
           </div>
         ))}
+        <h1 className="text-center title mb-5">Artigos mais vendidos</h1>
+        <div className="border-b border-(--horizontal-line) pb-10 flex flex-col items-center justify-center">
+          <div className="flex flex md:flex-row gap-10 justify-center items-center mb-5 px-5 m-auto">
+            {promotionalPages.slice(0, 2).map((promo, index) => (
+              <Link
+                href={promo.id}
+                key={index}
+                className="flex flex-col items-center text-center"
+              >
+                {promo.mainImage && (
+                  <div className="w-40 md:w-50 h-auto max-h-50 flex flex-col items-center justify-center p-5 rounded-[35px] shadow-sm bg-(--gray)">
+                    <img
+                      src={promo.mainImage}
+                      alt={promo.title}
+                      className="w-auto h-50 md:h-50 p-2 transition-transform duration-300 hover:scale-110"
+                    />
+                  </div>
+                )}
+                <h2 className="mt-2 text-[1em] font-normal text-(--black)">
+                  {promo.title}
+                </h2>
+              </Link>
+            ))}
+          </div>
+          <Link
+            href="/produtos"
+            className="rounded-full bg-(--orange) m-auto text-center px-4 py-2 text-white"
+          >
+            Ver todos os produtos
+          </Link>
+        </div>
       </div>
     </div>
   );

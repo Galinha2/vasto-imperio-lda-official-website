@@ -409,10 +409,16 @@
         "height": 200,
         "images": [
           "/produtos/4-cacifos/i3.jpg",
-          "/produtos/4-cacifos/i2.jpg",
-          "/produtos/4-cacifos/i1.jpg"
+          "/produtos/4-cacifos/i2.jpg"
         ],
-        "description": "Para mais informações contacte-nos."
+        "galeriaTitle": "Os nossos clientes",
+        "galeria": [
+          "/produtos/4-cacifos/a1.jpg",
+          "/produtos/4-cacifos/a1.webp",
+          "/produtos/4-cacifos/a2.webp",
+          "/produtos/4-cacifos/a3.webp"
+        ],
+        "description": "<span class='label'>Portas:</span> Disponiveis com 3 e 6 portas<br/><span class='label'>Dimensões:</span> 1900 × 900 × 500 mm<br/><span class='label'>Descrição:</span> Cacifos homologados de acordo com a Norma Portuguesa NP 1116.<br/>Práticos, seguros e essenciais para organizar os seus pertences, estes cacifos são ideais para utilização em vestiários e espaços de armazenamento. Mantenha tudo arrumado com estes armários de qualidade."
       },
       {
         "id": "arrumacao-vertical",

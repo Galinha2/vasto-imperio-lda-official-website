@@ -2013,6 +2013,18 @@
       "produto": "Vestiário Triplo 6 Cacifos",
       "preço": 401,
       "image": "/orcamento/cacifo.png"
+    },
+    {
+      "ref": 5,
+      "produto": "Porta Paletes Manual - 3000Kg",
+      "preço": 290,
+      "image": "/orcamento/i1 copy.png"
+    },
+    {
+      "ref": 5,
+      "produto": "Porta Paletes Elétrico - 1500Kg",
+      "preço": 1100,
+      "image": "/orcamento/i1 copy 2.png"
     }
   ],
   "descontos": [

@@ -18,22 +18,10 @@ function ProductTabela({ tabela = [] }) {
 
   return (
     <div className="p-5 max-w-450 m-auto">
-      <div className="flex items-center justify-center w-full">
-        <button
-          onClick={() => setShowTable(!showTable)}
-          className="mb-4 shadow-md m-auto cursor-pointer px-5 py-2 rounded-full bg-(--orange) text-white hover:bg-() transition"
-        >
-          {showTable
-            ? isPT
-              ? "Esconder Tabela de Dimenções"
-              : "Hide Table"
-            : isPT
-            ? "Mostrar Tabela de Dimenções"
-            : "Show Table"}
-        </button>
-      </div>
+      
+      
 
-      {showTable && (
+      {!showTable && (
         <div className="overflow-x-auto rounded-[20px] border border-(--horizontal-line)">
           <table className="min-w-full table-auto">
             <thead className="bg-gray-100">

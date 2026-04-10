@@ -95,7 +95,7 @@ export default async function Page({ params }) {
       </div>
       {tabela && (
         <div className={`border-b border-(--horizontal-line) pb-5 mb-15`}>
-          <ProductTabela product={product} />
+          <ProductTabela tabela={tabela} />
         </div>
       )}
       {product.galeria && product.galeria.length > 0 && (

@@ -106,6 +106,12 @@
     },
     {
       "ref": 1,
+      "produto": "Bastidor Ligeiro 3000x500 mm",
+      "preço": 28.49,
+      "image": "/orcamento/bastidor ligeiro.png"
+    },
+    {
+      "ref": 1,
       "produto": "Bastidor Ligeiro 3000x600 mm",
       "preço": 29.26,
       "image": "/orcamento/bastidor ligeiro.png"

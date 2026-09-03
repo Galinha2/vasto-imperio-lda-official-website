@@ -2044,6 +2044,12 @@
       "produto": "Porta Paletes Elétrico - 1500Kg",
       "preço": 1100,
       "image": "/orcamento/i1 copy 2.png"
+    },
+    {
+      "ref": 6,
+      "produto": "Bancada de Trabalho com 1 tampo de Madeira 2000x800x1000mm (CxPxA)",
+      "preço": 115,
+      "image": "/orcamento/i1.jpg"
     }
   ],
   "descontos": [

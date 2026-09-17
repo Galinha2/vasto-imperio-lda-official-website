@@ -49,28 +49,24 @@ function Page() {
   }, []);
 
   const procurarNif = async (valorNif) => {
-    // Se o NIF estiver vazio ou inválido, apenas limpar
     if (!/^\d{9}$/.test(valorNif)) {
       setDadosEmpresa(null);
       return;
     }
 
     setLoadingNif(true);
-    setDadosEmpresa(null); // limpar enquanto aguarda resposta
+    setDadosEmpresa(null);
 
     try {
-      // Chamada correta à API de NIFs
       const res = await fetch(`/api/nifs?nif=${valorNif}`);
       const data = await res.json();
 
-      // Se a API devolve erro ou não há nome, usar fallback
       setDadosEmpresa({
         nome: data?.nome || "Cliente",
         nif: data?.nif || valorNif,
         codigoPostal: data?.codigoPostal || "V/ Morada",
       });
     } catch (err) {
-      // Em caso de erro de rede ou exceção, usar fallback
       setDadosEmpresa({
         nome: "Cliente",
         nif: valorNif,
@@ -81,8 +77,6 @@ function Page() {
     }
   };
 
-  // --------------------
-  // Função para formatar números com espaços (ex: 1000 -> 1 000)
   const formatarNumero = (valor) => {
     const partes = valor.toFixed(2).split(".");
     const parteInteira = partes[0];
@@ -93,7 +87,6 @@ function Page() {
     return `${parteInteiraFormatada},${parteDecimal}`;
   };
 
-  // Funções
   const verificarPin = (e) => {
     e.preventDefault();
     if (pinDigitado === PIN_CORRETO) {
@@ -209,7 +202,6 @@ function Page() {
     }, 1000);
   };
 
-  // Função gerarPDF com a nova lógica de Nome/NIF
   const gerarPDF = async () => {
     const { default: autoTable } = await import("jspdf-autotable");
     const doc = new jsPDF();
@@ -270,9 +262,8 @@ function Page() {
       const now = new Date();
       const pad2 = (n) => n.toString().padStart(2, "0");
       const dataAtualFormatada = `${pad2(now.getDate())}/${pad2(now.getMonth() + 1)}/${now.getFullYear()}`;
-      const vencDate = new Date(now);
-      vencDate.setDate(vencDate.getDate() + 30);
-      const dataVencimentoFormatada = `${pad2(vencDate.getDate())}/${pad2(vencDate.getMonth() + 1)}/${vencDate.getFullYear()}`;
+      // Data de Vencimento com o mesmo dia da emissão
+      const dataVencimentoFormatada = dataAtualFormatada;
       
       const boxHeight = 6;
       const caixaX = 12;
@@ -294,21 +285,17 @@ function Page() {
       doc.text(dataAtualFormatada, caixaX + 2, yDatas + boxHeight + 4);
       doc.text(dataVencimentoFormatada, caixaX + textWidthEmissao + spacingX + 2, yDatas + boxHeight + 4);
 
-      // --- Lógica de Decisão do Cliente ---
       let clienteNome, clienteMorada, clienteNif;
 
       if (dadosEmpresa) {
-        // Se o NIF foi validado/encontrado, ignora o nomeClienteManual
         clienteNome = dadosEmpresa.nome || "Cliente";
         clienteMorada = dadosEmpresa.codigoPostal || "V/ Morada";
         clienteNif = dadosEmpresa.nif || nif;
       } else if (nomeClienteManual.trim() !== "") {
-        // Se NIF está vazio/não validado mas há nome inserido manualmente
         clienteNome = nomeClienteManual;
         clienteMorada = "V/ Morada";
         clienteNif = nif || "NIF do cliente";
       } else {
-        // Se nenhum estiver preenchido (ou fallback padrão)
         clienteNome = "Cliente";
         clienteMorada = "V/ Morada";
         clienteNif = nif || "NIF do cliente";
@@ -658,11 +645,9 @@ function Page() {
     logoPreload.src = "/logo.png";
     await new Promise((resolve) => (logoPreload.onload = resolve));
 
+    // Apenas gera uma única folha (Original)
     desenharPagina("Original", logoPreload);
-    doc.addPage();
-    desenharPagina("Duplicado", logoPreload);
 
-    // Definir título do PDF com base na resolução do nome do cliente
     let nomeFinalPDF = "Orçamento";
     if (dadosEmpresa && dadosEmpresa.nome && dadosEmpresa.nome !== "Cliente") {
       nomeFinalPDF = `Orçamento | ${dadosEmpresa.nome}`;
@@ -972,7 +957,6 @@ function Page() {
         </div>
       </div>
 
-      {/* Popup do NIF */}
       {popupMensagem ? (
         <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
           <div className="bg-white rounded-lg shadow-lg p-5 w-80 relative">

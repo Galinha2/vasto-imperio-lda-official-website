@@ -27,6 +27,7 @@ function Page() {
   const [pesquisaProduto, setPesquisaProduto] = useState("");
   const descRef = useRef(null);
   const [nif, setNif] = useState("");
+  const [nomeClienteManual, setNomeClienteManual] = useState("");
   const [dadosEmpresa, setDadosEmpresa] = useState(null);
   const [loadingNif, setLoadingNif] = useState(false);
   const [popupMensagem, setPopupMensagem] = useState(null);
@@ -83,15 +84,12 @@ function Page() {
   // --------------------
   // Função para formatar números com espaços (ex: 1000 -> 1 000)
   const formatarNumero = (valor) => {
-    // Separar parte inteira e decimal
     const partes = valor.toFixed(2).split(".");
     const parteInteira = partes[0];
     const parteDecimal = partes[1];
     
-    // Adicionar espaços a cada 3 dígitos na parte inteira
     const parteInteiraFormatada = parteInteira.replace(/\B(?=(\d{3})+(?!\d))/g, " ");
     
-    // Juntar com a parte decimal
     return `${parteInteiraFormatada},${parteDecimal}`;
   };
 
@@ -156,7 +154,6 @@ function Page() {
       return acc + l.total * (1 - descontoSelecionado / 100);
     }, 0);
 
-  // Portes de envio têm IVA mas não têm desconto. Aplicar IVA a todos, desconto só aos outros.
   const totalComIVA = linhas.reduce((acc, l) => {
     const valorDesc = l.isPortes ? 0 : descontoSelecionado > 0 ? (l.total * descontoSelecionado) / 100 : 0;
     const valorLiquido = l.total - valorDesc;
@@ -212,7 +209,7 @@ function Page() {
     }, 1000);
   };
 
-  // Função gerarPDF com formatação de números
+  // Função gerarPDF com a nova lógica de Nome/NIF
   const gerarPDF = async () => {
     const { default: autoTable } = await import("jspdf-autotable");
     const doc = new jsPDF();
@@ -264,65 +261,65 @@ function Page() {
       drawTopoDireito(tipoFolha, doc, pageWidth);
 
       let y = 12 + logoHeight + 6;
-      // Nome da empresa no topo, à esquerda
       doc.setFont("helvetica", "normal");
       doc.setFontSize(14);
       doc.setTextColor(...corPretaFooter);
       doc.text("VASTO IMPÉRIO, LDA", 12, y);
       y += 6;
 
-      // --- Datas (dinâmicas) lado a lado acima dos dados bancários ---
-      // Calcular datas
       const now = new Date();
       const pad2 = (n) => n.toString().padStart(2, "0");
       const dataAtualFormatada = `${pad2(now.getDate())}/${pad2(now.getMonth() + 1)}/${now.getFullYear()}`;
       const vencDate = new Date(now);
       vencDate.setDate(vencDate.getDate() + 30);
       const dataVencimentoFormatada = `${pad2(vencDate.getDate())}/${pad2(vencDate.getMonth() + 1)}/${vencDate.getFullYear()}`;
-      // Datas lado a lado: títulos na linha de cima, valores diretamente por baixo, ambos lado a lado
+      
       const boxHeight = 6;
       const caixaX = 12;
-      // yDatas: linha das datas (títulos)
       let yDatas = y;
-      const spacingX = 5; // distância horizontal entre as datas (reduzido de 80 para 5)
+      const spacingX = 5;
       const textEmissao = "Data Emissão:";
       const textVenc = "Data Vencimento:";
       doc.setFont("helvetica", "normal");
-      doc.setFontSize(9); // Tamanho reduzido para títulos das datas
+      doc.setFontSize(9);
       const textWidthEmissao = doc.getTextWidth(textEmissao) + 4;
       const textWidthVenc = doc.getTextWidth(textVenc) + 4;
-      // Desenhar caixas de fundo cinza para os títulos
       doc.setFillColor(200, 200, 200);
       doc.rect(caixaX, yDatas, textWidthEmissao, boxHeight, "F");
       doc.rect(caixaX + textWidthEmissao + spacingX, yDatas, textWidthVenc, boxHeight, "F");
-      // Títulos lado a lado
       doc.setTextColor(...corPretaFooter);
       doc.text(textEmissao, caixaX + 2, yDatas + 4);
       doc.text(textVenc, caixaX + textWidthEmissao + spacingX + 2, yDatas + 4);
-      // Datas lado a lado, diretamente por baixo dos títulos, com espaçamento maior
-      doc.setFontSize(9); // Tamanho reduzido para datas
+      doc.setFontSize(9);
       doc.text(dataAtualFormatada, caixaX + 2, yDatas + boxHeight + 4);
       doc.text(dataVencimentoFormatada, caixaX + textWidthEmissao + spacingX + 2, yDatas + boxHeight + 4);
 
-      // Cliente info na metade direita da página, alinhado horizontalmente com as datas
-      let clienteNome, clienteMorada;
-      if (!dadosEmpresa) {
-        clienteNome = "Cliente";
-        clienteMorada = "V/ Morada";
-      } else {
+      // --- Lógica de Decisão do Cliente ---
+      let clienteNome, clienteMorada, clienteNif;
+
+      if (dadosEmpresa) {
+        // Se o NIF foi validado/encontrado, ignora o nomeClienteManual
         clienteNome = dadosEmpresa.nome || "Cliente";
         clienteMorada = dadosEmpresa.codigoPostal || "V/ Morada";
+        clienteNif = dadosEmpresa.nif || nif;
+      } else if (nomeClienteManual.trim() !== "") {
+        // Se NIF está vazio/não validado mas há nome inserido manualmente
+        clienteNome = nomeClienteManual;
+        clienteMorada = "V/ Morada";
+        clienteNif = nif || "NIF do cliente";
+      } else {
+        // Se nenhum estiver preenchido (ou fallback padrão)
+        clienteNome = "Cliente";
+        clienteMorada = "V/ Morada";
+        clienteNif = nif || "NIF do cliente";
       }
-      const clienteNif = dadosEmpresa?.nif || nif || "NIF do cliente";
+
       const metadeX = pageWidth / 2;
-      const offsetClienteX = metadeX + 15; // aumentou de 2 para 10
-      // Ajustar yCliente para alinhar Exmo.(s) Senhor(es) com o topo do QR code
-      let yCliente = yDatas + 2; // alinhar topo do QR code com topo do texto
-      // Adicionar QR code à esquerda de "Exmo.(s) Senhor(es)"
+      const offsetClienteX = metadeX + 15;
+      let yCliente = yDatas + 2;
       const qrSize = 35;
       const qrX = offsetClienteX - qrSize - 3;
-      // Alinhar verticalmente o QR code com o topo do texto "Exmo.(s) Senhor(es)"
-      const yQRCode = yCliente - 4; // sobe o QR code
+      const yQRCode = yCliente - 4;
       doc.addImage("/orcamento/qr-code.png", "PNG", qrX, yQRCode, qrSize, qrSize);
       doc.setFontSize(10);
       doc.setFont("helvetica", "normal");
@@ -331,9 +328,8 @@ function Page() {
       yCliente += 5;
       doc.setFont("helvetica", "bold");
       doc.setFontSize(12);
-      doc.setTextColor(0, 0, 0); // nome do cliente em preto
-      // Se o nome do cliente for maior que 38 caracteres, dividir em duas linhas
-      // Nome do cliente: cortar por palavras, nunca cortar palavra ao meio
+      doc.setTextColor(0, 0, 0);
+
       const maxLen = 38;
       const words = clienteNome.split(" ");
       let line = "";
@@ -353,20 +349,15 @@ function Page() {
       }
       doc.setFont("helvetica", "normal");
       doc.setFontSize(10);
-      doc.setTextColor(...corPretaFooter); // voltar à cor original para morada e NIF
-      // Inserir duas linhas com o local antes do código postal
-      // Extrair o local do clienteMorada (depois do espaço). Exemplo: '5110-161 Armamar' -> 'Armamar'
+      doc.setTextColor(...corPretaFooter);
+      
       const local = clienteMorada.split(" ").slice(1).join(" ") || clienteMorada;
       doc.text(local, offsetClienteX, yCliente, { align: "left" });
       yCliente += 5;
       doc.text(local, offsetClienteX, yCliente, { align: "left" });
       yCliente += 5;
       doc.text(clienteMorada, offsetClienteX, yCliente, { align: "left" });
-      // Removido V/ Contribuinte do bloco do cliente
-      // O bloco de datas ocupa até yDatas + boxHeight + 3 (datas) + 7 (espaço extra)
-      // O bloco do cliente ocupa até yCliente + 5 (após morada), mas não afeta y para baixo
 
-      // Caixa V/ Documento por baixo das datas
       const yDocumento = yDatas + boxHeight + 10;
       const textoDocumento = "V/ Documento";
       doc.setFont("helvetica", "normal");
@@ -377,10 +368,8 @@ function Page() {
       doc.setTextColor(...corPretaFooter);
       doc.text(textoDocumento, caixaX + 2, yDocumento + 4);
 
-      // Atualizar yDatas para ficar abaixo do V/ Documento
       yDatas = yDocumento + boxHeight + 4;
 
-      // Dados Bancários box logo abaixo do V/ Documento
       const caixaY = yDatas;
       const text = "Dados Bancários";
       doc.setFont("helvetica", "normal");
@@ -394,31 +383,26 @@ function Page() {
       doc.text("EuroBic", caixaX + 2, caixaY + 10);
       doc.setFontSize(9);
       doc.text("IBAN:  PT50 0170 3378 0304 0019 8612 2", caixaX + 2, caixaY + 15);
-      // Sublinha o IBAN
       const larguraIBAN = doc.getTextWidth("IBAN:  PT50 0170 3378 0304 0019 8612 2");
       doc.line(caixaX + 2, caixaY + 16, caixaX + 2 + larguraIBAN, caixaY + 16);
 
-      // Adicionar Condições de Pagamento e V/ Contribuinte por baixo do IBAN
       const yCondicoes = caixaY + 22;
 
       doc.setFont("helvetica", "normal");
       doc.setFontSize(10);
       doc.setTextColor(...corPretaFooter);
 
-      // Condições de Pagamento sublinhado
       const textoCondicoes = "Condições de Pagamento: Pronto Pagamento";
       doc.text(textoCondicoes, caixaX + 2, yCondicoes);
       const larguraCondicoes = doc.getTextWidth(textoCondicoes);
       doc.line(caixaX + 2, yCondicoes + 1, caixaX + 2 + larguraCondicoes, yCondicoes + 1);
 
-      // V/ Contribuinte sublinhado ao lado
       const textoContribuinte = `V/ Contribuinte: ${clienteNif}`;
       const xContribuinte = caixaX + 2 + larguraCondicoes + 10;
       doc.text(textoContribuinte, xContribuinte, yCondicoes);
       const larguraContribuinte = doc.getTextWidth(textoContribuinte);
       doc.line(xContribuinte, yCondicoes + 1, xContribuinte + larguraContribuinte, yCondicoes + 1);
 
-      // Atualizar y para depois do bloco de condições e contribuinte
       y = yCondicoes + 8;
 
       const tableCols = [
@@ -432,12 +416,10 @@ function Page() {
         { title: "IVA", dataKey: "iva", width: 15 },
       ];
 
-      // Usar a refCompleta que já está armazenada no estado linhas
       const linhasProdutos = linhas
         .filter((l) => l.produto)
         .map((l) => {
           const unidade = "un";
-          // Para Portes de envio, desconto é sempre vazio na coluna "DESC"
           const descLinha = l.isPortes ? "" : (descontoSelecionado > 0 ? descontoSelecionado : 0);
           const valorDesc = l.isPortes ? 0 : (descontoSelecionado > 0 ? (l.total * descontoSelecionado) / 100 : 0);
           const valorLiquido = l.total - valorDesc;
@@ -454,7 +436,6 @@ function Page() {
         });
 
       autoTable(doc, {
-        // Sobe a tabela para ficar mais próxima do bloco anterior
         startY: y - 5,
         head: [
           tableCols.map((col, idx) => ({
@@ -520,14 +501,12 @@ function Page() {
           ),
         0,
       );
-      // Para Portes de envio, não há desconto, mas há IVA
       const totalLiquido = linhas.reduce(
         (acc, l) =>
           acc +
           (l.total - (l.isPortes ? 0 : (descontoSelecionado > 0 ? (l.total * descontoSelecionado) / 100 : 0))),
         0,
       );
-      // IVA sobre todos os produtos, incluindo Portes de envio
       const totalIVA = linhas.reduce(
         (acc, l) => {
           const valorDesc = l.isPortes ? 0 : (descontoSelecionado > 0 ? (l.total * descontoSelecionado) / 100 : 0);
@@ -683,20 +662,21 @@ function Page() {
     doc.addPage();
     desenharPagina("Duplicado", logoPreload);
 
-    // Definir título do PDF dinamicamente consoante o NIF encontrado
-    const nomeEmpresaPDF =
-      dadosEmpresa && dadosEmpresa.nome && dadosEmpresa.nome !== "Cliente"
-        ? `Orçamento | ${dadosEmpresa.nome}`
-        : "Orçamento";
+    // Definir título do PDF com base na resolução do nome do cliente
+    let nomeFinalPDF = "Orçamento";
+    if (dadosEmpresa && dadosEmpresa.nome && dadosEmpresa.nome !== "Cliente") {
+      nomeFinalPDF = `Orçamento | ${dadosEmpresa.nome}`;
+    } else if (nomeClienteManual.trim() !== "") {
+      nomeFinalPDF = `Orçamento | ${nomeClienteManual}`;
+    }
 
     doc.setProperties({
-      title: nomeEmpresaPDF,
+      title: nomeFinalPDF,
     });
-    const nomeFicheiro = `${nomeEmpresaPDF}.pdf`;
+    const nomeFicheiro = `${nomeFinalPDF}.pdf`;
     doc.save(nomeFicheiro);
   };
 
-  // Mantém a função para o dropdown: gerar refCompleta por família
   const gerarRefCompleta = (refFamilia) => {
     let contador = 1;
     return orcamento.produtos
@@ -704,8 +684,6 @@ function Page() {
       .map((p) => ({ ...p, refCompleta: `${refFamilia}.${contador++}` }));
   };
 
-  // --------------------
-  // Return condicional para PIN
   if (!mounted) {
     return null;
   }
@@ -716,7 +694,7 @@ function Page() {
           onSubmit={verificarPin}
           className="flex flex-col items-center gap-3"
         >
-            <Image src="/favicon.png" alt="Logo" width={150} height={60} className="mb-4" />
+          <Image src="/favicon.png" alt="Logo" width={150} height={60} className="mb-4" />
           <label className="text-lg font-bold">Insira o PIN de 4 dígitos</label>
           <input
             type="password"
@@ -898,7 +876,7 @@ function Page() {
               <p>{descontoSelecionado}%</p>
               <IoIosArrowDown />
             </button>
-            <div className="flex flex-col">
+            <div className="flex flex-col gap-2">
               <input
                 type="text"
                 className="flex orca w-40"
@@ -914,6 +892,13 @@ function Page() {
                     setDadosEmpresa(null);
                   }
                 }}
+              />
+              <input
+                type="text"
+                className="flex orca w-40"
+                placeholder="Nome do Cliente"
+                value={nomeClienteManual}
+                onChange={(e) => setNomeClienteManual(e.target.value)}
               />
               {loadingNif && (
                 <span className="text-xs mt-1">A procurar dados...</span>

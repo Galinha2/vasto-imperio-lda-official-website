@@ -216,7 +216,7 @@ function Page() {
   const gerarPDF = async () => {
     const { default: autoTable } = await import("jspdf-autotable");
     const doc = new jsPDF();
-    const corPretaFooter = [100, 100, 100];
+    const corPretaFooter = [0, 0, 0];
     const corBlue = [8, 121, 192];
     const corOrange = [255, 85, 0];
     const corGray = [255, 255, 255];
@@ -393,9 +393,9 @@ function Page() {
       doc.setFontSize(9);
       doc.text("EuroBic", caixaX + 2, caixaY + 10);
       doc.setFontSize(9);
-      doc.text("IBAN:  PT50 0079 0000 4766 1251 1016 4", caixaX + 2, caixaY + 15);
+      doc.text("IBAN:  PT50 0170 3378 0304 0019 8612 2", caixaX + 2, caixaY + 15);
       // Sublinha o IBAN
-      const larguraIBAN = doc.getTextWidth("IBAN:  PT50 0079 0000 4766 1251 1016 4");
+      const larguraIBAN = doc.getTextWidth("IBAN:  PT50 0170 3378 0304 0019 8612 2");
       doc.line(caixaX + 2, caixaY + 16, caixaX + 2 + larguraIBAN, caixaY + 16);
 
       // Adicionar Condições de Pagamento e V/ Contribuinte por baixo do IBAN
@@ -552,7 +552,7 @@ function Page() {
       );
       yFooter += 4;
       doc.text(
-        "Telefone: +351 966 518 436 | Email: vastoimperio@sapo.pt",
+        "Telefone: +351 966 518 436 | Email: geral@vastoimperio.pt",
         12,
         yFooter,
       );

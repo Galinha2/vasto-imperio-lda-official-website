@@ -552,13 +552,13 @@ function Page() {
       );
       yFooter += 4;
       doc.text(
-        "Telefone: +351 966 518 436 | Email: geral@vastoimperio.pt",
+        "Email: geral@vastoimperio.pt | Telefone: +351 966 518 436 (Chamada para a rede móvel nacional)",
         12,
         yFooter,
       );
       yFooter += 4;
       doc.text(
-        "Telefone: +351 928 348 117 | Email: geral@vastoimperio.pt",
+        "Email: geral@vastoimperio.pt | Telefone: +351 928 348 117 (Chamada para a rede móvel nacional)",
         12,
         yFooter,
       );

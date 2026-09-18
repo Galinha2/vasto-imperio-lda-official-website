@@ -2041,13 +2041,13 @@
     },
     {
       "ref": 4,
-      "produto": "Vestiário 2 portas laterais",
+      "produto": "Vestiário 2 portas",
       "preço": 240,
       "image": "/orcamento/cacifo.png"
     },
     {
       "ref": 4,
-      "produto": "Vestiário Triplo 3 portas laterais",
+      "produto": "Vestiário Triplo 3 portas",
       "preço": 325,
       "image": "/orcamento/cacifo.png"
     },

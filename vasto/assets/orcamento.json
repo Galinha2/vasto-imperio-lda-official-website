@@ -2035,20 +2035,32 @@
     },
     {
       "ref": 4,
-      "produto": "Vestiário Triplo 1 Cacifo",
+      "produto": "Vestiário 1 porta",
       "preço": 145,
       "image": "/orcamento/cacifo.png"
     },
     {
       "ref": 4,
-      "produto": "Vestiário Triplo 2 Cacifos",
+      "produto": "Vestiário 2 portas laterais",
       "preço": 240,
       "image": "/orcamento/cacifo.png"
     },
     {
       "ref": 4,
-      "produto": "Vestiário Triplo 3 Cacifos",
+      "produto": "Vestiário Triplo 3 portas laterais",
       "preço": 325,
+      "image": "/orcamento/cacifo.png"
+    },
+    {
+      "ref": 4,
+      "produto": "Vestiário 2 Cacifos",
+      "preço": 175,
+      "image": "/orcamento/cacifo.png"
+    },
+    {
+      "ref": 4,
+      "produto": "Vestiário Triplo 4 Cacifos",
+      "preço": 300,
       "image": "/orcamento/cacifo.png"
     },
     {

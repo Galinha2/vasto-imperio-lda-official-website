@@ -2035,6 +2035,18 @@
     },
     {
       "ref": 4,
+      "produto": "Vestiário Triplo 1 Cacifo",
+      "preço": 145,
+      "image": "/orcamento/cacifo.png"
+    },
+    {
+      "ref": 4,
+      "produto": "Vestiário Triplo 2 Cacifos",
+      "preço": 240,
+      "image": "/orcamento/cacifo.png"
+    },
+    {
+      "ref": 4,
       "produto": "Vestiário Triplo 3 Cacifos",
       "preço": 325,
       "image": "/orcamento/cacifo.png"

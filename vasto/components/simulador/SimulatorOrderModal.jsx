@@ -107,8 +107,8 @@ export default function SimulatorOrderModal({ open, onClose, total, details, ite
   };
 
   return (
-    <div className="fixed inset-0 z-[1000] flex items-center justify-center overflow-y-auto bg-[#1d1d1f]/45 p-3 backdrop-blur-sm sm:p-6">
-      <section role="dialog" aria-modal="true" aria-labelledby="simulator-order-title" className="my-auto max-h-[min(92vh,900px)] w-full max-w-4xl overflow-y-auto rounded-[30px] border border-white/70 bg-white p-5 shadow-[0_24px_90px_rgba(0,0,0,0.2)] sm:p-8">
+    <div className="fixed inset-0 z-[1000] flex items-stretch justify-center overflow-y-auto bg-[#1d1d1f]/45 p-0 backdrop-blur-sm sm:items-center sm:p-6">
+      <section role="dialog" aria-modal="true" aria-labelledby="simulator-order-title" className="min-h-[100dvh] w-full max-w-none overflow-y-auto rounded-none border-0 bg-white p-5 shadow-none sm:my-auto sm:min-h-0 sm:max-h-[min(92vh,900px)] sm:max-w-4xl sm:rounded-[30px] sm:border sm:border-white/70 sm:p-8 sm:shadow-[0_24px_90px_rgba(0,0,0,0.2)]">
         {sent ? (
           <div className="py-8 text-center sm:py-12">
             <span className="mx-auto grid h-14 w-14 place-items-center rounded-full bg-emerald-50 text-2xl text-emerald-600" aria-hidden="true">✓</span>

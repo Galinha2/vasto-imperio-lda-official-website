@@ -4,9 +4,8 @@ import Image from "@/components/loadings/LoadingImage";
 import { IoIosArrowDown } from "react-icons/io";
 import { IoIosAdd } from "react-icons/io";
 import orcamento from "../../../assets/orcamento.json";
+import generateBudgetPdf from "@/lib/generateBudgetPdf";
 import { MdOutlineDelete } from "react-icons/md";
-import jsPDF from "jspdf";
-import "jspdf-autotable";
 
 function Page() {
   // --------------------
@@ -202,465 +201,13 @@ function Page() {
     }, 1000);
   };
 
-  const gerarPDF = async () => {
-    const { default: autoTable } = await import("jspdf-autotable");
-    const doc = new jsPDF();
-    const corPretaFooter = [0, 0, 0];
-    const corBlue = [8, 121, 192];
-    const corOrange = [255, 85, 0];
-    const corGray = [255, 255, 255];
-    const corBlack = [0, 0, 0];
-
-    function drawTopoDireito(tipoFolha, doc, pageWidth) {
-      const x = pageWidth - 12;
-      let y = 15;
-      doc.setFont("helvetica", "normal");
-      doc.setFontSize(17);
-      doc.setTextColor(...corPretaFooter);
-      doc.text("Orçamento", x, y, { align: "right" });
-      y += 3;
-      doc.setDrawColor(...corBlack);
-      doc.setLineWidth(0.05);
-      doc.line(x - 40, y, x, y);
-      y += 7;
-      doc.setFont("helvetica", "normal");
-      doc.setFontSize(10);
-      doc.setTextColor(...corPretaFooter);
-      const tipoUpper = tipoFolha || "";
-      doc.text(`Folha Nº 1 de 1 ${tipoUpper}`, x, y, { align: "right" });
-      y += 7;
-      doc.text("Natureza: Orçamento", x, y, { align: "right" });
-    }
-
-    const desenharPagina = (tipoFolha, logoPreload) => {
-      const logo = logoPreload;
-      const maxWidth = 55;
-      const maxHeight = 22;
-      let logoWidth = logo.width;
-      let logoHeight = logo.height;
-      if (!logoWidth || !logoHeight) {
-        logoWidth = maxWidth;
-        logoHeight = maxHeight;
-      }
-      const ratio = Math.min(maxWidth / logoWidth, maxHeight / logoHeight);
-      logoWidth *= ratio;
-      logoHeight *= ratio;
-      const pageWidth = doc.internal.pageSize.getWidth();
-      const pageHeight = doc.internal.pageSize.getHeight();
-      const logoX = (pageWidth - logoWidth) / 2;
-      doc.addImage(logo, "PNG", logoX, 12, logoWidth, logoHeight);
-
-      drawTopoDireito(tipoFolha, doc, pageWidth);
-
-      let y = 12 + logoHeight + 6;
-      doc.setFont("helvetica", "normal");
-      doc.setFontSize(14);
-      doc.setTextColor(...corPretaFooter);
-      doc.text("VASTO IMPÉRIO, LDA", 12, y);
-      y += 6;
-
-      const now = new Date();
-      const pad2 = (n) => n.toString().padStart(2, "0");
-      const dataAtualFormatada = `${pad2(now.getDate())}/${pad2(now.getMonth() + 1)}/${now.getFullYear()}`;
-      // Data de Vencimento com o mesmo dia da emissão
-      const dataVencimentoFormatada = dataAtualFormatada;
-      
-      const boxHeight = 6;
-      const caixaX = 12;
-      let yDatas = y;
-      const spacingX = 5;
-      const textEmissao = "Data Emissão:";
-      const textVenc = "Data Vencimento:";
-      doc.setFont("helvetica", "normal");
-      doc.setFontSize(9);
-      const textWidthEmissao = doc.getTextWidth(textEmissao) + 4;
-      const textWidthVenc = doc.getTextWidth(textVenc) + 4;
-      doc.setFillColor(200, 200, 200);
-      doc.rect(caixaX, yDatas, textWidthEmissao, boxHeight, "F");
-      doc.rect(caixaX + textWidthEmissao + spacingX, yDatas, textWidthVenc, boxHeight, "F");
-      doc.setTextColor(...corPretaFooter);
-      doc.text(textEmissao, caixaX + 2, yDatas + 4);
-      doc.text(textVenc, caixaX + textWidthEmissao + spacingX + 2, yDatas + 4);
-      doc.setFontSize(9);
-      doc.text(dataAtualFormatada, caixaX + 2, yDatas + boxHeight + 4);
-      doc.text(dataVencimentoFormatada, caixaX + textWidthEmissao + spacingX + 2, yDatas + boxHeight + 4);
-
-      let clienteNome, clienteMorada, clienteNif;
-
-      if (dadosEmpresa) {
-        clienteNome = dadosEmpresa.nome || "Cliente";
-        clienteMorada = dadosEmpresa.codigoPostal || "V/ Morada";
-        clienteNif = dadosEmpresa.nif || nif;
-      } else if (nomeClienteManual.trim() !== "") {
-        clienteNome = nomeClienteManual;
-        clienteMorada = "V/ Morada";
-        clienteNif = nif || "NIF do cliente";
-      } else {
-        clienteNome = "Cliente";
-        clienteMorada = "V/ Morada";
-        clienteNif = nif || "NIF do cliente";
-      }
-
-      const metadeX = pageWidth / 2;
-      const offsetClienteX = metadeX + 15;
-      let yCliente = yDatas + 2;
-      const qrSize = 35;
-      const qrX = offsetClienteX - qrSize - 3;
-      const yQRCode = yCliente - 4;
-      doc.addImage("/orcamento/qr-code.png", "PNG", qrX, yQRCode, qrSize, qrSize);
-      doc.setFontSize(10);
-      doc.setFont("helvetica", "normal");
-      doc.setTextColor(...corPretaFooter);
-      doc.text("Exmo.(s) Senhor(es)", offsetClienteX, yCliente, { align: "left" });
-      yCliente += 5;
-      doc.setFont("helvetica", "bold");
-      doc.setFontSize(12);
-      doc.setTextColor(0, 0, 0);
-
-      const maxLen = 38;
-      const words = clienteNome.split(" ");
-      let line = "";
-      for (let i = 0; i < words.length; i++) {
-        const testLine = line ? line + " " + words[i] : words[i];
-        if (testLine.length > maxLen) {
-          doc.text(line, offsetClienteX, yCliente, { align: "left" });
-          yCliente += 5;
-          line = words[i];
-        } else {
-          line = testLine;
-        }
-      }
-      if (line) {
-        doc.text(line, offsetClienteX, yCliente, { align: "left" });
-        yCliente += 5;
-      }
-      doc.setFont("helvetica", "normal");
-      doc.setFontSize(10);
-      doc.setTextColor(...corPretaFooter);
-      
-      const local = clienteMorada.split(" ").slice(1).join(" ") || clienteMorada;
-      doc.text(local, offsetClienteX, yCliente, { align: "left" });
-      yCliente += 5;
-      doc.text(local, offsetClienteX, yCliente, { align: "left" });
-      yCliente += 5;
-      doc.text(clienteMorada, offsetClienteX, yCliente, { align: "left" });
-
-      const yDocumento = yDatas + boxHeight + 10;
-      const textoDocumento = "V/ Documento";
-      doc.setFont("helvetica", "normal");
-      doc.setFontSize(10);
-      const textWidthDocumento = doc.getTextWidth(textoDocumento) + 4;
-      doc.setFillColor(200, 200, 200);
-      doc.rect(caixaX, yDocumento, textWidthDocumento, boxHeight, "F");
-      doc.setTextColor(...corPretaFooter);
-      doc.text(textoDocumento, caixaX + 2, yDocumento + 4);
-
-      yDatas = yDocumento + boxHeight + 4;
-
-      const caixaY = yDatas;
-      const text = "Dados Bancários";
-      doc.setFont("helvetica", "normal");
-      doc.setFontSize(9);
-      const textWidth = doc.getTextWidth(text) + 4;
-      doc.setFillColor(200, 200, 200);
-      doc.rect(caixaX, caixaY, textWidth, boxHeight, "F");
-      doc.setTextColor(...corPretaFooter);
-      doc.text(text, caixaX + 2, caixaY + 4);
-      doc.setFontSize(9);
-      doc.text("EuroBic", caixaX + 2, caixaY + 10);
-      doc.setFontSize(9);
-      doc.text("IBAN:  PT50 0170 3378 0304 0019 8612 2", caixaX + 2, caixaY + 15);
-      const larguraIBAN = doc.getTextWidth("IBAN:  PT50 0170 3378 0304 0019 8612 2");
-      doc.line(caixaX + 2, caixaY + 16, caixaX + 2 + larguraIBAN, caixaY + 16);
-
-      const yCondicoes = caixaY + 22;
-
-      doc.setFont("helvetica", "normal");
-      doc.setFontSize(10);
-      doc.setTextColor(...corPretaFooter);
-
-      const textoCondicoes = "Condições de Pagamento: Pronto Pagamento";
-      doc.text(textoCondicoes, caixaX + 2, yCondicoes);
-      const larguraCondicoes = doc.getTextWidth(textoCondicoes);
-      doc.line(caixaX + 2, yCondicoes + 1, caixaX + 2 + larguraCondicoes, yCondicoes + 1);
-
-      const textoContribuinte = `V/ Contribuinte: ${clienteNif}`;
-      const xContribuinte = caixaX + 2 + larguraCondicoes + 10;
-      doc.text(textoContribuinte, xContribuinte, yCondicoes);
-      const larguraContribuinte = doc.getTextWidth(textoContribuinte);
-      doc.line(xContribuinte, yCondicoes + 1, xContribuinte + larguraContribuinte, yCondicoes + 1);
-
-      y = yCondicoes + 8;
-
-      const tableCols = [
-        { title: "REF", dataKey: "referencia", width: 22 },
-        { title: "DESCRIÇÃO", dataKey: "descricao", width: 67 },
-        { title: "QUANT.", dataKey: "quantidade", width: 15 },
-        { title: "UNI", dataKey: "uni", width: 13 },
-        { title: "P. VENDA S/IVA", dataKey: "pvenda", width: 25 },
-        { title: "DESC", dataKey: "desc", width: 13 },
-        { title: "VALOR LIQUIDO", dataKey: "valorliq", width: 22 },
-        { title: "IVA", dataKey: "iva", width: 15 },
-      ];
-
-      const linhasProdutos = linhas
-        .filter((l) => l.produto)
-        .map((l) => {
-          const unidade = "un";
-          const descLinha = l.isPortes ? "" : (descontoSelecionado > 0 ? descontoSelecionado : 0);
-          const valorDesc = l.isPortes ? 0 : (descontoSelecionado > 0 ? (l.total * descontoSelecionado) / 100 : 0);
-          const valorLiquido = l.total - valorDesc;
-          return {
-            referencia: l.refCompleta || "",
-            descricao: l.produto,
-            quantidade: l.unidades > 0 ? l.unidades : "",
-            uni: unidade,
-            pvenda: formatarNumero(l.preco) + "€",
-            desc: descLinha !== "" && descLinha > 0 ? descLinha + "%" : "",
-            valorliq: formatarNumero(valorLiquido) + "€",
-            iva: "23%",
-          };
-        });
-
-      autoTable(doc, {
-        startY: y - 5,
-        head: [
-          tableCols.map((col, idx) => ({
-            content: col.title,
-            halign: idx === 1 ? "left" : "center",
-          })),
-        ],
-        body: linhasProdutos.map((row) =>
-          tableCols.map((col) => row[col.dataKey]),
-        ),
-        theme: "plain",
-        styles: {
-          font: "helvetica",
-          fontStyle: "normal",
-          fontSize: 9,
-          cellPadding: 0.5,
-          minCellHeight: 1,
-          halign: "right",
-          valign: "middle",
-          textColor: corPretaFooter,
-          overflow: "hidden",
-          lineWidth: 0,
-        },
-        headStyles: {
-          fillColor: [200, 200, 200],
-          textColor: corPretaFooter,
-          fontStyle: "normal",
-          font: "helvetica",
-          halign: "center",
-          lineWidth: 0.1,
-          lineColor: corGray,
-          cellPadding: 2,
-        },
-        bodyStyles: {
-          fillColor: [255, 255, 255],
-          textColor: corPretaFooter,
-          fontStyle: "normal",
-          font: "helvetica",
-          lineWidth: 0,
-          cellPadding: 0.5,
-        },
-        columnStyles: {
-          0: { halign: "left" },
-          1: { halign: "left" },
-          2: { halign: "right" },
-          3: { halign: "left" },
-          4: { halign: "right" },
-          5: { halign: "center" },
-          6: { halign: "right" },
-          7: { halign: "right" },
-        },
-        margin: { left: 12, right: 8 },
-        tableWidth: "auto",
-        columnWidth: "auto",
-      });
-
-      const totalBruto = linhas.reduce((acc, l) => acc + l.total, 0);
-      const totalDescLinha = linhas.reduce(
-        (acc, l) =>
-          acc +
-          (l.isPortes ? 0 :
-            (descontoSelecionado > 0 ? (l.total * descontoSelecionado) / 100 : 0)
-          ),
-        0,
-      );
-      const totalLiquido = linhas.reduce(
-        (acc, l) =>
-          acc +
-          (l.total - (l.isPortes ? 0 : (descontoSelecionado > 0 ? (l.total * descontoSelecionado) / 100 : 0))),
-        0,
-      );
-      const totalIVA = linhas.reduce(
-        (acc, l) => {
-          const valorDesc = l.isPortes ? 0 : (descontoSelecionado > 0 ? (l.total * descontoSelecionado) / 100 : 0);
-          const valorLiquido = l.total - valorDesc;
-          return acc + valorLiquido * 0.23;
-        },
-        0,
-      );
-      const totalFinal = totalLiquido + totalIVA;
-
-      doc.setFont("helvetica", "normal");
-      doc.setFontSize(8);
-      doc.setTextColor(...corBlack);
-      let yFooter = pageHeight - 24;
-      doc.setDrawColor(...corPretaFooter);
-      doc.setLineWidth(0.05);
-      doc.line(12, yFooter - 3, pageWidth - 8, yFooter - 3);
-      doc.text(
-        "RUA PRINCIPAL N 31 CABECINHA BENEDITA 2475-014 BENEDITA",
-        12,
-        yFooter,
-      );
-      yFooter += 4;
-      doc.text(
-        "Email: geral@vastoimperio.pt | Telefone: +351 966 518 436 (Chamada para a rede móvel nacional)",
-        12,
-        yFooter,
-      );
-      yFooter += 4;
-      doc.text(
-        "Email: geral@vastoimperio.pt | Telefone: +351 928 348 117 (Chamada para a rede móvel nacional)",
-        12,
-        yFooter,
-      );
-      yFooter += 4;
-      const anoAtual = new Date().getFullYear();
-      doc.text(
-        `© ${anoAtual} Vasto Império. Todos os direitos reservados.`,
-        12,
-        yFooter,
-      );
-
-      const totaisAltura = 6 * 5 + 7 + 7;
-      const margemFooter = 8;
-      let yTot = pageHeight - 24 - margemFooter - totaisAltura;
-      let yAfterTable = doc.lastAutoTable.finalY + 4;
-      if (yTot < yAfterTable + 4) yTot = yAfterTable + 4;
-      doc.setDrawColor(...corBlack);
-      doc.setLineWidth(0.05);
-      doc.line(8, yTot - 5, pageWidth - 8, yTot - 5);
-
-      const xIncidencia = 12;
-      const yIncidencia = yTot;
-      const spacingY = 5;
-      const spacingXFooter = 30;
-
-      doc.setFont("helvetica", "normal");
-      doc.setTextColor(...corPretaFooter);
-      doc.setFontSize(10);
-      doc.text("Incidência", xIncidencia, yIncidencia, { align: "left" });
-      doc.text("Taxa", xIncidencia + spacingXFooter, yIncidencia, { align: "left" });
-      doc.text("IVA", xIncidencia + 2 * spacingXFooter, yIncidencia, {
-        align: "left",
-      });
-
-      doc.setFont("helvetica", "normal");
-      doc.text(
-        formatarNumero(totalLiquido) + "€",
-        xIncidencia,
-        yIncidencia + spacingY,
-        { align: "left" },
-      );
-      doc.text("23%", xIncidencia + spacingXFooter, yIncidencia + spacingY, {
-        align: "left",
-      });
-      doc.text(
-        formatarNumero(totalIVA) + "€",
-        xIncidencia + 2 * spacingXFooter,
-        yIncidencia + spacingY,
-        { align: "left" },
-      );
-
-      const xTotais = 125;
-      doc.setFontSize(10);
-      doc.setFont("helvetica", "normal");
-      doc.setTextColor(...corPretaFooter);
-      doc.text("Total Bruto:", xTotais, yTot, { align: "left" });
-      doc.text(formatarNumero(totalBruto) + "€", 200, yTot, {
-        align: "right",
-      });
-      yTot += 6;
-      doc.setFont("helvetica", "normal");
-      doc.setTextColor(...corPretaFooter);
-      doc.text("Desconto Linha:", xTotais, yTot, { align: "left" });
-      doc.setTextColor(...corOrange);
-      doc.text(
-        "-" + formatarNumero(totalDescLinha) + "€",
-        200,
-        yTot,
-        { align: "right" },
-      );
-      yTot += 6;
-      doc.setFont("helvetica", "normal");
-      doc.setTextColor(...corPretaFooter);
-      doc.text("Desconto Global:", xTotais, yTot, { align: "left" });
-      doc.setTextColor(...corOrange);
-      doc.text(`${descontoSelecionado}%`, 200, yTot, { align: "right" });
-      yTot += 6;
-      doc.setFont("helvetica", "normal");
-      doc.setTextColor(...corPretaFooter);
-      doc.text("Total Líquido:", xTotais, yTot, { align: "left" });
-      doc.setTextColor(...corOrange);
-      doc.text(formatarNumero(totalLiquido) + "€", 200, yTot, {
-        align: "right",
-      });
-      yTot += 6;
-      doc.setFont("helvetica", "normal");
-      doc.setTextColor(...corPretaFooter);
-      doc.text("Total IVA:", xTotais, yTot, { align: "left" });
-      doc.text(formatarNumero(totalIVA) + "€", 200, yTot, {
-        align: "right",
-      });
-
-      yTot += 3;
-      doc.setLineWidth(0.05);
-      doc.line(xTotais, yTot, 200, yTot);
-      const yLinhaTotal = yTot;
-      yTot += 5;
-
-      doc.setFont("helvetica", "bold");
-      doc.setFontSize(13);
-      doc.setTextColor(...corBlack);
-      doc.text("TOTAL:", xTotais, yTot, { align: "left" });
-      doc.setTextColor(...corBlue);
-      doc.text(formatarNumero(totalFinal) + "€", 200, yTot, {
-        align: "right",
-      });
-
-      doc.setDrawColor(...corBlack);
-      doc.setLineWidth(0.05);
-      doc.line(12, yLinhaTotal, 90, yLinhaTotal);
-      doc.setFont("helvetica", "normal");
-      doc.setFontSize(9);
-      doc.setTextColor(...corBlack);
-      doc.text("Este documento não serve de fatura", 12, yLinhaTotal + 12);
-    };
-
-    const logoPreload = new window.Image();
-    logoPreload.src = "/logo.png";
-    await new Promise((resolve) => (logoPreload.onload = resolve));
-
-    // Apenas gera uma única folha (Original)
-    desenharPagina("Original", logoPreload);
-
-    let nomeFinalPDF = "Orçamento";
-    if (dadosEmpresa && dadosEmpresa.nome && dadosEmpresa.nome !== "Cliente") {
-      nomeFinalPDF = `Orçamento | ${dadosEmpresa.nome}`;
-    } else if (nomeClienteManual.trim() !== "") {
-      nomeFinalPDF = `Orçamento | ${nomeClienteManual}`;
-    }
-
-    doc.setProperties({
-      title: nomeFinalPDF,
-    });
-    const nomeFicheiro = `${nomeFinalPDF}.pdf`;
-    doc.save(nomeFicheiro);
-  };
+  const gerarPDF = () => generateBudgetPdf({
+    linhas,
+    descontoSelecionado,
+    dadosEmpresa,
+    nif,
+    nomeClienteManual,
+  });
 
   const gerarRefCompleta = (refFamilia) => {
     let contador = 1;
@@ -674,28 +221,35 @@ function Page() {
   }
   if (!autenticado) {
     return (
-      <div className="flex items-center justify-center h-screen">
+      <div className="flex min-h-screen items-center justify-center bg-[#f5f5f7] px-5 py-12">
         <form
           onSubmit={verificarPin}
-          className="flex flex-col items-center gap-3"
+          className="flex w-full max-w-md flex-col items-center gap-4 rounded-[32px] border border-[#e5e5e7] bg-white px-7 py-10 shadow-[0_18px_50px_rgba(0,0,0,0.06)] sm:px-10"
         >
-          <Image src="/favicon.png" alt="Logo" width={150} height={60} className="mb-4" />
-          <label className="text-lg font-bold">Insira o PIN de 4 dígitos</label>
+          <Image src="/favicon.png" alt="Logo" width={120} height={48} className="mb-2" />
+          <div className="text-center">
+            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-(--orange)">Área reservada</p>
+            <h1 className="mt-2 text-2xl font-semibold tracking-[-0.04em] text-[#1d1d1f]">Acesso ao orçamento</h1>
+            <p className="mt-2 text-sm text-[#6e6e73]">Insira o PIN de 4 dígitos para continuar.</p>
+          </div>
           <input
             type="password"
+            inputMode="numeric"
+            autoComplete="current-password"
             maxLength={4}
             value={pinDigitado}
             onChange={(e) => setPinDigitado(e.target.value)}
-            className="border p-2 rounded-full text-center w-20"
+            aria-label="PIN de 4 dígitos"
+            className="mt-2 h-12 w-40 rounded-full border border-[#d2d2d7] bg-[#f5f5f7] px-5 text-center text-lg tracking-[0.45em] outline-none transition focus:border-(--blue) focus:ring-4 focus:ring-[#0879c0]/10"
           />
           <button
             type="submit"
-            className="bg-(--orange) cursor-pointer text-white px-5 py-2 rounded-full"
+            className="mt-1 h-12 w-full cursor-pointer rounded-full bg-(--orange) px-5 font-semibold text-white transition hover:-translate-y-0.5 hover:bg-(--orange-hover)"
           >
             Entrar
           </button>
           {erroPin && (
-            <p className="text-red-600">PIN incorreto. Tente novamente.</p>
+            <p role="alert" className="text-sm font-medium text-red-600">PIN incorreto. Tente novamente.</p>
           )}
         </form>
       </div>
@@ -705,17 +259,33 @@ function Page() {
   return (
     <div
       onCopy={handleCopy}
-      className="flex items-center justify-center h-screen p-0 md:p-5"
+      className="min-h-screen bg-[#f5f5f7] px-4 pb-10 pt-24 sm:px-6 sm:pb-14 sm:pt-28 lg:px-10"
     >
-      <div className="md:bg-(--gray) px-2 py-10 md:p-5 md:rounded-[35px] w-full md:w-auto flex flex-col gap-5 md:shadow-md min-h-150 md:min-h-100 justify-between">
-        <div className="flex flex-col gap-5 items-start">
+      <div className="mx-auto flex w-full max-w-[1440px] flex-col gap-6">
+        <header className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-(--orange)">Área de gestão</p>
+            <h1 className="mt-2 text-3xl font-semibold tracking-[-0.05em] text-[#1d1d1f] sm:text-4xl">Criar orçamento</h1>
+            <p className="mt-2 text-sm text-[#6e6e73]">Adicione produtos, indique os dados do cliente e gere a proposta.</p>
+          </div>
+          <span className="inline-flex w-fit items-center gap-2 rounded-full border border-[#e5e5e7] bg-white px-4 py-2 text-sm font-medium text-[#6e6e73]">
+            <span className="h-2 w-2 rounded-full bg-emerald-500" />
+            Documento em edição
+          </span>
+        </header>
+
+        <section aria-label="Linhas do orçamento" className="rounded-[28px] border border-[#e5e5e7] bg-white p-3 shadow-[0_8px_30px_rgba(0,0,0,0.035)] sm:p-5 lg:p-6">
+          <div className="mb-4 hidden grid-cols-[minmax(0,1fr)_80px_100px_100px_44px] gap-3 px-3 text-xs font-semibold uppercase tracking-[0.1em] text-[#86868b] sm:grid">
+            <span>Produto</span><span className="text-center">Qtd.</span><span className="text-center">Preço unit.</span><span className="text-center">Total</span><span />
+          </div>
+        <div className="flex flex-col gap-3 items-start">
           {linhas.map((linha, index) => (
             <div
               key={index}
-              className="flex gap-2 md:gap-5 w-full items-center relative"
+              className="relative grid w-full grid-cols-[repeat(3,minmax(0,1fr))_40px] items-center gap-2 rounded-[22px] border border-[#e8e8eb] bg-[#fbfbfd] p-3 sm:grid-cols-[minmax(0,1fr)_80px_100px_100px_44px] sm:gap-3 sm:rounded-full sm:bg-white sm:px-3 sm:py-2"
             >
-              <div data-produto-dropdown className="relative w-full">
-                <div className="flex items-center orca rounded-[25px] w-full md:w-100 lg:w-120 px-3">
+              <div data-produto-dropdown className="relative col-span-4 min-w-0 sm:col-span-1">
+                <div className="flex h-12 items-center rounded-full border border-[#e5e5e7] bg-white px-4 transition focus-within:border-(--blue) focus-within:ring-4 focus-within:ring-[#0879c0]/10 sm:border-transparent sm:bg-[#f5f5f7]">
                   <input
                     type="text"
                     value={
@@ -728,11 +298,11 @@ function Page() {
                       setPesquisaProduto(e.target.value);
                     }}
                     placeholder="Pesquisar produto..."
-                    className="flex-1 outline-none bg-transparent w-10"
+                    className="w-full min-w-0 flex-1 bg-transparent text-sm text-[#1d1d1f] outline-none placeholder:text-[#86868b]"
                   />
 
                   <IoIosArrowDown
-                    className="cursor-pointer"
+                    className="ml-2 shrink-0 cursor-pointer text-[#6e6e73]"
                     onClick={() =>
                       setOpenProdutoIndex(
                         openProdutoIndex === index ? null : index,
@@ -742,7 +312,7 @@ function Page() {
                 </div>
 
                 {openProdutoIndex === index && (
-                  <div className="absolute bg-white shadow-md rounded-[20px] mt-1 w-120 z-10 max-h-100 overflow-y-auto">
+                  <div className="absolute left-0 z-30 mt-2 max-h-80 w-[min(88vw,34rem)] overflow-y-auto rounded-[22px] border border-[#e5e5e7] bg-white p-2 shadow-[0_16px_42px_rgba(0,0,0,0.14)]">
                     {[
                       ...new Set(
                         orcamento.produtos
@@ -772,7 +342,7 @@ function Page() {
                           <div
                             key={p.refCompleta}
                             onClick={() => selecionarProduto(index, p)}
-                            className="p-2 cursor-pointer rounded-[15px] hover:bg-gray-200 flex items-center gap-3"
+                            className="flex cursor-pointer items-center gap-3 rounded-2xl p-2.5 transition hover:bg-[#f5f5f7]"
                           >
                             <span className="text-sm w-5">{p.refCompleta}</span>
                             <Image
@@ -804,11 +374,12 @@ function Page() {
                   const valorLimpo = e.target.value.replace(/[^0-9]/g, "");
                   alterarUnidades(index, valorLimpo);
                 }}
-                className="orca w-15 text-center"
-                placeholder="0un"
+                aria-label="Quantidade"
+                className="h-11 w-full min-w-0 rounded-full border border-[#e5e5e7] bg-white px-2 text-center text-xs outline-none focus:border-(--blue) sm:px-3 sm:text-sm"
+                placeholder="Qtd."
               />
 
-              <div className="orca flex w-full">
+              <div className="flex h-11 w-full items-center rounded-full border border-[#e5e5e7] bg-white px-3 text-sm sm:bg-[#f5f5f7]">
                 {linha.isPortes ? (
                   <input
                     type="number"
@@ -818,7 +389,7 @@ function Page() {
                     onChange={(e) => {
                       alterarPrecoPortes(index, e.target.value);
                     }}
-                    className="text-center w-full border rounded px-1"
+                    className="w-full rounded-full border border-[#d2d2d7] px-2 py-1 text-center outline-none focus:border-(--blue)"
                     placeholder="Preço"
                   />
                 ) : (
@@ -826,8 +397,8 @@ function Page() {
                 )}
               </div>
 
-              <div className="orca flex">
-                <p className="text-center">
+              <div className="flex h-11 w-full items-center justify-center rounded-full border border-[#e5e5e7] bg-white px-3 text-sm font-semibold text-[#1d1d1f] sm:bg-[#f5f5f7]">
+                <p className="text-center whitespace-nowrap">
                   {linha.total.toFixed(2).replace(".", ",")}€
                 </p>
               </div>
@@ -835,11 +406,10 @@ function Page() {
               <button
                 type="button"
                 onClick={() => removerLinha(index)}
-                className="flex items-center justify-center"
+                aria-label="Remover produto"
+                className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-full border border-[#e5e5e7] bg-white text-(--orange) transition hover:bg-[#fff0e8]"
               >
-                <div className="rounded-full bg-white shadow-md h-10 w-10 items-center flex justify-center text-center cursor-pointer">
-                  <MdOutlineDelete className="text-(--orange) text-[1.5em]" />
-                </div>
+                <MdOutlineDelete className="text-xl" />
               </button>
             </div>
           ))}
@@ -847,26 +417,32 @@ function Page() {
           <button
             type="button"
             onClick={adicionarLinha}
-            className="flex w-fit cursor-pointer orca"
+            className="inline-flex h-11 cursor-pointer items-center gap-2 rounded-full border border-[#e5e5e7] bg-white px-5 text-sm font-semibold text-[#1d1d1f] transition hover:border-[#c8c9cf] hover:bg-[#f5f5f7]"
           >
-            <IoIosAdd className="text-[2em]" />
+            <IoIosAdd className="text-xl text-(--orange)" />
+            Adicionar produto
           </button>
         </div>
 
-        <div className="flex justify-between relative">
-          <div data-desc-dropdown className="relative flex flex-col md:flex-row gap-5">
+        </section>
+
+        <section aria-label="Dados do cliente e totais" className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(360px,0.8fr)]">
+          <div className="rounded-[28px] border border-[#e5e5e7] bg-white p-5 shadow-[0_8px_30px_rgba(0,0,0,0.035)] sm:p-6">
+            <h2 className="text-lg font-semibold tracking-[-0.03em] text-[#1d1d1f]">Dados do cliente</h2>
+            <p className="mt-1 text-sm text-[#6e6e73]">Opcional · o NIF preenche os dados da empresa.</p>
+          <div data-desc-dropdown className="relative mt-5 flex flex-col gap-4 sm:flex-row sm:items-start">
             <button
               type="button"
               onClick={() => setOpenDesc(!openDesc)}
-              className="flex cursor-pointer orca w-20"
+              className="flex h-12 w-28 cursor-pointer items-center justify-between rounded-full border border-[#e5e5e7] bg-[#f5f5f7] px-4 text-sm font-medium transition hover:border-[#c8c9cf]"
             >
               <p>{descontoSelecionado}%</p>
               <IoIosArrowDown />
             </button>
-            <div className="flex flex-col gap-2">
+            <div className="flex min-w-0 flex-1 flex-col gap-3 sm:max-w-md">
               <input
                 type="text"
-                className="flex orca w-40"
+                className="h-12 w-full rounded-full border border-[#e5e5e7] bg-[#f5f5f7] px-4 text-sm outline-none transition placeholder:text-[#86868b] focus:border-(--blue) focus:ring-4 focus:ring-[#0879c0]/10"
                 placeholder="NIF"
                 maxLength={9}
                 value={nif}
@@ -882,7 +458,7 @@ function Page() {
               />
               <input
                 type="text"
-                className="flex orca w-40"
+                className="h-12 w-full rounded-full border border-[#e5e5e7] bg-[#f5f5f7] px-4 text-sm outline-none transition placeholder:text-[#86868b] focus:border-(--blue) focus:ring-4 focus:ring-[#0879c0]/10"
                 placeholder="Nome do Cliente"
                 value={nomeClienteManual}
                 onChange={(e) => setNomeClienteManual(e.target.value)}
@@ -891,7 +467,7 @@ function Page() {
                 <span className="text-xs mt-1">A procurar dados...</span>
               )}
               {dadosEmpresa && !loadingNif && (
-                <div className="text-xs mt-1 bg-white p-2 rounded shadow">
+                <div className="mt-1 rounded-2xl border border-[#e5e5e7] bg-[#f5f5f7] p-4 text-sm text-[#6e6e73]">
                   <p><strong>{dadosEmpresa.nome}</strong></p>
                   <p>NIF: {dadosEmpresa.nif}</p>
                   <p>{dadosEmpresa.codigoPostal}</p>
@@ -900,7 +476,7 @@ function Page() {
             </div>
 
             {openDesc && (
-              <div className="absolute bg-white rounded-[15px] shadow-md mt-1 w-20 z-10">
+              <div className="absolute left-0 top-14 z-20 w-28 rounded-2xl border border-[#e5e5e7] bg-white p-1 shadow-[0_12px_30px_rgba(0,0,0,0.12)]">
                 {orcamento.descontos.map((d, i) => (
                   <div
                     key={i}
@@ -908,7 +484,7 @@ function Page() {
                       setDescontoSelecionado(Number(d.desconto));
                       setOpenDesc(false);
                     }}
-                    className="p-2 cursor-pointer hover:bg-gray-200 text-center"
+                    className="cursor-pointer rounded-full px-3 py-2 text-center text-sm transition hover:bg-[#f5f5f7]"
                   >
                     {d.desconto}%
                   </div>
@@ -917,26 +493,26 @@ function Page() {
             )}
           </div>
 
-          <div className="text-[1.5em] text-right">
-            <h2>
-              Total Bruto: {totalSemDesconto.toFixed(2).replace(".", ",")}€
-            </h2>
+          </div>
+          <div className="rounded-[28px] border border-[#e5e5e7] bg-white p-5 shadow-[0_8px_30px_rgba(0,0,0,0.035)] sm:p-6">
+            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#86868b]">Resumo do orçamento</p>
+            <div className="mt-4 flex flex-col gap-2 text-sm text-[#6e6e73]">
+            <div className="flex items-center justify-between gap-4"><span>Total bruto</span><span className="font-medium text-[#1d1d1f]">{totalSemDesconto.toFixed(2).replace(".", ",")}€</span></div>
             {descontoSelecionado > 0 && (
-              <h2 className="text-(--orange)">
-                Total c/ {descontoSelecionado}% Desc:{" "}
-                {totalComDesconto.toFixed(2).replace(".", ",")}€
-              </h2>
+              <div className="flex items-center justify-between gap-4 text-(--orange)"><span>Desconto · {descontoSelecionado}%</span><span className="font-semibold">−{(totalSemDesconto - totalComDesconto).toFixed(2).replace(".", ",")}€</span></div>
             )}
-            <h2 className="text-(--blue)">
-              Total c/IVA: {totalComIVA.toFixed(2).replace(".", ",")}€
-            </h2>
-            <div className="flex gap-5 justify-end mt-4">
+            <div className="mt-2 flex items-baseline justify-between gap-4 border-t border-[#e8e8eb] pt-4">
+              <span className="font-semibold text-[#1d1d1f]">Total com IVA</span>
+              <span className="text-2xl font-semibold tracking-[-0.04em] text-(--blue)">{totalComIVA.toFixed(2).replace(".", ",")}€</span>
+            </div>
+            </div>
+            <div className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2">
               <button
                 type="button"
                 onClick={copiarManual}
                 className={`${
-                  copiado ? "bg-blue-600" : "bg-(--blue)"
-                } cursor-pointer text-white px-5 text-[0.8em] py-1 rounded-full transition-all duration-200`}
+                  copiado ? "bg-emerald-600" : "bg-(--blue)"
+                } h-12 cursor-pointer rounded-full px-5 text-sm font-semibold text-white transition-all duration-200 hover:-translate-y-0.5`}
               >
                 {copiado ? "Texto copiado" : "Copiar Texto"}
               </button>
@@ -950,13 +526,13 @@ function Page() {
                   }
                   gerarPDF();
                 }}
-                className="bg-(--orange) cursor-pointer text-white px-5 text-[0.8em] py-1 rounded-full"
+                className="h-12 cursor-pointer rounded-full bg-(--orange) px-5 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:bg-(--orange-hover)"
               >
                 Gerar PDF
               </button>
             </div>
           </div>
-        </div>
+        </section>
       </div>
 
       {popupMensagem ? (

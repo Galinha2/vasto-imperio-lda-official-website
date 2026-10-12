@@ -1,12 +1,13 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useLanguage } from "@/components/header/LanguageContext";
-import Link from "next/link";
 import SimulatorDropdown from "@/components/simulador/SimulatorDropdown";
 import SimulatorConfigurationOptions from "@/components/simulador/SimulatorConfigurationOptions";
 import SimulatorSolutions, { buildSimilarSolutions } from "@/components/simulador/SimulatorSolutions";
 import SimulatorSectionTabs from "@/components/simulador/SimulatorSectionTabs";
+import SimulatorOrderModal from "@/components/simulador/SimulatorOrderModal";
+import createQuoteLines from "@/components/simulador/createQuoteLines";
 import budget from "@/assets/orcamento.json";
 
 const products = budget.produtos.filter((product) => product.ref === 3);
@@ -356,7 +357,10 @@ function RackPreview({ modules, height, levels, floorType, galvanized, reinforce
   );
 }
 
-export default function SimulatorPicking() {
+export default function SimulatorPicking({ onQuoteDataChange }) {
+  const [orderOpen, setOrderOpen] = useState(false);
+  const orderQuoteRef = useRef(null);
+  const drawingRef = useRef(null);
   const { language } = useLanguage();
   const english = language === "en";
   const formatMeters = (value) => `${(value / 1000).toLocaleString(english ? "en-IE" : "pt-PT", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} m`;
@@ -432,6 +436,33 @@ export default function SimulatorPicking() {
     length,
     count: modules.filter((moduleLength) => moduleLength === length).length * levels * rowCount,
   }));
+  useEffect(() => {
+    const profile = reinforcedBeams ? "Viga Z100" : "Viga Z60";
+    const entries = [
+      { product: matchingFrame, quantity: (modules.length + 1) * rowCount },
+      ...[...new Set(modules)].flatMap((length) => {
+        const moduleCount = modules.filter((moduleLength) => moduleLength === length).length * levels * rowCount;
+        const centralCount = length <= 2000 ? 1 : 2;
+        return [
+          { product: beams.find((item) => item.length === length && item.produto.includes(profile)), quantity: moduleCount * 2 },
+          { product: shelves.find((item) => item.length === length && item.depth === depth && item.material === floorType), quantity: moduleCount },
+          { product: reinforcementProduct("central", depth, floorType), quantity: moduleCount * centralCount },
+          { product: reinforcementProduct("lateral", depth, floorType), quantity: moduleCount * 2 },
+        ];
+      }),
+      { product: safetyBrake, quantity: modules.length * levels * 4 * rowCount },
+    ];
+    const format = (value) => (value / 1000).toLocaleString("pt-PT", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    const quote = {
+      items: createQuoteLines(entries, 3),
+      discountPercent: discountRate * 100,
+      total: discountedEstimate,
+      details: `Estantes picking · Comprimento por fila: ${format(finalLength)} m · Comprimento total: ${format(finalLength * rowCount)} m · Altura: ${format(height)} m · Profundidade: ${format(depth)} m · Níveis: ${levels} · Filas: ${rowCount} · Piso: ${floorType} · Bastidores: ${galvanized ? "galvanizados" : "pintados"} · Vigas: ${profile} · Carga máxima por par de vigas: ${levelCapacity.toLocaleString("pt-PT")} kg`,
+      unavailable: isLengthUnavailable || !matchingFrame || modules.length === 0,
+    };
+    orderQuoteRef.current = quote;
+    onQuoteDataChange?.(quote);
+  }, [onQuoteDataChange, matchingFrame, modules, levels, rowCount, depth, floorType, safetyBrake, reinforcedBeams, galvanized, discountRate, discountedEstimate, finalLength, height, levelCapacity, isLengthUnavailable]);
 
   function hasPricedShelf(shelfDepth, material) {
     return shelves.some((shelf) => shelf.depth === shelfDepth && shelf.material === material && typeof shelf["preço"] === "number");
@@ -489,7 +520,7 @@ export default function SimulatorPicking() {
   }
 
   return (
-    <section className="min-h-screen bg-[#f8f8fa] px-4 py-12 sm:px-6 lg:px-10 lg:py-16">
+    <section ref={drawingRef} className="min-h-screen bg-[#f8f8fa] px-4 py-12 sm:px-6 lg:px-10 lg:py-16">
       <header className="mx-auto mb-9 max-w-[1800px] sm:mb-12">
         <p className="mt-[35px] mb-3 text-xs font-semibold uppercase tracking-[0.16em] text-[#6e6e73] lg:mt-5">{english ? "Configurator · Picking shelving" : "Configurador · Estantes picking"}</p>
         <h1 className="max-w-4xl text-4xl font-semibold leading-[1.05] tracking-[-0.045em] text-[#1d1d1f] sm:text-5xl lg:text-6xl">{english ? "Shelving made for your space." : "A sua estante, à medida do seu espaço."}</h1>
@@ -577,7 +608,7 @@ export default function SimulatorPicking() {
               </div>
             )}
             <div className="mt-5 grid grid-cols-[1fr_auto] gap-3">
-              <Link href="/orcamento" aria-disabled={isLengthUnavailable} onClick={(event) => { if (isLengthUnavailable) event.preventDefault(); }} className={`flex cursor-pointer items-center justify-center simulator-pill rounded-full bg-(--orange) px-4 py-3 text-sm font-semibold text-white shadow-sm transition hover:brightness-95 ${isLengthUnavailable ? "cursor-not-allowed opacity-50" : ""}`}>{english ? "Order" : "Encomendar"}</Link>
+              <button type="button" disabled={isLengthUnavailable} onClick={() => setOrderOpen(true)} className="flex cursor-pointer items-center justify-center simulator-pill rounded-full bg-(--orange) px-4 py-3 text-sm font-semibold text-white shadow-sm transition hover:brightness-95 disabled:cursor-not-allowed disabled:opacity-50">{english ? "Order" : "Encomendar"}</button>
               <button type="button" onClick={reset} className="cursor-pointer simulator-pill rounded-full border border-[#d2d2d7] bg-white px-4 py-3 text-sm font-semibold text-[#1d1d1f] transition hover:bg-[#f5f5f7]">{english ? "Reset" : "Recomeçar"}</button>
             </div>
           </div>
@@ -595,6 +626,7 @@ export default function SimulatorPicking() {
           </div>
         )}
       </div>
+      <SimulatorOrderModal open={orderOpen} onClose={() => setOrderOpen(false)} total={orderQuoteRef.current?.total ?? discountedEstimate} details={orderQuoteRef.current?.details} items={orderQuoteRef.current?.items} discountPercent={orderQuoteRef.current?.discountPercent ?? discountRate * 100} drawingRef={drawingRef} english={english} />
     </section>
   );
 }

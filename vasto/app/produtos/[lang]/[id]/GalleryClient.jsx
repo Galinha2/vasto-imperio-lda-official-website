@@ -109,7 +109,7 @@ export default function GalleryClient({ product, text }) {
                 <span aria-hidden="true">→</span>
               </Link>
             )}
-            <Link href="/contacto" className="inline-flex min-h-12 cursor-pointer items-center justify-center gap-2 rounded-full border border-[#d2d2d7] bg-white px-6 py-3 text-sm font-semibold text-[#1d1d1f] transition hover:bg-[#f5f5f7] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1d1d1f]">
+            <Link href="/orcamento" className="inline-flex min-h-12 cursor-pointer items-center justify-center gap-2 rounded-full border border-[#d2d2d7] bg-white px-6 py-3 text-sm font-semibold text-[#1d1d1f] transition hover:bg-[#f5f5f7] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1d1d1f]">
               {text?.contacte || (text?.caracteristicas === "Características" ? "Pedir informações" : "Request information")}
               <span aria-hidden="true">→</span>
             </Link>

@@ -1,12 +1,13 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useLanguage } from "@/components/header/LanguageContext";
-import Link from "next/link";
 import SimulatorDropdown from "@/components/simulador/SimulatorDropdown";
 import SimulatorConfigurationOptions from "@/components/simulador/SimulatorConfigurationOptions";
 import SimulatorSolutions, { buildSimilarSolutions } from "@/components/simulador/SimulatorSolutions";
 import SimulatorSectionTabs from "@/components/simulador/SimulatorSectionTabs";
+import SimulatorOrderModal from "@/components/simulador/SimulatorOrderModal";
+import createQuoteLines from "@/components/simulador/createQuoteLines";
 import budget from "@/assets/orcamento.json";
 
 const products = budget.produtos.filter((product) => product.ref === 2);
@@ -239,7 +240,10 @@ function RackPreview({ modules, height, levels, rowCount, capacityLabel, solutio
   );
 }
 
-export default function SimulatorRacks() {
+export default function SimulatorRacks({ onQuoteDataChange }) {
+  const [orderOpen, setOrderOpen] = useState(false);
+  const orderQuoteRef = useRef(null);
+  const drawingRef = useRef(null);
   const { language } = useLanguage();
   const english = language === "en";
   const formatMeters = (value) => `${(value / 1000).toLocaleString(english ? "en-IE" : "pt-PT", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} m`;
@@ -293,6 +297,26 @@ export default function SimulatorRacks() {
     length,
     count: modules.filter((moduleLength) => moduleLength === length).length * levels * 2 * rowCount,
   }));
+  useEffect(() => {
+    const entries = [
+      { product: matchingFrame, quantity: (modules.length + 1) * rowCount },
+      ...[...new Set(modules)].map((length) => ({
+        product: beams.find((item) => item.length === length),
+        quantity: modules.filter((moduleLength) => moduleLength === length).length * levels * 2 * rowCount,
+      })),
+      { product: safetyBrake, quantity: modules.length * levels * 4 * rowCount },
+    ];
+    const format = (value) => (value / 1000).toLocaleString("pt-PT", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    const quote = {
+      items: createQuoteLines(entries, 2),
+      discountPercent: discountRate * 100,
+      total: discountedEstimate,
+      details: `Racks para paletes · Comprimento por fila: ${format(finalLength)} m · Comprimento total: ${format(finalLength * rowCount)} m · Altura: ${format(height)} m · Profundidade: ${format(depth)} m · Níveis: ${levels} · Filas: ${rowCount} · Vigas: ${beamDistribution.map(({ length, count }) => `${count} × ${format(length)} m`).join(", ")} · Carga máxima por par de vigas: ${capacityIsMinimum ? "> " : ""}${levelCapacity.toLocaleString("pt-PT")} kg`,
+      unavailable: isLengthUnavailable || !matchingFrame || modules.length === 0,
+    };
+    orderQuoteRef.current = quote;
+    onQuoteDataChange?.(quote);
+  }, [onQuoteDataChange, matchingFrame, modules, levels, rowCount, safetyBrake, discountRate, discountedEstimate, finalLength, height, depth, beamDistribution, capacityIsMinimum, levelCapacity, isLengthUnavailable]);
 
   function handleHeightChange(nextHeight) {
     const validDepths = unique(frames.filter((frame) => frame.height === nextHeight).map((frame) => frame.depth));
@@ -315,7 +339,7 @@ export default function SimulatorRacks() {
   }
 
   return (
-    <section className="min-h-screen bg-[#f8f8fa] px-4 py-12 sm:px-6 lg:px-10 lg:py-16">
+    <section ref={drawingRef} className="min-h-screen bg-[#f8f8fa] px-4 py-12 sm:px-6 lg:px-10 lg:py-16">
       <header className="mx-auto mb-9 max-w-[1800px] sm:mb-12">
         <p className="mb-3 mt-[35px] text-xs font-semibold uppercase tracking-[0.16em] text-[#6e6e73] lg:mt-5">{english ? "Configurator · Pallet racking" : "Configurador · Racks industriais"}</p>
         <h1 className="max-w-4xl text-4xl font-semibold leading-[1.05] tracking-[-0.045em] text-[#1d1d1f] sm:text-5xl lg:text-6xl">{english ? "Racking tailored to your operation." : "Racks à medida da sua operação."}</h1>
@@ -355,13 +379,14 @@ export default function SimulatorRacks() {
               <p className="col-span-2"><span className="block text-xs text-[#86868b]">{english ? "Beams by length" : "Vigas por medida"}</span><strong className="mt-0.5 block font-semibold text-[#1d1d1f]">{beamDistribution.map(({ length, count }) => `${count} × ${formatMeters(length)}`).join(" · ")}</strong></p>
               <p className="col-span-2 border-t border-[#e5e5e7] pt-2 text-[#6e6e73]">{english ? "Maximum load per beam pair" : "Carga máxima por par de vigas"} <strong className="font-semibold text-(--orange)">{capacityIsMinimum ? "> " : ""}{levelCapacity.toLocaleString(english ? "en-IE" : "pt-PT")} kg</strong></p>
             </div>}
-            <div className="mt-5 grid grid-cols-[1fr_auto] gap-3"><Link href="/orcamento" aria-disabled={isLengthUnavailable} onClick={(event) => { if (isLengthUnavailable) event.preventDefault(); }} className={`flex cursor-pointer items-center justify-center simulator-pill rounded-full bg-(--orange) px-4 py-3 text-sm font-semibold text-white shadow-sm transition hover:brightness-95 ${isLengthUnavailable ? "cursor-not-allowed opacity-50" : ""}`}>{english ? "Order" : "Encomendar"}</Link><button type="button" onClick={reset} className="cursor-pointer simulator-pill rounded-full border border-[#d2d2d7] bg-white px-4 py-3 text-sm font-semibold text-[#1d1d1f] transition hover:bg-[#f5f5f7]">{english ? "Reset" : "Recomeçar"}</button></div>
+            <div className="mt-5 grid grid-cols-[1fr_auto] gap-3"><button type="button" disabled={isLengthUnavailable} onClick={() => setOrderOpen(true)} className="flex cursor-pointer items-center justify-center simulator-pill rounded-full bg-(--orange) px-4 py-3 text-sm font-semibold text-white shadow-sm transition hover:brightness-95 disabled:cursor-not-allowed disabled:opacity-50">{english ? "Order" : "Encomendar"}</button><button type="button" onClick={reset} className="cursor-pointer simulator-pill rounded-full border border-[#d2d2d7] bg-white px-4 py-3 text-sm font-semibold text-[#1d1d1f] transition hover:bg-[#f5f5f7]">{english ? "Reset" : "Recomeçar"}</button></div>
           </div>
           <p className="mt-4 text-xs leading-relaxed text-[#86868b]">{english ? "VAT is added at the applicable rate. Delivery is not included. Configuration is subject to technical validation." : "Ao valor acresce IVA à taxa legal. Transporte não incluído. Configuração sujeita a validação técnica."}</p>
           {!matchingFrame && <p className="mt-3 rounded-[30px] bg-amber-50 p-3 text-sm text-amber-800">{english ? "No frame with this height and depth combination is available in catalogue ref. 2." : "Não existe um bastidor com esta combinação de altura e profundidade no catálogo ref. 2."}</p>}
         </div>
         {isLengthUnavailable ? <div className="order-1 min-w-0 rounded-[30px] border border-[#e5e5e7] bg-white p-7 shadow-[0_12px_40px_rgba(0,0,0,0.05)] lg:order-2"><h2 className="text-xl font-semibold tracking-tight text-[#1d1d1f]">{english ? "2D preview" : "Pré-visualização 2D"}</h2><p className="mt-4 rounded-[30px] bg-red-50 p-4 text-sm text-red-700">{english ? "Lengths over 30.00 m are not available." : "Comprimentos superiores a 30,00 m não estão disponíveis."}</p></div> : <div className="order-1 min-w-0 lg:order-2"><RackPreview modules={modules} height={height} levels={levels} rowCount={rowCount} capacityLabel={`${english ? "Maximum load per beam pair" : "Carga máxima por par de vigas"}: ${capacityIsMinimum ? "> " : ""}${levelCapacity.toLocaleString(english ? "en-IE" : "pt-PT")} kg`} solutions={solutions} selectedSolutionId={selectedSolutionId} onSelectSolution={setSelectedSolutionId} english={english} /></div>}
       </div>
+      <SimulatorOrderModal open={orderOpen} onClose={() => setOrderOpen(false)} total={orderQuoteRef.current?.total ?? discountedEstimate} details={orderQuoteRef.current?.details} items={orderQuoteRef.current?.items} discountPercent={orderQuoteRef.current?.discountPercent ?? discountRate * 100} drawingRef={drawingRef} english={english} />
     </section>
   );
 }

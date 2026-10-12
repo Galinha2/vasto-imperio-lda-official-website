@@ -1,12 +1,13 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useLanguage } from "@/components/header/LanguageContext";
-import Link from "next/link";
 import SimulatorDropdown from "@/components/simulador/SimulatorDropdown";
 import SimulatorConfigurationOptions from "@/components/simulador/SimulatorConfigurationOptions";
 import SimulatorSolutions, { buildSimilarSolutions } from "@/components/simulador/SimulatorSolutions";
 import SimulatorSectionTabs from "@/components/simulador/SimulatorSectionTabs";
+import SimulatorOrderModal from "@/components/simulador/SimulatorOrderModal";
+import createQuoteLines from "@/components/simulador/createQuoteLines";
 import budget from "@/assets/orcamento.json";
 
 const products = budget.produtos.filter((product) => product.ref === 1);
@@ -254,7 +255,10 @@ function ShelfPreview({ modules, height, depth, levels, rowCount, bracedIndexes,
   );
 }
 
-export default function SimulatorEstantesLigeiras() {
+export default function SimulatorEstantesLigeiras({ onQuoteDataChange }) {
+  const [orderOpen, setOrderOpen] = useState(false);
+  const orderQuoteRef = useRef(null);
+  const drawingRef = useRef(null);
   const { language } = useLanguage();
   const english = language === "en";
   const formatMeters = (value) => `${(value / 1000).toLocaleString(english ? "en-IE" : "pt-PT", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} m`;
@@ -317,6 +321,23 @@ export default function SimulatorEstantesLigeiras() {
     ), 0),
   })).filter(({ count }) => count > 0);
   const shelfCapacity = shelfProducts.length ? Math.min(...shelfProducts.map((item) => item?.capacity || 0)) : 0;
+  useEffect(() => {
+    const entries = [
+      { product: matchingFrame, quantity: frameCountPerRow * rowCount },
+      ...shelfDistribution.map(({ width, count }) => ({ product: productForWidth(shelves, width, depth), quantity: count })),
+      ...braceDistribution.map(({ width, count }) => ({ product: braces.find((item) => item.width === width), quantity: count })),
+    ];
+    const format = (value) => (value / 1000).toLocaleString("pt-PT", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    const quote = {
+      items: createQuoteLines(entries, 1),
+      discountPercent: discountRate * 100,
+      total: discountedEstimate,
+      details: `Estantes de carga ligeira · Comprimento por fila: ${format(finalLength)} m · Comprimento total: ${format(finalLength * rowCount)} m · Altura: ${format(height)} m · Profundidade: ${format(depth)} m · Níveis: ${levels} · Filas: ${rowCount} · Tabuleiros: ${shelfDistribution.map(({ width, count }) => `${count} × ${format(width)} m`).join(", ")} · Travamentos: ${braceDistribution.map(({ width, count }) => `${count} × ${format(width)} m`).join(", ") || "nenhum"} · Carga máxima por nível: ${shelfCapacity.toLocaleString("pt-PT")} kg`,
+      unavailable: isLengthUnavailable || !matchingFrame || modules.length === 0,
+    };
+    orderQuoteRef.current = quote;
+    onQuoteDataChange?.(quote);
+  }, [onQuoteDataChange, matchingFrame, frameCountPerRow, rowCount, shelfDistribution, braceDistribution, discountRate, discountedEstimate, finalLength, height, depth, levels, shelfCapacity, isLengthUnavailable, modules.length]);
 
   function reset() {
     setDesiredLength("1.00"); setRowCount(1); setSameShelfLength(false); setDesiredShelfLength(1000); setHeight(2000); setDepth(400); setLevels(4);
@@ -331,7 +352,7 @@ export default function SimulatorEstantesLigeiras() {
   }
 
   return (
-    <section className="min-h-screen bg-[#f8f8fa] px-4 py-12 sm:px-6 lg:px-10 lg:py-16">
+    <section ref={drawingRef} className="min-h-screen bg-[#f8f8fa] px-4 py-12 sm:px-6 lg:px-10 lg:py-16">
       <header className="mx-auto mb-9 max-w-[1800px] sm:mb-12">
         <p className="mb-3 mt-[35px] text-xs font-semibold uppercase tracking-[0.16em] text-[#6e6e73] lg:mt-5">{english ? "Configurator · Light-duty shelving" : "Configurador · Estantes ligeiras"}</p>
         <h1 className="max-w-4xl text-4xl font-semibold leading-[1.05] tracking-[-0.045em] text-[#1d1d1f] sm:text-5xl lg:text-6xl">{english ? "Shelving tailored to your space." : "Estantes à medida do seu espaço."}</h1>
@@ -355,11 +376,12 @@ export default function SimulatorEstantesLigeiras() {
 
           <div className="mt-7 border-t border-[#e5e5e7] pt-6"><p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#86868b]">{english ? "Price estimate" : "Estimativa de preço"}</p><div className="mt-1 flex flex-wrap items-baseline gap-x-2 gap-y-1"><p className="text-4xl font-semibold tracking-[-0.04em] text-(--orange)">{isLengthUnavailable ? (english ? "Unavailable" : "Indisponível") : formatPrice(discountedEstimate)}</p>{!isLengthUnavailable && <span className="text-sm font-medium text-[#86868b]">{english ? "+ VAT" : "+ IVA"}</span>}</div><p className="mt-1 text-sm text-[#6e6e73]">{english ? `Total price for ${rowCount} identical row${rowCount === 1 ? "" : "s"}.` : `Preço total para ${rowCount} ${rowCount === 1 ? "fila" : "filas"} iguais.`}</p>{discountRate > 0 && !isLengthUnavailable && <p className="mt-2 text-sm font-semibold text-[#0879C0]">{english ? `${discountRate * 100}% discount applied: −${formatPrice(discountAmount)}` : `Desconto de ${discountRate * 100}% aplicado: −${formatPrice(discountAmount)}`}</p>}
             {!isLengthUnavailable && <div className="mt-5 grid grid-cols-2 gap-x-4 gap-y-3 rounded-[30px] bg-[#f5f5f7] p-5 text-sm"><p className="col-span-2 flex items-baseline justify-between gap-2 border-b border-[#e5e5e7] pb-2"><span className="text-[#6e6e73]">{english ? "Total row length" : "Comprimento total das filas"}</span><strong className="font-semibold text-[#1d1d1f]">{formatMeters(finalLength * rowCount)}</strong></p><p><span className="block text-xs text-[#86868b]">{english ? "Length per row" : "Comprimento por fila"}</span><strong className="mt-0.5 block font-semibold text-[#1d1d1f]">{formatMeters(finalLength)}</strong></p><p><span className="block text-xs text-[#86868b]">{english ? "Height" : "Altura"}</span><strong className="mt-0.5 block font-semibold text-[#1d1d1f]">{formatMeters(height)}</strong></p><p><span className="block text-xs text-[#86868b]">{english ? "Depth" : "Profundidade"}</span><strong className="mt-0.5 block font-semibold text-[#1d1d1f]">{formatMeters(depth)}</strong></p><p><span className="block text-xs text-[#86868b]">{english ? "Module distribution" : "Distribuição dos módulos"}</span><strong className="mt-0.5 block font-semibold text-[#1d1d1f]">{widthDistribution.map(({ width, count }) => `${count} × ${formatMeters(width)}`).join(" · ")}</strong></p><p><span className="block text-xs text-[#86868b]">{english ? "Levels" : "Níveis"}</span><strong className="mt-0.5 block font-semibold text-[#1d1d1f]">{levels}</strong></p><p className="col-span-2"><span className="block text-xs text-[#86868b]">{english ? "Shelves by length" : "Tabuleiros por medida"}</span><strong className="mt-0.5 block font-semibold text-[#1d1d1f]">{shelfDistribution.map(({ width, count }) => `${count} × ${formatMeters(width)}`).join(" · ")}</strong></p><p className="col-span-2"><span className="block text-xs text-[#86868b]">{english ? "Braces by length" : "Travamentos por medida"}</span><strong className="mt-0.5 block font-semibold text-[#1d1d1f]">{braceDistribution.map(({ width, count }) => `${count} × ${formatMeters(width)}`).join(" · ") || (english ? "None" : "Nenhum")}</strong></p><p><span className="block text-xs text-[#86868b]">{english ? "Frames" : "Bastidores"}</span><strong className="mt-0.5 block font-semibold text-[#1d1d1f]">{frameCountPerRow * rowCount}</strong></p><p><span className="block text-xs text-[#86868b]">{english ? "Maximum load per level" : "Carga máxima por nível"}</span><strong className="mt-0.5 block font-semibold text-(--orange)">{shelfCapacity} kg</strong></p></div>}
-            <div className="mt-5 grid grid-cols-[1fr_auto] gap-3"><Link href="/orcamento" aria-disabled={isLengthUnavailable} onClick={(event) => { if (isLengthUnavailable) event.preventDefault(); }} className={`simulator-pill flex cursor-pointer items-center justify-center rounded-full bg-(--orange) px-4 py-3 text-sm font-semibold text-white shadow-sm transition hover:brightness-95 ${isLengthUnavailable ? "cursor-not-allowed opacity-50" : ""}`}>{english ? "Order" : "Encomendar"}</Link><button type="button" onClick={reset} className="simulator-pill cursor-pointer rounded-full border border-[#d2d2d7] bg-white px-4 py-3 text-sm font-semibold text-[#1d1d1f] transition hover:bg-[#f5f5f7]">{english ? "Reset" : "Recomeçar"}</button></div>
+            <div className="mt-5 grid grid-cols-[1fr_auto] gap-3"><button type="button" disabled={isLengthUnavailable} onClick={() => setOrderOpen(true)} className={`simulator-pill flex cursor-pointer items-center justify-center rounded-full bg-(--orange) px-4 py-3 text-sm font-semibold text-white shadow-sm transition hover:brightness-95 disabled:cursor-not-allowed disabled:opacity-50`}>{english ? "Order" : "Encomendar"}</button><button type="button" onClick={reset} className="simulator-pill cursor-pointer rounded-full border border-[#d2d2d7] bg-white px-4 py-3 text-sm font-semibold text-[#1d1d1f] transition hover:bg-[#f5f5f7]">{english ? "Reset" : "Recomeçar"}</button></div>
           </div><p className="mt-4 text-xs leading-relaxed text-[#86868b]">{english ? "VAT is added at the applicable rate. Delivery is not included. Configuration is subject to technical validation." : "Ao valor acresce IVA à taxa legal. Transporte não incluído. Configuração sujeita a validação técnica."}</p>
         </div>
         <div className="order-1 min-w-0 lg:order-2"><ShelfPreview modules={modules} height={height} depth={depth} levels={levels} rowCount={rowCount} bracedIndexes={bracedIndexes} capacityLabel={`${english ? "Maximum load per level" : "Carga máxima por nível"}: ${shelfCapacity.toLocaleString(english ? "en-IE" : "pt-PT")} kg`} solutions={solutions} selectedSolutionId={selectedSolutionId} onSelectSolution={setSelectedSolutionId} english={english}/></div>
       </div>
+      <SimulatorOrderModal open={orderOpen} onClose={() => setOrderOpen(false)} total={orderQuoteRef.current?.total ?? discountedEstimate} details={orderQuoteRef.current?.details} items={orderQuoteRef.current?.items} discountPercent={orderQuoteRef.current?.discountPercent ?? discountRate * 100} drawingRef={drawingRef} english={english} />
     </section>
   );
 }

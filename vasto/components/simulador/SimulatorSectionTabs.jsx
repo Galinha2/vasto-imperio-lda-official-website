@@ -34,7 +34,7 @@ export default function SimulatorSectionTabs({ group = "storage", active, lang =
   return (
     <nav
       aria-label={lang === "en" ? (group === "storage" ? "Shelving simulators" : "Materials handling equipment") : (group === "storage" ? "Simuladores de estantes" : "Equipamentos de movimentação de carga")}
-      className="mt-3 mb-2 flex w-full max-w-full overflow-hidden rounded-full border border-[#e5e5e7] bg-white p-1 shadow-[0_1px_5px_rgba(0,0,0,0.025)] sm:inline-flex sm:w-fit"
+      className="mt-3 mb-2 flex w-full max-w-full overflow-hidden rounded-full border border-[#e5e5e7] bg-white px-1 pt-1 pb-0 shadow-[0_1px_5px_rgba(0,0,0,0.025)] sm:inline-flex sm:w-fit"
     >
       <ul className="grid w-full min-w-0 grid-cols-3 items-stretch gap-0.5 sm:flex sm:w-auto sm:min-w-max sm:items-center">
         {options.map((option) => {

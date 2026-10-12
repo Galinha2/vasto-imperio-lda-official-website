@@ -8,12 +8,12 @@
         "url": "/"
       },
       {
-        "label": "Products",
-        "url": "/produtos"
-      },
-      {
         "label": "Simulate",
         "url": "/simulador"
+      },
+      {
+        "label": "Products",
+        "url": "/produtos"
       },
       {
         "label": "About Us",

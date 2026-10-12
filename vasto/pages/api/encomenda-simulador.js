@@ -51,7 +51,7 @@ export default async function handler(req, res) {
         <table style="width:100%;border-collapse:collapse;margin:24px 0">
           ${row("Nome", nome)}${row("NIF", nif)}${row("Morada fiscal", moradaFiscal)}${row("Morada de envio", shippingAddress)}${row("Montagem", montagem ? "Sim" : "Não")}${row("Telefone", telefone)}${row("Email", email)}${row("Observações", observacoes)}
         </table>
-        <h3 style="margin-bottom:8px">Lista técnica · uso interno PAPS &amp; DAPS</h3>
+        <h3 style="margin-bottom:8px">Lista técnica · uso interno Vasto Império</h3>
         <p style="white-space:pre-line;color:#424245">${escapeHtml(detalhes || "")}</p>
         <table style="width:100%;border-collapse:collapse;margin-top:14px">
           <thead><tr style="background:#f5f5f7;text-align:left"><th style="padding:8px">Ref.</th><th style="padding:8px">Artigo</th><th style="padding:8px;text-align:right">Qtd.</th><th style="padding:8px;text-align:right">Total</th></tr></thead>
@@ -71,7 +71,7 @@ export default async function handler(req, res) {
       from: process.env.SMTP_USER,
       to: "geral@vastoimperio.pt",
       replyTo: email,
-      subject: `${nome.trim()} | Encomenda do simulador`,
+      subject: `Encomenda do simulador | ${nome.trim()}`,
       html,
       attachments: [
         { filename: "desenho-estante.jpg", content: fs.readFileSync(uploadedImage.filepath), contentType: "image/jpeg" },

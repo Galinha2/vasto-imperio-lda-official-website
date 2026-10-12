@@ -54,7 +54,6 @@ export default function SimulatorOrderModal({ open, onClose, total, details, ite
         const dataUrl = await toJpeg(drawing, { pixelRatio, quality, backgroundColor: "#ffffff", cacheBust: true });
         return fetch(dataUrl).then((response) => response.blob());
       };
-      let drawingBlob = await createDrawing(0.9, 0.62);
       const budgetPdf = await generateBudgetPdf({
         linhas: items,
         descontoSelecionado: discountPercent,
@@ -66,11 +65,21 @@ export default function SimulatorOrderModal({ open, onClose, total, details, ite
       const orderData = JSON.stringify({ ...form, total, detalhes: details, artigos: items });
       const maxRequestBytes = 3.9 * 1024 * 1024;
       const multipartMarginBytes = 96 * 1024;
-      const estimateRequestBytes = () => drawingBlob.size + budgetPdf.size + new Blob([orderData]).size + multipartMarginBytes;
-      // Mantém uma margem para os limites de payload e o overhead do multipart na Vercel.
-      if (estimateRequestBytes() > maxRequestBytes) drawingBlob = await createDrawing(0.5, 0.38);
-      if (estimateRequestBytes() > maxRequestBytes) {
-        const sizeInMb = (estimateRequestBytes() / (1024 * 1024)).toLocaleString(english ? "en-IE" : "pt-PT", { maximumFractionDigits: 1 });
+      const fixedRequestBytes = budgetPdf.size + new Blob([orderData]).size + multipartMarginBytes;
+      const imageProfiles = [[2, 0.9], [1.6, 0.86], [1.3, 0.82], [1, 0.78]];
+      let drawingBlob = null;
+      let estimatedBytes = fixedRequestBytes;
+      // Começa com uma imagem nítida e reduz gradualmente apenas se o pedido se aproximar do limite da Vercel.
+      for (const [pixelRatio, quality] of imageProfiles) {
+        const candidate = await createDrawing(pixelRatio, quality);
+        estimatedBytes = fixedRequestBytes + candidate.size;
+        if (estimatedBytes <= maxRequestBytes) {
+          drawingBlob = candidate;
+          break;
+        }
+      }
+      if (!drawingBlob) {
+        const sizeInMb = (estimatedBytes / (1024 * 1024)).toLocaleString(english ? "en-IE" : "pt-PT", { maximumFractionDigits: 1 });
         throw new Error(english ? `The order files are ${sizeInMb} MB and exceed the upload limit. Please contact us to place this order.` : `Os ficheiros da encomenda ocupam ${sizeInMb} MB e excedem o limite de envio. Contacte-nos para concluir esta encomenda.`);
       }
       const payload = new FormData();

@@ -252,9 +252,9 @@ export default function SimulatorRacks({ onQuoteDataChange }) {
   const [rowCount, setRowCount] = useState(1);
   const [sameBeamLength, setSameBeamLength] = useState(false);
   const [desiredBeamLength, setDesiredBeamLength] = useState(String((beamLengths[0] || 1000) / 1000));
-  const [height, setHeight] = useState(1500);
+  const [height, setHeight] = useState(4000);
   const [depth, setDepth] = useState(1000);
-  const [levels, setLevels] = useState(2);
+  const [levels, setLevels] = useState(4);
   const [selectedSolutionId, setSelectedSolutionId] = useState("chosen");
   const enteredLength = Number(desiredLength);
   const isLengthUnavailable = enteredLength > 30;
@@ -333,9 +333,9 @@ export default function SimulatorRacks({ onQuoteDataChange }) {
     setRowCount(1);
     setSameBeamLength(false);
     setDesiredBeamLength(String((beamLengths[0] || 1000) / 1000));
-    setHeight(1500);
+    setHeight(4000);
     setDepth(1000);
-    setLevels(2);
+    setLevels(4);
   }
 
   return (

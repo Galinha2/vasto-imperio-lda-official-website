@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
-import Image from "next/image";
+import Image from "@/components/loadings/LoadingImage";
 import { IoIosArrowDown } from "react-icons/io";
 import { IoIosAdd } from "react-icons/io";
 import orcamento from "../../../assets/orcamento.json";
@@ -775,13 +775,15 @@ function Page() {
                             className="p-2 cursor-pointer rounded-[15px] hover:bg-gray-200 flex items-center gap-3"
                           >
                             <span className="text-sm w-5">{p.refCompleta}</span>
-                            <img
+                            <Image
                               src={
                                 p.image && p.image !== "/orcamento/.png"
                                   ? p.image
                                   : "/favicon.png"
                               }
                               alt={p.produto}
+                              width={32}
+                              height={32}
                               onError={(e) => {
                                 e.currentTarget.src = "/favicon.png";
                               }}

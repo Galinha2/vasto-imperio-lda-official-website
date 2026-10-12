@@ -61,7 +61,7 @@ export default function SimulatorDropdown({ label, value, onChange, options, for
   }, [open, updateScrollbar]);
 
   return (
-    <label className="block min-w-0 space-y-2">
+    <div className="block min-w-0 space-y-2">
       <span className="block text-sm font-semibold text-[#424245]">{label}</span>
       <div ref={dropdownRef} className="relative">
         <button
@@ -99,6 +99,6 @@ export default function SimulatorDropdown({ label, value, onChange, options, for
           </div>
         )}
       </div>
-    </label>
+    </div>
   );
 }

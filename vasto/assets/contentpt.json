@@ -12,8 +12,8 @@
         "url": "/produtos"
       },
       {
-        "label": "Orçamento",
-        "url": "/orcamento"
+        "label": "Simular",
+        "url": "/simulador"
       },
       {
         "label": "Sobre Nós",
@@ -64,7 +64,7 @@
         "simulation": "Simulador",
         "subTitle": [
           {
-            "text": "Stakers"
+            "text": "Stackers"
           },
           {
             "text": "Porta-Paletes Elétricos"
@@ -151,7 +151,7 @@
         { "image": "/orcamento/i1.png" },
         { "image": "/orcamento/i2.png" }
       ],
-      "description": "<span class='label'>Material:</span> Galvanizado ou RAL 5005 / 7035<br/><span class='label'>Peso Suportado:</span> 3300Kg par de vigas<br/><span class='label'>Altura dos Bastidores:</span>  2000 a 5500 mm <br/><span class='label'>Profundidade dos Bastidores:</span> 800 a 1100 mm. <br/><span class='label'>Comprimento das Vigas:</span> 2200 a 2750 mm. <br/><span class='label'>Descrição:</span> Bastidor metálico com sapata, indicado para sistemas de armazenagem e estruturas industriais. Fabricado em aço de elevada resistência, permite múltiplas configurações de altura e profundidade, adaptando-se a diferentes necessidades de carga e espaço. Disponível em acabamento galvanizado ou pintado, garantindo durabilidade e proteção anticorrosão em ambientes industriais.",
+      "description": "<span class='label'>Material:</span> Galvanizado ou RAL 5005 / 7035<br/><span class='label'>Peso suportado:</span> 3300 kg par de vigas<br/><span class='label'>Altura dos Bastidores:</span>  2000 a 5500 mm <br/><span class='label'>Profundidade dos Bastidores:</span> 800 a 1100 mm. <br/><span class='label'>Comprimento das Vigas:</span> 2200 a 2750 mm. <br/><span class='label'>Descrição:</span> Bastidor metálico com sapata, indicado para sistemas de armazenagem e estruturas industriais. Fabricado em aço de elevada resistência, permite múltiplas configurações de altura e profundidade, adaptando-se a diferentes necessidades de carga e espaço. Disponível em acabamento galvanizado ou pintado, garantindo durabilidade e proteção anticorrosão em ambientes industriais.",
       "galleryTitle": "Os nossos Clientes",
       "gallery": [
         "/produtos/1-Paleco/a1.jpeg",
@@ -167,7 +167,7 @@
       "faq": [
         {
           "q": "Qual a carga máxima suportada?",
-          "a": "Até 3300Kg por par de vigas, dependendo da configuração escolhida."
+          "a": "Até 3300 kg por par de vigas, dependendo da configuração escolhida."
         },
         {
           "q": "Que alturas estão disponíveis?",
@@ -206,7 +206,7 @@
       "faq": [
         {
           "q": "Qual a carga máxima suportada?",
-          "a": "Até 210Kg por tabuleiro ou nivel, dependendo da configuração escolhida."
+          "a": "Até 210 kg por tabuleiro ou nível, dependendo da configuração escolhida."
         },
         {
           "q": "Que alturas estão disponíveis?",
@@ -257,7 +257,7 @@
           "/produtos/1-Paleco/a8.jpg",
           "/produtos/1-Paleco/a9.jpg"
         ],
-        "description": "<span class='label'>Material:</span> Galvanizado ou RAL 5005 / 7035<br/><span class='label'>Peso Suportado:</span> 3300Kg par de vigas<br/><span class='label'>Altura dos Bastidores:</span>  2000 a 5500 mm <br/><span class='label'>Profundidade dos Bastidores:</span> 800 a 1100 mm. <br/><span class='label'>Comprimento das Vigas:</span> 2200 a 2750 mm. <br/><span class='label'>Descrição:</span> Bastidor metálico com sapata, indicado para sistemas de armazenagem e estruturas industriais. Fabricado em aço de elevada resistência, permite múltiplas configurações de altura e profundidade, adaptando-se a diferentes necessidades de carga e espaço. Disponível em acabamento galvanizado ou pintado, garantindo durabilidade e proteção anticorrosão em ambientes industriais.",
+        "description": "<span class='label'>Material:</span> Galvanizado ou RAL 5005 / 7035<br/><span class='label'>Peso suportado:</span> 3300 kg par de vigas<br/><span class='label'>Altura dos Bastidores:</span>  2000 a 5500 mm <br/><span class='label'>Profundidade dos Bastidores:</span> 800 a 1100 mm. <br/><span class='label'>Comprimento das Vigas:</span> 2200 a 2750 mm. <br/><span class='label'>Descrição:</span> Bastidor metálico com sapata, indicado para sistemas de armazenagem e estruturas industriais. Fabricado em aço de elevada resistência, permite múltiplas configurações de altura e profundidade, adaptando-se a diferentes necessidades de carga e espaço. Disponível em acabamento galvanizado ou pintado, garantindo durabilidade e proteção anticorrosão em ambientes industriais.",
         "tabela": [
           {
             "nome": "Bastidores",
@@ -432,7 +432,7 @@
           "/produtos/9-Porteco Z60/i17.jpg"
         ],
 
-        "description": "<span class='label'>Material:</span> Estrutura metálica de alta resistência.<br/><span class='label'>Capacidade de Carga:</span> Até 1000Kg por par de vigas.<br/><span class='label'>Altura dos Bastidores:</span> 2000 a 5500 mm.<br/><span class='label'>Profundidade dos Bastidores:</span> 400 a 1100 mm.<br/><span class='label'>Comprimento das Vigas:</span> 1000 a 2750 mm.<br/><span class='label'>Modelos de Viga:</span> Z60 ou Z100.<br/><span class='label'>Descrição:</span> Sistema de estantes metálicas robustas indicado para armazéns, oficinas e espaços de armazenamento. Estrutura modular com vigas de encaixe rápido, permitindo diferentes configurações de altura, profundidade e largura conforme as necessidades de carga e organização.",
+        "description": "<span class='label'>Material:</span> Estrutura metálica de alta resistência.<br/><span class='label'>Capacidade de carga:</span> Até 1000 kg por par de vigas.<br/><span class='label'>Altura dos Bastidores:</span> 2000 a 5500 mm.<br/><span class='label'>Profundidade dos Bastidores:</span> 400 a 1100 mm.<br/><span class='label'>Comprimento das Vigas:</span> 1000 a 2750 mm.<br/><span class='label'>Modelos de Viga:</span> Z60 ou Z100.<br/><span class='label'>Descrição:</span> Sistema de estantes metálicas robustas indicado para armazéns, oficinas e espaços de armazenamento. Estrutura modular com vigas de encaixe rápido, permitindo diferentes configurações de altura, profundidade e largura conforme as necessidades de carga e organização.",
         "tabela": [
           {
             "nome": "Bastidores",
@@ -539,7 +539,7 @@
           "/produtos/4-cacifos/a2.webp",
           "/produtos/4-cacifos/a3.webp"
         ],
-        "description": "<span class='label'>Portas:</span> Disponiveis com 3 e 6 portas<br/><span class='label'>Dimensões:</span> 1900 × 900 × 500 mm<br/><span class='label'>Descrição:</span> Cacifos homologados de acordo com a Norma Portuguesa NP 1116.<br/>Práticos, seguros e essenciais para organizar os seus pertences, estes cacifos são ideais para utilização em vestiários e espaços de armazenamento. Mantenha tudo arrumado com estes armários de qualidade."
+        "description": "<span class='label'>Portas:</span> Disponíveis com 3 e 6 portas<br/><span class='label'>Dimensões:</span> 1900 × 900 × 500 mm<br/><span class='label'>Descrição:</span> Cacifos homologados de acordo com a Norma Portuguesa NP 1116.<br/>Práticos, seguros e essenciais para organizar os seus pertences, estes cacifos são ideais para utilização em vestiários e espaços de armazenamento. Mantenha tudo arrumado com estes armários de qualidade."
       },
       {
         "id": "porta-paletes-eletrico",
@@ -557,7 +557,7 @@
           "/produtos/5-porta-paletes-eletrico/i7.png"
         ],
 
-        "description": "<span class='label'>Capacidade:</span> 1500 Kg<br/><span class='label'>Peso sem bateria:</span> 110 Kg<br/><span class='label'>Peso com bateria:</span> 116 Kg<br/><span class='label'>Voltagem:</span> 25.6 V<br/><span class='label'>Capacidade da bateria:</span> 20 Ah <span class='label'>Descrição:</span> O nosso porta-paletes elétrico de 1500 Kg é ideal para movimentação rápida e segura de cargas em armazéns, centros logísticos ou fábricas. Equipado com motor elétrico e bateria de alta capacidade, permite manobras precisas com esforço mínimo, aumentando a eficiência operacional e reduzindo o esforço do operador. A estrutura em aço reforçado garante robustez e durabilidade, enquanto o design ergonómico assegura conforto e segurança durante o transporte de cargas pesadas. Uma solução confiável para otimizar a logística interna e aumentar a produtividade."
+        "description": "<span class='label'>Capacidade:</span> 1500 kg<br/><span class='label'>Peso sem bateria:</span> 110 kg<br/><span class='label'>Peso com bateria:</span> 116 kg<br/><span class='label'>Voltagem:</span> 25,6 V<br/><span class='label'>Capacidade da bateria:</span> 20 Ah <span class='label'>Descrição:</span> O nosso porta-paletes elétrico de 1500 kg é ideal para movimentação rápida e segura de cargas em armazéns, centros logísticos ou fábricas. Equipado com motor elétrico e bateria de alta capacidade, permite manobras precisas com esforço mínimo, aumentando a eficiência operacional e reduzindo o esforço do operador. A estrutura em aço reforçado garante robustez e durabilidade, enquanto o design ergonómico assegura conforto e segurança durante o transporte de cargas pesadas. Uma solução fiável para otimizar a logística interna e aumentar a produtividade."
       },
       {
         "id": "porta-paletes-manual",
@@ -571,7 +571,7 @@
           "/produtos/6-porta-paletes-manual/i3.png"
         ],
 
-        "description": "<span class='label'>Capacidade:</span> 3000 Kg<br/><span class='label'>Descrição:</span> As nossas soluções de porta-paletes manuais de alta capacidade são ideais para movimentação e transporte seguro de cargas pesadas em armazéns, fábricas ou centros logísticos. Este modelo suporta até 3000 kg, garantindo robustez e fiabilidade, com estrutura reforçada em aço resistente. A operação é prática e eficiente, permitindo manobras precisas mesmo em espaços reduzidos. Um equipamento essencial para otimizar a logística interna e aumentar a produtividade, mantendo sempre a segurança do operador e das mercadorias."
+        "description": "<span class='label'>Capacidade:</span> 3000 kg<br/><span class='label'>Descrição:</span> As nossas soluções de porta-paletes manuais de alta capacidade são ideais para movimentação e transporte seguro de cargas pesadas em armazéns, fábricas ou centros logísticos. Este modelo suporta até 3000 kg, garantindo robustez e fiabilidade, com estrutura reforçada em aço resistente. A operação é prática e eficiente, permitindo manobras precisas mesmo em espaços reduzidos. Um equipamento essencial para otimizar a logística interna e aumentar a produtividade, mantendo sempre a segurança do operador e das mercadorias."
       },
       {
         "id": "arrumacao-vertical",
@@ -679,7 +679,7 @@
           "/produtos/13-Cantilever Ligeiro (Light Cantilever)/i11.jpg"
         ],
 
-        "description": "<span class='label'>Carga por braço:</span> até 40Kg distribuídos uniformemente (80Kg por par de braços).<br/><span class='label'>Descrição:</span> Cantilever ligeiro, para carga manual, tipologia simples (acesso apenas de um lado). Base aparafusada à coluna do cantilever, com furação para permitir a fixação ao solo. Ajuste da altura dos braços de 50mm em 50mm. Os braços apresentam topo anti-queda. Carga por braço: até 40Kg distribuídos uniformemente (80Kg por par de braços). Pilares e base com acabamento a pintura epoxy de cor azul, RAL 5005, braços em cinza claro, RAL 7035, travessas e diagonais galvanizadas. Inclui fixação ao solo. Dimensões: 800x400x2000mm (CxPxA) ou 800x500x2000mm (CxPxA).",
+        "description": "<span class='label'>Carga por braço:</span> até 40 kg distribuídos uniformemente (80 kg por par de braços).<br/><span class='label'>Descrição:</span> Cantilever ligeiro, para carga manual, tipologia simples (acesso apenas de um lado). Base aparafusada à coluna do cantilever, com furação para permitir a fixação ao solo. Ajuste da altura dos braços de 50mm em 50mm. Os braços apresentam topo anti-queda. Carga por braço: até 40 kg distribuídos uniformemente (80 kg por par de braços). Pilares e base com acabamento a pintura epoxy de cor azul, RAL 5005, braços em cinza claro, RAL 7035, travessas e diagonais galvanizadas. Inclui fixação ao solo. Dimensões: 800x400x2000mm (CxPxA) ou 800x500x2000mm (CxPxA).",
         "tabela": [
           {
             "nome": "CANTILEVER LIGEIRO PORTECO SIMPLES",
@@ -745,7 +745,7 @@
           "/produtos/10-Porteco Z100/i6.jpg"
         ],
 
-        "description": "<span class='label'>Capacidade:</span> Até 850Kg por nível.<br/><span class='label'>Descrição:</span> Sistema de armazenagem carga média, muito versátil e resistente. É a solução indicada para armazenar mercadorias pesadas e volumosas, que são movimentadas de forma manual. Disponível em duas versões: Z100 e Z60",
+        "description": "<span class='label'>Capacidade:</span> Até 850 kg por nível.<br/><span class='label'>Descrição:</span> Sistema de armazenagem carga média, muito versátil e resistente. É a solução indicada para armazenar mercadorias pesadas e volumosas, que são movimentadas de forma manual. Disponível em duas versões: Z100 e Z60",
         "tabela": [
           {
             "codigo": "PTLZ1000-100",
@@ -911,7 +911,7 @@
           "/produtos/12-Rangeco Plus/i16.jpg"
         ],
 
-        "description": "<span class='label'>Peso máx por nível:</span> Até 303kg <br/><span class='label'>Número máx de níveis:</span> Até 7 níveis <br/><span class='label'>Número de profundidades disponíveis:</span> Até 6 profundidades diferentes <br/><span class='label'>Número de comprimentos disponíveis:</span> Até 4 comprimentos diferentes <span class='label'>Altura máxima:</span> Até 3 metros <br/><span class='label'>Descrição:</span> A Rang'Eco Plus é uma solução robusta para cargas até 303 kgs por nível. Oferece maior capacidade e durabilidade, é ideal para armazéns, oficinas e instalações que necessitam de uma estrutura confiável."
+        "description": "<span class='label'>Peso máx por nível:</span> Até 303 kg <br/><span class='label'>Número máx de níveis:</span> Até 7 níveis <br/><span class='label'>Número de profundidades disponíveis:</span> Até 6 profundidades diferentes <br/><span class='label'>Número de comprimentos disponíveis:</span> Até 4 comprimentos diferentes <span class='label'>Altura máxima:</span> Até 3 metros <br/><span class='label'>Descrição:</span> A Rang'Eco Plus é uma solução robusta para cargas até 303 kg por nível. Oferece maior capacidade e durabilidade, é ideal para armazéns, oficinas e instalações que necessitam de uma estrutura fiável."
       },
       {
         "id": "bancadas",

@@ -1,16 +1,23 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Image from "next/image";
+import Image from "@/components/loadings/LoadingImage";
 import Link from "next/link";
 import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
 import { IoClose } from "react-icons/io5";
+
+const simulatorLinks = {
+  "racks-industriais": "/simulador/racks",
+  "estante-carga-ligeira": "/simulador/estantes-ligeiras",
+  "estantes-picking": "/simulador/pt/estantes-picking",
+};
 
 export default function GalleryClient({ product, text }) {
   const images = product.images?.length ? product.images : [product.image];
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const hasMultipleImages = images.length > 1;
+  const simulatorHref = simulatorLinks[product.id];
 
   const showImage = (index) => setCurrentImageIndex((index + images.length) % images.length);
   const handleNextImage = () => showImage(currentImageIndex + 1);
@@ -95,10 +102,18 @@ export default function GalleryClient({ product, text }) {
             className="product-description mt-5 text-sm leading-[1.75] text-[#55565c] sm:text-base"
             dangerouslySetInnerHTML={{ __html: product.description || "" }}
           />
-          <Link href="/contacto" className="mt-7 inline-flex min-h-12 cursor-pointer items-center justify-center gap-2 rounded-full bg-(--orange) px-6 py-3 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:bg-(--orange-hover) focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--orange)">
-            {text?.contacte || (text?.caracteristicas === "Características" ? "Pedir informações" : "Request information")}
-            <span aria-hidden="true">→</span>
-          </Link>
+          <div className="mt-7 flex flex-col items-stretch gap-3 sm:flex-row lg:flex-col">
+            {simulatorHref && (
+              <Link href={simulatorHref} className="inline-flex min-h-12 cursor-pointer items-center justify-center gap-2 rounded-full bg-(--orange) px-6 py-3 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:bg-(--orange-hover) focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--orange)">
+                {text?.caracteristicas === "Características" ? "Simular configuração" : "Configure in the simulator"}
+                <span aria-hidden="true">→</span>
+              </Link>
+            )}
+            <Link href="/contacto" className="inline-flex min-h-12 cursor-pointer items-center justify-center gap-2 rounded-full border border-[#d2d2d7] bg-white px-6 py-3 text-sm font-semibold text-[#1d1d1f] transition hover:bg-[#f5f5f7] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1d1d1f]">
+              {text?.contacte || (text?.caracteristicas === "Características" ? "Pedir informações" : "Request information")}
+              <span aria-hidden="true">→</span>
+            </Link>
+          </div>
         </aside>
       </div>
 

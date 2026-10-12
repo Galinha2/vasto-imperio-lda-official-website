@@ -1,6 +1,6 @@
 "use client";
 
-import Image from "next/image";
+import Image from "@/components/loadings/LoadingImage";
 import contentpt from "@/assets/contentpt.json";
 import contenten from "@/assets/contenten.json";
 import PageSelection from "./PageSelection";
@@ -43,21 +43,22 @@ export default function Header() {
 
   return (
     <div
-      className={`fixed top-0 left-0 w-full z-50 bg-[var(--gray)] py-1 shadow-md transition-transform duration-300 ${
+      className={`fixed left-0 top-0 z-50 w-full px-3 pt-2 transition-transform duration-300 sm:px-5 ${
         showHeader ? "translate-y-0" : "-translate-y-full"
       }`}
     >
-      <div className="max-w-450 m-auto flex items-center justify-between px-4">
-        <Link href="/home">
+      <div className="mx-auto flex h-14 max-w-[1320px] items-center justify-between rounded-full border border-white/70 bg-white/88 px-4 shadow-[0_8px_30px_rgba(29,29,31,0.08)] backdrop-blur-xl sm:px-6">
+        <Link href="/home" aria-label="Vasto Império — página inicial" className="flex shrink-0 items-center">
           <Image
             src={content.header.logo}
             alt="Vasto Império Logo"
-            width={80}
-            height={80}
+            width={68}
+            height={68}
             priority
+            className="h-12 w-12 object-contain sm:h-[52px] sm:w-[52px]"
           />
         </Link>
-        <div className="flex items-center gap-4">
+        <div className="flex items-center">
           {/* Menu Desktop */}
           <div className="hidden md:flex">
             <PageSelection />

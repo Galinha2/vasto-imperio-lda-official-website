@@ -89,26 +89,34 @@ export default function OrcamentoInputs() {
 
   if (!mounted) return null;
   return (
-    <div className="md:p-5 md:pt-30 w-full max-w-200 m-auto relative">
+    <div className="relative mx-auto flex w-full max-w-[1120px] flex-col items-center px-5 pb-16 pt-[96px] sm:px-8 sm:pb-20 sm:pt-[112px] lg:pb-24 lg:pt-[128px]">
       {isSubmitting && (
-        <div className="fixed inset-0 bg-white bg-opacity-50 flex items-center justify-center z-50">
-          <div className="flex flex-col items-center justify-center gap-5">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-white/75 backdrop-blur-sm">
+          <div className="flex flex-col items-center justify-center gap-5 rounded-[28px] border border-[#e5e5e7] bg-white px-10 py-8 shadow-xl">
             <Spinner />
-            <p className="text-(--orange) font-medium text-[1.2em]">
-              {item.send}
-            </p>
+            <p className="text-base font-semibold text-[#1d1d1f]">{item.send}</p>
           </div>
         </div>
       )}
-      <h1 className="title mb-5 text-center">{item.title}</h1>
+      <header className="mx-auto mb-9 max-w-3xl text-center sm:mb-12">
+        <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-(--orange)">{language === "pt" ? "Orçamento gratuito · Sem compromisso" : "Free quote · No obligation"}</p>
+        <h1 className="mt-5 text-4xl font-semibold leading-[1.04] tracking-[-0.055em] text-[#1d1d1f] sm:text-5xl lg:text-6xl">{item.title}</h1>
+        <p className="mx-auto mt-5 max-w-2xl text-base leading-relaxed text-[#6e6e73] sm:text-lg">
+          {language === "pt" ? "Conte-nos o que precisa. A nossa equipa ajuda a encontrar a solução certa para o seu espaço." : "Tell us what you need. Our team will help you find the right solution for your space."}
+        </p>
+      </header>
       <div
         id="orcamento-form"
-        className="p-5 bg-white md:bg-(--gray) w-auto md:rounded-[35px] flex gap-5 flex-col"
+        className="flex w-full max-w-[960px] flex-col gap-5 sm:gap-6"
         autoComplete="off"
       >
-        <div className="flex gap-5">
+        <div className="mb-1 pb-1">
+          <h2 className="text-xl font-semibold tracking-[-0.035em] text-[#1d1d1f]">{language === "pt" ? "Conte-nos o que procura" : "Tell us what you need"}</h2>
+          <p className="mt-1.5 text-sm leading-6 text-[#6e6e73]">{language === "pt" ? "Preencha os seus dados e descreva o projeto." : "Add your contact details and describe your project."}</p>
+        </div>
+        <div className="grid gap-4 sm:grid-cols-2 sm:gap-5">
           <input
-            className="input"
+            className="input border border-[#e5e5e7] bg-white px-5 py-4 text-base text-[#1d1d1f] shadow-sm outline-none transition placeholder:text-[#929299] focus:border-(--blue) focus:ring-4 focus:ring-[#0879c0]/10"
             type="text"
             name="name"
             placeholder={item.nome}
@@ -117,7 +125,7 @@ export default function OrcamentoInputs() {
             onChange={handleInputChange}
           />
           <input
-            className="input"
+            className="input border border-[#e5e5e7] bg-white px-5 py-4 text-base text-[#1d1d1f] shadow-sm outline-none transition placeholder:text-[#929299] focus:border-(--blue) focus:ring-4 focus:ring-[#0879c0]/10"
             type="tel"
             name="phone"
             placeholder={item.phone}
@@ -127,7 +135,7 @@ export default function OrcamentoInputs() {
           />
         </div>
         <input
-          className="input"
+          className="input border border-[#e5e5e7] bg-white px-5 py-4 text-base text-[#1d1d1f] shadow-sm outline-none transition placeholder:text-[#929299] focus:border-(--blue) focus:ring-4 focus:ring-[#0879c0]/10"
           type="email"
           name="email"
           placeholder={item.mail}
@@ -136,7 +144,7 @@ export default function OrcamentoInputs() {
           onChange={handleInputChange}
         />
         <textarea
-          className="h-70 pt-5 input resize-none align-top"
+          className="input min-h-[190px] resize-y border border-[#e5e5e7] bg-white px-5 py-4 text-base text-[#1d1d1f] shadow-sm outline-none transition placeholder:text-[#929299] focus:border-(--blue) focus:ring-4 focus:ring-[#0879c0]/10"
           name="body"
           placeholder={item.body}
           required
@@ -144,9 +152,9 @@ export default function OrcamentoInputs() {
           onChange={handleInputChange}
         />
         {files.length < 3 && (
-          <label className="bg-white shadow-sm px-5 py-2 rounded-full w-fit cursor-pointer">
-            <div>
-              <FiUpload className="inline mr-2" />
+          <label className="flex w-fit cursor-pointer items-center gap-2 rounded-full border border-[#e5e5e7] bg-[#f5f5f7] px-5 py-3 text-sm font-semibold text-[#424245] transition hover:bg-[#eceef2]">
+            <div className="flex items-center gap-2">
+              <FiUpload aria-hidden="true" />
               {item.anexo}
             </div>
             <input
@@ -176,25 +184,26 @@ export default function OrcamentoInputs() {
           </label>
         )}
         {fileError && (
-          <div className="text-red-500 text-sm mb-2">{fileError}</div>
+          <div role="alert" className="mb-2 rounded-2xl bg-red-50 px-4 py-3 text-sm text-red-600">{fileError}</div>
         )}
 
         {formError && (
-          <div className="text-red-500 text-sm mb-2">{formError}</div>
+          <div role="alert" className="mb-2 rounded-2xl bg-red-50 px-4 py-3 text-sm text-red-600">{formError}</div>
         )}
 
         <div className="flex flex-wrap gap-5">
           {files.map((file, index) => (
             <div
               key={index}
-              className="flex items-center gap-3 bg-white shadow-sm px-5 py-2 rounded-full w-fit"
+              className="flex w-fit items-center gap-3 rounded-full border border-[#e5e5e7] bg-[#f5f5f7] px-4 py-2.5"
             >
               <span className="text-sm max-w-[200px] truncate">
                 {file.name}
               </span>
               <button
                 type="button"
-                className="text-(--orange) font-bold"
+                aria-label={`Remover ${file.name}`}
+                className="cursor-pointer rounded-full p-1 text-(--orange) transition hover:bg-white"
                 onClick={() => {
                   setFiles((prev) => prev.filter((_, i) => i !== index));
                 }}
@@ -207,7 +216,7 @@ export default function OrcamentoInputs() {
 
         <button
           type="button"
-          className="-mt-5 bg-(--orange) text-white px-5 py-2 rounded-full shadow-md w-fit cursor-pointer self-end"
+          className="mt-1 inline-flex min-h-12 w-full cursor-pointer items-center justify-center rounded-full bg-(--orange) px-7 py-3 text-sm font-semibold text-white shadow-[0_8px_20px_rgba(255,85,0,0.2)] transition hover:-translate-y-0.5 hover:bg-(--orange-hover) disabled:cursor-wait disabled:opacity-60 sm:w-fit sm:self-end"
           disabled={isSubmitting}
           onClick={handleSubmit}
         >

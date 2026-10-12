@@ -3,7 +3,7 @@
 import contentpt from "@/assets/contentpt.json";
 import contenten from "@/assets/contenten.json";
 import { useLanguage } from "../header/LanguageContext";
-import Image from "next/image";
+import Image from "@/components/loadings/LoadingImage";
 import Link from "next/link";
 
 export default function Products() {

@@ -1,5 +1,5 @@
 "use client";
-import Image from "next/image";
+import Image from "@/components/loadings/LoadingImage";
 
 export default function GalleryScroll({ images }) {
   if (!images || images.length === 0) return null;

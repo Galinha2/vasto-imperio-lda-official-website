@@ -10,24 +10,12 @@ export const metadata = {
 
 export default function Orcamento() {
   return (
-    <main className="relative z-0 pt-30 md:pt-20 w-full min-h-full mt-17 overflow-hidden">
-      
-      {/* Background rodado 180° */}
-      <div
-        className="absolute inset-0 -z-10"
-        style={{
-          backgroundImage: "url('/Background.png')",
-          backgroundRepeat: "no-repeat",
-          backgroundSize: "cover",
-          backgroundPosition: "bottom",
-          transform: "rotate(180deg)",
-        }}
-      />
-
-      {/* Conteúdo normal */}
-      <OrcamentoInputs />
-      <div className="border-t border-(--horizontal-line) mt-15 pt-15">
-        <ContactCard />
+    <main className="min-h-screen w-full overflow-hidden bg-[#f5f5f7]">
+      <div>
+        <OrcamentoInputs />
+        <div className="border-t border-[#e5e5e7]">
+          <ContactCard />
+        </div>
       </div>
     </main>
   );

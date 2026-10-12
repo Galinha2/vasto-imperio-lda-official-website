@@ -8,9 +8,9 @@ export const metadata = {
 
 function page() {
     return (
-        <div className="mt-25">
+        <div className="bg-[#f5f5f7] pt-[76px]">
             <ContactHeader />
-            <ContactCard />
+            <ContactCard wide />
         </div>
     )
 }

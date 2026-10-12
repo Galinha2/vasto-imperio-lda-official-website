@@ -48,6 +48,8 @@ export default function RootLayout({ children }) {
     <html lang="pt">
       <head>
         <link rel="icon" href="/favicon.ico" />
+        <meta name="color-scheme" content="only light" />
+        <meta name="theme-color" content="#ffffff" />
       </head>
       <body className={`${interTight.variable} min-h-screen flex flex-col antialiased`}>
         <LanguageProvider>

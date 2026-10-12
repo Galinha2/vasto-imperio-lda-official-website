@@ -1,10 +1,12 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { useLanguage } from "@/components/header/LanguageContext";
 import Link from "next/link";
 import SimulatorDropdown from "@/components/simulador/SimulatorDropdown";
 import SimulatorConfigurationOptions from "@/components/simulador/SimulatorConfigurationOptions";
 import SimulatorSolutions, { buildSimilarSolutions } from "@/components/simulador/SimulatorSolutions";
+import SimulatorSectionTabs from "@/components/simulador/SimulatorSectionTabs";
 import budget from "@/assets/orcamento.json";
 
 const products = budget.produtos.filter((product) => product.ref === 1);
@@ -132,7 +134,8 @@ function buildModules(targetLength, sameWidth, selectedWidth, { height, depth, l
   return bestModules;
 }
 
-function ShelfPreview({ modules, height, depth, levels, rowCount, bracedIndexes, solutions, selectedSolutionId, onSelectSolution }) {
+function ShelfPreview({ modules, height, depth, levels, rowCount, bracedIndexes, capacityLabel, solutions, selectedSolutionId, onSelectSolution, english }) {
+  const formatMeters = (value) => `${(value / 1000).toLocaleString(english ? "en-IE" : "pt-PT", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} m`;
   const svgWidth = 1200;
   const bottom = 440;
   const totalLength = modules.reduce((sum, value) => sum + value, 0);
@@ -157,17 +160,17 @@ function ShelfPreview({ modules, height, depth, levels, rowCount, bracedIndexes,
   return (
     <div className="min-w-0 rounded-[30px] border border-[#e5e5e7] bg-white p-5 shadow-[0_12px_40px_rgba(0,0,0,0.05)] sm:p-7 md:p-9">
       <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
-        <div><p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#86868b]">Visualização</p><h2 className="mt-1 text-xl font-semibold tracking-tight text-[#1d1d1f]">Pré-visualização 2D</h2></div>
-        <span className="simulator-pill rounded-full bg-[#f5f5f7] px-3 py-1.5 text-right text-sm font-medium text-[#6e6e73]">{modules.length} módulo(s) · {levels} níveis · {rowCount} {rowCount === 1 ? "fila" : "filas"}</span>
+        <div><p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#86868b]">{english ? "Preview" : "Visualização"}</p><h2 className="mt-1 text-xl font-semibold tracking-tight text-[#1d1d1f]">{english ? "2D preview" : "Pré-visualização 2D"}</h2></div>
+        <span className="simulator-pill rounded-full bg-[#f5f5f7] px-3 py-1.5 text-right text-sm font-medium text-[#6e6e73]">{modules.length} {english ? "module(s)" : "módulo(s)"} · {levels} {english ? "levels" : "níveis"} · {rowCount} {rowCount === 1 ? (english ? "row" : "fila") : (english ? "rows" : "filas")}</span>
       </div>
       <div className="w-full overflow-hidden">
-        <svg viewBox={`0 0 ${svgWidth} 520`} role="img" aria-label={`Vista frontal de estantes ligeiras com ${modules.length} módulos, ${formatMeters(height)} de altura e ${levels} níveis`} className="h-auto w-full">
+        <svg viewBox={`0 0 ${svgWidth} 545`} role="img" aria-label={english ? `Front view of light-duty shelving with ${modules.length} modules, ${formatMeters(height)} high and ${levels} levels` : `Vista frontal de estantes ligeiras com ${modules.length} módulos, ${formatMeters(height)} de altura e ${levels} níveis`} className="h-auto w-full">
           <defs>
             <linearGradient id="lightFrame" x1="0" x2="1" y1="0" y2="0"><stop offset="0" stopColor="#b8bdc3"/><stop offset="0.28" stopColor="#f4f5f6"/><stop offset="0.55" stopColor="#d5d9dd"/><stop offset="1" stopColor="#aeb4ba"/></linearGradient>
             <linearGradient id="lightShelf" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stopColor="#f8f9fa"/><stop offset="0.36" stopColor="#dfe2e5"/><stop offset="1" stopColor="#c4c9ce"/></linearGradient>
           </defs>
-          <text x="70" y="32" fill="#555" fontSize="18" fontWeight="600">Vista frontal · Comprimento total: {formatMeters(totalLength)}</text>
-          <text x={svgWidth - 70} y="32" textAnchor="end" fill="#555" fontSize="18" fontWeight="600">Altura: {formatMeters(height)}</text>
+          <text x="70" y="32" fill="#555" fontSize="18" fontWeight="600">{english ? "Front view · Total length: " : "Vista frontal · Comprimento total: "}{formatMeters(totalLength)}</text>
+          <text x={svgWidth - 70} y="32" textAnchor="end" fill="#555" fontSize="18" fontWeight="600">{english ? "Height: " : "Altura: "}{formatMeters(height)}</text>
           <line x1={left} y1={top - 17} x2={right} y2={top - 17} stroke="#a6a6a6" strokeWidth="2"/><line x1={left} y1={top - 22} x2={left} y2={top - 12} stroke="#a6a6a6" strokeWidth="2"/><line x1={right} y1={top - 22} x2={right} y2={top - 12} stroke="#a6a6a6" strokeWidth="2"/>
           <text x={(left + right) / 2} y={top - 24} textAnchor="middle" fill="#666" fontSize="16" fontWeight="600">{formatMeters(totalLength)}</text>
           <line x1={left - 30} y1={top} x2={left - 30} y2={bottom} stroke="#a6a6a6" strokeWidth="2"/><line x1={left - 36} y1={top} x2={left - 24} y2={top} stroke="#a6a6a6" strokeWidth="2"/><line x1={left - 36} y1={bottom} x2={left - 24} y2={bottom} stroke="#a6a6a6" strokeWidth="2"/>
@@ -241,17 +244,21 @@ function ShelfPreview({ modules, height, depth, levels, rowCount, bracedIndexes,
               <text x={dimensionX + 8} y={gapCenter + 4} fill="#666" fontSize="13">{formatMeters(clearHeight)}</text>
             </g>;
           })}
-          <g transform="translate(70 505)" fontSize="13" fill="#777"><rect width="9" height="9" rx="1" fill="#c5cbd0"/><text x="15" y="9">Bastidores</text><rect x="118" width="9" height="9" rx="1" fill="#e3e6e9"/><text x="133" y="9">Tabuleiros</text><path d="M 238 1 L 247 9 M 238 9 L 247 1" stroke="#92999f" strokeWidth="2"/><text x="254" y="9">Travamentos</text></g>
+          <text x={svgWidth - 70} y="505" textAnchor="end" fill="#ff5500" fontSize="15" fontWeight="700">{capacityLabel}</text>
+          <g transform="translate(70 530)" fontSize="13" fill="#777"><rect width="9" height="9" rx="1" fill="#c5cbd0"/><text x="15" y="9">{english ? "Frame" : "Bastidor"}</text><rect x="105" width="9" height="9" rx="1" fill="#e3e6e9"/><text x="120" y="9">{english ? "Shelf" : "Tabuleiro"}</text><path d="M 220 1 L 229 9 M 220 9 L 229 1" stroke="#92999f" strokeWidth="2"/><text x="236" y="9">{english ? "Brace" : "Travamento"}</text></g>
         </svg>
       </div>
-      <p className="mt-2 text-xs leading-relaxed text-[#86868b] sm:text-sm">Cada módulo leva um tabuleiro por nível. Nas filas ímpares, os travamentos alternam entre um módulo com e outro sem; a partir de 3,00 m de altura, as extremidades travadas recebem três travamentos. Nas filas pares com seis ou mais módulos, travam-se as extremidades, o 3.º e o antepenúltimo; se houver três módulos consecutivos sem travamento, acrescenta-se um no centro desse intervalo.</p>
-      <p className="mt-1 text-xs text-[#86868b]">Profundidade selecionada: {formatMeters(depth)}</p>
+      <p className="mt-2 text-xs leading-relaxed text-[#86868b] sm:text-sm">{english ? "Each level includes one shelf. The marked braces reinforce the structure." : "Cada nível inclui um tabuleiro. Os travamentos assinalados reforçam a estrutura."}</p>
       <SimulatorSolutions solutions={solutions} selectedId={selectedSolutionId} onSelect={onSelectSolution} />
     </div>
   );
 }
 
 export default function SimulatorEstantesLigeiras() {
+  const { language } = useLanguage();
+  const english = language === "en";
+  const formatMeters = (value) => `${(value / 1000).toLocaleString(english ? "en-IE" : "pt-PT", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} m`;
+  const formatPrice = (value) => new Intl.NumberFormat(english ? "en-IE" : "pt-PT", { style: "currency", currency: "EUR" }).format(value);
   const [desiredLength, setDesiredLength] = useState("1.00");
   const [rowCount, setRowCount] = useState(1);
   const [sameShelfLength, setSameShelfLength] = useState(false);
@@ -275,7 +282,7 @@ export default function SimulatorEstantesLigeiras() {
       return sum + priceOf(shelf) * levels + priceOf(braces.find((item) => item.width === width)) * braceCount;
     }, 0);
     const gross = (frameCost + moduleCost) * rowCount;
-    const rate = gross >= 2600 ? 0.15 : gross >= 1600 ? 0.10 : gross >= 500 ? 0.05 : 0;
+    const rate = gross >= 2600 ? 0.15 : gross >= 1900 ? 0.10 : gross >= 1000 ? 0.05 : 0;
     return gross * (1 - rate);
   };
   const solutions = useMemo(() => buildSimilarSolutions(baseModules, targetLength, {
@@ -291,19 +298,24 @@ export default function SimulatorEstantesLigeiras() {
   const bracedIndexes = useMemo(() => bracedBayIndexes(modules.length), [modules.length]);
   const shelfProducts = modules.map((width) => productForWidth(shelves, width, depth));
   const frameCountPerRow = modules.length + 1;
-  const shelfCountPerRow = modules.length * levels;
-  const braceCountPerRow = bracedIndexes.reduce((sum, index) => sum + bracesInBay(index, modules.length, height), 0);
   const estimatePerRow = priceOf(matchingFrame) * frameCountPerRow + modules.reduce((sum, width, index) => {
     const braceCount = bracedIndexes.includes(index) ? bracesInBay(index, modules.length, height) : 0;
     const braceProduct = braces.find((item) => item.width === width);
     return sum + priceOf(shelfProducts[index]) * levels + priceOf(braceProduct) * braceCount;
   }, 0);
   const estimate = estimatePerRow * rowCount;
-  const discountRate = estimate >= 2600 ? 0.15 : estimate >= 1600 ? 0.10 : estimate >= 500 ? 0.05 : 0;
+  const discountRate = estimate >= 2600 ? 0.15 : estimate >= 1900 ? 0.10 : estimate >= 1000 ? 0.05 : 0;
   const discountAmount = estimate * discountRate;
   const discountedEstimate = estimate - discountAmount;
   const finalLength = modules.reduce((sum, value) => sum + value, 0);
   const widthDistribution = widths.map((width) => ({ width, count: modules.filter((item) => item === width).length })).filter((item) => item.count > 0);
+  const shelfDistribution = widthDistribution.map(({ width, count }) => ({ width, count: count * levels * rowCount }));
+  const braceDistribution = widthDistribution.map(({ width }) => ({
+    width,
+    count: modules.reduce((sum, moduleWidth, index) => (
+      sum + (moduleWidth === width && bracedIndexes.includes(index) ? bracesInBay(index, modules.length, height) * rowCount : 0)
+    ), 0),
+  })).filter(({ count }) => count > 0);
   const shelfCapacity = shelfProducts.length ? Math.min(...shelfProducts.map((item) => item?.capacity || 0)) : 0;
 
   function reset() {
@@ -321,29 +333,32 @@ export default function SimulatorEstantesLigeiras() {
   return (
     <section className="min-h-screen bg-[#f8f8fa] px-4 py-12 sm:px-6 lg:px-10 lg:py-16">
       <header className="mx-auto mb-9 max-w-[1800px] sm:mb-12">
-        <p className="mb-3 mt-[35px] text-xs font-semibold uppercase tracking-[0.16em] text-[#6e6e73] lg:mt-5">Configurador · Estantes ligeiras</p>
-        <h1 className="max-w-4xl text-4xl font-semibold leading-[1.05] tracking-[-0.045em] text-[#1d1d1f] sm:text-5xl lg:text-6xl">Estantes à medida do seu espaço.</h1>
-        <p className="mt-4 max-w-2xl text-base leading-relaxed text-[#6e6e73] sm:text-lg">Configure a altura, profundidade e comprimento da sua fila. A estimativa usa os preços dos produtos ligeiros do catálogo.</p>
-        <div className="flex flex-wrap gap-x-5 gap-y-2"><Link href="/simulador" className="mt-4 inline-flex cursor-pointer items-center gap-2 text-sm font-semibold text-[#0071e3] hover:underline">Simulador de picking <span aria-hidden="true">→</span></Link><Link href="/simulador/racks" className="mt-4 inline-flex cursor-pointer items-center gap-2 text-sm font-semibold text-[#0071e3] hover:underline">Simulador de racks <span aria-hidden="true">→</span></Link></div>
+        <p className="mb-3 mt-[35px] text-xs font-semibold uppercase tracking-[0.16em] text-[#6e6e73] lg:mt-5">{english ? "Configurator · Light-duty shelving" : "Configurador · Estantes ligeiras"}</p>
+        <h1 className="max-w-4xl text-4xl font-semibold leading-[1.05] tracking-[-0.045em] text-[#1d1d1f] sm:text-5xl lg:text-6xl">{english ? "Shelving tailored to your space." : "Estantes à medida do seu espaço."}</h1>
+        <p className="mt-4 max-w-2xl text-base leading-relaxed text-[#6e6e73] sm:text-lg">{english ? "Set the height, depth and length of your row. The estimate uses prices from the light-duty product catalogue." : "Configure a altura, profundidade e comprimento da sua fila. A estimativa usa os preços dos produtos ligeiros do catálogo."}</p>
       </header>
+      <div className="mx-auto grid max-w-[1800px] gap-5 lg:grid-cols-[minmax(360px,0.78fr)_minmax(0,1.75fr)] xl:gap-7">
+        <div className="flex justify-start"><SimulatorSectionTabs group="storage" active="ligeiras" /></div>
+        <div className="hidden lg:block" aria-hidden="true" />
+      </div>
 
       <div className="mx-auto grid max-w-[1800px] items-start gap-5 lg:grid-cols-[minmax(360px,0.78fr)_minmax(0,1.75fr)] xl:gap-7">
         <div className="order-2 w-full rounded-[30px] border border-[#e5e5e7] bg-white p-5 shadow-[0_12px_40px_rgba(0,0,0,0.05)] sm:p-7 lg:order-1 lg:p-8">
-          <div className="mb-6"><p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#86868b]">1 · Configuração</p><h2 className="mt-1 text-2xl font-semibold tracking-tight text-[#1d1d1f]">Escolha as medidas</h2></div>
+          <div className="mb-6"><p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#86868b]">{english ? "1 · Configuration" : "1 · Configuração"}</p><h2 className="mt-1 text-2xl font-semibold tracking-tight text-[#1d1d1f]">{english ? "Choose dimensions" : "Escolha as medidas"}</h2></div>
           <div className="grid grid-cols-1 gap-x-4 gap-y-5 sm:grid-cols-2">
-            <label className="block min-w-0 space-y-2 sm:col-span-2"><span className="block text-sm font-semibold text-[#424245]">Comprimento pretendido por fila (m)</span><div className="simulator-pill flex items-center rounded-full border border-[#d2d2d7] bg-[#fbfbfd] px-5 transition focus-within:border-[#0071e3] focus-within:ring-4 focus-within:ring-[#0071e3]/10"><input type="text" inputMode="decimal" value={desiredLength} onClick={(event) => event.currentTarget.select()} onChange={(event) => setDesiredLength(event.target.value.slice(0, 6))} onBlur={() => { const value = Number(desiredLength); if (value > 0) setDesiredLength(value.toFixed(2)); }} className="w-full bg-transparent py-3.5 text-[15px] font-medium text-[#1d1d1f] outline-none" aria-label="Comprimento pretendido por fila em metros"/><span className="text-sm font-medium text-[#86868b]">m</span></div>{isLengthUnavailable && <span className="mt-1 block text-sm font-medium text-red-600">Comprimentos superiores a 30,00 m não estão disponíveis.</span>}</label>
-            <SimulatorDropdown label="Altura do bastidor (m)" value={height} onChange={changeHeight} options={unique(frames.filter((item) => item.depth === depth).map((item) => item.height))} format={formatMeters}/>
-            <SimulatorDropdown label="Profundidade (m)" value={depth} onChange={changeDepth} options={unique(frames.filter((item) => item.height === height).map((item) => item.depth))} format={formatMeters}/>
-            <SimulatorDropdown label="N.º de níveis" value={levels} onChange={setLevels} options={levelOptions}/>
-            <SimulatorConfigurationOptions rowCount={rowCount} onRowCountChange={setRowCount} sameBeamLength={fixedShelfLength} onSameBeamLengthChange={setSameShelfLength} desiredBeamLength={desiredShelfLength} onDesiredBeamLengthChange={setDesiredShelfLength} sameLengthToggleLabel="Tabuleiros do mesmo comprimento" sameLengthSelectLabel="Comprimento dos tabuleiros (m)" sameLengthOptions={widths} sameLengthFormat={formatMeters} automaticLengthMessage="Com esta opção desligada, o cálculo pode combinar tabuleiros de 0,75 m e 1,00 m para aproximar o comprimento pedido."/>
+            <label className="block min-w-0 space-y-2 sm:col-span-2"><span className="block text-sm font-semibold text-[#424245]">{english ? "Desired length per row (m)" : "Comprimento pretendido por fila (m)"}</span><div className="simulator-pill flex items-center rounded-full border border-[#d2d2d7] bg-[#fbfbfd] px-5 transition focus-within:border-[#0071e3] focus-within:ring-4 focus-within:ring-[#0071e3]/10"><input type="text" inputMode="decimal" value={desiredLength} onClick={(event) => event.currentTarget.select()} onChange={(event) => setDesiredLength(event.target.value.slice(0, 6))} onBlur={() => { const value = Number(desiredLength); if (value > 0) setDesiredLength(value.toFixed(2)); }} className="w-full bg-transparent py-3.5 text-[15px] font-medium text-[#1d1d1f] outline-none" aria-label={english ? "Desired length per row in metres" : "Comprimento pretendido por fila em metros"}/><span className="text-sm font-medium text-[#86868b]">m</span></div>{isLengthUnavailable && <span className="mt-1 block text-sm font-medium text-red-600">{english ? "Lengths over 30.00 m are not available." : "Comprimentos superiores a 30,00 m não estão disponíveis."}</span>}</label>
+            <SimulatorDropdown label={english ? "Frame height (m)" : "Altura do bastidor (m)"} value={height} onChange={changeHeight} options={unique(frames.filter((item) => item.depth === depth).map((item) => item.height))} format={formatMeters}/>
+            <SimulatorDropdown label={english ? "Depth (m)" : "Profundidade (m)"} value={depth} onChange={changeDepth} options={unique(frames.filter((item) => item.height === height).map((item) => item.depth))} format={formatMeters}/>
+            <SimulatorDropdown label={english ? "Number of levels" : "N.º de níveis"} value={levels} onChange={setLevels} options={levelOptions}/>
+            <SimulatorConfigurationOptions rowCount={rowCount} onRowCountChange={setRowCount} sameBeamLength={fixedShelfLength} onSameBeamLengthChange={setSameShelfLength} desiredBeamLength={desiredShelfLength} onDesiredBeamLengthChange={setDesiredShelfLength} sameLengthToggleLabel={english ? "Shelves of the same length" : "Tabuleiros do mesmo comprimento"} sameLengthSelectLabel={english ? "Shelf length (m)" : "Comprimento dos tabuleiros (m)"} sameLengthOptions={widths} sameLengthFormat={formatMeters} automaticLengthMessage={english ? "When this option is off, the calculation can combine 0.75 m and 1.00 m shelves to get close to the requested length." : "Com esta opção desligada, o cálculo pode combinar tabuleiros de 0,75 m e 1,00 m para aproximar o comprimento pedido."}/>
           </div>
 
-          <div className="mt-7 border-t border-[#e5e5e7] pt-6"><p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#86868b]">Estimativa de preço</p><div className="mt-1 flex flex-wrap items-baseline gap-x-2 gap-y-1"><p className="text-4xl font-semibold tracking-[-0.04em] text-(--orange)">{isLengthUnavailable ? "Indisponível" : formatPrice(discountedEstimate)}</p>{!isLengthUnavailable && <span className="text-sm font-medium text-[#86868b]">+ IVA</span>}</div><p className="mt-1 text-sm text-[#6e6e73]">Preço total para {rowCount} {rowCount === 1 ? "fila" : "filas"} iguais.</p>{discountRate > 0 && !isLengthUnavailable && <p className="mt-2 text-sm font-semibold text-[#0879C0]">Desconto de {discountRate * 100}% aplicado: −{formatPrice(discountAmount)}</p>}
-            {!isLengthUnavailable && <div className="mt-5 grid grid-cols-2 gap-x-4 gap-y-3 rounded-[30px] bg-[#f5f5f7] p-5 text-sm"><p className="col-span-2 flex items-baseline justify-between gap-2 border-b border-[#e5e5e7] pb-2"><span className="text-[#6e6e73]">Comprimento total das filas</span><strong className="font-semibold text-[#1d1d1f]">{formatMeters(finalLength * rowCount)}</strong></p><p><span className="block text-xs text-[#86868b]">Comprimento por fila</span><strong className="mt-0.5 block font-semibold text-[#1d1d1f]">{formatMeters(finalLength)}</strong></p><p><span className="block text-xs text-[#86868b]">Altura</span><strong className="mt-0.5 block font-semibold text-[#1d1d1f]">{formatMeters(height)}</strong></p><p><span className="block text-xs text-[#86868b]">Profundidade</span><strong className="mt-0.5 block font-semibold text-[#1d1d1f]">{formatMeters(depth)}</strong></p><p><span className="block text-xs text-[#86868b]">Distribuição dos módulos</span><strong className="mt-0.5 block font-semibold text-[#1d1d1f]">{widthDistribution.map(({ width, count }) => `${count} × ${formatMeters(width)}`).join(" · ")}</strong></p><p><span className="block text-xs text-[#86868b]">Níveis</span><strong className="mt-0.5 block font-semibold text-[#1d1d1f]">{levels}</strong></p><p><span className="block text-xs text-[#86868b]">Tabuleiros</span><strong className="mt-0.5 block font-semibold text-[#1d1d1f]">{shelfCountPerRow * rowCount}</strong></p><p><span className="block text-xs text-[#86868b]">Travamentos</span><strong className="mt-0.5 block font-semibold text-[#1d1d1f]">{braceCountPerRow * rowCount}</strong></p><p><span className="block text-xs text-[#86868b]">Bastidores</span><strong className="mt-0.5 block font-semibold text-[#1d1d1f]">{frameCountPerRow * rowCount}</strong></p><p><span className="block text-xs text-[#86868b]">Carga máxima por nível</span><strong className="mt-0.5 block font-semibold text-(--orange)">{shelfCapacity} kg</strong></p></div>}
-            <div className="mt-5 grid grid-cols-[1fr_auto] gap-3"><Link href="/orcamento" aria-disabled={isLengthUnavailable} onClick={(event) => { if (isLengthUnavailable) event.preventDefault(); }} className={`simulator-pill flex cursor-pointer items-center justify-center rounded-full bg-(--orange) px-4 py-3 text-sm font-semibold text-white shadow-sm transition hover:brightness-95 ${isLengthUnavailable ? "cursor-not-allowed opacity-50" : ""}`}>Encomendar</Link><button type="button" onClick={reset} className="simulator-pill cursor-pointer rounded-full border border-[#d2d2d7] bg-white px-4 py-3 text-sm font-semibold text-[#1d1d1f] transition hover:bg-[#f5f5f7]">Recomeçar</button></div>
-          </div><p className="mt-4 text-xs leading-relaxed text-[#86868b]">Ao valor acresce IVA à taxa legal. Transporte não incluído. Configuração sujeita a validação técnica.</p>
+          <div className="mt-7 border-t border-[#e5e5e7] pt-6"><p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#86868b]">{english ? "Price estimate" : "Estimativa de preço"}</p><div className="mt-1 flex flex-wrap items-baseline gap-x-2 gap-y-1"><p className="text-4xl font-semibold tracking-[-0.04em] text-(--orange)">{isLengthUnavailable ? (english ? "Unavailable" : "Indisponível") : formatPrice(discountedEstimate)}</p>{!isLengthUnavailable && <span className="text-sm font-medium text-[#86868b]">{english ? "+ VAT" : "+ IVA"}</span>}</div><p className="mt-1 text-sm text-[#6e6e73]">{english ? `Total price for ${rowCount} identical row${rowCount === 1 ? "" : "s"}.` : `Preço total para ${rowCount} ${rowCount === 1 ? "fila" : "filas"} iguais.`}</p>{discountRate > 0 && !isLengthUnavailable && <p className="mt-2 text-sm font-semibold text-[#0879C0]">{english ? `${discountRate * 100}% discount applied: −${formatPrice(discountAmount)}` : `Desconto de ${discountRate * 100}% aplicado: −${formatPrice(discountAmount)}`}</p>}
+            {!isLengthUnavailable && <div className="mt-5 grid grid-cols-2 gap-x-4 gap-y-3 rounded-[30px] bg-[#f5f5f7] p-5 text-sm"><p className="col-span-2 flex items-baseline justify-between gap-2 border-b border-[#e5e5e7] pb-2"><span className="text-[#6e6e73]">{english ? "Total row length" : "Comprimento total das filas"}</span><strong className="font-semibold text-[#1d1d1f]">{formatMeters(finalLength * rowCount)}</strong></p><p><span className="block text-xs text-[#86868b]">{english ? "Length per row" : "Comprimento por fila"}</span><strong className="mt-0.5 block font-semibold text-[#1d1d1f]">{formatMeters(finalLength)}</strong></p><p><span className="block text-xs text-[#86868b]">{english ? "Height" : "Altura"}</span><strong className="mt-0.5 block font-semibold text-[#1d1d1f]">{formatMeters(height)}</strong></p><p><span className="block text-xs text-[#86868b]">{english ? "Depth" : "Profundidade"}</span><strong className="mt-0.5 block font-semibold text-[#1d1d1f]">{formatMeters(depth)}</strong></p><p><span className="block text-xs text-[#86868b]">{english ? "Module distribution" : "Distribuição dos módulos"}</span><strong className="mt-0.5 block font-semibold text-[#1d1d1f]">{widthDistribution.map(({ width, count }) => `${count} × ${formatMeters(width)}`).join(" · ")}</strong></p><p><span className="block text-xs text-[#86868b]">{english ? "Levels" : "Níveis"}</span><strong className="mt-0.5 block font-semibold text-[#1d1d1f]">{levels}</strong></p><p className="col-span-2"><span className="block text-xs text-[#86868b]">{english ? "Shelves by length" : "Tabuleiros por medida"}</span><strong className="mt-0.5 block font-semibold text-[#1d1d1f]">{shelfDistribution.map(({ width, count }) => `${count} × ${formatMeters(width)}`).join(" · ")}</strong></p><p className="col-span-2"><span className="block text-xs text-[#86868b]">{english ? "Braces by length" : "Travamentos por medida"}</span><strong className="mt-0.5 block font-semibold text-[#1d1d1f]">{braceDistribution.map(({ width, count }) => `${count} × ${formatMeters(width)}`).join(" · ") || (english ? "None" : "Nenhum")}</strong></p><p><span className="block text-xs text-[#86868b]">{english ? "Frames" : "Bastidores"}</span><strong className="mt-0.5 block font-semibold text-[#1d1d1f]">{frameCountPerRow * rowCount}</strong></p><p><span className="block text-xs text-[#86868b]">{english ? "Maximum load per level" : "Carga máxima por nível"}</span><strong className="mt-0.5 block font-semibold text-(--orange)">{shelfCapacity} kg</strong></p></div>}
+            <div className="mt-5 grid grid-cols-[1fr_auto] gap-3"><Link href="/orcamento" aria-disabled={isLengthUnavailable} onClick={(event) => { if (isLengthUnavailable) event.preventDefault(); }} className={`simulator-pill flex cursor-pointer items-center justify-center rounded-full bg-(--orange) px-4 py-3 text-sm font-semibold text-white shadow-sm transition hover:brightness-95 ${isLengthUnavailable ? "cursor-not-allowed opacity-50" : ""}`}>{english ? "Order" : "Encomendar"}</Link><button type="button" onClick={reset} className="simulator-pill cursor-pointer rounded-full border border-[#d2d2d7] bg-white px-4 py-3 text-sm font-semibold text-[#1d1d1f] transition hover:bg-[#f5f5f7]">{english ? "Reset" : "Recomeçar"}</button></div>
+          </div><p className="mt-4 text-xs leading-relaxed text-[#86868b]">{english ? "VAT is added at the applicable rate. Delivery is not included. Configuration is subject to technical validation." : "Ao valor acresce IVA à taxa legal. Transporte não incluído. Configuração sujeita a validação técnica."}</p>
         </div>
-        <div className="order-1 min-w-0 lg:order-2"><ShelfPreview modules={modules} height={height} depth={depth} levels={levels} rowCount={rowCount} bracedIndexes={bracedIndexes} solutions={solutions} selectedSolutionId={selectedSolutionId} onSelectSolution={setSelectedSolutionId}/></div>
+        <div className="order-1 min-w-0 lg:order-2"><ShelfPreview modules={modules} height={height} depth={depth} levels={levels} rowCount={rowCount} bracedIndexes={bracedIndexes} capacityLabel={`${english ? "Maximum load per level" : "Carga máxima por nível"}: ${shelfCapacity.toLocaleString(english ? "en-IE" : "pt-PT")} kg`} solutions={solutions} selectedSolutionId={selectedSolutionId} onSelectSolution={setSelectedSolutionId} english={english}/></div>
       </div>
     </section>
   );

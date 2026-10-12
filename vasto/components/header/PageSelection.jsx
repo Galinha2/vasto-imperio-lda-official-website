@@ -13,14 +13,15 @@ export default function PageSelection() {
   const content = language === "pt" ? contentpt : contenten;
 
   return (
-    <div className="flex gap-10">
-        <ul className="flex gap-4">
+    <div className="flex items-center gap-5">
+        <ul className="flex items-center gap-1">
           {content.header.links.map((item) => (
             <li key={item.url}>
               <Link
                 href={item.url}
-                className={`px-2.5 py-1.5 inline-flex items-center justify-center rounded-full text-center ${
-                  pathname === item.url ? "bg-white shadow-md" : ""
+                aria-current={pathname === item.url ? "page" : undefined}
+                className={`inline-flex min-h-9 items-center justify-center rounded-full px-4 text-sm font-medium transition-colors hover:bg-[#f5f5f7] ${
+                  pathname === item.url ? "bg-[#f5f5f7] text-[#1d1d1f]" : "text-[#626268]"
                 }`}
               >
                 {item.label}

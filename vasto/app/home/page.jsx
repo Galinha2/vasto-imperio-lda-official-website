@@ -15,13 +15,13 @@ export default function Page() {
         <div className="overflow-hidden bg-white">
             <Banner />
             <section className="bg-white px-5 py-14 sm:px-8 sm:py-16 lg:py-20">
-                <div className="mx-auto grid max-w-[1480px] items-start gap-8 lg:grid-cols-[minmax(0,1.8fr)_minmax(320px,0.9fr)] lg:gap-10">
+                <div className="mx-auto grid max-w-[1480px] items-stretch gap-8 lg:grid-cols-[minmax(0,1.8fr)_minmax(320px,0.9fr)] lg:gap-10">
                     <SimulatorCard />
                     <InfoIconsCards />
                 </div>
             </section>
             <Cards />
-            <ContactCard />
+            <ContactCard wide />
         </div>
     );
 }

@@ -1,12 +1,12 @@
 "use client";
 
-import Image from "next/image";
+import Image from "@/components/loadings/LoadingImage";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import contentpt from "@/assets/contentpt.json";
 import contenten from "@/assets/contenten.json";
 import { useLanguage } from "./LanguageContext";
-import { IoIosClose } from "react-icons/io";
+import { IoClose } from "react-icons/io5";
 import { useEffect } from "react";
 
 export default function PageSelectionMobile({ isOpen, setIsOpen }) {
@@ -14,57 +14,73 @@ export default function PageSelectionMobile({ isOpen, setIsOpen }) {
   const pathname = usePathname();
   const content = language === "pt" ? contentpt : contenten;
 
-  // Bloquear scroll quando o menu mobile estiver aberto
   useEffect(() => {
+    const previousOverflow = document.body.style.overflow;
+    const closeOnEscape = (event) => {
+      if (event.key === "Escape") setIsOpen(false);
+    };
+
     if (isOpen) {
       document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "auto";
+      window.addEventListener("keydown", closeOnEscape);
     }
+
     return () => {
-      document.body.style.overflow = "auto";
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener("keydown", closeOnEscape);
     };
-  }, [isOpen]);
+  }, [isOpen, setIsOpen]);
+
+  if (!isOpen) return null;
 
   return (
-    <div className={`${isOpen ? "block" : "hidden"} relative z-50`}>
-      {/* Overlay atrás do menu */}
-      <div
-        className="fixed top-0 left-0 w-full h-screen bg-[var(--blur)] backdrop-blur-[1.5px] z-40"
+    <div className="fixed inset-0 z-[60] md:hidden">
+      <button
+        type="button"
+        aria-label={language === "pt" ? "Fechar menu" : "Close menu"}
+        className="absolute inset-0 h-full w-full cursor-pointer bg-[#1d1d1f]/20 backdrop-blur-sm"
         onClick={() => setIsOpen(false)}
-      ></div>
-
-      {/* Menu */}
-      <ul className="fixed right-0 top-0 bg-white w-80 h-screen z-50 flex flex-col py-5 gap-4">
-        <div className="flex px-3 justify-between w-full">
-          <Image
-            src={content.header.logoMini}
-            alt="Vasto Império Logo"
-            width={50}
-            height={50}
-            priority
-          />
-          <IoIosClose
-            className="self-end hover:text-[var(--orange)] bg-white shadow-md rounded-full w-8 h-8 active:p-0.5 cursor-pointer"
+      />
+      <nav
+        aria-label={language === "pt" ? "Menu principal" : "Main menu"}
+        className="absolute inset-x-3 top-[72px] mx-auto max-h-[calc(100dvh-84px)] max-w-[420px] overflow-y-auto rounded-[28px] border border-[#e5e5e7] bg-white p-4 shadow-[0_24px_70px_rgba(29,29,31,0.2)] sm:inset-x-5 sm:top-[76px] sm:p-5"
+      >
+        <div className="flex items-center justify-between border-b border-[#e5e5e7] px-2 pb-4">
+          <div className="flex items-center gap-3">
+            <Image src={content.header.logoMini} alt="Vasto Império" width={42} height={42} priority className="h-10 w-10 object-contain" />
+            <div>
+              <p className="text-sm font-semibold tracking-[-0.02em] text-[#1d1d1f]">Vasto Império</p>
+              <p className="mt-0.5 text-xs text-[#86868b]">Benedita · Viseu</p>
+            </div>
+          </div>
+          <button
+            type="button"
+            aria-label={language === "pt" ? "Fechar menu" : "Close menu"}
             onClick={() => setIsOpen(false)}
-          />
+            className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-full bg-[#f5f5f7] text-xl text-[#424245] transition hover:bg-[#eceef2]"
+          >
+            <IoClose aria-hidden="true" />
+          </button>
         </div>
-        {content.header.links.map((item) => (
-          <li key={item.url}>
-            <Link
-              href={item.url}
-              className={`w-75 px-5 py-1 inline-flex items-left rounded-[20px_0px] justify-left hover:text-[var(--orange)] text-left ${
-                pathname === item.url
-                  ? "bg-white shadow-md text-[var(--orange)]"
-                  : ""
-              }`}
-              onClick={() => setIsOpen(false)}
-            >
-              {item.label}
-            </Link>
-          </li>
-        ))}
-      </ul>
+        <ul className="flex flex-col gap-1 pt-3">
+          {content.header.links.map((item) => {
+            const active = pathname === item.url;
+            return (
+              <li key={item.url}>
+                <Link
+                  href={item.url}
+                  aria-current={active ? "page" : undefined}
+                  onClick={() => setIsOpen(false)}
+                  className={`flex min-h-14 items-center justify-between rounded-2xl px-4 text-base font-medium transition-colors ${active ? "bg-[#f5f5f7] text-(--orange)" : "text-[#303034] hover:bg-[#f5f5f7]"}`}
+                >
+                  {item.label}
+                  <span aria-hidden="true" className="text-xl font-normal text-[#a1a1a6]">›</span>
+                </Link>
+              </li>
+            );
+          })}
+        </ul>
+      </nav>
     </div>
   );
 }

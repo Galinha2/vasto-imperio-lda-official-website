@@ -1,10 +1,12 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { useLanguage } from "@/components/header/LanguageContext";
 import Link from "next/link";
 import SimulatorDropdown from "@/components/simulador/SimulatorDropdown";
 import SimulatorConfigurationOptions from "@/components/simulador/SimulatorConfigurationOptions";
 import SimulatorSolutions, { buildSimilarSolutions } from "@/components/simulador/SimulatorSolutions";
+import SimulatorSectionTabs from "@/components/simulador/SimulatorSectionTabs";
 import budget from "@/assets/orcamento.json";
 
 const products = budget.produtos.filter((product) => product.ref === 3);
@@ -134,7 +136,8 @@ function findBestModules(targetLength, { height, depth, levels, floorType, galva
   return modules;
 }
 
-function RackPreview({ modules, height, levels, floorType, galvanized, reinforcedBeams, rowCount, solutions, selectedSolutionId, onSelectSolution }) {
+function RackPreview({ modules, height, levels, floorType, galvanized, reinforcedBeams, rowCount, capacityLabel, solutions, selectedSolutionId, onSelectSolution, english }) {
+  const formatMeters = (value) => `${(value / 1000).toLocaleString(english ? "en-IE" : "pt-PT", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} m`;
   const width = 1000;
   const bottom = 410;
   const beamLengthTotal = modules.reduce((sum, moduleLength) => sum + moduleLength, 0);
@@ -162,13 +165,13 @@ function RackPreview({ modules, height, levels, floorType, galvanized, reinforce
     <div className="min-w-0 flex-1 rounded-[30px] border border-[#e5e5e7] bg-white p-5 shadow-[0_12px_40px_rgba(0,0,0,0.05)] sm:p-7 md:p-9">
       <div className="mb-5 flex items-center justify-between gap-3">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#86868b]">Visualização</p>
-          <h2 className="mt-1 text-xl font-semibold tracking-tight text-[#1d1d1f]">Pré-visualização 2D</h2>
+          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#86868b]">{english ? "Preview" : "Visualização"}</p>
+          <h2 className="mt-1 text-xl font-semibold tracking-tight text-[#1d1d1f]">{english ? "2D preview" : "Pré-visualização 2D"}</h2>
         </div>
-        <span className="simulator-pill rounded-full bg-[#f5f5f7] px-3 py-1.5 text-right text-sm font-medium text-[#6e6e73]">{modules.length} módulo(s) · {levels} níveis · {rowCount} {rowCount === 1 ? "fila" : "filas"}</span>
+        <span className="simulator-pill rounded-full bg-[#f5f5f7] px-3 py-1.5 text-right text-sm font-medium text-[#6e6e73]">{modules.length} {english ? "module(s)" : "módulo(s)"} · {levels} {english ? "levels" : "níveis"} · {rowCount} {rowCount === 1 ? (english ? "row" : "fila") : (english ? "rows" : "filas")}</span>
       </div>
       <div className="w-full overflow-hidden">
-        <svg viewBox={`0 0 ${width} 490`} role="img" aria-label={`Vista frontal de uma fila com ${modules.length} módulos, ${heightLabel} de altura, ${levels} níveis e repetida ${rowCount} vezes`} className="h-auto w-full">
+        <svg viewBox={`0 0 ${width} 490`} role="img" aria-label={english ? `Front view of a row with ${modules.length} modules, ${heightLabel} high, ${levels} levels, repeated ${rowCount} times` : `Vista frontal de uma fila com ${modules.length} módulos, ${heightLabel} de altura, ${levels} níveis e repetida ${rowCount} vezes`} className="h-auto w-full">
           <defs>
             <linearGradient id="pickingFrameMetalFinish" x1="0" x2="1" y1="0" y2="0">
               <stop offset="0" stopColor="#64717d" />
@@ -200,13 +203,13 @@ function RackPreview({ modules, height, levels, floorType, galvanized, reinforce
               <stop offset="1" stopColor="#493407" />
             </linearGradient>
           </defs>
-          <text x="70" y="30" fill="#555" fontSize="18" fontWeight="600">Vista frontal 2D · Comprimento por fila: {formatMeters(totalLength)}</text>
-          <text x={width - 70} y="30" textAnchor="end" fill="#555" fontSize="18" fontWeight="600">Altura: {heightLabel}</text>
+          <text x="70" y="30" fill="#555" fontSize="18" fontWeight="600">{english ? "Front view 2D · Length per row: " : "Vista frontal 2D · Comprimento por fila: "}{formatMeters(totalLength)}</text>
+          <text x={width - 70} y="30" textAnchor="end" fill="#555" fontSize="18" fontWeight="600">{english ? "Height: " : "Altura: "}{heightLabel}</text>
           <line x1="35" y1={top} x2="35" y2={bottom} stroke="#a6a6a6" strokeWidth="2" />
           <line x1="28" y1={top} x2="42" y2={top} stroke="#a6a6a6" strokeWidth="2" />
           <line x1="28" y1={bottom} x2="42" y2={bottom} stroke="#a6a6a6" strokeWidth="2" />
           <text x="21" y={(top + bottom) / 2} transform={`rotate(-90 21 ${(top + bottom) / 2})`} textAnchor="middle" fill="#777" fontSize="16">{heightLabel}</text>
-          <g aria-label={`Comprimento total ${formatMeters(totalLength)}`}>
+          <g aria-label={`${english ? "Total length" : "Comprimento total"} ${formatMeters(totalLength)}`}>
             <line x1={rackLeft} y1={top - 12} x2={rackRight} y2={top - 12} stroke="#a6a6a6" strokeWidth="2" />
             <line x1={rackLeft} y1={top - 17} x2={rackLeft} y2={top - 7} stroke="#a6a6a6" strokeWidth="2" />
             <line x1={rackRight} y1={top - 17} x2={rackRight} y2={top - 7} stroke="#a6a6a6" strokeWidth="2" />
@@ -337,15 +340,16 @@ function RackPreview({ modules, height, levels, floorType, galvanized, reinforce
               </g>
             );
           })}
+          <text x={width - 70} y="460" textAnchor="end" fill="#ff5500" fontSize="15" fontWeight="700">{capacityLabel}</text>
           <g transform="translate(70 470)" fontSize="13" fill="#777">
-            <rect width="8" height="8" fill={galvanized ? "url(#pickingFrameMetalFinish)" : "url(#pickingFrameBlueFinish)"} stroke={galvanized ? "#687580" : "none"} /><text x="13" y="8">Bastidores</text>
-            <rect x="100" width="8" height="8" fill="url(#pickingBeamFinish)" stroke="#b9bec8" /><text x="113" y="8">Travessas</text>
-            <rect x="205" width="8" height="8" fill={floorType === "Aglomerado" ? "url(#pickingWoodShelfFinish)" : "url(#pickingMetalShelfFinish)"} stroke={floorType === "Aglomerado" ? "#4a3508" : "#687580"} /><text x="218" y="8">Tampo em {floorType.toLowerCase()}</text>
+            <rect width="8" height="8" fill={galvanized ? "url(#pickingFrameMetalFinish)" : "url(#pickingFrameBlueFinish)"} stroke={galvanized ? "#687580" : "none"} /><text x="13" y="8">{english ? "Frame" : "Bastidor"}</text>
+            <rect x="92" width="8" height="8" fill="url(#pickingBeamFinish)" stroke="#b9bec8" /><text x="105" y="8">{english ? "Beam" : "Viga"}</text>
+            <rect x="155" width="8" height="8" fill={floorType === "Aglomerado" ? "url(#pickingWoodShelfFinish)" : "url(#pickingMetalShelfFinish)"} stroke={floorType === "Aglomerado" ? "#4a3508" : "#687580"} /><text x="168" y="8">{english ? "Shelf" : "Tampo"}</text>
           </g>
         </svg>
       </div>
       <p className="mt-2 text-xs leading-relaxed text-[#86868b] sm:text-sm">
-        Os valores sob cada vão indicam o comprimento nominal arredondado das vigas. As cotas laterais mostram o vão livre entre vigas. A vista mostra uma fila; o comprimento por fila mantém a medida exata e inclui a espessura dos bastidores.
+        {english ? "Dimensions are shown in the drawing; total length includes the frames." : "Cotas indicam as medidas; o comprimento total inclui os bastidores."}
       </p>
       <SimulatorSolutions solutions={solutions} selectedId={selectedSolutionId} onSelect={onSelectSolution} />
     </div>
@@ -353,6 +357,10 @@ function RackPreview({ modules, height, levels, floorType, galvanized, reinforce
 }
 
 export default function SimulatorPicking() {
+  const { language } = useLanguage();
+  const english = language === "en";
+  const formatMeters = (value) => `${(value / 1000).toLocaleString(english ? "en-IE" : "pt-PT", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} m`;
+  const formatPrice = (value) => new Intl.NumberFormat(english ? "en-IE" : "pt-PT", { style: "currency", currency: "EUR" }).format(value);
   const [desiredLength, setDesiredLength] = useState("1.00");
   const [rowCount, setRowCount] = useState(1);
   const [sameBeamLength, setSameBeamLength] = useState(false);
@@ -382,7 +390,7 @@ export default function SimulatorPicking() {
     const shelf = shelves.find((product) => product.length === moduleLength && product.depth === depth && product.material === floorType);
       return sum + (2 * numericPrice(beam) + numericPrice(shelf) + reinforcementPrice(moduleLength, depth, floorType) + numericPrice(safetyBrake) * 4) * levels * rowCount;
     }, 0);
-    const rate = gross > 2200 ? 0.15 : gross > 1200 ? 0.10 : gross > 600 ? 0.05 : 0;
+    const rate = gross >= 2600 ? 0.15 : gross >= 1900 ? 0.10 : gross >= 1000 ? 0.05 : 0;
     return gross * (1 - rate);
   };
   const solutions = useMemo(() => buildSimilarSolutions(baseModules, targetLength, {
@@ -405,7 +413,7 @@ export default function SimulatorPicking() {
   }, 0);
   const estimatePerRow = numericPrice(matchingFrame) * (modules.length + 1) + moduleSubtotal;
   const estimate = estimatePerRow * rowCount;
-  const discountRate = estimate > 2200 ? 0.15 : estimate > 1200 ? 0.10 : estimate > 600 ? 0.05 : 0;
+  const discountRate = estimate >= 2600 ? 0.15 : estimate >= 1900 ? 0.10 : estimate >= 1000 ? 0.05 : 0;
   const discountAmount = estimate * discountRate;
   const discountedEstimate = estimate - discountAmount;
   const finalLength = modules.length ? modules.reduce((sum, moduleLength) => sum + moduleLength, 0) + 50 : 0;
@@ -416,6 +424,14 @@ export default function SimulatorPicking() {
         return Number(beam?.produto.match(/suporta\s*(\d+)\s*(?:Kg|g)/i)?.[1]) || 0;
       }))
     : 0;
+  const beamDistribution = [...new Set(modules)].sort((a, b) => a - b).map((length) => ({
+    length,
+    count: modules.filter((moduleLength) => moduleLength === length).length * levels * 2 * rowCount,
+  }));
+  const shelfDistribution = [...new Set(modules)].sort((a, b) => a - b).map((length) => ({
+    length,
+    count: modules.filter((moduleLength) => moduleLength === length).length * levels * rowCount,
+  }));
 
   function hasPricedShelf(shelfDepth, material) {
     return shelves.some((shelf) => shelf.depth === shelfDepth && shelf.material === material && typeof shelf["preço"] === "number");
@@ -475,20 +491,23 @@ export default function SimulatorPicking() {
   return (
     <section className="min-h-screen bg-[#f8f8fa] px-4 py-12 sm:px-6 lg:px-10 lg:py-16">
       <header className="mx-auto mb-9 max-w-[1800px] sm:mb-12">
-        <p className="mt-[35px] mb-3 text-xs font-semibold uppercase tracking-[0.16em] text-[#6e6e73] lg:mt-5">Configurador · Estantes picking</p>
-        <h1 className="max-w-4xl text-4xl font-semibold leading-[1.05] tracking-[-0.045em] text-[#1d1d1f] sm:text-5xl lg:text-6xl">A sua estante, à medida do seu espaço.</h1>
-        <p className="mt-4 max-w-2xl text-base leading-relaxed text-[#6e6e73] sm:text-lg">Defina as medidas e os materiais. Veja a configuração, a capacidade e uma estimativa de preço atualizadas em tempo real.</p>
-        <Link href="/simulador/racks" className="mt-4 inline-flex cursor-pointer items-center gap-2 text-sm font-semibold text-[#0071e3] hover:underline">Ver simulador de racks industriais <span aria-hidden="true">→</span></Link>
+        <p className="mt-[35px] mb-3 text-xs font-semibold uppercase tracking-[0.16em] text-[#6e6e73] lg:mt-5">{english ? "Configurator · Picking shelving" : "Configurador · Estantes picking"}</p>
+        <h1 className="max-w-4xl text-4xl font-semibold leading-[1.05] tracking-[-0.045em] text-[#1d1d1f] sm:text-5xl lg:text-6xl">{english ? "Shelving made for your space." : "A sua estante, à medida do seu espaço."}</h1>
+        <p className="mt-4 max-w-2xl text-base leading-relaxed text-[#6e6e73] sm:text-lg">{english ? "Choose the dimensions and materials. See the configuration, load capacity and price estimate update in real time." : "Defina as medidas e os materiais. Veja a configuração, a capacidade e uma estimativa de preço atualizadas em tempo real."}</p>
       </header>
+      <div className="mx-auto grid max-w-[1800px] gap-5 lg:grid-cols-[minmax(360px,0.78fr)_minmax(0,1.75fr)] xl:gap-7">
+        <div className="flex justify-start"><SimulatorSectionTabs group="storage" active="picking" /></div>
+        <div className="hidden lg:block" aria-hidden="true" />
+      </div>
       <div className="mx-auto grid max-w-[1800px] items-start gap-5 lg:grid-cols-[minmax(360px,0.78fr)_minmax(0,1.75fr)] xl:gap-7">
         <div className="order-2 w-full rounded-[30px] border border-[#e5e5e7] bg-white p-5 shadow-[0_12px_40px_rgba(0,0,0,0.05)] sm:p-7 lg:order-1 lg:p-8">
           <div className="mb-6">
-            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#86868b]">1 · Configuração</p>
-            <h2 className="mt-1 text-2xl font-semibold tracking-tight text-[#1d1d1f]">Escolha as medidas</h2>
+            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#86868b]">{english ? "1 · Configuration" : "1 · Configuração"}</p>
+            <h2 className="mt-1 text-2xl font-semibold tracking-tight text-[#1d1d1f]">{english ? "Choose dimensions" : "Escolha as medidas"}</h2>
           </div>
           <div className="grid grid-cols-1 gap-x-4 gap-y-5 sm:grid-cols-2">
             <label className="block min-w-0 space-y-2 sm:col-span-2">
-              <span className="block text-sm font-semibold text-[#424245]">Comprimento pretendido por linha (m)</span>
+              <span className="block text-sm font-semibold text-[#424245]">{english ? "Desired length per row (m)" : "Comprimento pretendido por linha (m)"}</span>
               <div className="flex items-center simulator-pill rounded-full border border-[#d2d2d7] bg-[#fbfbfd] px-5 transition focus-within:border-[#0071e3] focus-within:ring-4 focus-within:ring-[#0071e3]/10">
                 <input
                   type="text"
@@ -501,18 +520,18 @@ export default function SimulatorPicking() {
                     if (value > 0) setDesiredLength(value.toFixed(2));
                   }}
                   className="w-full bg-transparent py-3.5 text-[15px] font-medium text-[#1d1d1f] outline-none"
-                  aria-label="Comprimento pretendido por linha em metros"
+                  aria-label={english ? "Desired length per row in metres" : "Comprimento pretendido por linha em metros"}
                 />
                 <span className="text-sm font-medium text-[#86868b]">m</span>
               </div>
               {isLengthUnavailable ? (
-                <span className="mt-1 block text-sm font-medium text-red-600">Comprimentos superiores a 30,00 m não estão disponíveis.</span>
+                <span className="mt-1 block text-sm font-medium text-red-600">{english ? "Lengths over 30.00 m are not available." : "Comprimentos superiores a 30,00 m não estão disponíveis."}</span>
               ) : null}
             </label>
-            <SimulatorDropdown label="Altura do bastidor (m)" value={height} onChange={handleHeightChange} options={availableHeights.length ? availableHeights : heights} format={formatMeters} />
-            <SimulatorDropdown label="Profundidade (m)" value={depth} onChange={handleDepthChange} options={availableDepths.length ? availableDepths : depths} format={formatMeters} />
-            <SimulatorDropdown label="N.º de níveis" value={levels} onChange={setLevels} options={levelOptions} />
-            <SimulatorDropdown label="Tipo de piso" value={floorType} onChange={handleFloorTypeChange} options={["Aglomerado", "Metálica"]} />
+            <SimulatorDropdown label={english ? "Frame height (m)" : "Altura do bastidor (m)"} value={height} onChange={handleHeightChange} options={availableHeights.length ? availableHeights : heights} format={formatMeters} />
+            <SimulatorDropdown label={english ? "Depth (m)" : "Profundidade (m)"} value={depth} onChange={handleDepthChange} options={availableDepths.length ? availableDepths : depths} format={formatMeters} />
+            <SimulatorDropdown label={english ? "Number of levels" : "N.º de níveis"} value={levels} onChange={setLevels} options={levelOptions} />
+            <SimulatorDropdown label={english ? "Shelf material" : "Tipo de piso"} value={floorType} onChange={handleFloorTypeChange} options={["Aglomerado", "Metálica"]} format={(value) => english ? (value === "Aglomerado" ? "Chipboard" : "Metal") : value} />
             <SimulatorConfigurationOptions
               rowCount={rowCount}
               onRowCountChange={setRowCount}
@@ -520,55 +539,59 @@ export default function SimulatorPicking() {
               onSameBeamLengthChange={setSameBeamLength}
               desiredBeamLength={desiredBeamLength}
               onDesiredBeamLengthChange={setDesiredBeamLength}
+              sameLengthToggleLabel={english ? "Beams of the same length" : "Vigas do mesmo comprimento"}
+              sameLengthSelectLabel={english ? "Desired beam length (m)" : "Comprimento pretendido das vigas (m)"}
+              automaticLengthMessage={english ? "When this option is off, the calculation can combine beams of different lengths to get close to the requested length." : "Com esta opção desligada, o cálculo pode combinar vigas de diferentes comprimentos para aproximar o comprimento pedido."}
             />
             <label className="flex min-w-0 cursor-pointer items-center gap-3 simulator-pill rounded-full border border-[#e5e5e7] bg-[#fbfbfd] px-4 py-3 text-sm font-medium text-[#424245] transition hover:border-[#c7c7cc]">
               <input type="checkbox" checked={galvanized} onChange={(event) => handleGalvanizedChange(event.target.checked)} className="h-4 w-4 shrink-0 accent-[#0071e3]" />
-              <span>Bastidores galvanizados</span>
+              <span>{english ? "Galvanised frames" : "Bastidores galvanizados"}</span>
             </label>
             <label className="flex min-w-0 cursor-pointer items-center gap-3 simulator-pill rounded-full border border-[#e5e5e7] bg-[#fbfbfd] px-4 py-3 text-sm font-medium text-[#424245] transition hover:border-[#c7c7cc]">
               <input type="checkbox" checked={reinforcedBeams} onChange={(event) => setReinforcedBeams(event.target.checked)} className="h-4 w-4 shrink-0 accent-[#0071e3]" />
-              <span>Vigas reforçadas (Z100)</span>
+              <span>{english ? "Reinforced beams (Z100)" : "Vigas reforçadas (Z100)"}</span>
             </label>
           </div>
           <div className="mt-7 border-t border-[#e5e5e7] pt-6">
-            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#86868b]">Estimativa de preço</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#86868b]">{english ? "Price estimate" : "Estimativa de preço"}</p>
             <div className="mt-1 flex flex-wrap items-baseline gap-x-2 gap-y-1">
-              <p className="text-4xl font-semibold tracking-[-0.04em] text-(--orange)">{isLengthUnavailable ? "Indisponível" : formatPrice(discountedEstimate)}</p>
-              {!isLengthUnavailable && <span className="text-sm font-medium text-[#86868b]">+ IVA</span>}
+              <p className="text-4xl font-semibold tracking-[-0.04em] text-(--orange)">{isLengthUnavailable ? (english ? "Unavailable" : "Indisponível") : formatPrice(discountedEstimate)}</p>
+              {!isLengthUnavailable && <span className="text-sm font-medium text-[#86868b]">{english ? "+ VAT" : "+ IVA"}</span>}
             </div>
-            <p className="mt-1 text-sm text-[#6e6e73]">Preço total para {rowCount} {rowCount === 1 ? "fila" : "filas"} iguais.</p>
+            <p className="mt-1 text-sm text-[#6e6e73]">{english ? `Total price for ${rowCount} identical row${rowCount === 1 ? "" : "s"}.` : `Preço total para ${rowCount} ${rowCount === 1 ? "fila" : "filas"} iguais.`}</p>
             {discountRate > 0 && !isLengthUnavailable && (
-              <p className="mt-2 text-sm font-semibold text-[#0879C0]">Desconto de {discountRate * 100}% aplicado: −{formatPrice(discountAmount)}</p>
+              <p className="mt-2 text-sm font-semibold text-[#0879C0]">{english ? `${discountRate * 100}% discount applied: −${formatPrice(discountAmount)}` : `Desconto de ${discountRate * 100}% aplicado: −${formatPrice(discountAmount)}`}</p>
             )}
             {!isLengthUnavailable && (
               <div className="mt-5 grid grid-cols-2 gap-x-4 gap-y-3 rounded-[30px] bg-[#f5f5f7] p-5 text-sm">
-                <p className="col-span-2 flex items-baseline justify-between gap-2 border-b border-[#e5e5e7] pb-2"><span className="text-[#6e6e73]">Comprimento total das filas</span><strong className="font-semibold text-[#1d1d1f]">{formatMeters(finalLength * rowCount)}</strong></p>
-                <p><span className="block text-xs text-[#86868b]">Comprimento por fila</span><strong className="mt-0.5 block font-semibold text-[#1d1d1f]">{formatMeters(finalLength)}</strong></p>
-                <p><span className="block text-xs text-[#86868b]">Altura</span><strong className="mt-0.5 block font-semibold text-[#1d1d1f]">{formatMeters(height)}</strong></p>
-                <p><span className="block text-xs text-[#86868b]">Profundidade</span><strong className="mt-0.5 block font-semibold text-[#1d1d1f]">{formatMeters(depth)}</strong></p>
-                <p><span className="block text-xs text-[#86868b]">Níveis · Piso</span><strong className="mt-0.5 block font-semibold text-[#1d1d1f]">{levels} · {floorType}</strong></p>
-                <p><span className="block text-xs text-[#86868b]">Estrutura · Vigas</span><strong className="mt-0.5 block font-semibold text-[#1d1d1f]">{galvanized ? "Galvanizada" : "Pintada"} · {beamProfile}</strong></p>
-                <p><span className="block text-xs text-[#86868b]">Filas iguais</span><strong className="mt-0.5 block font-semibold text-[#1d1d1f]">{rowCount}</strong></p>
-                {sameBeamLength && <p><span className="block text-xs text-[#86868b]">Comprimento uniforme das vigas</span><strong className="mt-0.5 block font-semibold text-[#1d1d1f]">{formatMeters(modules[0] || 0)}</strong></p>}
-                <p className="col-span-2 border-t border-[#e5e5e7] pt-2 text-[#6e6e73]">Carga máxima por par de vigas <strong className="font-semibold text-(--orange)">{levelCapacity.toLocaleString("pt-PT")} kg</strong></p>
+                <p className="col-span-2 flex items-baseline justify-between gap-2 border-b border-[#e5e5e7] pb-2"><span className="text-[#6e6e73]">{english ? "Total row length" : "Comprimento total das filas"}</span><strong className="font-semibold text-[#1d1d1f]">{formatMeters(finalLength * rowCount)}</strong></p>
+                <p><span className="block text-xs text-[#86868b]">{english ? "Length per row" : "Comprimento por fila"}</span><strong className="mt-0.5 block font-semibold text-[#1d1d1f]">{formatMeters(finalLength)}</strong></p>
+                <p><span className="block text-xs text-[#86868b]">{english ? "Height" : "Altura"}</span><strong className="mt-0.5 block font-semibold text-[#1d1d1f]">{formatMeters(height)}</strong></p>
+                <p><span className="block text-xs text-[#86868b]">{english ? "Depth" : "Profundidade"}</span><strong className="mt-0.5 block font-semibold text-[#1d1d1f]">{formatMeters(depth)}</strong></p>
+                <p><span className="block text-xs text-[#86868b]">{english ? "Levels · Shelf" : "Níveis · Piso"}</span><strong className="mt-0.5 block font-semibold text-[#1d1d1f]">{levels} · {english ? (floorType === "Aglomerado" ? "Chipboard" : "Metal") : floorType}</strong></p>
+                <p><span className="block text-xs text-[#86868b]">{english ? "Frame · Beams" : "Estrutura · Vigas"}</span><strong className="mt-0.5 block font-semibold text-[#1d1d1f]">{galvanized ? (english ? "Galvanised" : "Galvanizada") : (english ? "Painted" : "Pintada")} · {beamProfile}</strong></p>
+                <p><span className="block text-xs text-[#86868b]">{english ? "Identical rows" : "Filas iguais"}</span><strong className="mt-0.5 block font-semibold text-[#1d1d1f]">{rowCount}</strong></p>
+                <p className="col-span-2"><span className="block text-xs text-[#86868b]">{english ? "Beams by length" : "Vigas por medida"}</span><strong className="mt-0.5 block font-semibold text-[#1d1d1f]">{beamDistribution.map(({ length, count }) => `${count} × ${formatMeters(length)}`).join(" · ")}</strong></p>
+                <p className="col-span-2"><span className="block text-xs text-[#86868b]">{english ? "Shelves by length" : "Tampos por medida"}</span><strong className="mt-0.5 block font-semibold text-[#1d1d1f]">{shelfDistribution.map(({ length, count }) => `${count} × ${formatMeters(length)}`).join(" · ")}</strong></p>
+                <p className="col-span-2 border-t border-[#e5e5e7] pt-2 text-[#6e6e73]">{english ? "Maximum load per beam pair" : "Carga máxima por par de vigas"} <strong className="font-semibold text-(--orange)">{levelCapacity.toLocaleString(english ? "en-IE" : "pt-PT")} kg</strong></p>
               </div>
             )}
             <div className="mt-5 grid grid-cols-[1fr_auto] gap-3">
-              <Link href="/orcamento" aria-disabled={isLengthUnavailable} onClick={(event) => { if (isLengthUnavailable) event.preventDefault(); }} className={`flex cursor-pointer items-center justify-center simulator-pill rounded-full bg-(--orange) px-4 py-3 text-sm font-semibold text-white shadow-sm transition hover:brightness-95 ${isLengthUnavailable ? "cursor-not-allowed opacity-50" : ""}`}>Encomendar</Link>
-              <button type="button" onClick={reset} className="cursor-pointer simulator-pill rounded-full border border-[#d2d2d7] bg-white px-4 py-3 text-sm font-semibold text-[#1d1d1f] transition hover:bg-[#f5f5f7]">Recomeçar</button>
+              <Link href="/orcamento" aria-disabled={isLengthUnavailable} onClick={(event) => { if (isLengthUnavailable) event.preventDefault(); }} className={`flex cursor-pointer items-center justify-center simulator-pill rounded-full bg-(--orange) px-4 py-3 text-sm font-semibold text-white shadow-sm transition hover:brightness-95 ${isLengthUnavailable ? "cursor-not-allowed opacity-50" : ""}`}>{english ? "Order" : "Encomendar"}</Link>
+              <button type="button" onClick={reset} className="cursor-pointer simulator-pill rounded-full border border-[#d2d2d7] bg-white px-4 py-3 text-sm font-semibold text-[#1d1d1f] transition hover:bg-[#f5f5f7]">{english ? "Reset" : "Recomeçar"}</button>
             </div>
           </div>
-          <p className="mt-4 text-xs leading-relaxed text-[#86868b]">Ao valor acresce IVA à taxa legal. Transporte não incluído. Configuração sujeita a validação técnica.</p>
-          {!matchingFrame && <p className="mt-3 rounded-[30px] bg-amber-50 p-3 text-sm text-amber-800">Não existe um bastidor com esta combinação de altura, profundidade e acabamento no catálogo ref. 3.</p>}
+          <p className="mt-4 text-xs leading-relaxed text-[#86868b]">{english ? "VAT is added at the applicable rate. Delivery is not included. Configuration is subject to technical validation." : "Ao valor acresce IVA à taxa legal. Transporte não incluído. Configuração sujeita a validação técnica."}</p>
+          {!matchingFrame && <p className="mt-3 rounded-[30px] bg-amber-50 p-3 text-sm text-amber-800">{english ? "No frame with this height, depth and finish combination is available in catalogue ref. 3." : "Não existe um bastidor com esta combinação de altura, profundidade e acabamento no catálogo ref. 3."}</p>}
         </div>
         {isLengthUnavailable ? (
           <div className="order-1 min-w-0 flex-1 rounded-[30px] border border-[#e5e5e7] bg-white p-7 shadow-[0_12px_40px_rgba(0,0,0,0.05)] lg:order-2">
-            <h2 className="text-xl font-semibold tracking-tight text-[#1d1d1f]">Pré-visualização 2D</h2>
-            <p className="mt-4 rounded-[30px] bg-red-50 p-4 text-sm text-red-700">Comprimentos superiores a 30,00 m não estão disponíveis.</p>
+            <h2 className="text-xl font-semibold tracking-tight text-[#1d1d1f]">{english ? "2D preview" : "Pré-visualização 2D"}</h2>
+            <p className="mt-4 rounded-[30px] bg-red-50 p-4 text-sm text-red-700">{english ? "Lengths over 30.00 m are not available." : "Comprimentos superiores a 30,00 m não estão disponíveis."}</p>
           </div>
         ) : (
           <div className="order-1 min-w-0 lg:order-2">
-            <RackPreview modules={modules} height={height} levels={levels} floorType={floorType} galvanized={galvanized} reinforcedBeams={reinforcedBeams} rowCount={rowCount} solutions={solutions} selectedSolutionId={selectedSolutionId} onSelectSolution={setSelectedSolutionId} />
+            <RackPreview modules={modules} height={height} levels={levels} floorType={floorType} galvanized={galvanized} reinforcedBeams={reinforcedBeams} rowCount={rowCount} capacityLabel={`${english ? "Maximum load per beam pair" : "Carga máxima por par de vigas"}: ${levelCapacity.toLocaleString(english ? "en-IE" : "pt-PT")} kg`} solutions={solutions} selectedSolutionId={selectedSolutionId} onSelectSolution={setSelectedSolutionId} english={english} />
           </div>
         )}
       </div>

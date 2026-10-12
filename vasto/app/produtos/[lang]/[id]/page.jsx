@@ -5,6 +5,8 @@ import ContactCard from "@/components/contacts/ContactCard";
 import ProductTabela from "@/components/produtos/ProductTabela";
 import Galeria from "@/components/galeria/Galeria";
 import Link from "next/link";
+import { redirect } from "next/navigation";
+import SimulatorSectionTabs from "@/components/simulador/SimulatorSectionTabs";
 
 // Geração estática de todos os IDs para pt e en
 export function generateStaticParams() {
@@ -39,6 +41,10 @@ export async function generateMetadata({ params }) {
       title: "Produto não encontrado | Vasto Império",
       description: "O produto que procura não foi encontrado."
     };
+  }
+
+  if (product.id === "estantes-picking") {
+    redirect("/estantes-picking");
   }
 
   const canonicalUrl = `https://www.vastoimperio.pt/produtos/${lang}/${id}`;
@@ -77,6 +83,11 @@ export default async function Page({ params }) {
   const product = content.productsShowcase.products.find(
     (item) => item.id === decodeURIComponent(String(id))
   );
+  const handlingTab = product?.id === "porta-paletes-eletrico"
+    ? "eletrico"
+    : product?.id === "porta-paletes-manual"
+      ? "manual"
+      : null;
   const tabela = product?.tabela;
   const hasGallery = Boolean(product?.galeria?.length);
   const contactBackground = Boolean(tabela) === hasGallery ? "white" : "gray";
@@ -94,7 +105,7 @@ export default async function Page({ params }) {
 
   return (
     <>
-      <main className="mt-[68px] bg-[#f5f5f7] px-5 pb-16 pt-8 sm:px-8 sm:pt-12 lg:mt-[76px] lg:pb-20">
+      <main className="bg-[#f5f5f7] px-5 pb-16 pt-[76px] sm:px-8 sm:pt-[84px] lg:pb-20">
         <div className="mx-auto max-w-[1440px]">
           <nav aria-label={lang === "pt" ? "Navegação estrutural" : "Breadcrumb"} className="mb-7 text-sm text-[#7a7a80]">
             <Link href="/produtos" className="transition-colors hover:text-(--orange)">
@@ -111,6 +122,7 @@ export default async function Page({ params }) {
               {product.text}
             </h1>
           </header>
+          {handlingTab && <SimulatorSectionTabs group="handling" active={handlingTab} lang={lang} />}
           <GalleryClient product={product} text={text} />
         </div>
       </main>

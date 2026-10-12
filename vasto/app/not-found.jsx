@@ -1,9 +1,10 @@
 import Link from "next/link"
+import Image from "@/components/loadings/LoadingImage";
 
 function NotFound() {
     return (
         <div className="w-screen h-screen gap-5 flex flex-col items-center justify-center text-center">
-            <img className="w-75" src="/404.png" alt="404 Error" />
+            <Image className="w-75" src="/404.png" alt="404 Error" width={600} height={400} />
             <h1 className="font-[300]">Página não encontrada</h1>
             <Link
                 href="/"

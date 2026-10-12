@@ -1,6 +1,6 @@
 "use client";
 
-import Image from "next/image";
+import Image from "@/components/loadings/LoadingImage";
 import { useEffect, useState } from "react";
 import { IoClose } from "react-icons/io5";
 

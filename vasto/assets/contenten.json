@@ -12,8 +12,8 @@
         "url": "/produtos"
       },
       {
-        "label": "Quote",
-        "url": "/orcamento"
+        "label": "Simulate",
+        "url": "/simulador"
       },
       {
         "label": "About Us",
@@ -46,9 +46,15 @@
         "url": "/simulador/estantes-ligeiras",
         "simulation": "Simulator",
         "subTitle": [
-          { "text": "Racks - Heavy pallet loads" },
-          { "text": "Picking - Medium loads" },
-          { "text": "Light duty - Light loads" }
+          {
+            "text": "Racks - Heavy pallet loads"
+          },
+          {
+            "text": "Picking - Medium loads"
+          },
+          {
+            "text": "Light duty - Light loads"
+          }
         ]
       },
       {
@@ -57,9 +63,15 @@
         "url": "/simulador/movimentacao-de-carga",
         "simulation": "Simulator",
         "subTitle": [
-          { "text": "Stackers" },
-          { "text": "Electric pallet trucks" },
-          { "text": "Manual pallet trucks" }
+          {
+            "text": "Stackers"
+          },
+          {
+            "text": "Electric pallet trucks"
+          },
+          {
+            "text": "Manual pallet trucks"
+          }
         ]
       }
     ]
@@ -135,8 +147,12 @@
       "mainImage": "/orcamento/i1.png",
       "backgroundImage": "/Background.png",
       "features": [
-        { "image": "/orcamento/i1.png" },
-        { "image": "/orcamento/i2.png" }
+        {
+          "image": "/orcamento/i1.png"
+        },
+        {
+          "image": "/orcamento/i2.png"
+        }
       ],
       "description": "<span class='label'>Material:</span> Galvanized or RAL 5005 / 7035<br/><span class='label'>Supported Weight:</span> 3300Kg per pair of beams<br/><span class='label'>Frame Height:</span> 2000 to 5500 mm <br/><span class='label'>Frame Depth:</span> 800 to 1100 mm. <br/><span class='label'>Beam Length:</span> 2200 to 2750 mm. <br/><span class='label'>Description:</span> Metallic frame with footplate, suitable for storage systems and industrial structures. Manufactured in high-strength steel, it allows multiple height and depth configurations, adapting to different load and space requirements. Available in galvanized or painted finish, ensuring durability and anti-corrosion protection in industrial environments.",
       "galleryTitle": "Our Customers",
@@ -177,8 +193,12 @@
       "mainImage": "/orcamento/prateleira inteira.png",
       "backgroundImage": "/Background.png",
       "features": [
-        { "image": "/prateleira inteira.png" },
-        { "image": "/orcamento/a2.png" }
+        {
+          "image": "/prateleira inteira.png"
+        },
+        {
+          "image": "/orcamento/a2.png"
+        }
       ],
       "description": "<span class='label'>Frame Height:</span> 1000 to 3000 mm <br/><span class='label'>Frame Depth:</span> 300 to 600 mm. <br/><span class='label'>Shelf Length:</span> 750 to 1000 mm <br/><span class='label'>Shelf Width:</span> 300 to 600 mm <br/><span class='label'>Description:</span> Tool-free boltless metal shelving is a practical and resistant solution for spaces requiring efficient organization and high load capacity, such as warehouses, archives, or industrial areas. The modular system allows easy adjustment of shelf heights, adapting the structure to the specific needs of each use. Assembly is quick and secure, through reinforced fittings that guarantee stability and prevent unwanted movement. Manufactured in robust steel, these shelves offer durability, flexibility, and an excellent response for different storage configurations, and can be dimensioned to fit the available space.",
       "galleryTitle": "Our Customers",
@@ -393,6 +413,121 @@
           }
         ],
         "description": "<span class='label'>Frame Height:</span> 1000 to 3000 mm <br/><span class='label'>Frame Depth:</span> 300 to 600 mm. <br/><span class='label'>Shelf Length:</span> 750 to 1000 mm <br/><span class='label'>Shelf Width:</span> 300 to 600 mm <br/><span class='label'>Description:</span> Tool-free boltless metal shelving is a practical and resistant solution for spaces requiring efficient organization and high load capacity, such as warehouses, archives, or industrial areas. The modular system allows easy adjustment of shelf heights, adapting the structure to the specific needs of each use. Assembly is quick and secure, through reinforced fittings that guarantee stability and prevent unwanted movement. Manufactured in robust steel, these shelves offer durability, flexibility, and an excellent response for different storage configurations, and can be dimensioned to fit the available space."
+      },
+      {
+        "id": "estantes-picking",
+        "image": "/produtos/9-Porteco Z60/i1.png",
+        "width": 160,
+        "text": "Picking Shelving with Shelves",
+        "images": [
+          "/produtos/9-Porteco Z60/i1.png",
+          "/produtos/9-Porteco Z60/i2.jpg",
+          "/produtos/9-Porteco Z60/i3.jpg",
+          "/produtos/9-Porteco Z60/i4.jpg",
+          "/produtos/9-Porteco Z60/i5.jpg",
+          "/produtos/9-Porteco Z60/i6.jpg",
+          "/produtos/9-Porteco Z60/i7.jpg",
+          "/produtos/9-Porteco Z60/i8.jpg",
+          "/produtos/9-Porteco Z60/i9.jpg",
+          "/produtos/9-Porteco Z60/i10.jpg",
+          "/produtos/9-Porteco Z60/i12.jpg",
+          "/produtos/9-Porteco Z60/i13.jpg",
+          "/produtos/9-Porteco Z60/i14.jpg",
+          "/produtos/9-Porteco Z60/i15.jpg",
+          "/produtos/9-Porteco Z60/i16.jpg",
+          "/produtos/9-Porteco Z60/i17.jpg"
+        ],
+        "description": "<span class='label'>Material:</span> High-strength metal structure.<br/><span class='label'>Load capacity:</span> Up to 1,000 kg per beam pair.<br/><span class='label'>Frame height:</span> 2,000 to 5,500 mm.<br/><span class='label'>Frame depth:</span> 400 to 1,100 mm.<br/><span class='label'>Beam length:</span> 1,000 to 2,750 mm.<br/><span class='label'>Beam profiles:</span> Z60 or Z100.<br/><span class='label'>Description:</span> A robust metal shelving system for warehouses, workshops and storage areas. Its modular structure and quick-fit beams support a range of height, depth and length configurations to suit your load and organisation needs.",
+        "tabela": [
+          {
+            "nome": "Frames",
+            "altura_mm": 2000,
+            "largura_mm": "800 | 900 | 1000 | 1100",
+            "acabamento": "Galvanised or RAL 5005 / 7035"
+          },
+          {
+            "nome": "Frames",
+            "altura_mm": 2500,
+            "largura_mm": "800 | 900 | 1000 | 1100",
+            "acabamento": "Galvanised or RAL 5005 / 7035"
+          },
+          {
+            "nome": "Frames",
+            "altura_mm": 3000,
+            "largura_mm": "800 | 900 | 1000 | 1100",
+            "acabamento": "Galvanised or RAL 5005 / 7035"
+          },
+          {
+            "nome": "Frames",
+            "altura_mm": 3500,
+            "largura_mm": "800 | 900 | 1000 | 1100",
+            "acabamento": "Galvanised or RAL 5005 / 7035"
+          },
+          {
+            "nome": "Frames",
+            "altura_mm": 4000,
+            "largura_mm": "800 | 900 | 1000 | 1100",
+            "acabamento": "Galvanised or RAL 5005 / 7035"
+          },
+          {
+            "nome": "Frames",
+            "altura_mm": 4500,
+            "largura_mm": "800 | 900 | 1000 | 1100",
+            "acabamento": "Galvanised or RAL 5005 / 7035"
+          },
+          {
+            "nome": "Frames",
+            "altura_mm": 5000,
+            "largura_mm": "800 | 900 | 1000 | 1100",
+            "acabamento": "Galvanised or RAL 5005 / 7035"
+          },
+          {
+            "nome": "Frames",
+            "altura_mm": 5500,
+            "largura_mm": "800 | 900 | 1000 | 1100",
+            "acabamento": "Galvanised or RAL 5005 / 7035"
+          },
+          {
+            "nome": "Z60 | Z100 Beams",
+            "altura_mm": "-",
+            "largura_mm": 1000
+          },
+          {
+            "nome": "Z60 | Z100 Beams",
+            "altura_mm": "-",
+            "largura_mm": 1250
+          },
+          {
+            "nome": "Z60 | Z100 Beams",
+            "altura_mm": "-",
+            "largura_mm": 1500
+          },
+          {
+            "nome": "Z60 | Z100 Beams",
+            "altura_mm": "-",
+            "largura_mm": 1750
+          },
+          {
+            "nome": "Z60 | Z100 Beams",
+            "altura_mm": "-",
+            "largura_mm": 2000
+          },
+          {
+            "nome": "Z60 | Z100 Beams",
+            "altura_mm": "-",
+            "largura_mm": 2250
+          },
+          {
+            "nome": "Z60 | Z100 Beams",
+            "altura_mm": "-",
+            "largura_mm": 2500
+          },
+          {
+            "nome": "Z60 | Z100 Beams",
+            "altura_mm": "-",
+            "largura_mm": 2750
+          }
+        ]
       },
       {
         "id": "porta-paletes-eletrico",

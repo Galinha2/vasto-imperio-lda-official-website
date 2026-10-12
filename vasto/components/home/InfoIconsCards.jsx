@@ -21,7 +21,7 @@ export default function InfoIconsCards() {
   const { title, text: items } = (language === "pt" ? contentpt : contenten).homeInfoCards;
 
   return (
-    <aside className="rounded-[28px] border border-[#e5e5e7] bg-[#f5f5f7] p-5 shadow-[0_2px_10px_rgba(0,0,0,0.035)] sm:p-6 lg:mt-[116px]">
+    <aside className="rounded-[28px] border border-[#e5e5e7] bg-[#f5f5f7] p-5 shadow-[0_2px_10px_rgba(0,0,0,0.035)] sm:p-6 lg:mt-[132px] lg:self-start">
       <div className="border-b border-[#e2e2e5] pb-5">
         <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-(--orange)">{language === "pt" ? "Porquê a Vasto Império" : "Why Vasto Império"}</p>
         <h2 className="mt-2 text-2xl font-semibold leading-tight tracking-[-0.035em] text-[#1d1d1f]">{title}</h2>

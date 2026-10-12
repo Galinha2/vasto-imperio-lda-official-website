@@ -42,6 +42,12 @@ export default async function handler(req, res) {
         <td style="padding:8px;border-bottom:1px solid #e5e5e7;text-align:right">${escapeHtml(item.unidades || 0)}</td>
         <td style="padding:8px;border-bottom:1px solid #e5e5e7;text-align:right">${Number(item.total || 0).toFixed(2).replace(".", ",")} €</td>
       </tr>`).join("");
+    const confirmationItemRows = items.map((item) => `
+      <tr>
+        <td style="padding:8px;border-bottom:1px solid #e5e5e7">${escapeHtml(item.refCompleta || "")}</td>
+        <td style="padding:8px;border-bottom:1px solid #e5e5e7">${escapeHtml(item.produto || "")}</td>
+        <td style="padding:8px;border-bottom:1px solid #e5e5e7;text-align:right">${escapeHtml(item.unidades || 0)}</td>
+      </tr>`).join("");
     const row = (label, value) => `<tr><td style="padding:7px 0;width:180px;color:#6e6e73"><strong>${label}</strong></td><td style="padding:7px 0">${escapeHtml(value || "—")}</td></tr>`;
     const shippingAddress = moradaEnvioIgual ? moradaFiscal : moradaEnvio;
     const html = `
@@ -79,8 +85,8 @@ export default async function handler(req, res) {
         </table>
         <h3 style="margin:24px 0 8px">${english ? "Items" : "Artigos"}</h3>
         <table style="width:100%;border-collapse:collapse">
-          <thead><tr style="background:#f5f5f7;text-align:left"><th style="padding:8px">${english ? "Ref." : "Ref."}</th><th style="padding:8px">${english ? "Item" : "Artigo"}</th><th style="padding:8px;text-align:right">${english ? "Qty." : "Qtd."}</th><th style="padding:8px;text-align:right">${english ? "Total" : "Total"}</th></tr></thead>
-          <tbody>${listRows}</tbody>
+          <thead><tr style="background:#f5f5f7;text-align:left"><th style="padding:8px">Ref.</th><th style="padding:8px">${english ? "Item" : "Artigo"}</th><th style="padding:8px;text-align:right">${english ? "Qty." : "Qtd."}</th></tr></thead>
+          <tbody>${confirmationItemRows}</tbody>
         </table>
         <p style="margin-top:20px;font-size:18px"><strong>${english ? "Final value" : "Valor final"}: ${Number(total).toFixed(2).replace(".", ",")} € ${english ? "+ VAT at the applicable rate. Delivery is not included." : "+ IVA à taxa legal em vigor. Transporte não incluído."}</strong></p>
         <p style="color:#6e6e73">${english ? "Our team will contact you to follow up on your request." : "A equipa da Vasto Império entrará em contacto para dar seguimento ao pedido."}</p>

@@ -62,7 +62,7 @@ export default function SimulatorOrderModal({ open, onClose, total, details, ite
         nomeClienteManual: form.nome,
         returnBlob: true,
       });
-      const orderData = JSON.stringify({ ...form, total, detalhes: details, artigos: items });
+      const orderData = JSON.stringify({ ...form, total, detalhes: details, artigos: items, idioma: english ? "en" : "pt" });
       const maxRequestBytes = 3.9 * 1024 * 1024;
       const multipartMarginBytes = 96 * 1024;
       const fixedRequestBytes = budgetPdf.size + new Blob([orderData]).size + multipartMarginBytes;

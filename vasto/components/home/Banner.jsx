@@ -1,60 +1,72 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import contentpt from "@/assets/contentpt.json";
 import contenten from "@/assets/contenten.json";
 import { useLanguage } from "../header/LanguageContext";
 
-function Banner() {
+export default function Banner() {
   const { language } = useLanguage();
   const content = language === "pt" ? contentpt : contenten;
   const item = content.homeHeader.text[0];
+  const titleParts = item.title.match(/^([\s\S]*?)<span[^>]*>([\s\S]*?)<\/span>([\s\S]*)$/);
+  const plainTitle = item.title.replace(/<[^>]*>/g, "");
+
   return (
-    <div className="relative flex w-full mt-17 h-150 md:h-120 lg:h-150 border-(--horizontal-line) border-b overflow-hidden">
+    <section className="relative isolate mt-[68px] overflow-hidden bg-[#f5f5f7] lg:mt-[76px]">
       <Image
         src={content.homeHeader.background}
-        alt="Banner Image"
+        alt=""
         fill
         priority
-        className="z-1 absolute object-cover object-bottom-left object-bottom rotate-180 md:rotate-0"
+        sizes="100vw"
+        className="z-0 object-cover object-center"
       />
-      <div className="w-full max-w-450 h-full m-auto flex flex-col md:flex-row items-center md:items-end px-5 justify-between">
-        <div className="flex gap-3 flex-col-reverse items-center md:items-start md:flex-col">
-              <Image
-                src={content.header.logo}
-                alt="Banner Image"
-                width={2000}
-                height={50}
-                priority
-                className="z-1 relative w-full max-w-[100px] md:max-w-[250px] lg:max-w-[350px] xl:max-w-[400px] h-auto"
-              />
-            <div className="flex flex-col md:items-start text-center md:text-left items-center gap-4 justify-end z-1 relative bg-[var(--gray-transparent)] backdrop-blur-[5px] w-110 h-57 md:h-58 pt-5 px-5 pb-6 md:pb-4 rounded-[0px_0px_35px_35px] md:rounded-[35px_35px_0px_0px]">
-              <h1
-                className="text-3xl md:text-4xl font-black text-[var(--blue)]"
-                dangerouslySetInnerHTML={{ __html: item.title }}
-              ></h1>
-              <p className="text-[var(--blue)] w-90">{item.subTitle}</p>
-              <a
-                key={item.url}
-                href={item.url}
-                className="bg-[var(--orange)] hover:bg-[var(--orange-hover)] text-white px-4 py-2 rounded-full shadow-md"
-              >
-                {item.button}
-              </a>
-            </div>
+      <div className="absolute inset-0 z-10 bg-[linear-gradient(90deg,rgba(248,249,251,0.98)_0%,rgba(248,249,251,0.88)_46%,rgba(248,249,251,0.24)_100%)]" />
+      <div className="relative z-20 mx-auto grid min-h-[620px] max-w-[1440px] items-center gap-8 px-5 py-14 sm:px-8 lg:min-h-[700px] lg:grid-cols-[1.05fr_0.95fr] lg:items-stretch lg:gap-4 lg:px-12 lg:pb-0 lg:pt-20">
+        <div className="relative z-10 max-w-3xl lg:self-center">
+          <p className="mb-5 inline-flex items-center gap-2 rounded-full border border-black/10 bg-white/75 px-4 py-2 text-xs font-semibold uppercase tracking-[0.14em] text-[#52545a] shadow-sm backdrop-blur-md sm:text-sm">
+            <span className="h-2 w-2 rounded-full bg-(--orange)" />
+            Vasto Império · Benedita e Viseu
+          </p>
+          <h1
+            className="max-w-3xl text-4xl font-semibold leading-[1.03] tracking-[-0.045em] text-[#15171a] sm:text-5xl md:text-6xl lg:text-7xl"
+          >
+            {titleParts ? <>{titleParts[1]}<span className="bg-gradient-to-r from-(--blue) to-(--orange) bg-clip-text text-transparent">{titleParts[2]}</span>{titleParts[3]}</> : plainTitle}
+          </h1>
+          <p className="mt-6 max-w-xl text-lg leading-relaxed text-[#555b63] sm:text-xl">
+            {item.subTitle}
+          </p>
+          <div className="mt-8 flex flex-wrap items-center gap-3">
+            <Link
+              href={item.url}
+              className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-full bg-(--orange) px-6 py-3.5 text-sm font-semibold text-white shadow-[0_8px_24px_rgba(255,85,0,0.22)] transition hover:-translate-y-0.5 hover:bg-(--orange-hover) hover:shadow-lg"
+            >
+              {item.button}<span aria-hidden="true">→</span>
+            </Link>
+            <Link
+              href="/simulador"
+              className="inline-flex cursor-pointer items-center justify-center rounded-full border border-black/10 bg-white/80 px-6 py-3.5 text-sm font-semibold text-[#25282d] backdrop-blur transition hover:-translate-y-0.5 hover:bg-white"
+            >
+              {content.simulationCards.title}
+            </Link>
+          </div>
+          <p className="mt-7 text-sm font-medium text-[#737880]">{language === "pt" ? "Soluções para armazenagem profissional em todo o país." : "Professional storage solutions across Portugal."}</p>
         </div>
-
-        <Image
-          src={content.homeHeader.tools}
-          alt="Banner Image"
-          width={2000}
-          height={100}
-          priority
-          className="z-1 relative w-full max-w-[400px] md:max-w-[300px] lg:max-w-[500px] xl:max-w-[800px] h-auto"
-        />
+        <div className="relative mx-auto flex w-full max-w-[680px] items-end justify-center lg:-mr-8 lg:justify-end lg:self-end">
+          <div className="absolute inset-x-8 bottom-8 top-8 rounded-full bg-white/55 blur-3xl" />
+          <Image
+            src={content.homeHeader.tools}
+            alt={language === "pt" ? "Equipamento de armazenagem da Vasto Império" : "Vasto Império storage equipment"}
+            width={1200}
+            height={700}
+            priority
+            sizes="(max-width: 1024px) 90vw, 52vw"
+            className="relative z-10 h-auto max-h-[420px] w-full object-contain object-bottom drop-shadow-[0_28px_35px_rgba(35,45,60,0.18)] lg:max-h-[520px]"
+          />
+        </div>
       </div>
-    </div>
+    </section>
   );
 }
-
-export default Banner;

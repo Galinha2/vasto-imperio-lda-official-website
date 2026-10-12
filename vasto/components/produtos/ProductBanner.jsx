@@ -1,46 +1,57 @@
 "use client";
+
 import Image from "next/image";
 import contentpt from "@/assets/contentpt.json";
 import contenten from "@/assets/contenten.json";
 import { useLanguage } from "../header/LanguageContext";
 
-function ProductBanner() {
+export default function ProductBanner() {
   const { language } = useLanguage();
   const content = language === "pt" ? contentpt : contenten;
-  const item = content.productBanner;
+
   return (
-    <div className="relative flex w-full mt-17 h-70 md:h-100 xl:h-140 2xl:h-150 border-(--horizontal-line) border-b overflow-hidden">
+    <section className="relative isolate mt-[68px] overflow-hidden bg-[#f5f5f7] lg:mt-[76px]">
       <Image
-        src={item.background}
-        alt="Banner Image"
-        width={4000}
-        height={500}
+        src={content.productBanner.background}
+        alt=""
+        fill
         priority
-        className="z-1 absolute w-full md:h-full object-cover object-bottom-center object-bottom h-full"
+        sizes="100vw"
+        className="z-0 object-cover object-center opacity-35"
       />
-      <div className="w-full max-w-450 h-full m-auto flex flex-col items-center  px-5 justify-between">
-        <div className="flex gap-3 flex-col-reverse items-center">
-          <Image
-            src={item.logo}
-            alt="Banner Image"
-            width={2000}
-            height={50}
-            priority
-            className="z-2 absolute top-10 w-full max-w-[140px] md:max-w-[200px] lg:max-w-[220px] xl:max-w-[270px] h-auto"
-          />
+      <div className="absolute inset-0 z-10 bg-gradient-to-r from-[#f5f5f7] via-[#f5f5f7]/95 to-white/65" />
+      <div className="relative z-20 mx-auto grid min-h-[520px] max-w-[1440px] items-center gap-8 px-5 py-14 sm:px-8 lg:min-h-[590px] lg:grid-cols-[0.9fr_1.1fr] lg:gap-4 lg:px-12 lg:pb-0 lg:pt-16">
+        <div className="relative z-10 max-w-xl lg:self-center lg:pb-14">
+          <p className="inline-flex items-center gap-2 rounded-full border border-black/[0.08] bg-white/75 px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-[#555860] shadow-sm backdrop-blur">
+            <span className="h-2 w-2 rounded-full bg-(--orange)" />
+            {language === "pt" ? "Vasto Império · Soluções de armazenagem" : "Vasto Império · Storage solutions"}
+          </p>
+          <h1 className="mt-6 text-4xl font-semibold leading-[1.04] tracking-[-0.045em] text-[#1d1d1f] sm:text-5xl lg:text-6xl">
+            {language === "pt" ? <>Soluções feitas para <span className="text-(--orange)">organizar melhor.</span></> : <>Storage designed to <span className="text-(--orange)">work better.</span></>}
+          </h1>
+          <p className="mt-5 max-w-lg text-base leading-relaxed text-[#626268] sm:text-lg">
+            {language === "pt"
+              ? "Explore sistemas profissionais para armazéns, oficinas, lojas e espaços de trabalho."
+              : "Explore professional systems for warehouses, workshops, shops and workplaces."}
+          </p>
+          <p className="mt-7 text-sm font-medium text-[#777980]">
+            {language === "pt" ? "Descubra a solução certa para o seu espaço." : "Find the right solution for your space."}
+          </p>
         </div>
 
-        <Image
-          src={item.tools}
-          alt="Banner Image"
-          width={2000}
-          height={100}
-          priority
-          className="z-1 relative w-full lg:mt-3 max-w-[500px] md:max-w-[1000px] lg:max-w-[2000px] h-auto"
-        />
+        <div className="relative mx-auto flex w-full max-w-[820px] items-end lg:h-full lg:self-end">
+          <div className="absolute inset-x-10 bottom-8 top-12 rounded-full bg-white/70 blur-3xl" />
+          <Image
+            src={content.productBanner.tools}
+            alt={language === "pt" ? "Seleção de soluções de armazenagem Vasto Império" : "A selection of Vasto Império storage solutions"}
+            width={2000}
+            height={673}
+            priority
+            sizes="(max-width: 1024px) 95vw, 58vw"
+            className="relative z-10 h-auto w-full object-contain object-bottom drop-shadow-[0_22px_26px_rgba(35,45,60,0.12)] lg:mt-auto"
+          />
+        </div>
       </div>
-    </div>
+    </section>
   );
 }
-
-export default ProductBanner;

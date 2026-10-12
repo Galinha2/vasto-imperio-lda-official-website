@@ -43,7 +43,7 @@
       {
         "image": "/estantessim.png",
         "title": "Shelving",
-        "url": "/simulador/estantes",
+        "url": "/simulador/estantes-ligeiras",
         "simulation": "Simulator",
         "subTitle": [
           { "text": "Racks - Heavy pallet loads" },

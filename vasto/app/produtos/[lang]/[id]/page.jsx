@@ -4,6 +4,7 @@ import GalleryClient from "./GalleryClient";
 import ContactCard from "@/components/contacts/ContactCard";
 import ProductTabela from "@/components/produtos/ProductTabela";
 import Galeria from "@/components/galeria/Galeria";
+import Link from "next/link";
 
 // Geração estática de todos os IDs para pt e en
 export function generateStaticParams() {
@@ -77,34 +78,69 @@ export default async function Page({ params }) {
     (item) => item.id === decodeURIComponent(String(id))
   );
   const tabela = product?.tabela;
+  const hasGallery = Boolean(product?.galeria?.length);
+  const contactBackground = Boolean(tabela) === hasGallery ? "white" : "gray";
 
   if (!product) {
     return (
-      <div className="p-10 mt-17 text-center">
-        <p className="text-xl font-medium">{text.produtoNe}</p>
+      <div className="mt-[76px] flex min-h-[50vh] flex-col items-center justify-center gap-5 px-5 text-center">
+        <p className="text-2xl font-semibold tracking-tight text-[#1d1d1f]">{text.produtoNe}</p>
+        <Link href={`/produtos`} className="rounded-full bg-(--orange) px-5 py-3 text-sm font-semibold text-white transition hover:bg-(--orange-hover)">
+          {lang === "pt" ? "Ver todos os produtos" : "View all products"}
+        </Link>
       </div>
     );
   }
 
   return (
     <>
-      <div className={`mt-17 m-auto pt-10 px-5 2xl:px-30 xl:px-5 pb-20 font-medium flex flex-col gap-10 ${!tabela && "border-b border-(--horizontal-line) mb-10"}`}>
-        <h1 className="w-full max-w-450 m-auto title -mb-7">{product.text}</h1>
-
-        <GalleryClient product={product} text={text} />
-      </div>
+      <main className="mt-[68px] bg-[#f5f5f7] px-5 pb-16 pt-8 sm:px-8 sm:pt-12 lg:mt-[76px] lg:pb-20">
+        <div className="mx-auto max-w-[1440px]">
+          <nav aria-label={lang === "pt" ? "Navegação estrutural" : "Breadcrumb"} className="mb-7 text-sm text-[#7a7a80]">
+            <Link href="/produtos" className="transition-colors hover:text-(--orange)">
+              {lang === "pt" ? "Produtos" : "Products"}
+            </Link>
+            <span className="mx-2 text-[#b5b5ba]" aria-hidden="true">/</span>
+            <span className="text-[#4e4e53]">{product.text}</span>
+          </nav>
+          <header className="mb-8 border-b border-[#e5e5e7] pb-6 sm:mb-10 sm:pb-8">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-(--orange)">
+              {lang === "pt" ? "Soluções de armazenagem" : "Storage solutions"}
+            </p>
+            <h1 className="mt-3 max-w-4xl text-3xl font-semibold leading-tight tracking-[-0.045em] text-[#1d1d1f] sm:text-4xl lg:text-5xl">
+              {product.text}
+            </h1>
+          </header>
+          <GalleryClient product={product} text={text} />
+        </div>
+      </main>
       {tabela && (
-        <div className={`border-b border-(--horizontal-line) pb-5 mb-15`}>
+        <section className="border-y border-[#e5e5e7] bg-white py-14 sm:py-16 lg:py-20">
           <ProductTabela tabela={tabela} />
-        </div>
+        </section>
       )}
-      {product.galeria && product.galeria.length > 0 && (
-        <div className="mb-20 border-b border-(--horizontal-line) -mt-15 py-20 bg-(--gray) p-5">
-          <h1 className="title m-auto max-w-200 text-center mb-5">{product.galeriaTitle}</h1>
-          <Galeria productId={product.id} />
-        </div>
+      {hasGallery && (
+        <section className={`${tabela ? "bg-[#f5f5f7]" : "bg-white"} px-5 py-14 sm:px-8 sm:py-16 lg:py-20`}>
+          <div className="mx-auto max-w-[1440px]">
+            <header className="mb-8 flex flex-col gap-5 border-b border-[#dedee3] pb-7 sm:mb-10 sm:flex-row sm:items-end sm:justify-between sm:pb-8">
+              <div>
+                <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-(--orange)">
+                  {lang === "pt" ? "No terreno" : "In the field"}
+                </p>
+                <h2 className="mt-2 text-3xl font-semibold tracking-[-0.04em] text-[#1d1d1f] sm:text-4xl">{product.galeriaTitle}</h2>
+                <p className="mt-3 max-w-2xl text-sm leading-relaxed text-[#68686e] sm:text-base">
+                  {lang === "pt" ? "Conheça algumas das soluções implementadas junto dos nossos clientes." : "Explore some of the solutions delivered for our customers."}
+                </p>
+              </div>
+              <span className="inline-flex w-fit items-center rounded-full border border-[#dedee3] bg-white px-4 py-2 text-xs font-medium text-[#68686e] shadow-sm">
+                {String(product.galeria.length).padStart(2, "0")} {lang === "pt" ? "fotografias" : "photos"}
+              </span>
+            </header>
+            <Galeria images={product.galeria} alt={product.text} language={lang} />
+          </div>
+        </section>
       )}
-      <ContactCard />
+      <ContactCard sectionBackground={contactBackground} />
     </>
   );
 }

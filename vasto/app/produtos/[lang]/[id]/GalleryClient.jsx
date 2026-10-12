@@ -1,115 +1,127 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
 import { IoClose } from "react-icons/io5";
 
 export default function GalleryClient({ product, text }) {
-  const images =
-    product.images && product.images.length > 0
-      ? product.images
-      : [product.image];
-
+  const images = product.images?.length ? product.images : [product.image];
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isModalOpen, setIsModalOpen] = useState(false);
-
   const hasMultipleImages = images.length > 1;
 
-  const handleNextImage = () => {
-    setCurrentImageIndex((prev) => (prev + 1) % images.length);
-  };
+  const showImage = (index) => setCurrentImageIndex((index + images.length) % images.length);
+  const handleNextImage = () => showImage(currentImageIndex + 1);
+  const handlePrevImage = () => showImage(currentImageIndex - 1);
 
-  const handlePrevImage = () => {
-    setCurrentImageIndex((prev) => (prev - 1 + images.length) % images.length);
-  };
-
-  const openModal = (index) => {
-    setCurrentImageIndex(index);
-    setIsModalOpen(true);
-  };
-
-  const closeModal = () => {
-    setIsModalOpen(false);
-  };
+  useEffect(() => {
+    if (!isModalOpen) return undefined;
+    const handleKeyDown = (event) => {
+      if (event.key === "Escape") setIsModalOpen(false);
+      if (event.key === "ArrowRight") handleNextImage();
+      if (event.key === "ArrowLeft") handlePrevImage();
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [isModalOpen, currentImageIndex]);
 
   return (
     <>
-      <div className="flex w-full items-center max-w-450 m-auto justify-center md:justify-start md:gap-5 lg:gap-10 xl:gap-30 md:items-start flex-col md:flex-row gap-5">
-        <div className="flex p-4 flex-col items-center md:flex-row justify-center bg-white w-100 h-100 md:min-w-100 lg:min-w-150 lg:min-h-160 shadow-lg rounded-[35px] relative">
-          <Image
-            src={images[currentImageIndex]}
-            alt={product.text}
-            width={600}
-            height={600}
-            className="cursor-pointer w-auto max-h-100 lg:max-h-150"
-            onClick={() => openModal(currentImageIndex)}
-          />
+      <div className="grid items-start gap-8 lg:grid-cols-[minmax(0,1.2fr)_minmax(340px,0.8fr)] lg:gap-12">
+        <div className="min-w-0">
+          <div className="group relative aspect-[4/3] overflow-hidden rounded-[28px] border border-[#e5e5e7] bg-white sm:rounded-[32px]" style={{ backgroundColor: "#fff" }}>
+            <button
+              type="button"
+              onClick={() => setIsModalOpen(true)}
+              aria-label={text?.verImagem || `View ${product.text} image`}
+              className="absolute inset-0 z-0 flex h-full w-full cursor-zoom-in items-center justify-center bg-white p-6 sm:p-10"
+              style={{ backgroundColor: "#fff" }}
+            >
+              <Image
+                src={images[currentImageIndex]}
+                alt={product.text}
+                fill
+                priority
+                sizes="(max-width: 1024px) 100vw, 58vw"
+                className="object-contain p-6 transition duration-500 group-hover:scale-[1.025] sm:p-10"
+              />
+            </button>
+
+            {hasMultipleImages && (
+              <>
+                <button
+                  type="button"
+                  onClick={handlePrevImage}
+                  aria-label={text?.imagemAnterior || "Previous image"}
+                  className="absolute left-4 top-1/2 z-10 flex h-11 w-11 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full border border-black/[0.06] bg-white/90 text-2xl text-[#1d1d1f] shadow-md backdrop-blur transition hover:scale-105 hover:bg-white"
+                >
+                  <IoIosArrowBack aria-hidden="true" />
+                </button>
+                <button
+                  type="button"
+                  onClick={handleNextImage}
+                  aria-label={text?.proximaImagem || "Next image"}
+                  className="absolute right-4 top-1/2 z-10 flex h-11 w-11 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full border border-black/[0.06] bg-white/90 text-2xl text-[#1d1d1f] shadow-md backdrop-blur transition hover:scale-105 hover:bg-white"
+                >
+                  <IoIosArrowForward aria-hidden="true" />
+                </button>
+              </>
+            )}
+          </div>
 
           {hasMultipleImages && (
-            <div className="absolute top-[40%] lg:top-[43%] left-1/2 transform -translate-x-1/2 flex gap-70 lg:gap-120">
-              <button onClick={handlePrevImage} className="buttonGallery">
-                <IoIosArrowBack />
-              </button>
-              <button onClick={handleNextImage} className="buttonGallery">
-                <IoIosArrowForward />
-              </button>
-            </div>
-          )}
-
-          {hasMultipleImages && (
-            <div className="absolute top-[91%] lg:top-[94%] left-1/2 transform -translate-x-1/2 flex justify-center gap-2">
-              {images.map((_, index) => (
-                <span
-                  key={index}
-                  className={`w-3 h-3 rounded-full transition-colors duration-300 shadow-md ${
-                    index === currentImageIndex ? "bg-white" : "bg-gray-400"
-                  }`}
-                />
+            <div className="simulator-dropdown-scroll mt-4 flex gap-3 overflow-x-auto pb-2">
+              {images.map((image, index) => (
+                <button
+                  key={image}
+                  type="button"
+                  onClick={() => showImage(index)}
+                  aria-label={`${text?.imagem || "Image"} ${index + 1}`}
+                  aria-current={index === currentImageIndex ? "true" : undefined}
+                  className={`relative h-[76px] w-[92px] shrink-0 cursor-pointer overflow-hidden rounded-2xl border bg-white p-2 transition sm:h-[88px] sm:w-[108px] ${index === currentImageIndex ? "border-(--orange) ring-2 ring-(--orange)/15" : "border-[#e5e5e7] hover:border-[#b7b7bd]"}`}
+                >
+                  <Image src={image} alt="" fill sizes="108px" className="object-contain p-2" />
+                </button>
               ))}
             </div>
           )}
         </div>
 
-        <div className="flex mt-5 md:mt-0 md:items-start md:justify-start flex-col gap-2">
-          <p className="text-(--blue) text-center md:text-left">
-            {text.caracteristicas}
-          </p>
-
-          <div className="text-center max-w-150 gap-2 m-auto flex flex-col items-start bg-(--gray) p-5 rounded-[35px]">
-
-            {product.description && (
-              <div
-                className="text-left"
-                dangerouslySetInnerHTML={{ __html: product.description }}
-              />
-            )}
-          </div>
-        </div>
+        <aside className="rounded-[28px] border border-[#e5e5e7] bg-white p-5 shadow-[0_4px_20px_rgba(0,0,0,0.035)] sm:p-7 lg:sticky lg:top-8">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.17em] text-(--orange)">{text.caracteristicas}</p>
+          <div
+            className="product-description mt-5 text-sm leading-[1.75] text-[#55565c] sm:text-base"
+            dangerouslySetInnerHTML={{ __html: product.description || "" }}
+          />
+          <Link href="/contacto" className="mt-7 inline-flex min-h-12 cursor-pointer items-center justify-center gap-2 rounded-full bg-(--orange) px-6 py-3 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:bg-(--orange-hover) focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--orange)">
+            {text?.contacte || (text?.caracteristicas === "Características" ? "Pedir informações" : "Request information")}
+            <span aria-hidden="true">→</span>
+          </Link>
+        </aside>
       </div>
 
       {isModalOpen && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-white"
-          onClick={closeModal}
+          className="fixed inset-0 z-50 flex items-center justify-center bg-white p-4 sm:p-8"
+          onClick={() => setIsModalOpen(false)}
+          role="dialog"
+          aria-modal="true"
+          aria-label={product.text}
         >
-          <div className="relative" onClick={(e) => e.stopPropagation()}>
-            <Image
-              src={images[currentImageIndex]}
-              alt={product.text}
-              width={800}
-              height={800}
-            />
-            <button
-              onClick={closeModal}
-              className="absolute top-0 right-2 cursor-pointer text-(--orange) p-2 text-4xl"
-            >
-              <IoClose />
-            </button>
+          <div className="relative h-[min(88vh,900px)] w-full max-w-6xl" onClick={(event) => event.stopPropagation()}>
+            <Image src={images[currentImageIndex]} alt={product.text} fill sizes="95vw" className="object-contain" />
+            {hasMultipleImages && (
+              <>
+                <button type="button" onClick={handlePrevImage} aria-label={text?.imagemAnterior || "Previous image"} className="absolute left-2 top-1/2 flex h-12 w-12 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full bg-white/90 text-2xl text-[#1d1d1f] shadow-lg transition hover:bg-white sm:left-5"><IoIosArrowBack aria-hidden="true" /></button>
+                <button type="button" onClick={handleNextImage} aria-label={text?.proximaImagem || "Next image"} className="absolute right-2 top-1/2 flex h-12 w-12 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full bg-white/90 text-2xl text-[#1d1d1f] shadow-lg transition hover:bg-white sm:right-5"><IoIosArrowForward aria-hidden="true" /></button>
+              </>
+            )}
+            <button type="button" onClick={() => setIsModalOpen(false)} aria-label={text?.fechar || "Close"} className="absolute right-2 top-2 flex h-11 w-11 cursor-pointer items-center justify-center rounded-full bg-white/90 text-2xl text-[#1d1d1f] shadow-lg transition hover:scale-105 hover:bg-white sm:right-5 sm:top-5"><IoClose aria-hidden="true" /></button>
           </div>
         </div>
       )}
-      
     </>
   );
 }

@@ -1,9 +1,5 @@
-function page() {
-    return (
-        <div>
-            
-        </div>
-    )
-}
+import SimulatorPicking from "@/components/simulador/SimulatorPicking";
 
-export default page
+export default function SimulatorPage() {
+  return <SimulatorPicking />;
+}

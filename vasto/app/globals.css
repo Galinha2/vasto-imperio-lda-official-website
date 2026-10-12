@@ -63,6 +63,31 @@ body {
   line-height: 2.5;
 }
 
+.product-description .label {
+  display: inline-block;
+  color: var(--orange);
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+.product-description br {
+  content: "";
+  display: block;
+  margin-block: 0.45rem;
+}
+
 .background {
   background-image: url(/background.png);
+}
+
+.simulator-dropdown-scroll {
+  scrollbar-width: none;
+}
+
+.simulator-dropdown-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.simulator-pill {
+  border-radius: 9999px;
 }

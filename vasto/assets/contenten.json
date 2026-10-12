@@ -37,6 +37,33 @@
       }
     ]
   },
+  "simulationCards": {
+    "title": "Simulate Your Quote",
+    "text": [
+      {
+        "image": "/estantessim.png",
+        "title": "Shelving",
+        "url": "/simulador/estantes",
+        "simulation": "Simulator",
+        "subTitle": [
+          { "text": "Racks - Heavy pallet loads" },
+          { "text": "Picking - Medium loads" },
+          { "text": "Light duty - Light loads" }
+        ]
+      },
+      {
+        "image": "/transport.png",
+        "title": "Material Handling",
+        "url": "/simulador/movimentacao-de-carga",
+        "simulation": "Simulator",
+        "subTitle": [
+          { "text": "Stackers" },
+          { "text": "Electric pallet trucks" },
+          { "text": "Manual pallet trucks" }
+        ]
+      }
+    ]
+  },
   "homeInfoCards": {
     "title": "Racks, Shelving and Storage Solutions in Benedita and Viseu",
     "text": [

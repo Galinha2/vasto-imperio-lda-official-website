@@ -37,6 +37,45 @@
       }
     ]
   },
+  "simulationCards": {
+    "title": "Simule o seu Orçamento",
+    "text": [
+      {
+        "image": "/estantessim.png",
+        "title": "Estantes",
+        "url": "/simulador/estantes",
+        "simulation": "Simulador",
+        "subTitle": [
+          {
+            "text": "Racks - Carga pesada para paletes"
+          },
+          {
+            "text": "Picking - Carga média"
+          },
+          {
+            "text": "Ligeiras - Carga ligeira"
+          }
+        ]
+      },
+      {
+        "image": "/transport.png",
+        "title": "Movimentação de carga",
+        "url": "/simulador/movimentacao-de-carga",
+        "simulation": "Simulador",
+        "subTitle": [
+          {
+            "text": "Stakers"
+          },
+          {
+            "text": "Porta-Paletes Elétricos"
+          },
+          {
+            "text": "Porta-Paletes Manual"
+          }
+        ]
+      }
+    ]
+  },
   "homeInfoCards": {
     "title": "Racks, Prateleiras e Soluções de Arrumação em Benedita e Viseu",
     "text": [

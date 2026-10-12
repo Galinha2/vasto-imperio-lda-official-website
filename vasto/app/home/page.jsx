@@ -8,12 +8,18 @@ import Cards from "@/components/home/Cards";
 import Banner from "@/components/home/Banner";
 import InfoIconsCards from "@/components/home/InfoIconsCards";
 import ContactCard from "@/components/contacts/ContactCard";
+import SimulatorCard from "@/components/home/SimulatorCard";
 
 export default function Page() {
     return (
         <div>
             <Banner />
-            <InfoIconsCards />
+            <div className="border-b border-(--horizontal-line)">
+                <div className="flex pt-5 justify-center items-center max-w-450 m-auto">
+                    <SimulatorCard />
+                    <InfoIconsCards />
+                </div>
+            </div>
             <Cards />
             <ContactCard />
         </div>

@@ -74,7 +74,7 @@ export default async function handler(req, res) {
       subject: `${nome.trim()} | Encomenda do simulador`,
       html,
       attachments: [
-        { filename: "desenho-estante.png", content: fs.readFileSync(uploadedImage.filepath), contentType: "image/png" },
+        { filename: "desenho-estante.jpg", content: fs.readFileSync(uploadedImage.filepath), contentType: "image/jpeg" },
         { filename: "folha-orcamento.pdf", content: fs.readFileSync(uploadedPdf.filepath), contentType: "application/pdf" },
       ],
     });

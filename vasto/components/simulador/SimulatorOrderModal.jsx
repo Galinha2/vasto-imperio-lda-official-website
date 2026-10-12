@@ -33,13 +33,10 @@ export default function SimulatorOrderModal({ open, onClose, total, details, ite
     if (!open) return undefined;
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
-    const onKeyDown = (event) => { if (event.key === "Escape" && !submitting) onClose(); };
-    window.addEventListener("keydown", onKeyDown);
     return () => {
       document.body.style.overflow = previousOverflow;
-      window.removeEventListener("keydown", onKeyDown);
     };
-  }, [open, onClose, submitting]);
+  }, [open]);
 
   if (!open) return null;
 
@@ -52,9 +49,12 @@ export default function SimulatorOrderModal({ open, onClose, total, details, ite
       const drawing = drawingRef?.current?.querySelector('svg[role="img"]');
       if (!drawing) throw new Error(english ? "The drawing is not available to attach." : "Não foi possível preparar o desenho da estante.");
       await document.fonts?.ready;
-      const { toPng } = await import("html-to-image");
-      const drawingDataUrl = await toPng(drawing, { pixelRatio: 3, backgroundColor: "#ffffff", cacheBust: true });
-      const drawingBlob = await fetch(drawingDataUrl).then((response) => response.blob());
+      const { toJpeg } = await import("html-to-image");
+      const createDrawing = async (pixelRatio, quality) => {
+        const dataUrl = await toJpeg(drawing, { pixelRatio, quality, backgroundColor: "#ffffff", cacheBust: true });
+        return fetch(dataUrl).then((response) => response.blob());
+      };
+      let drawingBlob = await createDrawing(1.1, 0.7);
       const budgetPdf = await generateBudgetPdf({
         linhas: items,
         descontoSelecionado: discountPercent,
@@ -63,15 +63,32 @@ export default function SimulatorOrderModal({ open, onClose, total, details, ite
         nomeClienteManual: form.nome,
         returnBlob: true,
       });
+      const orderData = JSON.stringify({ ...form, total, detalhes: details, artigos: items });
+      const maxRequestBytes = 3.5 * 1024 * 1024;
+      const estimateRequestBytes = () => drawingBlob.size + budgetPdf.size + new Blob([orderData]).size + 64 * 1024;
+      // Mantém uma margem para os limites de payload e o overhead do multipart na Vercel.
+      if (estimateRequestBytes() > maxRequestBytes) drawingBlob = await createDrawing(0.65, 0.45);
+      if (estimateRequestBytes() > maxRequestBytes) {
+        throw new Error(english ? "The attachments exceed the hosting upload limit. Please contact us to place this order." : "Os anexos excedem o limite de envio do alojamento. Contacte-nos para concluir esta encomenda.");
+      }
       const payload = new FormData();
-      payload.append("dados", JSON.stringify({ ...form, total, detalhes: details, artigos: items }));
-      payload.append("imagem", drawingBlob, "desenho-estante.png");
+      payload.append("dados", orderData);
+      payload.append("imagem", drawingBlob, "desenho-estante.jpg");
       payload.append("orcamento", budgetPdf, "folha-orcamento.pdf");
       const response = await fetch("/api/encomenda-simulador", {
         method: "POST",
         body: payload,
       });
-      const result = await response.json();
+      const responseText = await response.text();
+      let result;
+      try {
+        result = JSON.parse(responseText);
+      } catch {
+        if (response.status === 413 || /request entity too large/i.test(responseText)) {
+          throw new Error(english ? "The attachments exceed the server upload limit. Reduce the number of modules and try again." : "Os anexos excedem o limite de envio do servidor. Reduza o número de módulos e tente novamente.");
+        }
+        throw new Error(english ? "The server returned an invalid response. Please try again." : "O servidor devolveu uma resposta inválida. Tente novamente.");
+      }
       if (!response.ok) throw new Error(result.error || (english ? "Could not submit the order." : "Não foi possível enviar a encomenda."));
       setSent(true);
     } catch (submitError) {
@@ -88,7 +105,7 @@ export default function SimulatorOrderModal({ open, onClose, total, details, ite
   };
 
   return (
-    <div className="fixed inset-0 z-[1000] flex items-center justify-center overflow-y-auto bg-[#1d1d1f]/45 p-3 backdrop-blur-sm sm:p-6" onMouseDown={(event) => { if (event.target === event.currentTarget && !submitting) onClose(); }}>
+    <div className="fixed inset-0 z-[1000] flex items-center justify-center overflow-y-auto bg-[#1d1d1f]/45 p-3 backdrop-blur-sm sm:p-6">
       <section role="dialog" aria-modal="true" aria-labelledby="simulator-order-title" className="my-auto max-h-[min(92vh,900px)] w-full max-w-2xl overflow-y-auto rounded-[30px] border border-white/70 bg-white p-5 shadow-[0_24px_90px_rgba(0,0,0,0.2)] sm:p-8">
         {sent ? (
           <div className="py-8 text-center sm:py-12">

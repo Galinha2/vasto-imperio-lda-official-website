@@ -36,10 +36,11 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: "Campos obrigatórios não preenchidos" });
     }
 
+    const smtpPort = Number(process.env.SMTP_PORT);
     const transporter = nodemailer.createTransport({
-      host: process.env.SMTP_HOST,       // mail.vastoimperio.pt
-      port: 587,                          // STARTTLS
-      secure: false,                      // false = STARTTLS
+      host: process.env.SMTP_HOST,
+      port: smtpPort,
+      secure: smtpPort === 465,
       auth: {
         user: process.env.SMTP_USER,
         pass: process.env.SMTP_PASS,
@@ -118,6 +119,6 @@ export default async function handler(req, res) {
     return res.status(200).json({ message: "Enviado com sucesso" });
   } catch (err) {
     console.error(err);
-    return res.status(500).json({ error: err.message });
+    return res.status(500).json({ error: "Não foi possível enviar o pedido. Verifique as configurações de email ou tente novamente mais tarde." });
   }
 }

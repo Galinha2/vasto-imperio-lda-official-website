@@ -19,25 +19,29 @@ export default function Header() {
   const lastScrollY = useRef(0);
 
   useEffect(() => {
-    const controlHeader = () => {
-      if (typeof window !== "undefined") {
-        const isMobile = window.innerWidth < 768; // só mobile
-        if (!isMobile) return;
+    lastScrollY.current = window.scrollY;
 
-        if (window.scrollY > lastScrollY.current + 10 && window.scrollY > 50) {
-          // scroll down
-          setShowHeader(false);
-        } else if (window.scrollY < lastScrollY.current) {
-          // scroll up
-          setShowHeader(true);
-        }
+    const controlHeader = () => {
+      const isMobile = window.innerWidth < 768;
+      if (!isMobile) {
+        setShowHeader(true);
         lastScrollY.current = window.scrollY;
+        return;
       }
+
+      if (window.scrollY > lastScrollY.current + 10 && window.scrollY > 50) {
+        setShowHeader(false);
+      } else if (window.scrollY < lastScrollY.current) {
+        setShowHeader(true);
+      }
+      lastScrollY.current = window.scrollY;
     };
 
     window.addEventListener("scroll", controlHeader);
+    window.addEventListener("resize", controlHeader);
     return () => {
       window.removeEventListener("scroll", controlHeader);
+      window.removeEventListener("resize", controlHeader);
     };
   }, []);
 

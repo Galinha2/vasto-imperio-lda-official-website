@@ -7,7 +7,7 @@ function formatarNumero(valor) {
 
 export default async function generateBudgetPdf({ linhas, descontoSelecionado, dadosEmpresa, nif, nomeClienteManual, additionalDetails = "", returnBlob = false }) {
     const { default: autoTable } = await import("jspdf-autotable");
-    const doc = new jsPDF();
+    const doc = new jsPDF({ compress: true });
     const corPretaFooter = [0, 0, 0];
     const corBlue = [8, 121, 192];
     const corOrange = [255, 85, 0];

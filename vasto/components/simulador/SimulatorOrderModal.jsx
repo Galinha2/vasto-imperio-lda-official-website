@@ -54,7 +54,7 @@ export default function SimulatorOrderModal({ open, onClose, total, details, ite
         const dataUrl = await toJpeg(drawing, { pixelRatio, quality, backgroundColor: "#ffffff", cacheBust: true });
         return fetch(dataUrl).then((response) => response.blob());
       };
-      let drawingBlob = await createDrawing(1.1, 0.7);
+      let drawingBlob = await createDrawing(0.9, 0.62);
       const budgetPdf = await generateBudgetPdf({
         linhas: items,
         descontoSelecionado: discountPercent,
@@ -64,12 +64,14 @@ export default function SimulatorOrderModal({ open, onClose, total, details, ite
         returnBlob: true,
       });
       const orderData = JSON.stringify({ ...form, total, detalhes: details, artigos: items });
-      const maxRequestBytes = 3.5 * 1024 * 1024;
-      const estimateRequestBytes = () => drawingBlob.size + budgetPdf.size + new Blob([orderData]).size + 64 * 1024;
+      const maxRequestBytes = 3.9 * 1024 * 1024;
+      const multipartMarginBytes = 96 * 1024;
+      const estimateRequestBytes = () => drawingBlob.size + budgetPdf.size + new Blob([orderData]).size + multipartMarginBytes;
       // Mantém uma margem para os limites de payload e o overhead do multipart na Vercel.
-      if (estimateRequestBytes() > maxRequestBytes) drawingBlob = await createDrawing(0.65, 0.45);
+      if (estimateRequestBytes() > maxRequestBytes) drawingBlob = await createDrawing(0.5, 0.38);
       if (estimateRequestBytes() > maxRequestBytes) {
-        throw new Error(english ? "The attachments exceed the hosting upload limit. Please contact us to place this order." : "Os anexos excedem o limite de envio do alojamento. Contacte-nos para concluir esta encomenda.");
+        const sizeInMb = (estimateRequestBytes() / (1024 * 1024)).toLocaleString(english ? "en-IE" : "pt-PT", { maximumFractionDigits: 1 });
+        throw new Error(english ? `The order files are ${sizeInMb} MB and exceed the upload limit. Please contact us to place this order.` : `Os ficheiros da encomenda ocupam ${sizeInMb} MB e excedem o limite de envio. Contacte-nos para concluir esta encomenda.`);
       }
       const payload = new FormData();
       payload.append("dados", orderData);

@@ -23,7 +23,7 @@ export default function SimulatorAdmin() {
   const [quoteData, setQuoteData] = useState(null);
   const [nomeCliente, setNomeCliente] = useState("");
   const [nifCliente, setNifCliente] = useState("");
-  const [descontoManual, setDescontoManual] = useState("");
+  const [descontoManual, setDescontoManual] = useState(null);
   const [produtosExtra, setProdutosExtra] = useState([]);
   const [produtoExtraAberto, setProdutoExtraAberto] = useState(null);
   const [pesquisaProdutoExtra, setPesquisaProdutoExtra] = useState("");
@@ -121,7 +121,7 @@ export default function SimulatorAdmin() {
           };
         }),
       ],
-      descontoSelecionado: descontoManual === "" ? quoteData.discountPercent : Number(descontoManual),
+      descontoSelecionado: descontoManual === null ? quoteData.discountPercent : Number(descontoManual || 0),
       dadosEmpresa,
       nif: nifCliente,
       nomeClienteManual: nomeCliente.trim(),
@@ -233,7 +233,7 @@ export default function SimulatorAdmin() {
               key={id}
               type="button"
               aria-pressed={simuladorAtivo === id}
-              onClick={() => { setSimuladorAtivo(id); setQuoteData(null); setMensagem(""); setMensagemSucesso(false); setDescontoManual(""); setProdutosExtra([]); setProdutoExtraAberto(null); setPesquisaProdutoExtra(""); }}
+              onClick={() => { setSimuladorAtivo(id); setQuoteData(null); setMensagem(""); setMensagemSucesso(false); setDescontoManual(null); setProdutosExtra([]); setProdutoExtraAberto(null); setPesquisaProdutoExtra(""); }}
               className={`flex min-h-[76px] cursor-pointer items-center gap-3 rounded-2xl border px-4 py-3 text-left transition ${
                 simuladorAtivo === id
                   ? "border-[#0071e3]/30 bg-[#edf4ff] shadow-sm"

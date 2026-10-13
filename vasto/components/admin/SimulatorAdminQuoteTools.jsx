@@ -43,7 +43,7 @@ export default function SimulatorAdminQuoteTools({
               min="0"
               max="100"
               step="1"
-              value={descontoManual === "" ? (quoteData?.discountPercent ?? 0) : descontoManual}
+              value={descontoManual === null ? (quoteData?.discountPercent ?? 0) : descontoManual}
               onChange={(event) => setDescontoManual(event.target.value)}
               className="h-11 rounded-full border border-[#e5e5e7] bg-[#f5f5f7] px-4 text-[#1d1d1f] outline-none focus:border-(--blue)"
             />

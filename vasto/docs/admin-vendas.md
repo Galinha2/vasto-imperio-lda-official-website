@@ -20,7 +20,7 @@ Entrar em `/admin/login`. O dashboard fica em `/admin`. Estas rotas não têm li
 
 Não usar prefixos `NEXT_PUBLIC_` nestas variáveis. A chave do Supabase nunca é enviada para o navegador. Os PDFs são enviados com uma URL assinada temporária para o bucket privado e descarregados através do backend autenticado; não há URLs públicas dos documentos. A arquitetura segue o acesso controlado descrito na [documentação oficial de Storage do Supabase](https://supabase.com/docs/guides/storage/security/access-control).
 
-Se o bucket `sales-pdfs` já existir, executar novamente `supabase/admin-sales.sql` para atualizar o limite de tamanho para 6 MB.
+Se o bucket `sales-pdfs` já existir ou se a instalação já tiver registos, executar novamente `supabase/admin-sales.sql`. O script atualiza o limite/formats do bucket e migra os estados antigos para os campos independentes de orçamento, pagamento e entrega.
 
 Uma configuração incompleta na Vercel bloqueia o registo de vendas, para evitar guardar documentos num disco temporário. Este projeto não cria uma conta ou um projeto Supabase automaticamente.
 
@@ -38,11 +38,13 @@ Os dados guardados localmente **não são sincronizados automaticamente** com Su
 
 - Importar um ou vários PDFs exportados pelas secções Orçamentos ou Simulador da área `/admin`, até 6 MB por ficheiro.
 - Cliente, NIF, data, total sem IVA, IVA e total com IVA são extraídos automaticamente. Os documentos novos contêm também metadados para importação exata; os antigos são lidos pelo texto e pelas posições dos campos.
-- Os PDFs entram como **Em preparação**. Alterar o seletor para **Vendida** quando a venda estiver confirmada.
+- Cada registo tem três acompanhamentos independentes: estado do orçamento (**A aguardar resposta / Confirmado pelo cliente**), pagamento (**Por pagar / Entrada paga / Pago**) e entrega (**Por entregar / Entregue**). O registo fica assinalado como **Resolvido** automaticamente quando está pago e entregue.
 - O mês corresponde à **data do orçamento**. Alterar o estado não muda a data do documento.
-- Os totais de vendas somam apenas documentos marcados como **Vendida**, com valores sem IVA e com IVA separados. Os valores em preparação são apresentados à parte.
+- Os totais de encomendas confirmadas incluem os orçamentos aceites pelo cliente, com valores sem IVA e com IVA separados. Os orçamentos que aguardam resposta são apresentados à parte; estes totais indicam valor contratado, não montantes já recebidos.
 - O mesmo conteúdo PDF não pode ser registado duas vezes, mesmo com outro nome de ficheiro.
 - O PDF original fica guardado e pode ser aberto pela linha da encomenda.
+- A ação de imagens permite anexar, consultar e remover até 10 imagens JPG, PNG ou WebP (4 MB por imagem) a cada orçamento. Os anexos são privados e só ficam acessíveis com sessão de administrador.
+- A ação de eliminar orçamento remove o registo, o PDF original e os respetivos anexos; esta operação é permanente.
 - PDFs de terceiros, digitalizados sem texto, protegidos ou sem os campos obrigatórios são recusados, em vez de criar registos com valores estimados.
 
 As sessões duram oito horas. O limite de tentativas de login é por instância do servidor; para instalações com grande exposição, pode ser complementado por rate limiting no fornecedor de hosting.

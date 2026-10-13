@@ -357,7 +357,7 @@ function RackPreview({ modules, height, levels, floorType, galvanized, reinforce
   );
 }
 
-export default function SimulatorPicking({ onQuoteDataChange, adminMode = false }) {
+export default function SimulatorPicking({ onQuoteDataChange, adminMode = false, adminPanel }) {
   const [orderOpen, setOrderOpen] = useState(false);
   const orderQuoteRef = useRef(null);
   const drawingRef = useRef(null);
@@ -615,8 +615,9 @@ export default function SimulatorPicking({ onQuoteDataChange, adminMode = false 
           <p className="mt-4 text-xs leading-relaxed text-[#86868b]">{english ? "VAT is added at the applicable rate. Delivery is not included. Configuration is subject to technical validation." : "Ao valor acresce IVA à taxa legal. Transporte não incluído. Configuração sujeita a validação técnica."}</p>
           {!matchingFrame && <p className="mt-3 rounded-[30px] bg-amber-50 p-3 text-sm text-amber-800">{english ? "No frame with this height, depth and finish combination is available in catalogue ref. 3." : "Não existe um bastidor com esta combinação de altura, profundidade e acabamento no catálogo ref. 3."}</p>}
         </div>
+        <div className="order-1 min-w-0 space-y-4 lg:order-2">
         {isLengthUnavailable ? (
-          <div className="order-1 min-w-0 flex-1 rounded-[30px] border border-[#e5e5e7] bg-white p-7 shadow-[0_12px_40px_rgba(0,0,0,0.05)] lg:order-2">
+          <div className="flex-1 rounded-[30px] border border-[#e5e5e7] bg-white p-7 shadow-[0_12px_40px_rgba(0,0,0,0.05)]">
             <h2 className="text-xl font-semibold tracking-tight text-[#1d1d1f]">{english ? "2D preview" : "Pré-visualização 2D"}</h2>
             <p className="mt-4 rounded-[30px] bg-red-50 p-4 text-sm text-red-700">{english ? "Lengths over 30.00 m are not available." : "Comprimentos superiores a 30,00 m não estão disponíveis."}</p>
           </div>
@@ -625,6 +626,8 @@ export default function SimulatorPicking({ onQuoteDataChange, adminMode = false 
             <RackPreview modules={modules} height={height} levels={levels} floorType={floorType} galvanized={galvanized} reinforcedBeams={reinforcedBeams} rowCount={rowCount} capacityLabel={`${english ? "Maximum load per beam pair" : "Carga máxima por par de vigas"}: ${levelCapacity.toLocaleString(english ? "en-IE" : "pt-PT")} kg`} solutions={solutions} selectedSolutionId={selectedSolutionId} onSelectSolution={setSelectedSolutionId} english={english} />
           </div>
         )}
+          {adminMode && adminPanel}
+        </div>
       </div>
       {!adminMode && <SimulatorOrderModal open={orderOpen} onClose={() => setOrderOpen(false)} total={orderQuoteRef.current?.total ?? discountedEstimate} details={orderQuoteRef.current?.details} items={orderQuoteRef.current?.items} discountPercent={orderQuoteRef.current?.discountPercent ?? discountRate * 100} drawingRef={drawingRef} english={english} />}
     </section>

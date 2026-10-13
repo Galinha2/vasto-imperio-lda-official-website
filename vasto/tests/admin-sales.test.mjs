@@ -1,14 +1,14 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { createRequire } from "node:module";
-import { readFile, mkdtemp } from "node:fs/promises";
+import { readFile, writeFile, mkdtemp } from "node:fs/promises";
 import { readFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { signIn, verifySession, assertOrigin, assertSession, SESSION_COOKIE } from "../lib/admin/auth.mjs";
 import { parseSalePdf } from "../lib/admin/pdf.mjs";
-import { createSale, createSaleUpload, readSaleUpload, deleteSaleUpload, changeStatus, getPdf, listSales, storageMode } from "../lib/admin/store.mjs";
+import { createSale, createSaleUpload, readSaleUpload, deleteSaleUpload, addSaleImage, getSaleImage, deleteSaleImage, deleteSale, updateSaleWorkflow, getPdf, getSale, listSales, storageMode } from "../lib/admin/store.mjs";
 
 const require = createRequire(import.meta.url);
 const { jsPDF } = require("jspdf");
@@ -120,16 +120,55 @@ test("invalid PDFs, invalid dates and inconsistent amounts are refused", async (
 test("records and original PDFs persist, identical content cannot be registered twice", async () => {
   const buffer = pdfWithMetadata();
   const record = await parseSalePdf(buffer, "sales.pdf");
-  await createSale(record, buffer);
+  const created = await createSale(record, buffer);
+  assert.equal(created.status, "em_preparacao");
+  assert.equal(created.paymentStatus, "por_pagar");
+  assert.equal(created.deliveryStatus, "por_entregar");
   assert.equal((await listSales()).length, 1);
   assert.deepEqual((await getPdf(record.id)).buffer, buffer);
   const same = await parseSalePdf(buffer, "renamed.pdf");
   await assert.rejects(createSale(same, buffer), { status: 409 });
-  const updated = await changeStatus(record.id, "vendida");
-  assert.equal(updated.status, "vendida"); assert.equal(updated.issuedAt, "2026-09-20");
-  assert.equal((await listSales())[0].status, "vendida");
-  await assert.rejects(changeStatus(record.id, "invalid"), { status: 400 });
+  const confirmed = await updateSaleWorkflow(record.id, { status: "confirmada" });
+  assert.equal(confirmed.status, "confirmada");
+  assert.equal(confirmed.paymentStatus, "por_pagar");
+  const deposit = await updateSaleWorkflow(record.id, { paymentStatus: "entrada_paga" });
+  assert.equal(deposit.status, "confirmada");
+  assert.equal(deposit.paymentStatus, "entrada_paga");
+  assert.equal(deposit.deliveryStatus, "por_entregar");
+  const paid = await updateSaleWorkflow(record.id, { paymentStatus: "pago" });
+  assert.equal(paid.paymentStatus, "pago");
+  const resolved = await updateSaleWorkflow(record.id, { deliveryStatus: "entregue" });
+  assert.equal(resolved.paymentStatus, "pago");
+  assert.equal(resolved.deliveryStatus, "entregue");
+  assert.equal((await listSales())[0].status, "confirmada");
+  await assert.rejects(updateSaleWorkflow(record.id, { status: "invalid" }), { status: 400 });
+  await assert.rejects(updateSaleWorkflow(record.id, { paymentStatus: "invalid" }), { status: 400 });
+  await assert.rejects(updateSaleWorkflow(record.id, { deliveryStatus: "invalid" }), { status: 400 });
+  await assert.rejects(updateSaleWorkflow(record.id, {}), { status: 400 });
+  await assert.rejects(updateSaleWorkflow(record.id, null), { status: 400 });
+
+  const legacy = { ...resolved, status: "resolvida" };
+  delete legacy.paymentStatus;
+  delete legacy.deliveryStatus;
+  await writeFile(path.join(process.env.ADMIN_DATA_DIR, `${record.id}.json`), JSON.stringify(legacy));
+  const migrated = await getSale(record.id);
+  assert.equal(migrated.status, "confirmada");
+  assert.equal(migrated.paymentStatus, "pago");
+  assert.equal(migrated.deliveryStatus, "entregue");
   await assert.rejects(getPdf("../outside"), { status: 400 });
+
+  const png = Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]);
+  const image = await addSaleImage(record.id, "estante.png", "image/png", png);
+  assert.deepEqual((await getSaleImage(record.id, image.id)).buffer, png);
+  await assert.rejects(addSaleImage(record.id, "imagem.png", "image/png", Buffer.from("not an image")), { status: 400 });
+  await assert.rejects(addSaleImage(record.id, "imagem.png", "__proto__", png), { status: 400 });
+  await deleteSaleImage(record.id, image.id);
+  await assert.rejects(getSaleImage(record.id, image.id), { status: 404 });
+  for (let index = 0; index < 10; index++) await addSaleImage(record.id, `anexo-${index}.png`, "image/png", png);
+  await assert.rejects(addSaleImage(record.id, "limite.png", "image/png", png), { status: 400 });
+  await deleteSale(record.id);
+  assert.equal((await listSales()).length, 0);
+  await assert.rejects(getSaleImage(record.id, image.id), { status: 404 });
 });
 
 test("Vercel never falls back to temporary disk storage", () => {
@@ -149,7 +188,8 @@ test("Supabase adapter stores private PDFs, lists records, changes status and re
     const parsed = new URL(url);
     if (parsed.pathname.startsWith("/storage/v1/object/authenticated/sales-pdfs/")) {
       const objectPath = decodeURIComponent(parsed.pathname.split("/storage/v1/object/authenticated/sales-pdfs/")[1]);
-      return objects.has(objectPath) ? new Response(objects.get(objectPath), { headers: { "Content-Type": "application/pdf" } }) : new Response(null, { status: 404 });
+      const contentType = objectPath.endsWith(".png") ? "image/png" : "application/pdf";
+      return objects.has(objectPath) ? new Response(objects.get(objectPath), { headers: { "Content-Type": contentType } }) : new Response(null, { status: 404 });
     }
     if (parsed.pathname.startsWith("/storage/v1/object/upload/sign/sales-pdfs/")) {
       assert.equal(options.method, "POST");
@@ -162,7 +202,7 @@ test("Supabase adapter stores private PDFs, lists records, changes status and re
       return Response.json({ message: "deleted" });
     }
     if (parsed.pathname.startsWith("/storage/v1/object/sales-pdfs/")) {
-      assert.equal(options.method, "POST"); assert.equal(options.headers["Content-Type"], "application/pdf");
+      assert.equal(options.method, "POST");
       objects.set(decodeURIComponent(parsed.pathname.split("/storage/v1/object/sales-pdfs/")[1]), options.body);
       return Response.json({ success: true });
     }
@@ -174,6 +214,7 @@ test("Supabase adapter stores private PDFs, lists records, changes status and re
     if (options.method === "PATCH") {
       rows.set(id, { ...rows.get(id), ...JSON.parse(options.body) }); return new Response(null, { status: 204 });
     }
+    if (options.method === "DELETE") { rows.delete(id); return new Response(null, { status: 204 }); }
     return Response.json(id ? (rows.has(id) ? [rows.get(id)] : []) : [...rows.values()]);
   };
   try {
@@ -189,9 +230,18 @@ test("Supabase adapter stores private PDFs, lists records, changes status and re
     const buffer = pdfWithMetadata(); const record = await parseSalePdf(buffer, "supabase.pdf");
     await createSale(record, buffer);
     assert.equal((await listSales()).length, 1);
-    assert.equal((await changeStatus(record.id, "vendida")).status, "vendida");
+    const updated = await updateSaleWorkflow(record.id, { paymentStatus: "entrada_paga" });
+    assert.equal(updated.status, "em_preparacao");
+    assert.equal(updated.paymentStatus, "entrada_paga");
+    assert.equal((await updateSaleWorkflow(record.id, { status: "confirmada" })).paymentStatus, "entrada_paga");
     assert.deepEqual((await getPdf(record.id)).buffer, buffer);
     await assert.rejects(createSale(record, buffer), { status: 409 });
+    const png = Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]);
+    const image = await addSaleImage(record.id, "rack.png", "image/png", png);
+    assert.deepEqual((await getSaleImage(record.id, image.id)).buffer, png);
+    await deleteSale(record.id);
+    assert.equal((await listSales()).length, 0);
+    assert.equal(objects.size, 0);
   } finally { globalThis.fetch = realFetch; delete process.env.SUPABASE_URL; delete process.env.SUPABASE_SERVICE_ROLE_KEY; }
 });
 

@@ -1,9 +1,12 @@
 import Sobre from "@/components/sobre/Sobre"
 import ContactCard from "@/components/contacts/ContactCard"
+import { createPageMetadata } from "@/lib/seo";
 
-export const metadata = {
-    title: "Sobre nós | Vasto Império",
-};
+export const metadata = createPageMetadata({
+    title: "Sobre a Vasto Império",
+    description: "Conheça a Vasto Império: mais de 20 anos em racks, estantes metálicas, porta-paletes e equipamentos de armazenagem, com presença em Viseu e Benedita.",
+    path: "/sobre-nos",
+});
 
 function page() {
     return (

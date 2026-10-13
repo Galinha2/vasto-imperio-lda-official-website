@@ -8,6 +8,33 @@ import Link from "next/link";
 import SimulatorSectionTabs from "@/components/simulador/SimulatorSectionTabs";
 import budget from "@/assets/orcamento.json";
 
+const portugueseProductSeo = {
+  "racks-industriais": {
+    title: "Racks Industriais para Paletes",
+    description: "Racks industriais para armazenagem de paletes e cargas pesadas. Projeto e fornecimento com apoio da Vasto Império em Viseu e Benedita e entregas em Portugal.",
+  },
+  "estante-carga-ligeira": {
+    title: "Estantes Metálicas de Carga Ligeira",
+    description: "Estantes metálicas para arrumação manual e cargas ligeiras, adaptáveis a oficinas, lojas e armazéns. Peça aconselhamento e orçamento à Vasto Império.",
+  },
+  "estantes-picking": {
+    title: "Estantes de Picking",
+    description: "Estantes de picking para preparação de encomendas e armazenagem manual em armazéns. Soluções da Vasto Império para Viseu, Benedita e todo o Portugal.",
+  },
+  "porta-paletes-eletrico": {
+    title: "Porta-Paletes Elétricos",
+    description: "Porta-paletes elétricos para movimentar cargas com maior eficiência. Consulte características e disponibilidade junto da Vasto Império, com apoio em Portugal.",
+  },
+  "porta-paletes-manual": {
+    title: "Porta-Paletes Manuais",
+    description: "Porta-paletes manuais para movimentação de cargas em armazéns e espaços comerciais. Consulte a solução da Vasto Império e peça um orçamento.",
+  },
+  stacker: {
+    title: "Stackers para Armazém",
+    description: "Stackers para elevação e movimentação de cargas em armazéns. Consulte os equipamentos disponíveis na Vasto Império, com apoio em Viseu, Benedita e Portugal.",
+  },
+};
+
 // Geração estática de todos os IDs para pt e en
 export function generateStaticParams() {
   const langs = ['pt', 'en'];
@@ -43,18 +70,34 @@ export async function generateMetadata({ params }) {
     };
   }
 
-  const canonicalUrl = `https://www.vastoimperio.pt/produtos/${lang}/${id}`;
+  const canonicalPath = `/produtos/${lang}/${id}`;
+  const localizedSeo = lang === "pt" ? portugueseProductSeo[product.id] : null;
+  const title = localizedSeo?.title ?? product.text;
+  const description = localizedSeo?.description ?? product.description;
+  const languageAlternates = {};
+
+  if (contentpt.productsShowcase.products.some((item) => item.id === product.id)) {
+    languageAlternates["pt-PT"] = `/produtos/pt/${id}`;
+    languageAlternates["x-default"] = `/produtos/pt/${id}`;
+  }
+  if (contenten.productsShowcase.products.some((item) => item.id === product.id)) {
+    languageAlternates["en-US"] = `/produtos/en/${id}`;
+    if (!languageAlternates["x-default"]) {
+      languageAlternates["x-default"] = `/produtos/en/${id}`;
+    }
+  }
 
   return {
-    title: `${product.text} | Vasto Império`,
-    description: product.description,
+    title,
+    description,
     alternates: {
-      canonical: canonicalUrl
+      canonical: canonicalPath,
+      languages: languageAlternates,
     },
     openGraph: {
-      title: `${product.text} | Vasto Império`,
-      description: product.description,
-      url: canonicalUrl,
+      title,
+      description,
+      url: canonicalPath,
       siteName: "Vasto Império",
       locale: lang === "pt" ? "pt_PT" : "en_US",
       type: "website",

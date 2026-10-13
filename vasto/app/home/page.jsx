@@ -1,8 +1,11 @@
-export const metadata = {
-  title: "Racks, Estantes e Prateleiras Metálicas em Viseu e Benedita | Vasto Império",
-  description:
-    "A Vasto Império Lda fornece racks, estantes e prateleiras metálicas em Viseu e em todo o distrito. Soluções profissionais de armazenamento para empresas, armazéns e indústria, com entregas em todo o país."
-};
+import { createPageMetadata } from "@/lib/seo";
+
+export const metadata = createPageMetadata({
+  title: "Racks e Estantes Metálicas em Viseu",
+  description: "Racks industriais, estantes metálicas e porta-paletes em Viseu e Benedita. Mais de 20 anos em soluções de armazenagem, com entregas em Portugal. Peça um orçamento gratuito.",
+  path: "/",
+  image: "/favicon-google.png",
+});
 
 import Cards from "@/components/home/Cards";
 import Banner from "@/components/home/Banner";

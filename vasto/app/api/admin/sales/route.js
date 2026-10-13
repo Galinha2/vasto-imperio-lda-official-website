@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { assertSession, assertOrigin } from "@/lib/admin/auth.mjs";
-import { listSales, createSale, storageMode } from "@/lib/admin/store.mjs";
+import { listSales, createSale, addSaleImage, deleteSale, storageMode } from "@/lib/admin/store.mjs";
 import { parseSalePdf } from "@/lib/admin/pdf.mjs";
 
 export const runtime = "nodejs";
@@ -28,8 +28,24 @@ export async function POST(request) {
     if (!file || typeof file.arrayBuffer !== "function" || file.size > 6 * 1024 * 1024) {
       return NextResponse.json({ error: "Escolha um ficheiro PDF com até 6 MB." }, { status: 400 });
     }
+    const image = data.get("image");
+    if (image && (typeof image.arrayBuffer !== "function" || image.size > 4 * 1024 * 1024 || !["image/jpeg", "image/png", "image/webp"].includes(image.type))) {
+      return NextResponse.json({ error: "A imagem deve ser JPG, PNG ou WebP e ter até 4 MB." }, { status: 400 });
+    }
     const buffer = Buffer.from(await file.arrayBuffer());
     const record = await parseSalePdf(buffer, file.name);
-    return NextResponse.json({ sale: await createSale(record, buffer) }, { status: 201, headers: { "Cache-Control": "no-store" } });
+    const sale = await createSale(record, buffer);
+    if (!image) return NextResponse.json({ sale }, { status: 201, headers: { "Cache-Control": "no-store" } });
+    try {
+      const savedImage = await addSaleImage(sale.id, image.name, image.type, Buffer.from(await image.arrayBuffer()));
+      return NextResponse.json({ sale: { ...sale, images: [savedImage] } }, { status: 201, headers: { "Cache-Control": "no-store" } });
+    } catch (error) {
+      try {
+        await deleteSale(sale.id);
+      } catch (cleanupError) {
+        throw new Error(`${error.message} A simulação ficou registada sem a imagem e a limpeza do registo falhou: ${cleanupError.message}`);
+      }
+      throw error;
+    }
   } catch (error) { return errorResponse(error); }
 }

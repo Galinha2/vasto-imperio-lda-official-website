@@ -19,6 +19,7 @@ export default function SimulatorAdmin() {
   const [simuladorAtivo, setSimuladorAtivo] = useState("ligeiras");
   const [aExportar, setAExportar] = useState(false);
   const [mensagem, setMensagem] = useState("");
+  const [mensagemSucesso, setMensagemSucesso] = useState(false);
   const [quoteData, setQuoteData] = useState(null);
   const [nomeCliente, setNomeCliente] = useState("");
   const [nifCliente, setNifCliente] = useState("");
@@ -71,6 +72,7 @@ export default function SimulatorAdmin() {
     if (!capturaRef.current || aExportar) return;
     setAExportar(true);
     setMensagem("");
+    setMensagemSucesso(false);
     try {
       await document.fonts?.ready;
       const { toPng } = await import("html-to-image");
@@ -93,43 +95,91 @@ export default function SimulatorAdmin() {
     }
   }
 
-  async function gerarPdf() {
+  function obterDadosPdf() {
     if (!quoteData || quoteData.unavailable || !quoteData.items?.length || aExportar) {
       setMensagem("A configuração atual não tem dados suficientes para gerar o orçamento.");
-      return;
+      return null;
     }
+    if (dadosEmpresa?.nome === "NIF não encontrado") {
+      setMensagem("Não é possível gerar o PDF: NIF não encontrado.");
+      return null;
+    }
+    return {
+      source: "simulador",
+      linhas: [
+        ...quoteData.items,
+        ...produtosExtra.filter((item) => item.produto).map((item) => {
+          const quantidade = Math.max(0, Number(item.unidades) || 0);
+          const preco = Number(item.preco ?? item.produto["preço"]) || 0;
+          return {
+            produto: item.produto.produto,
+            refCompleta: item.produto.refCompleta,
+            unidades: quantidade,
+            preco,
+            total: quantidade * preco,
+            isPortes: String(item.produto.ref) === "0",
+          };
+        }),
+      ],
+      descontoSelecionado: descontoManual === "" ? quoteData.discountPercent : Number(descontoManual),
+      dadosEmpresa,
+      nif: nifCliente,
+      nomeClienteManual: nomeCliente.trim(),
+    };
+  }
+
+  async function gerarPdf() {
+    const dadosPdf = obterDadosPdf();
+    if (!dadosPdf) return;
     setAExportar(true);
     setMensagem("");
+    setMensagemSucesso(false);
     try {
-      if (dadosEmpresa?.nome === "NIF não encontrado") {
-        setMensagem("Não é possível gerar o PDF: NIF não encontrado.");
-        return;
-      }
-      await generateBudgetPdf({
-        source: "simulador",
-        linhas: [
-          ...quoteData.items,
-          ...produtosExtra.filter((item) => item.produto).map((item) => {
-            const quantidade = Math.max(0, Number(item.unidades) || 0);
-            const preco = Number(item.preco ?? item.produto["preço"]) || 0;
-            return {
-              produto: item.produto.produto,
-              refCompleta: item.produto.refCompleta,
-              unidades: quantidade,
-              preco,
-              total: quantidade * preco,
-              isPortes: String(item.produto.ref) === "0",
-            };
-          }),
-        ],
-        descontoSelecionado: descontoManual === "" ? quoteData.discountPercent : Number(descontoManual),
-        dadosEmpresa,
-        nif: nifCliente,
-        nomeClienteManual: nomeCliente.trim(),
-      });
+      await generateBudgetPdf(dadosPdf);
     } catch (error) {
       console.error("Não foi possível gerar o PDF da simulação.", error);
       setMensagem("Não foi possível gerar o PDF. Tente novamente.");
+    } finally {
+      setAExportar(false);
+    }
+  }
+
+  async function enviarParaVendas() {
+    const dadosPdf = obterDadosPdf();
+    if (!dadosPdf) return;
+    setAExportar(true);
+    setMensagem("");
+    setMensagemSucesso(false);
+    try {
+      await document.fonts?.ready;
+      const desenho = capturaRef.current?.querySelector('svg[role="img"]');
+      if (!desenho) throw new Error("O desenho da pré-visualização não está disponível.");
+      const [{ toJpeg }, pdf] = await Promise.all([
+        import("html-to-image"),
+        generateBudgetPdf({ ...dadosPdf, returnBlob: true }),
+      ]);
+      const imagemBlob = await toJpeg(desenho, {
+        pixelRatio: 2,
+        backgroundColor: "#ffffff",
+        cacheBust: true,
+        quality: 0.9,
+      });
+      if (imagemBlob.size > 4 * 1024 * 1024) throw new Error("A imagem gerada ultrapassa o limite de 4 MB.");
+      if (pdf.size > 6 * 1024 * 1024) throw new Error("O PDF gerado ultrapassa o limite de 6 MB.");
+
+      const nomeBase = `simulacao-${simuladorAtivo}-${new Date().toISOString().slice(0, 10)}`;
+      const form = new FormData();
+      form.append("pdf", pdf, `${nomeBase}.pdf`);
+      form.append("image", imagemBlob, `${nomeBase}.jpg`);
+      const response = await fetch("/api/admin/sales", { method: "POST", body: form, cache: "no-store" });
+      const result = await response.json();
+      if (response.status === 401) throw new Error("A sessão de administração expirou. Inicie sessão novamente.");
+      if (!response.ok) throw new Error(result.error || "Não foi possível enviar a simulação para as vendas.");
+      setMensagem(`Simulação de ${result.sale.customerName} enviada para as vendas com o PDF e a imagem.`);
+      setMensagemSucesso(true);
+    } catch (error) {
+      console.error("Não foi possível enviar a simulação para as vendas.", error);
+      setMensagem(error.message || "Não foi possível enviar a simulação para as vendas.");
     } finally {
       setAExportar(false);
     }
@@ -156,9 +206,11 @@ export default function SimulatorAdmin() {
       loadingNif={loadingNif}
       dadosEmpresa={dadosEmpresa}
       mensagem={mensagem}
+      mensagemSucesso={mensagemSucesso}
       aExportar={aExportar}
       gerarImagem={gerarImagem}
       gerarPdf={gerarPdf}
+      enviarParaVendas={enviarParaVendas}
     />
   );
 
@@ -180,7 +232,7 @@ export default function SimulatorAdmin() {
               key={id}
               type="button"
               aria-pressed={simuladorAtivo === id}
-              onClick={() => { setSimuladorAtivo(id); setQuoteData(null); setMensagem(""); setDescontoManual(""); setProdutosExtra([]); setProdutoExtraAberto(null); setPesquisaProdutoExtra(""); }}
+              onClick={() => { setSimuladorAtivo(id); setQuoteData(null); setMensagem(""); setMensagemSucesso(false); setDescontoManual(""); setProdutosExtra([]); setProdutoExtraAberto(null); setPesquisaProdutoExtra(""); }}
               className={`flex min-h-[76px] cursor-pointer items-center gap-3 rounded-2xl border px-4 py-3 text-left transition ${
                 simuladorAtivo === id
                   ? "border-[#0071e3]/30 bg-[#edf4ff] shadow-sm"

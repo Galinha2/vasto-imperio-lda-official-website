@@ -335,8 +335,8 @@ export default function SalesDashboard() {
   const periodLabel = month === "all" ? `Ano ${year}` : `${months[Number(month) - 1]} ${year}`;
   const controls = "h-10 rounded-full border border-[#e5e5e7] bg-white py-2 pl-4 pr-4 text-sm text-[#424245] outline-none transition-colors hover:border-[#c7c7cc] hover:bg-[#fbfbfd] focus:border-sky-600 focus:ring-2 focus:ring-sky-600/10";
   return (
-    <main className="min-w-0 px-5 py-8 sm:px-8 lg:px-10 lg:py-10 xl:px-14">
-        <div className="mx-auto max-w-[1440px]">
+    <main className="min-w-0 px-4 py-8 sm:px-6 lg:px-6 lg:py-10 xl:px-8">
+        <div className="w-full">
           <header className="flex flex-col justify-between gap-5 sm:flex-row sm:items-center">
             <div><p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[#86868b]">Visão geral</p><h1 className="mt-2 text-4xl font-semibold tracking-[-0.055em] sm:text-[44px]">As suas vendas.</h1><p className="mt-2 text-sm text-[#86868b]">Uma visão clara de cada documento e de cada mês.</p></div>
           </header>
@@ -402,48 +402,55 @@ export default function SalesDashboard() {
             </div>
             {loading ? <div role="status" className="p-16 text-center text-sm text-[#86868b]">A carregar os seus documentos…</div> : visibleSales.length ? (
               <div className="overflow-x-auto">
-                <table className="w-full min-w-[1120px] text-left">
+                <table className="w-full min-w-[1000px] table-fixed text-left">
                   <thead className="bg-[#fbfbfd] text-[10px] font-semibold uppercase tracking-[0.1em] text-[#86868b]">
-                    <tr><th className="px-6 py-4">Cliente / documento</th><th className="px-4 py-4">Datas</th><th className="px-4 py-4 text-right">Sem IVA</th><th className="px-4 py-4 text-right">Com IVA</th><th className="px-4 py-4">Orçamento</th><th className="px-4 py-4">Pagamento</th><th className="px-4 py-4">Entrega</th><th className="px-4 py-4">Estado</th><th className="px-5 py-4 text-right">Ações</th></tr>
+                    <tr>
+                      <th className="w-[17%] px-3 py-4">Cliente / documento</th>
+                      <th className="w-[14%] px-2 py-4 text-right">Valores</th>
+                      <th className="w-[13%] px-2 py-4">Orçamento</th>
+                      <th className="w-[11%] px-2 py-4">Pagamento</th>
+                      <th className="w-[24%] px-2 py-4">Entrega</th>
+                      <th className="w-[9%] px-2 py-4">Estado</th>
+                      <th className="w-[12%] px-3 py-4 text-right">Ações</th>
+                    </tr>
                   </thead>
                   <tbody>
                     {visibleSales.map((sale) => (
                       <Fragment key={sale.id}>
                         <tr className={`border-t transition ${isResolved(sale) ? "border-emerald-100 border-l-2 border-l-emerald-500 bg-[#f5faf6] hover:bg-[#eff7f0]" : "border-[#f0f0f2] hover:bg-[#fbfbfd]"}`}>
-                          <td className="max-w-[350px] px-6 py-5">
+                          <td className="px-3 py-5">
                             <p className="truncate text-sm font-semibold tracking-tight">{sale.customerName}</p>
                             <p className="mt-1 truncate text-[11px] text-[#a1a1a6]">{sale.nif ? `${sale.nif} · ` : ""}{sale.fileName}</p>
-                            <span className="mt-1 inline-block text-[10px] text-[#86868b]">{sale.source === "simulador" ? "Simulador" : "Orçamento"}</span>
+                            <p className="mt-1 truncate text-[10px] text-[#86868b]">{sale.source === "simulador" ? "Simulador" : "Orçamento"} · {dateLabel(sale.issuedAt)}</p>
                           </td>
-                          <td className="whitespace-nowrap px-4 py-5">
-                            <p className="text-[10px] text-[#a1a1a6]">Orçamento · {dateLabel(sale.issuedAt)}</p>
+                          <td className="whitespace-nowrap px-2 py-5 text-right">
+                            <p className="text-sm font-medium">{currency.format(sale.subtotal)}</p>
+                            <p className="mt-1 text-[10px] text-[#86868b]">c/ IVA {currency.format(sale.total)}</p>
                           </td>
-                          <td className="whitespace-nowrap px-4 py-5 text-right text-sm font-medium">{currency.format(sale.subtotal)}</td>
-                          <td className="whitespace-nowrap px-4 py-5 text-right text-xs text-[#86868b]">{currency.format(sale.total)}</td>
-                          <td className="px-4 py-5">
+                          <td className="px-2 py-5">
                             <DashboardDropdown
                               label={`Estado do orçamento de ${sale.customerName}`}
                               options={quoteStatuses}
                               value={sale.status}
                               onChange={(value) => updateWorkflow(sale, { status: value })}
-                              className="max-w-[185px] text-[11px]"
+                              className="w-full max-w-[140px] text-[11px]"
                               disabled={changing === sale.id}
                               tone
                             />
                           </td>
-                          <td className="px-4 py-5">
+                          <td className="px-2 py-5">
                             <DashboardDropdown
                               label={`Estado do pagamento de ${sale.customerName}`}
                               options={paymentStatuses}
                               value={sale.paymentStatus}
                               onChange={(value) => updateWorkflow(sale, { paymentStatus: value })}
-                              className="text-[11px]"
+                              className="w-full max-w-[112px] text-[11px]"
                               disabled={changing === sale.id}
                               tone
                             />
                           </td>
-                          <td className="px-4 py-5">
-                            <div className="flex items-center gap-2">
+                          <td className="px-2 py-5">
+                            <div className="flex items-center gap-1">
                               <DashboardDropdown
                                 label={`Estado da entrega de ${sale.customerName}`}
                                 options={deliveryStatuses}
@@ -454,47 +461,47 @@ export default function SalesDashboard() {
                                     setDeliveryPrompt(sale);
                                   } else updateWorkflow(sale, { deliveryStatus: value });
                                 }}
-                                className="text-[11px]"
+                                className="w-[98px] shrink-0 text-[11px]"
                                 disabled={changing === sale.id}
                                 tone
                               />
                               {sale.deliveryStatus === "entregue" && (
-                                <label className="flex items-center gap-1.5 text-[10px] font-medium text-[#6e6e73]">
-                                  Data
+                                <label className="flex min-w-0 items-center text-[10px] font-medium text-[#6e6e73]">
                                   <input
                                     type="date"
                                     aria-label={`Data de entrega de ${sale.customerName}`}
+                                    title="Data de entrega"
                                     value={sale.deliveryDate || ""}
                                     max="9999-12-31"
                                     disabled={changing === sale.id}
                                     onChange={(event) => {
                                       if (event.target.value) updateWorkflow(sale, { deliveryDate: event.target.value });
                                     }}
-                                    className="h-10 w-[142px] cursor-pointer rounded-full border border-[#e5e5e7] bg-white px-3 text-xs text-[#424245] outline-none transition hover:border-[#cbd5e1] hover:bg-[#f8fafc] focus:border-sky-600 focus:ring-2 focus:ring-sky-600/10 disabled:cursor-not-allowed disabled:opacity-60"
+                                    className="h-10 w-[116px] min-w-0 cursor-pointer rounded-full border border-[#e5e5e7] bg-white px-2 text-[10px] text-[#424245] outline-none transition hover:border-[#cbd5e1] hover:bg-[#f8fafc] focus:border-sky-600 focus:ring-2 focus:ring-sky-600/10 disabled:cursor-not-allowed disabled:opacity-60"
                                   />
                                 </label>
                               )}
                             </div>
                           </td>
-                          <td className="px-4 py-5">
+                          <td className="px-2 py-5">
                             {isResolved(sale)
                               ? <span className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-full border border-[#e5e5e7] bg-[#f5f5f7] px-2.5 py-1.5 text-[10px] font-semibold text-[#424245]"><IoCheckmarkCircleOutline className="text-sm text-emerald-600" />Resolvido</span>
                               : <span className="inline-flex whitespace-nowrap rounded-full border border-[#e5e5e7] bg-white/80 px-2.5 py-1.5 text-[10px] font-medium text-[#86868b]">Não resolvido</span>}
                           </td>
-                          <td className="px-5 py-4">
-                            <div className="flex justify-end gap-1">
+                          <td className="px-3 py-4">
+                            <div className="flex justify-end gap-0">
                               <button
                                 type="button"
                                 aria-expanded={imagePanel === sale.id}
                                 aria-label={`${imagePanel === sale.id ? "Fechar imagens" : "Gerir imagens"} de ${sale.customerName}`}
                                 onClick={() => setImagePanel((current) => current === sale.id ? "" : sale.id)}
-                                className={`relative grid h-9 min-w-9 cursor-pointer place-items-center rounded-full px-2 text-lg transition ${imagePanel === sale.id ? "bg-[#f5f5f7] text-[#424245]" : "text-[#86868b] hover:bg-[#f5f5f7] hover:text-[#424245]"}`}
+                                className={`relative grid h-8 min-w-8 cursor-pointer place-items-center rounded-full px-1 text-base transition ${imagePanel === sale.id ? "bg-[#f5f5f7] text-[#424245]" : "text-[#86868b] hover:bg-[#f5f5f7] hover:text-[#424245]"}`}
                               >
                                 <IoImagesOutline />
                                 {(sale.images?.length ?? 0) > 0 && <span className="ml-1 text-[10px] font-semibold">{sale.images.length}</span>}
                               </button>
-                              <a href={`/api/admin/sales/${sale.id}/pdf`} target="_blank" rel="noopener noreferrer" aria-label={`Abrir PDF de ${sale.customerName}`} className="grid h-9 w-9 place-items-center rounded-full text-lg text-[#86868b] transition hover:bg-[#f5f5f7] hover:text-[#424245]"><IoOpenOutline /></a>
-                              <button type="button" aria-label={`Eliminar orçamento de ${sale.customerName}`} onClick={() => setSaleToDelete(sale)} className="grid h-9 w-9 cursor-pointer place-items-center rounded-full text-lg text-[#a1a1a6] transition hover:bg-red-50 hover:text-red-600"><IoTrashOutline /></button>
+                              <a href={`/api/admin/sales/${sale.id}/pdf`} target="_blank" rel="noopener noreferrer" aria-label={`Abrir PDF de ${sale.customerName}`} className="grid h-8 w-8 place-items-center rounded-full text-base text-[#86868b] transition hover:bg-[#f5f5f7] hover:text-[#424245]"><IoOpenOutline /></a>
+                              <button type="button" aria-label={`Eliminar orçamento de ${sale.customerName}`} onClick={() => setSaleToDelete(sale)} className="grid h-8 w-8 cursor-pointer place-items-center rounded-full text-base text-[#a1a1a6] transition hover:bg-red-50 hover:text-red-600"><IoTrashOutline /></button>
                             </div>
                           </td>
                         </tr>

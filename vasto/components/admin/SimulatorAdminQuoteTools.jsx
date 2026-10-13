@@ -21,9 +21,11 @@ export default function SimulatorAdminQuoteTools({
   loadingNif,
   dadosEmpresa,
   mensagem,
+  mensagemSucesso,
   aExportar,
   gerarImagem,
   gerarPdf,
+  enviarParaVendas,
 }) {
   return (
     <div className="space-y-4">
@@ -151,7 +153,12 @@ export default function SimulatorAdminQuoteTools({
         <div>
           <h2 className="text-base font-semibold text-[#1d1d1f]">Guardar esta configuração</h2>
           <p className="mt-1 text-sm text-[#6e6e73]">A imagem guarda apenas o desenho e as cotas. O PDF gera a folha de orçamento com artigos, quantidades, preços e desconto.</p>
-          {mensagem && <p role="alert" className="mt-2 text-sm font-medium text-red-600">{mensagem}</p>}
+          {mensagem && (
+            <div role={mensagemSucesso ? "status" : "alert"} className={`mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm font-medium ${mensagemSucesso ? "text-emerald-700" : "text-red-600"}`}>
+              <span>{mensagem}</span>
+              {mensagemSucesso && <a href="/admin" className="cursor-pointer font-semibold underline underline-offset-2 hover:text-emerald-900">Abrir vendas</a>}
+            </div>
+          )}
           <div className="mt-4 grid gap-3 sm:grid-cols-2">
             <input
               value={nomeCliente}
@@ -170,7 +177,7 @@ export default function SimulatorAdminQuoteTools({
           {loadingNif && <p className="mt-2 text-xs text-[#86868b]">A procurar dados do NIF…</p>}
           {dadosEmpresa && !loadingNif && <p className="mt-2 text-xs text-[#6e6e73]">{dadosEmpresa.nome} · {dadosEmpresa.codigoPostal}</p>}
         </div>
-        <div className="grid gap-3 sm:grid-cols-2">
+        <div className="grid gap-3 sm:grid-cols-3">
           <button
             type="button"
             onClick={gerarImagem}
@@ -186,6 +193,14 @@ export default function SimulatorAdminQuoteTools({
             className="h-12 cursor-pointer rounded-full bg-(--orange) px-5 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:bg-(--orange-hover) disabled:cursor-not-allowed disabled:opacity-50"
           >
             {aExportar ? "A preparar…" : "Guardar PDF"}
+          </button>
+          <button
+            type="button"
+            onClick={enviarParaVendas}
+            disabled={aExportar || loadingNif || !quoteData || quoteData.unavailable}
+            className="h-12 cursor-pointer rounded-full bg-sky-700 px-5 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:bg-sky-800 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            {aExportar ? "A preparar…" : "Enviar para vendas"}
           </button>
         </div>
       </section>

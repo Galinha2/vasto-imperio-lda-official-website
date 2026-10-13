@@ -1,12 +1,13 @@
 import React from "react";
 import OrcamentoInputs from "@/components/orcamento/OrcamentoInputs";
 import ContactCard from "@/components/contacts/ContactCard";
+import { createPageMetadata } from "@/lib/seo";
 
-export const metadata = {
-  title: "Orçamento | Vasto Império LDA",
-  description:
-    "Receba um orçamento transparente para racks, prateleiras e soluções de arrumação, adaptado às necessidades do seu negócio local.",
-};
+export const metadata = createPageMetadata({
+  title: "Orçamento para Racks e Estantes",
+  description: "Peça um orçamento gratuito para racks industriais, estantes metálicas, prateleiras e porta-paletes. Atendimento em Viseu, Benedita e em todo Portugal.",
+  path: "/orcamento",
+});
 
 export default function Orcamento() {
   return (

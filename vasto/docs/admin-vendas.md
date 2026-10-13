@@ -37,6 +37,7 @@ Os dados guardados localmente **não são sincronizados automaticamente** com Su
 ## Utilização
 
 - Importar um ou vários PDFs exportados pelas secções Orçamentos ou Simulador da área `/admin`, até 6 MB por ficheiro.
+- No simulador admin, usar **Enviar para vendas** para registar o orçamento PDF e anexar automaticamente a imagem do desenho à mesma venda.
 - Cliente, NIF, data, total sem IVA, IVA e total com IVA são extraídos automaticamente. Os documentos novos contêm também metadados para importação exata; os antigos são lidos pelo texto e pelas posições dos campos.
 - Cada registo tem três acompanhamentos independentes: estado do orçamento (**A aguardar resposta / Confirmado pelo cliente**), pagamento (**Por pagar / Entrada paga / Pago**) e entrega (**Por entregar / Entregue**). O registo fica assinalado como **Resolvido** automaticamente quando está pago e entregue.
 - A data original do orçamento mantém-se. Ao mudar a entrega para **Entregue**, é pedida a data de entrega; a venda passa então a contar no mês da entrega, que pode ser corrigido ao lado do estado da entrega. Antes da entrega, as vendas confirmadas contam pelo mês em que foram confirmadas e os orçamentos a aguardar resposta pelo mês de emissão.

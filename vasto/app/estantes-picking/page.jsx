@@ -1,11 +1,12 @@
 import content from "@/assets/contentpt.json";
 import PromotionalPage from "@/components/produtos/PromotionalPage";
+import { createPageMetadata } from "@/lib/seo";
 
-export const metadata = {
-  title: "Estantes de Picking com Tampos | Vasto Império",
-  description:
-    "Configure estantes de picking modulares com tampos em aglomerado ou metálicos, adaptadas ao espaço e à carga pretendida.",
-};
+export const metadata = createPageMetadata({
+  title: "Estantes de Picking Metálicas em Viseu",
+  description: "Configure estantes de picking metálicas com tampos em aglomerado ou metal. Soluções modulares para armazéns, com apoio em Viseu e Benedita e entrega em Portugal.",
+  path: "/estantes-picking",
+});
 
 export default function EstantesPickingPage() {
   const product = content.productsShowcase.products.find(

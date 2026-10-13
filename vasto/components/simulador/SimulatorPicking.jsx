@@ -546,7 +546,8 @@ export default function SimulatorPicking({ onQuoteDataChange, adminMode = false,
           </div>
           <div className="grid grid-cols-1 gap-x-4 gap-y-5 sm:grid-cols-2">
             <label className="block min-w-0 space-y-2 sm:col-span-2">
-              <span className="block text-sm font-semibold text-[#424245]">{english ? "Desired length per row (m)" : "Comprimento pretendido por linha (m)"}</span>
+              <span className="block text-sm font-semibold text-[#424245]">{english ? "Total desired length (m)" : "Comprimento total pretendido (m)"}</span>
+              <span className="block text-xs leading-relaxed text-[#86868b]">{english ? "Enter the metres of shelving in a straight line for one row." : "Indique os metros de estantes em linha reta para uma fila."}</span>
               <div className="flex items-center simulator-pill rounded-full border border-[#d2d2d7] bg-[#fbfbfd] px-5 transition focus-within:border-[#0071e3] focus-within:ring-4 focus-within:ring-[#0071e3]/10">
                 <input
                   type="text"
@@ -559,7 +560,7 @@ export default function SimulatorPicking({ onQuoteDataChange, adminMode = false,
                     if (value > 0) setDesiredLength(value.toFixed(2));
                   }}
                   className="w-full bg-transparent py-3.5 text-[15px] font-medium text-[#1d1d1f] outline-none"
-                  aria-label={english ? "Desired length per row in metres" : "Comprimento pretendido por linha em metros"}
+                  aria-label={english ? "Total desired length in metres" : "Comprimento total pretendido em metros"}
                 />
                 <span className="text-sm font-medium text-[#86868b]">m</span>
               </div>

@@ -278,6 +278,10 @@ body {
   }
 }
 
+.simulator-info[data-open="true"] .simulator-info-tooltip {
+  display: block;
+}
+
 .loading-skeleton {
   background: linear-gradient(105deg, #e8e9ed 20%, #f7f7f9 38%, #e8e9ed 56%);
   background-size: 220% 100%;

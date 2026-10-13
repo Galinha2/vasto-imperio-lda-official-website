@@ -177,6 +177,8 @@ export default function SalesDashboard() {
   const [deliveryDate, setDeliveryDate] = useState("");
   const [deletingSale, setDeletingSale] = useState(false);
   const [dragging, setDragging] = useState(false);
+  const [tableDropActive, setTableDropActive] = useState(false);
+  const tableDragDepth = useRef(0);
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
   const [year, setYear] = useState(() => new Intl.DateTimeFormat("en", { timeZone: "Europe/Lisbon", year: "numeric" }).format(new Date()));
@@ -356,10 +358,61 @@ export default function SalesDashboard() {
   const averageConfirmed = confirmed.length ? sum(confirmed) / confirmed.length : 0;
   const conversionRate = period.length ? Math.round((confirmed.length / period.length) * 100) : 0;
   const resolvedCount = confirmed.filter(isResolved).length;
-  const resolvedRate = confirmed.length ? Math.round((resolvedCount / confirmed.length) * 100) : 0;
+  const resolvedRate = period.length ? Math.round((resolvedCount / period.length) * 100) : 0;
   const max = Math.max(...monthly.map(({ subtotal }) => subtotal), 1);
   const periodLabel = month === "all" ? `Ano ${year}` : `${months[Number(month) - 1]} ${year}`;
   const controls = "h-10 rounded-full border border-[#e5e5e7] bg-white py-2 pl-4 pr-4 text-sm text-[#424245] outline-none transition-colors hover:border-[#c7c7cc] hover:bg-[#fbfbfd] focus:border-sky-600 focus:ring-2 focus:ring-sky-600/10";
+  const filterGroups = [
+    {
+      label: "Orçamento",
+      value: status,
+      onChange: setStatus,
+      options: [
+        { value: "all", label: "Todos" },
+        { value: "em_preparacao", label: "A aguardar resposta" },
+        { value: "confirmada", label: "Confirmado" },
+      ],
+    },
+    {
+      label: "Pagamento",
+      value: paymentFilter,
+      onChange: setPaymentFilter,
+      options: [
+        { value: "all", label: "Todos" },
+        { value: "por_pagar", label: "Por pagar" },
+        { value: "entrada_paga", label: "Entrada paga" },
+        { value: "pago", label: "Pago" },
+      ],
+    },
+    {
+      label: "Entrega",
+      value: deliveryFilter,
+      onChange: setDeliveryFilter,
+      options: [
+        { value: "all", label: "Todos" },
+        { value: "por_entregar", label: "Por entregar" },
+        { value: "entregue", label: "Entregue" },
+      ],
+    },
+    {
+      label: "Resolução",
+      value: resolutionFilter,
+      onChange: setResolutionFilter,
+      options: [
+        { value: "all", label: "Todos" },
+        { value: "resolved", label: "Resolvidos" },
+        { value: "unresolved", label: "Não resolvidos" },
+      ],
+    },
+  ];
+  const cycleFilter = (group) => {
+    const currentIndex = group.options.findIndex((option) => option.value === group.value);
+    if (group.label !== "Orçamento") setStatus("all");
+    if (group.label !== "Pagamento") setPaymentFilter("all");
+    if (group.label !== "Entrega") setDeliveryFilter("all");
+    if (group.label !== "Resolução") setResolutionFilter("all");
+    group.onChange(group.options[(currentIndex + 1) % group.options.length].value);
+  };
   return (
     <main className="min-w-0 px-4 py-8 sm:px-6 lg:px-6 lg:py-10 xl:px-8">
         <div className="mx-auto w-full max-w-[1500px]">
@@ -433,68 +486,104 @@ export default function SalesDashboard() {
               <article className="rounded-2xl border border-[#e8e8ed] bg-white p-4">
                 <p className="text-xs font-medium text-[#86868b]">Encomendas resolvidas</p>
                 <p className="mt-2 text-xl font-semibold tracking-tight text-emerald-700">{loading ? "—" : `${resolvedRate}%`}</p>
-                <p className="mt-1 text-[11px] text-[#a1a1a6]">{resolvedCount} pagas e entregues de {confirmed.length} confirmadas</p>
+                <p className="mt-1 text-[11px] text-[#a1a1a6]">{resolvedCount} pagas e entregues de {period.length} documentos</p>
               </article>
             </div>
           </section>
 
-          <section className="mt-6 overflow-hidden rounded-[28px] border border-[#e8e8ed] bg-white">
-            <div className="flex flex-col justify-between gap-4 border-b border-[#f0f0f2] p-5 sm:p-7 xl:flex-row xl:items-center">
-              <div><h2 className="text-base font-semibold tracking-tight">Encomendas e documentos</h2><p className="mt-1 text-xs text-[#86868b]">{visibleSales.length} de {period.length} {visibleSales.length === 1 ? "registo" : "registos"} · {periodLabel}</p></div>
-              <div className="flex flex-col gap-2">
-                <label className="relative">
+          <section
+            className={`relative mt-6 overflow-hidden rounded-[28px] border bg-white transition-colors ${tableDropActive ? "border-2 border-dashed border-orange-400" : "border-[#e8e8ed]"}`}
+            onDragEnter={(event) => {
+              event.preventDefault();
+              if (uploading || loading || !Array.from(event.dataTransfer.items || []).some((item) => item.kind === "file")) return;
+              tableDragDepth.current += 1;
+              setTableDropActive(true);
+            }}
+            onDragOver={(event) => {
+              event.preventDefault();
+              event.dataTransfer.dropEffect = "copy";
+            }}
+            onDragLeave={(event) => {
+              if (!event.currentTarget.contains(event.relatedTarget)) {
+                tableDragDepth.current = 0;
+                setTableDropActive(false);
+              }
+            }}
+            onDrop={(event) => {
+              event.preventDefault();
+              event.stopPropagation();
+              tableDragDepth.current = 0;
+              setTableDropActive(false);
+              importFiles(event.dataTransfer.files);
+            }}
+          >
+            {tableDropActive && (
+              <div className="pointer-events-none absolute inset-0 z-20 grid place-items-center bg-white/85 backdrop-blur-[2px]" role="status">
+                <div className="rounded-2xl border border-orange-200 bg-white px-6 py-5 text-center shadow-lg">
+                  <IoCloudUploadOutline className="mx-auto text-3xl text-orange-600" />
+                  <p className="mt-2 text-sm font-semibold text-[#1d1d1f]">Largue os PDFs para registar</p>
+                  <p className="mt-1 text-xs text-[#86868b]">Orçamentos ou simulações · até 6 MB por PDF</p>
+                </div>
+              </div>
+            )}
+            <div className="flex flex-col gap-4 border-b border-[#f0f0f2] p-5 sm:p-7 xl:flex-row xl:items-center xl:justify-between">
+              <div className="shrink-0"><h2 className="text-base font-semibold tracking-tight">Encomendas e documentos</h2><p className="mt-1 text-xs text-[#86868b]">{visibleSales.length} de {period.length} {visibleSales.length === 1 ? "registo" : "registos"} · {periodLabel}</p></div>
+              <div className="flex flex-wrap items-center justify-end gap-2 xl:flex-nowrap">
+                <label className="relative w-full sm:w-[240px] sm:max-w-[320px]">
                   <span className="sr-only">Pesquisar cliente, NIF ou documento</span>
                   <IoSearchOutline className="absolute left-3 top-3 text-[#a1a1a6]" />
-                  <input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Pesquisar cliente, NIF ou documento" className={`${controls} w-full pl-9 sm:w-[300px]`} />
+                  <input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Pesquisar cliente, NIF ou documento" className={`${controls} w-full pl-9`} />
                 </label>
-                <div className="flex flex-wrap items-center gap-2">
-                  <DashboardDropdown
-                    label="Filtrar estado do orçamento"
-                    options={[
-                      { value: "all", label: "Todos os orçamentos" },
-                      { value: "em_preparacao", label: "A aguardar resposta" },
-                      { value: "confirmada", label: "Confirmado pelo cliente" },
-                    ]}
-                    value={status}
-                    onChange={setStatus}
-                  />
-                  <DashboardDropdown
-                    label="Filtrar estado do pagamento"
-                    options={[
-                      { value: "all", label: "Qualquer pagamento" },
-                      { value: "por_pagar", label: "Por pagar" },
-                      { value: "entrada_paga", label: "Entrada paga" },
-                      { value: "pago", label: "Pago" },
-                    ]}
-                    value={paymentFilter}
-                    onChange={setPaymentFilter}
-                  />
-                  <DashboardDropdown
-                    label="Filtrar estado da entrega"
-                    options={[
-                      { value: "all", label: "Qualquer entrega" },
-                      { value: "por_entregar", label: "Por entregar" },
-                      { value: "entregue", label: "Entregue" },
-                    ]}
-                    value={deliveryFilter}
-                    onChange={setDeliveryFilter}
-                  />
-                  <DashboardDropdown
-                    label="Filtrar resolução"
-                    options={[
-                      { value: "all", label: "Resolvidos e pendentes" },
-                      { value: "resolved", label: "Resolvidos" },
-                      { value: "unresolved", label: "Não resolvidos" },
-                    ]}
-                    value={resolutionFilter}
-                    onChange={setResolutionFilter}
-                  />
+                <DashboardDropdown
+                  label="Filtrar estado do orçamento"
+                  options={[
+                    { value: "all", label: "Todos os orçamentos" },
+                    { value: "em_preparacao", label: "A aguardar resposta" },
+                    { value: "confirmada", label: "Confirmado pelo cliente" },
+                  ]}
+                  value={status}
+                  onChange={setStatus}
+                  className="xl:w-[148px] xl:max-w-[148px] xl:text-xs"
+                />
+                <DashboardDropdown
+                  label="Filtrar estado do pagamento"
+                  options={[
+                    { value: "all", label: "Qualquer pagamento" },
+                    { value: "por_pagar", label: "Por pagar" },
+                    { value: "entrada_paga", label: "Entrada paga" },
+                    { value: "pago", label: "Pago" },
+                  ]}
+                  value={paymentFilter}
+                  onChange={setPaymentFilter}
+                  className="xl:w-[148px] xl:max-w-[148px] xl:text-xs"
+                />
+                <DashboardDropdown
+                  label="Filtrar estado da entrega"
+                  options={[
+                    { value: "all", label: "Qualquer entrega" },
+                    { value: "por_entregar", label: "Por entregar" },
+                    { value: "entregue", label: "Entregue" },
+                  ]}
+                  value={deliveryFilter}
+                  onChange={setDeliveryFilter}
+                  className="xl:w-[148px] xl:max-w-[148px] xl:text-xs"
+                />
+                <DashboardDropdown
+                  label="Filtrar resolução"
+                  options={[
+                    { value: "all", label: "Resolvidos e pendentes" },
+                    { value: "resolved", label: "Resolvidos" },
+                    { value: "unresolved", label: "Não resolvidos" },
+                  ]}
+                  value={resolutionFilter}
+                  onChange={setResolutionFilter}
+                  className="xl:w-[148px] xl:max-w-[148px] xl:text-xs"
+                />
                   {hasActiveFilters && (
                     <button type="button" onClick={() => { setStatus("all"); setPaymentFilter("all"); setDeliveryFilter("all"); setResolutionFilter("all"); setSearch(""); }} className="h-10 cursor-pointer rounded-full px-3 text-xs font-semibold text-sky-700 transition hover:bg-sky-50">
                       Limpar filtros
                     </button>
                   )}
-                </div>
               </div>
             </div>
             {loading ? <div role="status" className="p-16 text-center text-sm text-[#86868b]">A carregar os seus documentos…</div> : visibleSales.length ? (
@@ -504,10 +593,24 @@ export default function SalesDashboard() {
                     <tr>
                       <th className="w-[17%] px-3 py-4">Cliente / documento</th>
                       <th className="w-[14%] px-2 py-4 text-right">Valores</th>
-                      <th className="w-[13%] px-2 py-4">Orçamento</th>
-                      <th className="w-[11%] px-2 py-4">Pagamento</th>
-                      <th className="w-[24%] px-2 py-4">Entrega</th>
-                      <th className="w-[9%] px-2 py-4">Estado</th>
+                      {filterGroups.map((group) => {
+                        const selected = group.options.find((option) => option.value === group.value) || group.options[0];
+                        const active = selected.value !== "all";
+                        return (
+                          <th key={group.label} className={`px-2 py-1.5 ${group.label === "Orçamento" ? "w-[13%]" : group.label === "Pagamento" ? "w-[11%]" : group.label === "Entrega" ? "w-[24%]" : "w-[9%]"}`}>
+                            <button
+                              type="button"
+                              aria-label={`Filtrar por ${group.label.toLocaleLowerCase("pt-PT")}: ${selected.label}. Clique para alternar o estado.`}
+                              aria-pressed={active}
+                              title={`Clique para alternar os estados de ${group.label.toLocaleLowerCase("pt-PT")}`}
+                              onClick={() => cycleFilter(group)}
+                              className={`flex min-h-7 w-full cursor-pointer items-center rounded-lg px-2 text-left transition-colors hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-600/30 ${active ? "font-semibold text-sky-800" : "text-[#86868b]"}`}
+                            >
+                              <span>{group.label === "Resolução" ? "Estado" : group.label}</span>
+                            </button>
+                          </th>
+                        );
+                      })}
                       <th className="w-[12%] px-3 py-4 text-right">Ações</th>
                     </tr>
                   </thead>
@@ -641,6 +744,8 @@ export default function SalesDashboard() {
                                 onDrop={(event) => {
                                   event.preventDefault();
                                   event.stopPropagation();
+                                  tableDragDepth.current = 0;
+                                  setTableDropActive(false);
                                   setImageDropTarget("");
                                   if ((sale.images?.length ?? 0) < 10) addImages(sale, event.dataTransfer.files);
                                   else setError("Este registo já atingiu o máximo de 10 imagens.");

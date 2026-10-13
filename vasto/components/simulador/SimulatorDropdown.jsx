@@ -10,7 +10,7 @@ function Chevron({ open }) {
   );
 }
 
-export default function SimulatorDropdown({ label, value, onChange, options, format = (option) => option }) {
+export default function SimulatorDropdown({ label, value, onChange, options, format = (option) => option, compact = false }) {
   const [open, setOpen] = useState(false);
   const [scrollbar, setScrollbar] = useState({ visible: false, height: 0, top: 0 });
   const dropdownRef = useRef(null);
@@ -70,7 +70,7 @@ export default function SimulatorDropdown({ label, value, onChange, options, for
           aria-haspopup="listbox"
           aria-expanded={open}
           onClick={() => setOpen((isOpen) => !isOpen)}
-          className={`simulator-pill flex w-full cursor-pointer items-center justify-between rounded-full border bg-[#fbfbfd] py-3.5 pl-5 pr-5 text-left text-[15px] font-medium text-[#1d1d1f] outline-none transition ${open ? "border-[#0071e3] ring-4 ring-[#0071e3]/10" : "border-[#d2d2d7] hover:border-[#a1a1a6]"}`}
+          className={`simulator-pill flex w-full cursor-pointer items-center justify-between rounded-full border ${compact ? "bg-white py-2.5 pl-4 pr-4 text-sm" : "bg-[#fbfbfd] py-3.5 pl-5 pr-5 text-[15px]"} text-left font-medium text-[#1d1d1f] outline-none transition ${open ? "border-[#0071e3] ring-4 ring-[#0071e3]/10" : "border-[#d2d2d7] hover:border-[#a1a1a6]"}`}
         >
           <span>{format(value)}</span>
           <Chevron open={open} />

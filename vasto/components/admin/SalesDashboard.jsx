@@ -3,7 +3,7 @@
 import { Fragment, useEffect, useId, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createPortal } from "react-dom";
-import { IoAddOutline, IoArrowUpOutline, IoCheckmarkCircleOutline, IoCloudUploadOutline, IoDocumentTextOutline, IoSearchOutline, IoTimeOutline, IoOpenOutline, IoCloseOutline, IoImagesOutline, IoTrashOutline, IoChevronDownOutline } from "react-icons/io5";
+import { IoAddOutline, IoAlertCircleOutline, IoArrowUpOutline, IoCheckmarkCircleOutline, IoCloudUploadOutline, IoDocumentTextOutline, IoSearchOutline, IoTimeOutline, IoOpenOutline, IoCloseOutline, IoImagesOutline, IoTrashOutline, IoChevronDownOutline } from "react-icons/io5";
 
 const months = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
 const currency = new Intl.NumberFormat("pt-PT", { style: "currency", currency: "EUR" });
@@ -20,6 +20,17 @@ const todayInLisbon = () => {
   return `${parts.year}-${parts.month}-${parts.day}`;
 };
 const periodDate = (sale) => sale.status === "em_preparacao" ? sale.issuedAt : sale.deliveryStatus === "entregue" && sale.deliveryDate ? sale.deliveryDate : sale.saleDate || sale.issuedAt;
+const unresolvedDate = (sale) => sale.status === "em_preparacao" ? sale.issuedAt : sale.saleDate || sale.issuedAt;
+const unresolvedAge = (date) => {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(date || "")) return "data desconhecida";
+  const [year, month, day] = date.split("-").map(Number);
+  const now = todayInLisbon().split("-").map(Number);
+  let elapsedMonths = (now[0] - year) * 12 + now[1] - month;
+  if (now[2] < day) elapsedMonths -= 1;
+  if (elapsedMonths > 0) return `há ${elapsedMonths} ${elapsedMonths === 1 ? "mês" : "meses"}`;
+  const days = Math.max(0, Math.floor((Date.parse(`${todayInLisbon()}T12:00:00Z`) - Date.parse(`${date}T12:00:00Z`)) / 86_400_000));
+  return days === 0 ? "desde hoje" : `há ${days} ${days === 1 ? "dia" : "dias"}`;
+};
 const sum = (records, field = "subtotal") => records.reduce((value, sale) => value + Math.round(sale[field] * 100), 0) / 100;
 const quoteStatuses = [
   { value: "em_preparacao", label: "A aguardar resposta", color: "bg-amber-50 text-amber-700" },
@@ -182,6 +193,8 @@ export default function SalesDashboard() {
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
   const [salesDetail, setSalesDetail] = useState("");
+  const [unresolvedExpanded, setUnresolvedExpanded] = useState(false);
+  const unresolvedReminderRef = useRef(null);
   const [year, setYear] = useState(() => new Intl.DateTimeFormat("en", { timeZone: "Europe/Lisbon", year: "numeric" }).format(new Date()));
   const [month, setMonth] = useState(() => new Intl.DateTimeFormat("en", { timeZone: "Europe/Lisbon", month: "2-digit" }).format(new Date()));
   const [status, setStatus] = useState("all");
@@ -199,6 +212,22 @@ export default function SalesDashboard() {
     document.addEventListener("keydown", closeOnEscape);
     return () => document.removeEventListener("keydown", closeOnEscape);
   }, [salesDetail]);
+
+  useEffect(() => {
+    if (!unresolvedExpanded) return undefined;
+    const closeOutside = (event) => {
+      if (!unresolvedReminderRef.current?.contains(event.target)) setUnresolvedExpanded(false);
+    };
+    const closeOnEscape = (event) => {
+      if (event.key === "Escape") setUnresolvedExpanded(false);
+    };
+    document.addEventListener("pointerdown", closeOutside);
+    document.addEventListener("keydown", closeOnEscape);
+    return () => {
+      document.removeEventListener("pointerdown", closeOutside);
+      document.removeEventListener("keydown", closeOnEscape);
+    };
+  }, [unresolvedExpanded]);
 
   async function api(url, options) {
     const response = await fetch(url, { ...options, cache: "no-store" });
@@ -384,6 +413,9 @@ export default function SalesDashboard() {
   const conversionRate = period.length ? Math.round((confirmed.length / period.length) * 100) : 0;
   const resolvedCount = confirmed.filter(isResolved).length;
   const resolvedRate = period.length ? Math.round((resolvedCount / period.length) * 100) : 0;
+  const unresolvedSales = sales
+    .filter((sale) => !isResolved(sale))
+    .sort((a, b) => (unresolvedDate(a) || "9999-99-99").localeCompare(unresolvedDate(b) || "9999-99-99"));
   const max = Math.max(...monthly.map(({ subtotal }) => subtotal), 1);
   const periodLabel = month === "all" ? `Ano ${year}` : `${months[Number(month) - 1]} ${year}`;
   const controls = "h-10 rounded-full border border-[#e5e5e7] bg-white py-2 pl-4 pr-4 text-sm text-[#424245] outline-none transition-colors hover:border-[#c7c7cc] hover:bg-[#fbfbfd] focus:border-sky-600 focus:ring-2 focus:ring-sky-600/10";
@@ -537,6 +569,106 @@ export default function SalesDashboard() {
           {error && <div role="alert" className="mt-5 flex items-start justify-between gap-3 rounded-2xl border border-red-100 bg-red-50 p-4 text-sm text-red-700"><p className="whitespace-pre-line">{error}</p><button type="button" aria-label="Fechar aviso" onClick={() => setError("")} className="grid h-9 w-9 shrink-0 cursor-pointer place-items-center rounded-full transition hover:bg-red-100"><IoCloseOutline className="text-xl" /></button></div>}
           {notice && <p role="status" className="mt-5 flex items-start gap-2 rounded-2xl bg-[#f5f5f7] p-4 text-sm text-[#424245]"><IoCheckmarkCircleOutline className="shrink-0 text-lg text-emerald-600" />{notice}</p>}
 
+          {!loading && unresolvedSales.length > 0 && (
+            <section ref={unresolvedReminderRef} aria-labelledby="unresolved-reminder-heading" className={`relative mt-3 ${unresolvedExpanded ? "z-50" : ""}`}>
+              <div className={`flex flex-wrap items-center gap-2 ${unresolvedExpanded ? "mb-2" : ""}`}>
+                <button
+                  type="button"
+                  aria-expanded={unresolvedExpanded}
+                  aria-controls="unresolved-reminder-list"
+                  onClick={() => setUnresolvedExpanded((expanded) => !expanded)}
+                  className={`inline-flex max-w-full cursor-pointer items-center gap-2 rounded-full px-3 py-1.5 text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-600/30 ${unresolvedExpanded ? "bg-amber-100 text-amber-950" : "bg-amber-50 text-amber-900 hover:bg-amber-100"}`}
+                >
+                  <IoAlertCircleOutline className="shrink-0 text-base" />
+                  <span id="unresolved-reminder-heading" className="truncate text-xs font-semibold">
+                    {unresolvedSales.length} por resolver · mais antigo {unresolvedAge(unresolvedDate(unresolvedSales[0]))}
+                  </span>
+                  <IoChevronDownOutline className={`shrink-0 text-xs transition-transform ${unresolvedExpanded ? "rotate-180" : ""}`} />
+                </button>
+              </div>
+              {unresolvedExpanded && (
+                <div id="unresolved-reminder-list" className="absolute left-0 top-full z-50 mt-2 w-[min(560px,calc(100vw-2rem))] max-w-[calc(100vw-2rem)] overflow-hidden rounded-[20px] border border-[#e5e5e7] bg-white shadow-[0_18px_54px_rgba(15,23,42,0.18)]">
+                  <div className="flex items-center justify-between gap-3 border-b border-[#f0f0f2] px-4 py-3">
+                    <div>
+                      <p className="text-xs font-semibold text-[#1d1d1f]">Ainda por resolver</p>
+                      <p className="mt-0.5 text-[10px] text-[#86868b]">Ordenado do mais antigo</p>
+                    </div>
+                    <span className="rounded-full bg-amber-50 px-2.5 py-1 text-[10px] font-semibold text-amber-800 ring-1 ring-amber-100">
+                      {unresolvedSales.length} {unresolvedSales.length === 1 ? "pendente" : "pendentes"}
+                    </span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const oldest = unresolvedSales[0];
+                      const date = periodDate(oldest);
+                      setYear(date.slice(0, 4));
+                      setMonth(date.slice(5, 7));
+                      setStatus("all");
+                      setPaymentFilter("all");
+                      setDeliveryFilter("all");
+                      setResolutionFilter("all");
+                      setSearch(oldest.fileName || oldest.customerName || "");
+                      setHeaderSort({ group: "", value: "all" });
+                      setUnresolvedExpanded(false);
+                      window.setTimeout(() => document.getElementById("sales-documents")?.scrollIntoView({ behavior: "smooth", block: "start" }), 100);
+                    }}
+                    className="mx-3 mb-2 flex h-8 w-[calc(100%-1.5rem)] cursor-pointer items-center justify-center rounded-full bg-amber-50 text-[11px] font-semibold text-amber-900 transition hover:bg-amber-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-600/30"
+                  >
+                    Rever o documento mais antigo
+                  </button>
+                  <ul className="divide-y divide-[#f0f0f2]">
+                    {unresolvedSales.slice(0, 5).map((sale) => {
+                      const date = unresolvedDate(sale);
+                      const quote = statusFor(quoteStatuses, sale.status).label;
+                      const payment = statusFor(paymentStatuses, sale.paymentStatus).label;
+                      const delivery = statusFor(deliveryStatuses, sale.deliveryStatus).label;
+                      return (
+                        <li key={sale.id}>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const targetDate = periodDate(sale);
+                              setYear(targetDate.slice(0, 4));
+                              setMonth(targetDate.slice(5, 7));
+                              setStatus("all");
+                              setPaymentFilter("all");
+                              setDeliveryFilter("all");
+                              setResolutionFilter("all");
+                              setSearch(sale.fileName || sale.customerName || "");
+                              setHeaderSort({ group: "", value: "all" });
+                              setUnresolvedExpanded(false);
+                              window.setTimeout(() => document.getElementById("sales-documents")?.scrollIntoView({ behavior: "smooth", block: "start" }), 100);
+                            }}
+                            className="flex w-full cursor-pointer flex-col gap-2 px-4 py-3 text-left transition hover:bg-[#f8fafc] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-sky-600/30 sm:flex-row sm:items-center sm:justify-between"
+                          >
+                            <span className="min-w-0">
+                              <span className="block truncate text-xs font-semibold text-[#343438]">{sale.customerName || "Cliente"} <span className="font-normal text-[#86868b]">· {sale.fileName || "Documento"}</span></span>
+                              <span className="mt-1.5 flex flex-wrap gap-1">
+                                <span className={`rounded-full px-2 py-0.5 text-[9px] font-medium ${sale.status === "em_preparacao" ? "bg-amber-50 text-amber-800" : "bg-sky-50 text-sky-800"}`}>{quote}</span>
+                                <span className={`rounded-full px-2 py-0.5 text-[9px] font-medium ${sale.paymentStatus === "pago" ? "bg-emerald-50 text-emerald-800" : "bg-[#f5f5f7] text-[#6e6e73]"}`}>{payment}</span>
+                                <span className={`rounded-full px-2 py-0.5 text-[9px] font-medium ${sale.deliveryStatus === "entregue" ? "bg-emerald-50 text-emerald-800" : "bg-[#f5f5f7] text-[#6e6e73]"}`}>{delivery}</span>
+                              </span>
+                            </span>
+                            <span className="flex shrink-0 items-center justify-between gap-3 sm:flex-col sm:items-end">
+                              <span className="text-[10px] font-medium text-amber-800">{unresolvedAge(date)}</span>
+                              <span className="text-xs font-semibold tabular-nums text-[#343438]">{currency.format(sale.total)}</span>
+                            </span>
+                          </button>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                  {unresolvedSales.length > 5 && (
+                    <p className="border-t border-[#f0f0f2] px-4 py-2 text-[11px] font-medium text-amber-900/75">
+                      E mais {unresolvedSales.length - 5} {unresolvedSales.length - 5 === 1 ? "documento por resolver" : "documentos por resolver"}.
+                    </p>
+                  )}
+                </div>
+              )}
+            </section>
+          )}
+
           <div className="mt-5 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
             {[
               { id: "confirmed", label: "Encomendas confirmadas", value: currency.format(sum(confirmed)), detail: "Valor confirmado · sem IVA", icon: <IoArrowUpOutline />, color: "bg-teal-50 text-teal-700 ring-teal-100" },
@@ -599,6 +731,7 @@ export default function SalesDashboard() {
           </section>
 
           <section
+            id="sales-documents"
             className={`relative mt-6 overflow-hidden rounded-[28px] border bg-white transition-colors ${tableDropActive ? "border-2 border-dashed border-orange-400" : "border-[#e8e8ed]"}`}
             onDragEnter={(event) => {
               event.preventDefault();

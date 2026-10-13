@@ -417,7 +417,7 @@ export default function SalesDashboard() {
                   <tbody>
                     {visibleSales.map((sale) => (
                       <Fragment key={sale.id}>
-                        <tr className={`border-t transition ${isResolved(sale) ? "border-emerald-100 border-l-2 border-l-emerald-500 bg-[#f5faf6] hover:bg-[#eff7f0]" : "border-[#f0f0f2] hover:bg-[#fbfbfd]"}`}>
+                        <tr className={`border-t border-l-2 transition ${isResolved(sale) ? "border-emerald-100 border-l-emerald-500 bg-[#f5faf6] hover:bg-[#eff7f0]" : "border-[#f0f0f2] border-l-red-500 hover:bg-[#fbfbfd]"}`}>
                           <td className="px-3 py-5">
                             <p className="truncate text-sm font-semibold tracking-tight">{sale.customerName}</p>
                             <p className="mt-1 truncate text-[11px] text-[#a1a1a6]">{sale.nif ? `${sale.nif} · ` : ""}{sale.fileName}</p>

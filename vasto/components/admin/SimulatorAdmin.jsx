@@ -158,12 +158,13 @@ export default function SimulatorAdmin() {
         import("html-to-image"),
         generateBudgetPdf({ ...dadosPdf, returnBlob: true }),
       ]);
-      const imagemBlob = await toJpeg(desenho, {
+      const imagemDataUrl = await toJpeg(desenho, {
         pixelRatio: 2,
         backgroundColor: "#ffffff",
         cacheBust: true,
         quality: 0.9,
       });
+      const imagemBlob = await (await fetch(imagemDataUrl)).blob();
       if (imagemBlob.size > 4 * 1024 * 1024) throw new Error("A imagem gerada ultrapassa o limite de 4 MB.");
       if (pdf.size > 6 * 1024 * 1024) throw new Error("O PDF gerado ultrapassa o limite de 6 MB.");
 

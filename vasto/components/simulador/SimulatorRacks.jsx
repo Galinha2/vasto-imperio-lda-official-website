@@ -45,7 +45,7 @@ function findBestModules(targetLength, { height, depth, levels, sameBeamLength, 
     return [length, cost];
   }));
   if (sameBeamLength) {
-    const requestedLength = Math.round(Number(desiredBeamLength) * 1000) || beamLengths[0];
+    const requestedLength = Math.round(Number(desiredBeamLength)) || beamLengths[0];
     const availableLengths = beamLengths.filter((length) => Number.isFinite(moduleCosts.get(length)));
     if (!availableLengths.length) return [];
     const selectedLength = availableLengths.reduce((best, length) => {
@@ -251,7 +251,7 @@ export default function SimulatorRacks({ onQuoteDataChange, adminMode = false, a
   const [desiredLength, setDesiredLength] = useState("2.30");
   const [rowCount, setRowCount] = useState(1);
   const [sameBeamLength, setSameBeamLength] = useState(false);
-  const [desiredBeamLength, setDesiredBeamLength] = useState(String((beamLengths[0] || 1000) / 1000));
+  const [desiredBeamLength, setDesiredBeamLength] = useState(beamLengths[0] || 1000);
   const [height, setHeight] = useState(4000);
   const [depth, setDepth] = useState(1000);
   const [levels, setLevels] = useState(4);
@@ -311,7 +311,7 @@ export default function SimulatorRacks({ onQuoteDataChange, adminMode = false, a
       items: createQuoteLines(entries, 2),
       discountPercent: discountRate * 100,
       total: discountedEstimate,
-      details: `Racks para paletes · Comprimento por fila: ${format(finalLength)} m · Comprimento total: ${format(finalLength * rowCount)} m · Altura: ${format(height)} m · Profundidade: ${format(depth)} m · Níveis: ${levels} · Filas: ${rowCount} · Vigas: ${beamDistribution.map(({ length, count }) => `${count} × ${format(length)} m`).join(", ")} · Carga máxima por par de vigas: ${capacityIsMinimum ? "> " : ""}${levelCapacity.toLocaleString("pt-PT")} kg`,
+      details: `Racks para paletes · Comprimento por fila: ${format(finalLength)} m · Comprimento total: ${format(finalLength * rowCount)} m · Altura: ${format(height)} m · Profundidade: ${format(depth)} m · Níveis: ${levels} · Linhas de estantes lado a lado: ${rowCount} · Vigas: ${beamDistribution.map(({ length, count }) => `${count} × ${format(length)} m`).join(", ")} · Carga máxima por par de vigas: ${capacityIsMinimum ? "> " : ""}${levelCapacity.toLocaleString("pt-PT")} kg`,
       unavailable: isLengthUnavailable || !matchingFrame || modules.length === 0,
     };
     orderQuoteRef.current = quote;
@@ -332,7 +332,7 @@ export default function SimulatorRacks({ onQuoteDataChange, adminMode = false, a
     setDesiredLength("2.30");
     setRowCount(1);
     setSameBeamLength(false);
-    setDesiredBeamLength(String((beamLengths[0] || 1000) / 1000));
+    setDesiredBeamLength(beamLengths[0] || 1000);
     setHeight(4000);
     setDepth(1000);
     setLevels(4);
@@ -361,12 +361,12 @@ export default function SimulatorRacks({ onQuoteDataChange, adminMode = false, a
             <SimulatorDropdown label={english ? "Frame height (m)" : "Altura do bastidor (m)"} value={height} onChange={handleHeightChange} options={availableHeights.length ? availableHeights : heights} format={formatMeters} />
             <SimulatorDropdown label={english ? "Depth (m)" : "Profundidade (m)"} value={depth} onChange={handleDepthChange} options={availableDepths.length ? availableDepths : depths} format={formatMeters} />
             <SimulatorDropdown label={english ? "Number of levels" : "N.º de níveis"} value={levels} onChange={setLevels} options={levelOptions} />
-            <SimulatorConfigurationOptions rowCount={rowCount} onRowCountChange={setRowCount} sameBeamLength={sameBeamLength} onSameBeamLengthChange={setSameBeamLength} desiredBeamLength={desiredBeamLength} onDesiredBeamLengthChange={setDesiredBeamLength} sameLengthToggleLabel={english ? "Beams of the same length" : "Vigas do mesmo comprimento"} sameLengthSelectLabel={english ? "Desired beam length (m)" : "Comprimento pretendido das vigas (m)"} automaticLengthMessage={english ? "When this option is off, beams of different lengths can be combined to get close to the requested length." : "Com esta opção desligada, o cálculo pode combinar vigas de diferentes comprimentos para aproximar o comprimento pedido."} />
+            <SimulatorConfigurationOptions rowCount={rowCount} onRowCountChange={setRowCount} sameBeamLength={sameBeamLength} onSameBeamLengthChange={setSameBeamLength} desiredBeamLength={desiredBeamLength} onDesiredBeamLengthChange={setDesiredBeamLength} sameLengthToggleLabel={english ? "Beams of the same length" : "Vigas do mesmo comprimento"} sameLengthSelectLabel={english ? "Available beam length (m)" : "Medida disponível das vigas (m)"} sameLengthOptions={beamLengths} sameLengthFormat={formatMeters} automaticLengthMessage={english ? "When this option is off, beams of different lengths can be combined to get close to the requested length." : "Com esta opção desligada, o cálculo pode combinar vigas de diferentes comprimentos para aproximar o comprimento pedido."} />
           </div>
           <div className="mt-7 border-t border-[#e5e5e7] pt-6">
             <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#86868b]">{english ? "Price estimate" : "Estimativa de preço"}</p>
             <div className="mt-1 flex flex-wrap items-baseline gap-x-2 gap-y-1"><p className="text-4xl font-semibold tracking-[-0.04em] text-(--orange)">{isLengthUnavailable ? (english ? "Unavailable" : "Indisponível") : formatPrice(discountedEstimate)}</p>{!isLengthUnavailable && <span className="text-sm font-medium text-[#86868b]">{english ? "+ VAT" : "+ IVA"}</span>}</div>
-            <p className="mt-1 text-sm text-[#6e6e73]">{english ? `Total price for ${rowCount} identical row${rowCount === 1 ? "" : "s"}.` : `Preço total para ${rowCount} ${rowCount === 1 ? "fila" : "filas"} iguais.`}</p>
+            <p className="mt-1 text-sm text-[#6e6e73]">{english ? `Total price for ${rowCount} shelving line${rowCount === 1 ? "" : "s"} placed side by side.` : `Preço total para ${rowCount} ${rowCount === 1 ? "linha de estantes" : "linhas de estantes"} lado a lado.`}</p>
             {discountRate > 0 && !isLengthUnavailable && <p className="mt-2 text-sm font-semibold text-[#0879C0]">{english ? `${discountRate * 100}% discount applied: −${formatPrice(discountAmount)}` : `Desconto de ${discountRate * 100}% aplicado: −${formatPrice(discountAmount)}`}</p>}
             {!isLengthUnavailable && <div className="mt-5 grid grid-cols-2 gap-x-4 gap-y-3 rounded-[30px] bg-[#f5f5f7] p-5 text-sm">
               <p className="col-span-2 flex items-baseline justify-between gap-2 border-b border-[#e5e5e7] pb-2"><span className="text-[#6e6e73]">{english ? "Total row length" : "Comprimento total das filas"}</span><strong className="font-semibold text-[#1d1d1f]">{formatMeters(finalLength * rowCount)}</strong></p>

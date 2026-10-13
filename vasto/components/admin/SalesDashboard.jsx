@@ -7,7 +7,13 @@ import { IoAddOutline, IoArrowUpOutline, IoCheckmarkCircleOutline, IoCloudUpload
 
 const months = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
 const currency = new Intl.NumberFormat("pt-PT", { style: "currency", currency: "EUR" });
-const compactCurrency = new Intl.NumberFormat("pt-PT", { style: "currency", currency: "EUR", notation: "compact", maximumFractionDigits: 1 });
+const compactCurrency = (amount) => {
+  const absoluteAmount = Math.abs(amount);
+  const divisor = absoluteAmount >= 1_000_000 ? 1_000_000 : absoluteAmount >= 1_000 ? 1_000 : 1;
+  const suffix = divisor === 1_000_000 ? " mi" : divisor === 1_000 ? " mil" : "";
+  const number = (amount / divisor).toFixed(1).replace(/\.0$/, "").replace(".", ",");
+  return `${number}${suffix} €`;
+};
 const dateLabel = (date) => new Intl.DateTimeFormat("pt-PT", { day: "2-digit", month: "short", year: "numeric" }).format(new Date(`${date}T12:00:00`));
 const todayInLisbon = () => {
   const parts = Object.fromEntries(new Intl.DateTimeFormat("en", { timeZone: "Europe/Lisbon", year: "numeric", month: "2-digit", day: "2-digit" }).formatToParts(new Date()).map(({ type, value }) => [type, value]));
@@ -176,6 +182,9 @@ export default function SalesDashboard() {
   const [year, setYear] = useState(() => new Intl.DateTimeFormat("en", { timeZone: "Europe/Lisbon", year: "numeric" }).format(new Date()));
   const [month, setMonth] = useState(() => new Intl.DateTimeFormat("en", { timeZone: "Europe/Lisbon", month: "2-digit" }).format(new Date()));
   const [status, setStatus] = useState("all");
+  const [paymentFilter, setPaymentFilter] = useState("all");
+  const [deliveryFilter, setDeliveryFilter] = useState("all");
+  const [resolutionFilter, setResolutionFilter] = useState("all");
   const [search, setSearch] = useState("");
 
   async function api(url, options) {
@@ -223,7 +232,7 @@ export default function SalesDashboard() {
       }
       if (imported.length) {
         setSales((current) => [...imported, ...current]);
-        setYear(imported[0].issuedAt.slice(0, 4)); setMonth(imported[0].issuedAt.slice(5, 7)); setStatus("all"); setSearch("");
+        setYear(imported[0].issuedAt.slice(0, 4)); setMonth(imported[0].issuedAt.slice(5, 7)); setStatus("all"); setPaymentFilter("all"); setDeliveryFilter("all"); setResolutionFilter("all"); setSearch("");
         setNotice(`${imported.length === 1 ? "Documento registado" : `${imported.length} documentos registados`} com sucesso. Cliente, data e valores identificados automaticamente.`);
       }
       if (failures.length) setError(failures.join("\n"));
@@ -330,7 +339,15 @@ export default function SalesDashboard() {
   const period = sales.filter((sale) => periodDate(sale).startsWith(year) && (month === "all" || periodDate(sale).slice(5, 7) === month));
   const confirmed = period.filter((sale) => sale.status !== "em_preparacao");
   const preparing = period.filter((sale) => sale.status === "em_preparacao");
-  const visibleSales = period.filter((sale) => (status === "all" || (status === "confirmada" ? sale.status !== "em_preparacao" : sale.status === "em_preparacao")) && `${sale.customerName} ${sale.nif} ${sale.fileName}`.toLocaleLowerCase("pt-PT").includes(search.toLocaleLowerCase("pt-PT"))).sort((a, b) => periodDate(b).localeCompare(periodDate(a)) || b.uploadedAt.localeCompare(a.uploadedAt));
+  const visibleSales = period.filter((sale) => {
+    const matchesQuote = status === "all" || (status === "confirmada" ? sale.status !== "em_preparacao" : sale.status === "em_preparacao");
+    const matchesPayment = paymentFilter === "all" || sale.paymentStatus === paymentFilter;
+    const matchesDelivery = deliveryFilter === "all" || sale.deliveryStatus === deliveryFilter;
+    const matchesResolution = resolutionFilter === "all" || (resolutionFilter === "resolved" ? isResolved(sale) : !isResolved(sale));
+    const matchesSearch = `${sale.customerName} ${sale.nif} ${sale.fileName}`.toLocaleLowerCase("pt-PT").includes(search.toLocaleLowerCase("pt-PT"));
+    return matchesQuote && matchesPayment && matchesDelivery && matchesResolution && matchesSearch;
+  }).sort((a, b) => periodDate(b).localeCompare(periodDate(a)) || b.uploadedAt.localeCompare(a.uploadedAt));
+  const hasActiveFilters = status !== "all" || paymentFilter !== "all" || deliveryFilter !== "all" || resolutionFilter !== "all" || Boolean(search);
   const yearSales = sales.filter((sale) => sale.status !== "em_preparacao" && periodDate(sale).startsWith(year));
   const monthly = months.map((_, index) => {
     const monthSales = yearSales.filter((sale) => periodDate(sale).slice(5, 7) === String(index + 1).padStart(2, "0"));
@@ -391,7 +408,7 @@ export default function SalesDashboard() {
             </div>
             <div className="mt-7 grid grid-cols-6 gap-x-2 gap-y-4 sm:grid-cols-12 sm:gap-x-4">
               {monthly.map(({ subtotal, total }, index) => <button type="button" key={index} aria-label={`${months[index]} ${year}: ${currency.format(subtotal)} sem IVA, ${currency.format(total)} com IVA`} title={`${months[index]}: ${currency.format(subtotal)} sem IVA · ${currency.format(total)} com IVA`} onClick={() => setMonth(String(index + 1).padStart(2, "0"))} className="group flex h-[105px] min-w-0 cursor-pointer flex-col items-center justify-end gap-1 rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-600">
-                <span className={`w-full truncate text-center text-[8px] leading-tight sm:text-[9px] ${month === String(index + 1).padStart(2, "0") ? "font-semibold text-orange-700" : "text-[#86868b]"}`}>{compactCurrency.format(subtotal)}</span>
+                <span className={`w-full truncate text-center text-[8px] leading-tight sm:text-[9px] ${month === String(index + 1).padStart(2, "0") ? "font-semibold text-orange-700" : "text-[#86868b]"}`}>{compactCurrency(subtotal)}</span>
                 <span className={`block w-full rounded-t-md transition ${month === String(index + 1).padStart(2, "0") ? "bg-orange-600" : "bg-[#dce5ef] group-hover:bg-[#afc1d4]"}`} style={{ height: `${Math.max(4, subtotal / max * 65)}px` }} />
                 <span className={`text-center text-[9px] sm:text-[11px] ${month === String(index + 1).padStart(2, "0") ? "font-semibold text-orange-700" : "text-[#a1a1a6]"}`}>{months[index].slice(0, 3)}</span>
               </button>)}
@@ -423,23 +440,61 @@ export default function SalesDashboard() {
 
           <section className="mt-6 overflow-hidden rounded-[28px] border border-[#e8e8ed] bg-white">
             <div className="flex flex-col justify-between gap-4 border-b border-[#f0f0f2] p-5 sm:p-7 xl:flex-row xl:items-center">
-              <div><h2 className="text-base font-semibold tracking-tight">Encomendas e documentos</h2><p className="mt-1 text-xs text-[#86868b]">{visibleSales.length} {visibleSales.length === 1 ? "registo" : "registos"} · {periodLabel}</p></div>
-              <div className="flex flex-col gap-2 sm:flex-row">
+              <div><h2 className="text-base font-semibold tracking-tight">Encomendas e documentos</h2><p className="mt-1 text-xs text-[#86868b]">{visibleSales.length} de {period.length} {visibleSales.length === 1 ? "registo" : "registos"} · {periodLabel}</p></div>
+              <div className="flex flex-col gap-2">
                 <label className="relative">
                   <span className="sr-only">Pesquisar cliente, NIF ou documento</span>
                   <IoSearchOutline className="absolute left-3 top-3 text-[#a1a1a6]" />
-                  <input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Pesquisar cliente ou documento" className={`${controls} w-full pl-9 sm:w-64`} />
+                  <input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Pesquisar cliente, NIF ou documento" className={`${controls} w-full pl-9 sm:w-[300px]`} />
                 </label>
-                <DashboardDropdown
-                  label="Filtrar estado do orçamento"
-                  options={[
-                    { value: "all", label: "Todos os orçamentos" },
-                    { value: "em_preparacao", label: "A aguardar resposta" },
-                    { value: "confirmada", label: "Confirmado pelo cliente" },
-                  ]}
-                  value={status}
-                  onChange={setStatus}
-                />
+                <div className="flex flex-wrap items-center gap-2">
+                  <DashboardDropdown
+                    label="Filtrar estado do orçamento"
+                    options={[
+                      { value: "all", label: "Todos os orçamentos" },
+                      { value: "em_preparacao", label: "A aguardar resposta" },
+                      { value: "confirmada", label: "Confirmado pelo cliente" },
+                    ]}
+                    value={status}
+                    onChange={setStatus}
+                  />
+                  <DashboardDropdown
+                    label="Filtrar estado do pagamento"
+                    options={[
+                      { value: "all", label: "Qualquer pagamento" },
+                      { value: "por_pagar", label: "Por pagar" },
+                      { value: "entrada_paga", label: "Entrada paga" },
+                      { value: "pago", label: "Pago" },
+                    ]}
+                    value={paymentFilter}
+                    onChange={setPaymentFilter}
+                  />
+                  <DashboardDropdown
+                    label="Filtrar estado da entrega"
+                    options={[
+                      { value: "all", label: "Qualquer entrega" },
+                      { value: "por_entregar", label: "Por entregar" },
+                      { value: "entregue", label: "Entregue" },
+                    ]}
+                    value={deliveryFilter}
+                    onChange={setDeliveryFilter}
+                  />
+                  <DashboardDropdown
+                    label="Filtrar resolução"
+                    options={[
+                      { value: "all", label: "Resolvidos e pendentes" },
+                      { value: "resolved", label: "Resolvidos" },
+                      { value: "unresolved", label: "Não resolvidos" },
+                    ]}
+                    value={resolutionFilter}
+                    onChange={setResolutionFilter}
+                  />
+                  {hasActiveFilters && (
+                    <button type="button" onClick={() => { setStatus("all"); setPaymentFilter("all"); setDeliveryFilter("all"); setResolutionFilter("all"); setSearch(""); }} className="h-10 cursor-pointer rounded-full px-3 text-xs font-semibold text-sky-700 transition hover:bg-sky-50">
+                      Limpar filtros
+                    </button>
+                  )}
+                </div>
               </div>
             </div>
             {loading ? <div role="status" className="p-16 text-center text-sm text-[#86868b]">A carregar os seus documentos…</div> : visibleSales.length ? (

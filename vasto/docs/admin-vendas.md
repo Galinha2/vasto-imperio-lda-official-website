@@ -20,6 +20,12 @@ Entrar em `/admin/login`. O dashboard fica em `/admin`. Estas rotas não têm li
 
 Não usar prefixos `NEXT_PUBLIC_` nestas variáveis. A chave do Supabase nunca é enviada para o navegador. Os PDFs são enviados com uma URL assinada temporária para o bucket privado e descarregados através do backend autenticado; não há URLs públicas dos documentos. A arquitetura segue o acesso controlado descrito na [documentação oficial de Storage do Supabase](https://supabase.com/docs/guides/storage/security/access-control).
 
+### Manter o projeto Supabase ativo no plano gratuito
+
+O Vercel executa diariamente uma consulta autenticada e apenas de leitura à tabela `admin_sales`. Não são inseridas vendas, PDFs ou dados artificiais. Para ativar o agendamento, definir também `CRON_SECRET` nas variáveis de ambiente de produção da Vercel com um segredo aleatório forte (por exemplo, gerar com `openssl rand -hex 32`) e fazer um novo deploy. A configuração está em `vercel.json`; o endpoint só aceita o pedido de cron autenticado.
+
+Este ping reduz o risco de pausa por inatividade, mas não garante disponibilidade contínua: o agendamento Hobby pode atrasar até cerca de uma hora e a Vercel/Supabase podem ter falhas ou limites próprios. Um projeto já pausado poderá ter de ser retomado manualmente no painel Supabase. A documentação do Supabase indica que só o plano Pro garante que o projeto não é pausado por inatividade.
+
 Se o bucket `sales-pdfs` já existir ou se a instalação já tiver registos, executar novamente `supabase/admin-sales.sql`. O script atualiza o limite/formats do bucket e migra os estados antigos para os campos independentes de orçamento, pagamento e entrega.
 
 Uma configuração incompleta na Vercel bloqueia o registo de vendas, para evitar guardar documentos num disco temporário. Este projeto não cria uma conta ou um projeto Supabase automaticamente.

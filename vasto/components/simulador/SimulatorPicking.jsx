@@ -81,7 +81,7 @@ function findBestModules(targetLength, { height, depth, levels, floorType, galva
     return [length, hasAllPrices ? prices[0] + levels * (2 * prices[1] + prices[2] + reinforcement + 4 * prices[3]) : Infinity];
   }));
   if (sameBeamLength) {
-    const requestedLength = Math.round(Number(desiredBeamLength) * 1000) || beamLengths[0];
+    const requestedLength = Math.round(Number(desiredBeamLength)) || beamLengths[0];
     const availableLengths = beamLengths.filter((length) => Number.isFinite(moduleCosts.get(length)));
     if (!availableLengths.length) return [];
     const selectedLength = availableLengths.reduce((best, length) => {
@@ -368,7 +368,7 @@ export default function SimulatorPicking({ onQuoteDataChange, adminMode = false,
   const [desiredLength, setDesiredLength] = useState("1.00");
   const [rowCount, setRowCount] = useState(1);
   const [sameBeamLength, setSameBeamLength] = useState(false);
-  const [desiredBeamLength, setDesiredBeamLength] = useState(String((beamLengths[0] || 1000) / 1000));
+  const [desiredBeamLength, setDesiredBeamLength] = useState(beamLengths[0] || 1000);
   const [height, setHeight] = useState(2000);
   const [depth, setDepth] = useState(400);
   const [levels, setLevels] = useState(4);
@@ -376,6 +376,9 @@ export default function SimulatorPicking({ onQuoteDataChange, adminMode = false,
   const [galvanized, setGalvanized] = useState(true);
   const [reinforcedBeams, setReinforcedBeams] = useState(false);
   const [selectedSolutionId, setSelectedSolutionId] = useState("chosen");
+  const availableBeamLengths = useMemo(() => unique(beams
+    .filter((beam) => beam.produto.includes(reinforcedBeams ? "Viga Z100" : "Viga Z60"))
+    .map((beam) => beam.length)), [reinforcedBeams]);
   const enteredLength = Number(desiredLength);
   const isLengthUnavailable = enteredLength > 30;
   const targetLength = enteredLength > 0 ? Math.min(30, enteredLength) * 1000 : 5000;
@@ -406,6 +409,11 @@ export default function SimulatorPicking({ onQuoteDataChange, adminMode = false,
   }), [baseModules, targetLength, height, depth, levels, floorType, galvanized, reinforcedBeams, sameBeamLength, desiredBeamLength, rowCount]);
   const configKey = [desiredLength, rowCount, sameBeamLength, desiredBeamLength, height, depth, levels, floorType, galvanized, reinforcedBeams].join("|");
   useEffect(() => setSelectedSolutionId("chosen"), [configKey]);
+  useEffect(() => {
+    if (!availableBeamLengths.includes(Number(desiredBeamLength)) && availableBeamLengths.length) {
+      setDesiredBeamLength(availableBeamLengths[0]);
+    }
+  }, [availableBeamLengths, desiredBeamLength]);
   const modules = solutions.find((solution) => solution.id === selectedSolutionId)?.modules ?? baseModules;
   const moduleSubtotal = modules.reduce((sum, moduleLength) => {
     const beamProfile = reinforcedBeams ? "Viga Z100" : "Viga Z60";
@@ -457,7 +465,7 @@ export default function SimulatorPicking({ onQuoteDataChange, adminMode = false,
       items: createQuoteLines(entries, 3),
       discountPercent: discountRate * 100,
       total: discountedEstimate,
-      details: `Estantes picking · Comprimento por fila: ${format(finalLength)} m · Comprimento total: ${format(finalLength * rowCount)} m · Altura: ${format(height)} m · Profundidade: ${format(depth)} m · Níveis: ${levels} · Filas: ${rowCount} · Piso: ${floorType} · Bastidores: ${galvanized ? "galvanizados" : "pintados"} · Vigas: ${profile} · Carga máxima por par de vigas: ${levelCapacity.toLocaleString("pt-PT")} kg`,
+      details: `Estantes picking · Comprimento por fila: ${format(finalLength)} m · Comprimento total: ${format(finalLength * rowCount)} m · Altura: ${format(height)} m · Profundidade: ${format(depth)} m · Níveis: ${levels} · Linhas de estantes lado a lado: ${rowCount} · Piso: ${floorType} · Bastidores: ${galvanized ? "galvanizados" : "pintados"} · Vigas: ${profile} · Carga máxima por par de vigas: ${levelCapacity.toLocaleString("pt-PT")} kg`,
       unavailable: isLengthUnavailable || !matchingFrame || modules.length === 0,
     };
     orderQuoteRef.current = quote;
@@ -510,7 +518,7 @@ export default function SimulatorPicking({ onQuoteDataChange, adminMode = false,
     setDesiredLength("1.00");
     setRowCount(1);
     setSameBeamLength(false);
-    setDesiredBeamLength(String((beamLengths[0] || 1000) / 1000));
+    setDesiredBeamLength(availableBeamLengths[0] || beamLengths[0] || 1000);
     setHeight(2000);
     setDepth(400);
     setLevels(4);
@@ -571,7 +579,9 @@ export default function SimulatorPicking({ onQuoteDataChange, adminMode = false,
               desiredBeamLength={desiredBeamLength}
               onDesiredBeamLengthChange={setDesiredBeamLength}
               sameLengthToggleLabel={english ? "Beams of the same length" : "Vigas do mesmo comprimento"}
-              sameLengthSelectLabel={english ? "Desired beam length (m)" : "Comprimento pretendido das vigas (m)"}
+              sameLengthSelectLabel={english ? "Available beam length (m)" : "Medida disponível das vigas (m)"}
+              sameLengthOptions={availableBeamLengths}
+              sameLengthFormat={formatMeters}
               automaticLengthMessage={english ? "When this option is off, the calculation can combine beams of different lengths to get close to the requested length." : "Com esta opção desligada, o cálculo pode combinar vigas de diferentes comprimentos para aproximar o comprimento pedido."}
             />
             <label className="flex min-w-0 cursor-pointer items-center gap-3 simulator-pill rounded-full border border-[#e5e5e7] bg-[#fbfbfd] px-4 py-3 text-sm font-medium text-[#424245] transition hover:border-[#c7c7cc]">
@@ -589,7 +599,7 @@ export default function SimulatorPicking({ onQuoteDataChange, adminMode = false,
               <p className="text-4xl font-semibold tracking-[-0.04em] text-(--orange)">{isLengthUnavailable ? (english ? "Unavailable" : "Indisponível") : formatPrice(discountedEstimate)}</p>
               {!isLengthUnavailable && <span className="text-sm font-medium text-[#86868b]">{english ? "+ VAT" : "+ IVA"}</span>}
             </div>
-            <p className="mt-1 text-sm text-[#6e6e73]">{english ? `Total price for ${rowCount} identical row${rowCount === 1 ? "" : "s"}.` : `Preço total para ${rowCount} ${rowCount === 1 ? "fila" : "filas"} iguais.`}</p>
+            <p className="mt-1 text-sm text-[#6e6e73]">{english ? `Total price for ${rowCount} shelving line${rowCount === 1 ? "" : "s"} placed side by side.` : `Preço total para ${rowCount} ${rowCount === 1 ? "linha de estantes" : "linhas de estantes"} lado a lado.`}</p>
             {discountRate > 0 && !isLengthUnavailable && (
               <p className="mt-2 text-sm font-semibold text-[#0879C0]">{english ? `${discountRate * 100}% discount applied: −${formatPrice(discountAmount)}` : `Desconto de ${discountRate * 100}% aplicado: −${formatPrice(discountAmount)}`}</p>
             )}

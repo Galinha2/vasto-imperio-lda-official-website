@@ -14,24 +14,35 @@ export default function SimulatorConfigurationOptions({
   sameLengthSelectLabel = "Comprimento pretendido das vigas (m)",
   sameLengthOptions,
   sameLengthFormat,
+  rowCountLabel,
+  rowCountDescriptions,
   automaticLengthMessage,
 }) {
   const { language } = useLanguage();
   const english = language === "en";
+  const rowsDescription = rowCountDescriptions || (english
+    ? ["One standalone shelving line", "Two parallel shelving lines", "Three parallel shelving lines"]
+    : ["Uma linha de estantes isolada", "Duas linhas de estantes paralelas", "Três linhas de estantes paralelas"]);
   return (
     <div className="sm:col-span-2 space-y-4 rounded-[30px] bg-[#f5f5f7] p-5">
       <div>
-        <p className="mb-2 text-sm font-semibold text-[#424245]">{english ? "Number of identical rows" : "Número de filas iguais"}</p>
+        <p className="mb-1 text-sm font-semibold text-[#424245]">{rowCountLabel || (english ? "How many shelving lines do you need?" : "Quantas linhas de estantes pretende?")}</p>
+        <p className="mb-3 text-xs leading-relaxed text-[#86868b]">{english ? "Choose how many identical lines to place side by side." : "Escolha quantas linhas iguais pretende instalar lado a lado."}</p>
         <div className="grid grid-cols-3 gap-2">
           {[1, 2, 3].map((count) => (
             <button
               key={count}
               type="button"
               aria-pressed={rowCount === count}
+              aria-label={`${count} ${english ? `shelving line${count === 1 ? "" : "s"}` : `fila${count === 1 ? "" : "s"}`}: ${rowsDescription[count - 1]}`}
               onClick={() => onRowCountChange(count)}
-              className={`simulator-pill cursor-pointer rounded-full border px-3 py-2.5 text-sm font-semibold transition duration-200 hover:-translate-y-0.5 hover:shadow-md ${rowCount === count ? "border-[#0071e3] bg-[#0071e3] text-white shadow-sm hover:bg-[#0062c4]" : "border-[#d2d2d7] bg-white text-[#424245] hover:border-[#0071e3] hover:bg-[#f5f9ff]"}`}
+              className={`simulator-pill flex min-h-[112px] cursor-pointer flex-col items-center justify-center gap-2 rounded-2xl border px-2 py-3 text-center transition duration-200 hover:-translate-y-0.5 hover:shadow-md ${rowCount === count ? "border-[#0071e3] bg-[#0071e3] text-white shadow-sm hover:bg-[#0062c4]" : "border-[#d2d2d7] bg-white text-[#424245] hover:border-[#0071e3] hover:bg-[#f5f9ff]"}`}
             >
-              {english ? (count === 1 ? "Single row" : count === 2 ? "Double row" : "Triple row") : (count === 1 ? "Fila simples" : count === 2 ? "Fila dupla" : "Fila tripla")}
+              <span aria-hidden="true" className="flex h-7 items-center gap-1">
+                {Array.from({ length: count }, (_, index) => <span key={index} className={`h-2 w-8 rounded-full ${rowCount === count ? "bg-white" : "bg-sky-600"}`} />)}
+              </span>
+              <span className="text-sm font-semibold">{count} {english ? `line${count === 1 ? "" : "s"}` : `fila${count === 1 ? "" : "s"}`}</span>
+              <span className={`text-[10px] leading-tight ${rowCount === count ? "text-white/85" : "text-[#86868b]"}`}>{rowsDescription[count - 1]}</span>
             </button>
           ))}
         </div>

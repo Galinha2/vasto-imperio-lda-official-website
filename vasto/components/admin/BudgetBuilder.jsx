@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import Image from "@/components/loadings/LoadingImage";
 import { IoIosArrowDown } from "react-icons/io";
 import { IoIosAdd } from "react-icons/io";
+import { IoCloudUploadOutline } from "react-icons/io5";
 import orcamento from "@/assets/orcamento.json";
 import generateBudgetPdf from "@/lib/generateBudgetPdf";
 import { MdOutlineDelete } from "react-icons/md";
@@ -21,6 +22,7 @@ export default function BudgetBuilder() {
   const [dadosEmpresa, setDadosEmpresa] = useState(null);
   const [loadingNif, setLoadingNif] = useState(false);
   const [popupMensagem, setPopupMensagem] = useState(null);
+  const [sendingToSales, setSendingToSales] = useState(false);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -172,6 +174,41 @@ export default function BudgetBuilder() {
     nif,
     nomeClienteManual,
   });
+
+  const enviarParaVendas = async () => {
+    if (sendingToSales) return;
+    if (dadosEmpresa?.nome === "NIF não encontrado") {
+      setPopupMensagem("Não é possível enviar o orçamento: NIF não encontrado.");
+      return;
+    }
+
+    setSendingToSales(true);
+    try {
+      const pdf = await generateBudgetPdf({
+        source: "orcamento",
+        linhas,
+        descontoSelecionado,
+        dadosEmpresa,
+        nif,
+        nomeClienteManual,
+        returnBlob: true,
+      });
+      if (pdf.size > 6 * 1024 * 1024) throw new Error("O PDF gerado ultrapassa o limite de 6 MB.");
+
+      const form = new FormData();
+      form.append("pdf", pdf, `orcamento-${new Date().toISOString().slice(0, 10)}.pdf`);
+      const response = await fetch("/api/admin/sales", { method: "POST", body: form, cache: "no-store" });
+      const result = await response.json();
+      if (response.status === 401) throw new Error("A sessão de administração expirou. Inicie sessão novamente.");
+      if (!response.ok) throw new Error(result.error || "Não foi possível enviar o orçamento para as vendas.");
+      setPopupMensagem(`Orçamento de ${result.sale.customerName} enviado para as vendas.`);
+    } catch (error) {
+      console.error("Não foi possível enviar o orçamento para as vendas.", error);
+      setPopupMensagem(error.message || "Não foi possível enviar o orçamento para as vendas.");
+    } finally {
+      setSendingToSales(false);
+    }
+  };
 
   const gerarRefCompleta = (refFamilia) => {
     let contador = 1;
@@ -426,7 +463,7 @@ export default function BudgetBuilder() {
               <span className="text-2xl font-semibold tracking-[-0.04em] text-(--blue)">{totalComIVA.toFixed(2).replace(".", ",")}€</span>
             </div>
             </div>
-            <div className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <div className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-3">
               <button
                 type="button"
                 onClick={copiarManual}
@@ -449,6 +486,16 @@ export default function BudgetBuilder() {
                 className="h-12 cursor-pointer rounded-full bg-(--orange) px-5 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:bg-(--orange-hover)"
               >
                 Gerar PDF
+              </button>
+
+              <button
+                type="button"
+                onClick={enviarParaVendas}
+                disabled={sendingToSales || loadingNif}
+                className="inline-flex h-12 cursor-pointer items-center justify-center gap-2 rounded-full bg-sky-700 px-5 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:bg-sky-800 disabled:cursor-wait disabled:opacity-60"
+              >
+                <IoCloudUploadOutline />
+                {sendingToSales ? "A enviar…" : "Enviar para vendas"}
               </button>
             </div>
           </div>

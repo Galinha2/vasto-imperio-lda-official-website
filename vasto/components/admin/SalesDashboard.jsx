@@ -7,6 +7,7 @@ import { IoAddOutline, IoArrowUpOutline, IoCheckmarkCircleOutline, IoCloudUpload
 
 const months = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
 const currency = new Intl.NumberFormat("pt-PT", { style: "currency", currency: "EUR" });
+const compactCurrency = new Intl.NumberFormat("pt-PT", { style: "currency", currency: "EUR", notation: "compact", maximumFractionDigits: 1 });
 const dateLabel = (date) => new Intl.DateTimeFormat("pt-PT", { day: "2-digit", month: "short", year: "numeric" }).format(new Date(`${date}T12:00:00`));
 const todayInLisbon = () => {
   const parts = Object.fromEntries(new Intl.DateTimeFormat("en", { timeZone: "Europe/Lisbon", year: "numeric", month: "2-digit", day: "2-digit" }).formatToParts(new Date()).map(({ type, value }) => [type, value]));
@@ -331,8 +332,15 @@ export default function SalesDashboard() {
   const preparing = period.filter((sale) => sale.status === "em_preparacao");
   const visibleSales = period.filter((sale) => (status === "all" || (status === "confirmada" ? sale.status !== "em_preparacao" : sale.status === "em_preparacao")) && `${sale.customerName} ${sale.nif} ${sale.fileName}`.toLocaleLowerCase("pt-PT").includes(search.toLocaleLowerCase("pt-PT"))).sort((a, b) => periodDate(b).localeCompare(periodDate(a)) || b.uploadedAt.localeCompare(a.uploadedAt));
   const yearSales = sales.filter((sale) => sale.status !== "em_preparacao" && periodDate(sale).startsWith(year));
-  const monthly = months.map((_, index) => sum(yearSales.filter((sale) => periodDate(sale).slice(5, 7) === String(index + 1).padStart(2, "0"))));
-  const max = Math.max(...monthly, 1);
+  const monthly = months.map((_, index) => {
+    const monthSales = yearSales.filter((sale) => periodDate(sale).slice(5, 7) === String(index + 1).padStart(2, "0"));
+    return { subtotal: sum(monthSales), total: sum(monthSales, "total") };
+  });
+  const averageConfirmed = confirmed.length ? sum(confirmed) / confirmed.length : 0;
+  const conversionRate = period.length ? Math.round((confirmed.length / period.length) * 100) : 0;
+  const resolvedCount = confirmed.filter(isResolved).length;
+  const resolvedRate = confirmed.length ? Math.round((resolvedCount / confirmed.length) * 100) : 0;
+  const max = Math.max(...monthly.map(({ subtotal }) => subtotal), 1);
   const periodLabel = month === "all" ? `Ano ${year}` : `${months[Number(month) - 1]} ${year}`;
   const controls = "h-10 rounded-full border border-[#e5e5e7] bg-white py-2 pl-4 pr-4 text-sm text-[#424245] outline-none transition-colors hover:border-[#c7c7cc] hover:bg-[#fbfbfd] focus:border-sky-600 focus:ring-2 focus:ring-sky-600/10";
   return (
@@ -374,9 +382,42 @@ export default function SalesDashboard() {
           </div>
 
           <section className="mt-6 rounded-[28px] border border-[#e8e8ed] bg-white p-5 sm:p-7">
-            <div className="flex items-center justify-between gap-4"><div><h2 className="text-base font-semibold tracking-tight">O ano, mês a mês.</h2><p className="mt-1 text-xs text-[#86868b]">Encomendas confirmadas · por data da venda · {year}</p></div><span className="text-lg font-semibold tracking-tight">{currency.format(sum(yearSales))}</span></div>
-            <div className="mt-7 grid h-[145px] grid-cols-12 items-end gap-1.5 sm:gap-4">
-              {monthly.map((value, index) => <button type="button" key={index} aria-label={`${months[index]} ${year}: ${currency.format(value)} de vendas sem IVA`} title={`${months[index]}: ${currency.format(value)}`} onClick={() => setMonth(String(index + 1).padStart(2, "0"))} className="group flex h-full min-w-0 cursor-pointer flex-col justify-end gap-3 rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-600"><span className={`block min-h-1 rounded-t-md transition ${month === String(index + 1).padStart(2, "0") ? "bg-orange-600" : "bg-[#dce5ef] group-hover:bg-[#afc1d4]"}`} style={{ height: `${Math.max(4, value / max * 110)}px` }} /><span className={`text-center text-[9px] sm:text-[11px] ${month === String(index + 1).padStart(2, "0") ? "font-semibold text-orange-700" : "text-[#a1a1a6]"}`}>{months[index].slice(0, 3)}</span></button>)}
+            <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-start">
+              <div><h2 className="text-base font-semibold tracking-tight">O ano, mês a mês.</h2><p className="mt-1 text-xs text-[#86868b]">Encomendas confirmadas · por data da venda · {year}</p></div>
+              <div className="flex flex-col gap-2 sm:text-right">
+                <div><p className="text-[10px] font-medium text-[#86868b]">Total sem IVA</p><p className="text-sm font-semibold tracking-tight text-[#1d1d1f]">{currency.format(sum(yearSales))}</p></div>
+                <div><p className="text-[10px] font-medium text-[#86868b]">Total com IVA</p><p className="text-sm font-semibold tracking-tight text-sky-700">{currency.format(sum(yearSales, "total"))}</p></div>
+              </div>
+            </div>
+            <div className="mt-7 grid grid-cols-6 gap-x-2 gap-y-4 sm:grid-cols-12 sm:gap-x-4">
+              {monthly.map(({ subtotal, total }, index) => <button type="button" key={index} aria-label={`${months[index]} ${year}: ${currency.format(subtotal)} sem IVA, ${currency.format(total)} com IVA`} title={`${months[index]}: ${currency.format(subtotal)} sem IVA · ${currency.format(total)} com IVA`} onClick={() => setMonth(String(index + 1).padStart(2, "0"))} className="group flex h-[105px] min-w-0 cursor-pointer flex-col items-center justify-end gap-1 rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-600">
+                <span className={`w-full truncate text-center text-[8px] leading-tight sm:text-[9px] ${month === String(index + 1).padStart(2, "0") ? "font-semibold text-orange-700" : "text-[#86868b]"}`}>{compactCurrency.format(subtotal)}</span>
+                <span className={`block w-full rounded-t-md transition ${month === String(index + 1).padStart(2, "0") ? "bg-orange-600" : "bg-[#dce5ef] group-hover:bg-[#afc1d4]"}`} style={{ height: `${Math.max(4, subtotal / max * 65)}px` }} />
+                <span className={`text-center text-[9px] sm:text-[11px] ${month === String(index + 1).padStart(2, "0") ? "font-semibold text-orange-700" : "text-[#a1a1a6]"}`}>{months[index].slice(0, 3)}</span>
+              </button>)}
+            </div>
+          </section>
+
+          <section aria-labelledby="sales-insights-heading" className="mt-6">
+            <div className="mb-3 flex items-end justify-between gap-3">
+              <div><h2 id="sales-insights-heading" className="text-base font-semibold tracking-tight">Indicadores do período</h2><p className="mt-1 text-xs text-[#86868b]">Um resumo do desempenho em {periodLabel.toLocaleLowerCase("pt-PT")}.</p></div>
+            </div>
+            <div className="grid gap-3 sm:grid-cols-3">
+              <article className="rounded-2xl border border-[#e8e8ed] bg-white p-4">
+                <p className="text-xs font-medium text-[#86868b]">Valor médio por encomenda</p>
+                <p className="mt-2 text-xl font-semibold tracking-tight text-[#1d1d1f]">{loading ? "—" : currency.format(averageConfirmed)}</p>
+                <p className="mt-1 text-[11px] text-[#a1a1a6]">Encomendas confirmadas · sem IVA</p>
+              </article>
+              <article className="rounded-2xl border border-[#e8e8ed] bg-white p-4">
+                <p className="text-xs font-medium text-[#86868b]">Taxa de conversão</p>
+                <p className="mt-2 text-xl font-semibold tracking-tight text-sky-700">{loading ? "—" : `${conversionRate}%`}</p>
+                <p className="mt-1 text-[11px] text-[#a1a1a6]">{confirmed.length} confirmadas de {period.length} documentos</p>
+              </article>
+              <article className="rounded-2xl border border-[#e8e8ed] bg-white p-4">
+                <p className="text-xs font-medium text-[#86868b]">Encomendas resolvidas</p>
+                <p className="mt-2 text-xl font-semibold tracking-tight text-emerald-700">{loading ? "—" : `${resolvedRate}%`}</p>
+                <p className="mt-1 text-[11px] text-[#a1a1a6]">{resolvedCount} pagas e entregues de {confirmed.length} confirmadas</p>
+              </article>
             </div>
           </section>
 
@@ -423,6 +464,7 @@ export default function SalesDashboard() {
                             <p className="truncate text-sm font-semibold tracking-tight">{sale.customerName}</p>
                             <p className="mt-1 truncate text-[11px] text-[#a1a1a6]">{sale.nif ? `${sale.nif} · ` : ""}{sale.fileName}</p>
                             <p className="mt-1 truncate text-[10px] text-[#86868b]">{sale.source === "simulador" ? "Simulador" : "Orçamento"} · {dateLabel(sale.issuedAt)}</p>
+                            {sale.uploadedAt && <p className="mt-0.5 truncate text-[9px] text-[#a1a1a6]" title={`Pedido recebido em ${dateLabel(sale.uploadedAt.slice(0, 10))}`}>Recebido · {dateLabel(sale.uploadedAt.slice(0, 10))}</p>}
                           </td>
                           <td className="whitespace-nowrap px-2 py-5 text-right">
                             <p className="text-sm font-medium">{currency.format(sale.subtotal)}</p>

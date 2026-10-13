@@ -34,13 +34,13 @@ export default function AdminNavigation({ children }) {
     <div className="min-h-screen bg-[#f5f5f7] lg:grid lg:grid-cols-[240px_minmax(0,1fr)]">
       <aside className="sticky top-0 z-40 border-b border-[#e5e5e7] bg-white px-4 py-3 lg:flex lg:h-screen lg:flex-col lg:border-b-0 lg:border-r lg:px-6 lg:py-8">
         <div className="flex items-center justify-between gap-3">
-          <div className="flex min-w-0 items-center gap-3">
-            <img src="/favicon.png" alt="" width="36" height="36" className="h-9 w-9 shrink-0 object-contain" />
+          <Link href="/" aria-label="Ir para a página inicial da Vasto Império" className="flex min-w-0 items-center gap-3 rounded-lg outline-none focus-visible:ring-2 focus-visible:ring-[#0071e3]/40">
+            <img src="/favicon-google.png" alt="" width="36" height="36" className="h-9 w-9 shrink-0 object-contain" />
             <div className="min-w-0">
               <p className="truncate text-sm font-semibold tracking-tight">Vasto Império</p>
               <p className="mt-0.5 text-[11px] text-[#86868b]">Área de administração</p>
             </div>
-          </div>
+          </Link>
           <button type="button" onClick={logout} className="flex shrink-0 cursor-pointer items-center gap-2 rounded-xl px-2 py-2 text-xs text-[#6e6e73] transition hover:bg-[#f5f5f7] hover:text-[#1d1d1f] lg:hidden">
             <IoLogOutOutline className="text-base" /> Sair
           </button>

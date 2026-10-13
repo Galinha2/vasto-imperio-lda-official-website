@@ -181,13 +181,24 @@ export default function SalesDashboard() {
   const tableDragDepth = useRef(0);
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
+  const [salesDetail, setSalesDetail] = useState("");
   const [year, setYear] = useState(() => new Intl.DateTimeFormat("en", { timeZone: "Europe/Lisbon", year: "numeric" }).format(new Date()));
   const [month, setMonth] = useState(() => new Intl.DateTimeFormat("en", { timeZone: "Europe/Lisbon", month: "2-digit" }).format(new Date()));
   const [status, setStatus] = useState("all");
   const [paymentFilter, setPaymentFilter] = useState("all");
   const [deliveryFilter, setDeliveryFilter] = useState("all");
   const [resolutionFilter, setResolutionFilter] = useState("all");
+  const [headerSort, setHeaderSort] = useState({ group: "", value: "all" });
   const [search, setSearch] = useState("");
+
+  useEffect(() => {
+    if (!salesDetail) return undefined;
+    const closeOnEscape = (event) => {
+      if (event.key === "Escape") setSalesDetail("");
+    };
+    document.addEventListener("keydown", closeOnEscape);
+    return () => document.removeEventListener("keydown", closeOnEscape);
+  }, [salesDetail]);
 
   async function api(url, options) {
     const response = await fetch(url, { ...options, cache: "no-store" });
@@ -341,14 +352,28 @@ export default function SalesDashboard() {
   const period = sales.filter((sale) => periodDate(sale).startsWith(year) && (month === "all" || periodDate(sale).slice(5, 7) === month));
   const confirmed = period.filter((sale) => sale.status !== "em_preparacao");
   const preparing = period.filter((sale) => sale.status === "em_preparacao");
-  const visibleSales = period.filter((sale) => {
+  const filteredSales = period.filter((sale) => {
     const matchesQuote = status === "all" || (status === "confirmada" ? sale.status !== "em_preparacao" : sale.status === "em_preparacao");
     const matchesPayment = paymentFilter === "all" || sale.paymentStatus === paymentFilter;
     const matchesDelivery = deliveryFilter === "all" || sale.deliveryStatus === deliveryFilter;
     const matchesResolution = resolutionFilter === "all" || (resolutionFilter === "resolved" ? isResolved(sale) : !isResolved(sale));
     const matchesSearch = `${sale.customerName} ${sale.nif} ${sale.fileName}`.toLocaleLowerCase("pt-PT").includes(search.toLocaleLowerCase("pt-PT"));
     return matchesQuote && matchesPayment && matchesDelivery && matchesResolution && matchesSearch;
-  }).sort((a, b) => periodDate(b).localeCompare(periodDate(a)) || b.uploadedAt.localeCompare(a.uploadedAt));
+  });
+  const headerSortGroups = {
+    quote: (sale, value) => value === "em_preparacao" ? sale.status === "em_preparacao" : sale.status !== "em_preparacao",
+    payment: (sale, value) => sale.paymentStatus === value,
+    delivery: (sale, value) => sale.deliveryStatus === value,
+    resolution: (sale, value) => value === "resolved" ? isResolved(sale) : !isResolved(sale),
+  };
+  const visibleSales = [...filteredSales].sort((a, b) => {
+    if (headerSort.group && headerSort.value !== "all") {
+      const matchesA = headerSortGroups[headerSort.group](a, headerSort.value);
+      const matchesB = headerSortGroups[headerSort.group](b, headerSort.value);
+      if (matchesA !== matchesB) return matchesA ? -1 : 1;
+    }
+    return periodDate(b).localeCompare(periodDate(a)) || b.uploadedAt.localeCompare(a.uploadedAt);
+  });
   const hasActiveFilters = status !== "all" || paymentFilter !== "all" || deliveryFilter !== "all" || resolutionFilter !== "all" || Boolean(search);
   const yearSales = sales.filter((sale) => sale.status !== "em_preparacao" && periodDate(sale).startsWith(year));
   const monthly = months.map((_, index) => {
@@ -364,6 +389,7 @@ export default function SalesDashboard() {
   const controls = "h-10 rounded-full border border-[#e5e5e7] bg-white py-2 pl-4 pr-4 text-sm text-[#424245] outline-none transition-colors hover:border-[#c7c7cc] hover:bg-[#fbfbfd] focus:border-sky-600 focus:ring-2 focus:ring-sky-600/10";
   const filterGroups = [
     {
+      id: "quote",
       label: "Orçamento",
       value: status,
       onChange: setStatus,
@@ -374,6 +400,7 @@ export default function SalesDashboard() {
       ],
     },
     {
+      id: "payment",
       label: "Pagamento",
       value: paymentFilter,
       onChange: setPaymentFilter,
@@ -385,6 +412,7 @@ export default function SalesDashboard() {
       ],
     },
     {
+      id: "delivery",
       label: "Entrega",
       value: deliveryFilter,
       onChange: setDeliveryFilter,
@@ -395,6 +423,7 @@ export default function SalesDashboard() {
       ],
     },
     {
+      id: "resolution",
       label: "Resolução",
       value: resolutionFilter,
       onChange: setResolutionFilter,
@@ -405,13 +434,79 @@ export default function SalesDashboard() {
       ],
     },
   ];
-  const cycleFilter = (group) => {
-    const currentIndex = group.options.findIndex((option) => option.value === group.value);
-    if (group.label !== "Orçamento") setStatus("all");
-    if (group.label !== "Pagamento") setPaymentFilter("all");
-    if (group.label !== "Entrega") setDeliveryFilter("all");
-    if (group.label !== "Resolução") setResolutionFilter("all");
-    group.onChange(group.options[(currentIndex + 1) % group.options.length].value);
+  const cycleHeaderSort = (group) => {
+    const currentValue = headerSort.group === group.id ? headerSort.value : "all";
+    const currentIndex = group.options.findIndex((option) => option.value === currentValue);
+    const nextValue = group.options[(currentIndex + 1) % group.options.length].value;
+    setHeaderSort(nextValue === "all" ? { group: "", value: "all" } : { group: group.id, value: nextValue });
+  };
+  const salesDetailRows = (records) => records
+    .slice()
+    .sort((a, b) => periodDate(b).localeCompare(periodDate(a)) || b.uploadedAt.localeCompare(a.uploadedAt))
+    .map((sale) => {
+      const articles = sale.orderDetails?.artigos;
+      const articleDetail = Array.isArray(articles) && articles.length
+        ? articles.map((item) => `${item.produto || "Artigo"} × ${Number(item.unidades) || 0}`).join(", ")
+        : "Artigos não discriminados";
+      return {
+        customer: sale.customerName || "Cliente",
+        document: sale.fileName || "Documento",
+        date: dateLabel(periodDate(sale)),
+        status: `${statusFor(quoteStatuses, sale.status).label} · ${statusFor(paymentStatuses, sale.paymentStatus).label} · ${statusFor(deliveryStatuses, sale.deliveryStatus).label}`,
+        value: currency.format(sale.subtotal),
+        detail: articleDetail,
+      };
+    });
+  const salesDetails = {
+    confirmed: {
+      title: "Encomendas confirmadas",
+      description: `Valor total sem IVA das encomendas confirmadas em ${periodLabel}.`,
+      rows: salesDetailRows(confirmed),
+      metric: currency.format(sum(confirmed)),
+      empty: "Não há encomendas confirmadas neste período.",
+    },
+    gross: {
+      title: "Total confirmado com IVA",
+      description: `Composição do total com IVA das ${confirmed.length} encomendas confirmadas em ${periodLabel}.`,
+      rows: salesDetailRows(confirmed),
+      metric: currency.format(sum(confirmed, "total")),
+      empty: "Não há encomendas confirmadas neste período.",
+    },
+    preparing: {
+      title: "Orçamentos a aguardar resposta",
+      description: `Documentos pendentes e respetivos valores em ${periodLabel}.`,
+      rows: salesDetailRows(preparing),
+      metric: currency.format(sum(preparing)),
+      empty: "Não há orçamentos a aguardar resposta neste período.",
+    },
+    documents: {
+      title: "Documentos registados",
+      description: `Todos os documentos registados em ${periodLabel}.`,
+      rows: salesDetailRows(period),
+      metric: String(period.length),
+      empty: "Não há documentos neste período.",
+    },
+    average: {
+      title: "Valor médio por encomenda",
+      description: `Média de ${currency.format(averageConfirmed)} sem IVA, calculada sobre ${confirmed.length} encomendas confirmadas.`,
+      rows: salesDetailRows(confirmed),
+      metric: currency.format(averageConfirmed),
+      empty: "Não há encomendas confirmadas para calcular a média.",
+    },
+    conversion: {
+      title: "Taxa de conversão",
+      description: `${confirmed.length} de ${period.length} documentos confirmados · ${conversionRate}% em ${periodLabel}.`,
+      rows: salesDetailRows(period),
+      metric: `${conversionRate}%`,
+      empty: "Não há documentos neste período.",
+    },
+    resolved: {
+      title: "Encomendas resolvidas",
+      description: `${resolvedCount} de ${period.length} documentos pagos e entregues · ${resolvedRate}% em ${periodLabel}.`,
+      rows: salesDetailRows(period),
+      metric: `${resolvedRate}%`,
+      empty: "Não há documentos neste período.",
+    },
   };
   return (
     <main className="min-w-0 px-4 py-8 sm:px-6 lg:px-6 lg:py-10 xl:px-8">
@@ -444,11 +539,23 @@ export default function SalesDashboard() {
 
           <div className="mt-5 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
             {[
-              { label: "Encomendas confirmadas", value: currency.format(sum(confirmed)), detail: "Valor confirmado · sem IVA", icon: <IoArrowUpOutline />, color: "bg-teal-50 text-teal-700 ring-teal-100" },
-              { label: "Total confirmado", value: currency.format(sum(confirmed, "total")), detail: `${confirmed.length} ${confirmed.length === 1 ? "encomenda confirmada" : "encomendas confirmadas"} · com IVA`, icon: <IoCheckmarkCircleOutline />, color: "bg-sky-50 text-sky-600 ring-sky-100" },
-              { label: "A aguardar resposta", value: currency.format(sum(preparing)), detail: `${preparing.length} ${preparing.length === 1 ? "orçamento · sem IVA" : "orçamentos · sem IVA"}`, icon: <IoTimeOutline />, color: "bg-slate-50 text-slate-600 ring-slate-200" },
-              { label: "Documentos", value: String(period.length).padStart(2, "0"), detail: "Registados neste período", icon: <IoDocumentTextOutline />, color: "bg-violet-50 text-violet-600 ring-violet-100" },
-            ].map((card) => <section key={card.label} className="rounded-[24px] border border-[#e8e8ed] bg-white p-5 sm:p-6"><div className="flex items-center justify-between gap-2"><p className="text-xs font-medium text-[#86868b]">{card.label}</p><span className={`grid h-10 w-10 place-items-center rounded-2xl text-lg shadow-sm ring-1 ${card.color}`}>{card.icon}</span></div><p className="mt-5 text-[28px] font-semibold leading-none tracking-[-0.055em]">{loading ? "—" : card.value}</p><p className="mt-3 text-[11px] text-[#a1a1a6]">{card.detail}</p></section>)}
+              { id: "confirmed", label: "Encomendas confirmadas", value: currency.format(sum(confirmed)), detail: "Valor confirmado · sem IVA", icon: <IoArrowUpOutline />, color: "bg-teal-50 text-teal-700 ring-teal-100" },
+              { id: "gross", label: "Total confirmado", value: currency.format(sum(confirmed, "total")), detail: `${confirmed.length} ${confirmed.length === 1 ? "encomenda confirmada" : "encomendas confirmadas"} · com IVA`, icon: <IoCheckmarkCircleOutline />, color: "bg-sky-50 text-sky-600 ring-sky-100" },
+              { id: "preparing", label: "A aguardar resposta", value: currency.format(sum(preparing)), detail: `${preparing.length} ${preparing.length === 1 ? "orçamento · sem IVA" : "orçamentos · sem IVA"}`, icon: <IoTimeOutline />, color: "bg-slate-50 text-slate-600 ring-slate-200" },
+              { id: "documents", label: "Documentos", value: String(period.length).padStart(2, "0"), detail: "Registados neste período", icon: <IoDocumentTextOutline />, color: "bg-violet-50 text-violet-600 ring-violet-100" },
+            ].map((card) => (
+              <button
+                type="button"
+                key={card.label}
+                aria-haspopup="dialog"
+                onClick={() => setSalesDetail(card.id)}
+                className="w-full cursor-pointer rounded-[24px] border border-[#e8e8ed] bg-white p-5 text-left transition hover:border-sky-200 hover:bg-sky-50/40 hover:shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-600/30 sm:p-6"
+              >
+                <div className="flex items-center justify-between gap-2"><p className="text-xs font-medium text-[#86868b]">{card.label}</p><span className={`grid h-10 w-10 place-items-center rounded-2xl text-lg shadow-sm ring-1 ${card.color}`}>{card.icon}</span></div>
+                <p className="mt-5 text-[28px] font-semibold leading-none tracking-[-0.055em]">{loading ? "—" : card.value}</p>
+                <p className="mt-3 text-[11px] text-[#a1a1a6]">{card.detail}</p>
+              </button>
+            ))}
           </div>
 
           <section className="mt-6 rounded-[28px] border border-[#e8e8ed] bg-white p-5 sm:p-7">
@@ -473,21 +580,21 @@ export default function SalesDashboard() {
               <div><h2 id="sales-insights-heading" className="text-base font-semibold tracking-tight">Indicadores do período</h2><p className="mt-1 text-xs text-[#86868b]">Um resumo do desempenho em {periodLabel.toLocaleLowerCase("pt-PT")}.</p></div>
             </div>
             <div className="grid gap-3 sm:grid-cols-3">
-              <article className="rounded-2xl border border-[#e8e8ed] bg-white p-4">
+              <button type="button" aria-haspopup="dialog" onClick={() => setSalesDetail("average")} className="w-full cursor-pointer rounded-2xl border border-[#e8e8ed] bg-white p-4 text-left transition hover:border-sky-200 hover:bg-sky-50/40 hover:shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-600/30">
                 <p className="text-xs font-medium text-[#86868b]">Valor médio por encomenda</p>
                 <p className="mt-2 text-xl font-semibold tracking-tight text-[#1d1d1f]">{loading ? "—" : currency.format(averageConfirmed)}</p>
                 <p className="mt-1 text-[11px] text-[#a1a1a6]">Encomendas confirmadas · sem IVA</p>
-              </article>
-              <article className="rounded-2xl border border-[#e8e8ed] bg-white p-4">
+              </button>
+              <button type="button" aria-haspopup="dialog" onClick={() => setSalesDetail("conversion")} className="w-full cursor-pointer rounded-2xl border border-[#e8e8ed] bg-white p-4 text-left transition hover:border-sky-200 hover:bg-sky-50/40 hover:shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-600/30">
                 <p className="text-xs font-medium text-[#86868b]">Taxa de conversão</p>
                 <p className="mt-2 text-xl font-semibold tracking-tight text-sky-700">{loading ? "—" : `${conversionRate}%`}</p>
                 <p className="mt-1 text-[11px] text-[#a1a1a6]">{confirmed.length} confirmadas de {period.length} documentos</p>
-              </article>
-              <article className="rounded-2xl border border-[#e8e8ed] bg-white p-4">
+              </button>
+              <button type="button" aria-haspopup="dialog" onClick={() => setSalesDetail("resolved")} className="w-full cursor-pointer rounded-2xl border border-[#e8e8ed] bg-white p-4 text-left transition hover:border-emerald-200 hover:bg-emerald-50/40 hover:shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600/30">
                 <p className="text-xs font-medium text-[#86868b]">Encomendas resolvidas</p>
                 <p className="mt-2 text-xl font-semibold tracking-tight text-emerald-700">{loading ? "—" : `${resolvedRate}%`}</p>
                 <p className="mt-1 text-[11px] text-[#a1a1a6]">{resolvedCount} pagas e entregues de {period.length} documentos</p>
-              </article>
+              </button>
             </div>
           </section>
 
@@ -514,7 +621,7 @@ export default function SalesDashboard() {
               event.stopPropagation();
               tableDragDepth.current = 0;
               setTableDropActive(false);
-              importFiles(event.dataTransfer.files);
+              importFiles(Array.from(event.dataTransfer.files));
             }}
           >
             {tableDropActive && (
@@ -594,16 +701,17 @@ export default function SalesDashboard() {
                       <th className="w-[17%] px-3 py-4">Cliente / documento</th>
                       <th className="w-[14%] px-2 py-4 text-right">Valores</th>
                       {filterGroups.map((group) => {
-                        const selected = group.options.find((option) => option.value === group.value) || group.options[0];
+                        const headerValue = headerSort.group === group.id ? headerSort.value : "all";
+                        const selected = group.options.find((option) => option.value === headerValue) || group.options[0];
                         const active = selected.value !== "all";
                         return (
                           <th key={group.label} className={`px-2 py-1.5 ${group.label === "Orçamento" ? "w-[13%]" : group.label === "Pagamento" ? "w-[11%]" : group.label === "Entrega" ? "w-[24%]" : "w-[9%]"}`}>
                             <button
                               type="button"
-                              aria-label={`Filtrar por ${group.label.toLocaleLowerCase("pt-PT")}: ${selected.label}. Clique para alternar o estado.`}
+                              aria-label={`Ordenar por ${group.label.toLocaleLowerCase("pt-PT")}: ${selected.label}. Clique para alternar a prioridade.`}
                               aria-pressed={active}
-                              title={`Clique para alternar os estados de ${group.label.toLocaleLowerCase("pt-PT")}`}
-                              onClick={() => cycleFilter(group)}
+                              title={`Clique para mostrar primeiro os registos ${selected.value === "all" ? "" : `com estado "${selected.label}" em `}${group.label.toLocaleLowerCase("pt-PT")}`}
+                              onClick={() => cycleHeaderSort(group)}
                               className={`flex min-h-7 w-full cursor-pointer items-center rounded-lg px-2 text-left transition-colors hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-600/30 ${active ? "font-semibold text-sky-800" : "text-[#86868b]"}`}
                             >
                               <span>{group.label === "Resolução" ? "Estado" : group.label}</span>
@@ -798,9 +906,86 @@ export default function SalesDashboard() {
             ) : <div className="px-6 py-14 text-center"><span className="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-[#f5f5f7] text-2xl text-[#a1a1a6]"><IoDocumentTextOutline /></span><h3 className="mt-4 text-lg font-semibold tracking-tight">{sales.length ? "Ainda sem documentos neste período." : "Tudo começa com o primeiro PDF."}</h3><p className="mx-auto mt-2 max-w-sm text-sm leading-relaxed text-[#86868b]">{sales.length ? "Escolha outro mês ou ajuste os filtros para consultar as suas encomendas." : "Importe um orçamento ou uma simulação. Os dados ficam organizados automaticamente."}</p></div>}
           </section>
 
-          <button type="button" disabled={uploading || loading} onClick={() => inputRef.current?.click()} onDragOver={(event) => { event.preventDefault(); if (!uploading && !loading) setDragging(true); }} onDragLeave={() => setDragging(false)} onDrop={(event) => { event.preventDefault(); setDragging(false); importFiles(event.dataTransfer.files); }} className={`mt-6 flex w-full cursor-pointer flex-col items-center justify-center gap-3 rounded-full border-2 border-dashed p-7 transition disabled:cursor-wait disabled:opacity-60 sm:flex-row sm:gap-5 ${dragging ? "border-orange-400 bg-orange-50" : "border-[#dcdce2] hover:border-orange-300 hover:bg-orange-50/50"}`}><IoCloudUploadOutline className="text-3xl text-orange-600" /><span className="text-center sm:text-left"><span className="block text-sm font-semibold">{uploading ? "A ler e registar os documentos…" : "Arraste os seus PDFs para aqui."}</span><span className="mt-1 block text-xs text-[#86868b]">Ou clique para escolher · Orçamentos e simulador · Até 6 MB por PDF</span></span></button>
+          <button type="button" disabled={uploading || loading} onClick={() => inputRef.current?.click()} onDragOver={(event) => { event.preventDefault(); if (!uploading && !loading) setDragging(true); }} onDragLeave={() => setDragging(false)} onDrop={(event) => { event.preventDefault(); setDragging(false); importFiles(Array.from(event.dataTransfer.files)); }} className={`mt-6 flex w-full cursor-pointer flex-col items-center justify-center gap-3 rounded-full border-2 border-dashed p-7 transition disabled:cursor-wait disabled:opacity-60 sm:flex-row sm:gap-5 ${dragging ? "border-orange-400 bg-orange-50" : "border-[#dcdce2] hover:border-orange-300 hover:bg-orange-50/50"}`}><IoCloudUploadOutline className="text-3xl text-orange-600" /><span className="text-center sm:text-left"><span className="block text-sm font-semibold">{uploading ? "A ler e registar os documentos…" : "Arraste os seus PDFs para aqui."}</span><span className="mt-1 block text-xs text-[#86868b]">Ou clique para escolher · Orçamentos e simulador · Até 6 MB por PDF</span></span></button>
           <p className="mt-5 text-center text-[11px] leading-relaxed text-[#a1a1a6]">As vendas ainda não entregues contam no mês em que foram confirmadas; ao registar a entrega, passam a contar no mês da entrega. Os orçamentos a aguardar resposta contam no mês de emissão.</p>
         </div>
+        {salesDetail && (
+          <div
+            className="fixed inset-0 z-[55] flex items-center justify-center bg-[#1d1d1f]/35 p-4 backdrop-blur-[2px]"
+            onMouseDown={(event) => { if (event.target === event.currentTarget) setSalesDetail(""); }}
+          >
+            <section
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="sales-detail-title"
+              className="max-h-[min(85vh,48rem)] w-full max-w-3xl overflow-y-auto rounded-[26px] border border-[#e8e8ed] bg-white shadow-[0_24px_80px_rgba(0,0,0,0.22)]"
+            >
+              <div className="border-b border-[#e8e8ed] bg-gradient-to-br from-sky-50 via-white to-white px-5 py-5 sm:px-7 sm:py-6">
+                <div className="flex items-start justify-between gap-4">
+                  <div className="min-w-0">
+                    <p className="text-[10px] font-semibold uppercase tracking-[0.15em] text-sky-700">Detalhe das vendas · {periodLabel}</p>
+                    <h2 id="sales-detail-title" className="mt-1.5 text-xl font-semibold tracking-tight text-[#1d1d1f]">{salesDetails[salesDetail].title}</h2>
+                    <p className="mt-2 max-w-2xl text-xs leading-relaxed text-[#6e6e73]">{salesDetails[salesDetail].description}</p>
+                  </div>
+                  <button type="button" aria-label="Fechar detalhe" onClick={() => setSalesDetail("")} className="grid h-9 w-9 shrink-0 cursor-pointer place-items-center rounded-full border border-[#e5e5e7] bg-white text-[#6e6e73] transition hover:border-[#c8c9cf] hover:bg-[#f5f5f7] hover:text-[#1d1d1f] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-600/30">
+                    <IoCloseOutline className="text-xl" />
+                  </button>
+                </div>
+              </div>
+              {salesDetails[salesDetail].rows.length ? (
+                <div className="p-5 sm:p-7">
+                  <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+                    <div>
+                      <p className="text-sm font-semibold text-[#1d1d1f]">Registos incluídos</p>
+                      <p className="mt-0.5 text-xs text-[#86868b]">A tabela de vendas continua visível por trás deste detalhe.</p>
+                    </div>
+                    <span className="rounded-full bg-sky-50 px-3 py-1.5 text-xs font-semibold text-sky-800 ring-1 ring-sky-100">
+                      {salesDetails[salesDetail].rows.length} {salesDetails[salesDetail].rows.length === 1 ? "registo" : "registos"} · {salesDetails[salesDetail].metric}
+                    </span>
+                  </div>
+                  <div className="overflow-hidden rounded-2xl border border-[#e8e8ed]">
+                    <div className="max-h-[min(48vh,25rem)] overflow-auto">
+                      <table className="w-full min-w-[700px] text-left text-xs">
+                        <thead className="sticky top-0 z-10 bg-[#f7f8fa] text-[10px] font-semibold uppercase tracking-[0.1em] text-[#86868b]">
+                          <tr>
+                            <th className="px-3 py-3">Cliente / documento</th>
+                            <th className="px-3 py-3">Data e estado</th>
+                            <th className="px-3 py-3">Artigos</th>
+                            <th className="px-3 py-3 text-right">Valor</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-[#f0f0f2]">
+                          {salesDetails[salesDetail].rows.map((row, index) => (
+                            <tr key={`${row.document}-${index}`} className="align-top transition-colors odd:bg-white even:bg-[#fbfbfd] hover:bg-sky-50/70">
+                              <td className="max-w-[16rem] px-3 py-3">
+                                <span className="block font-semibold text-[#343438]">{row.customer}</span>
+                                <span className="mt-1 block break-words text-[#86868b]">{row.document}</span>
+                              </td>
+                              <td className="max-w-[15rem] px-3 py-3">
+                                <span className="block text-[#424245]">{row.date}</span>
+                                <span className="mt-1 block leading-relaxed text-[#86868b]">{row.status}</span>
+                              </td>
+                              <td className="max-w-[18rem] px-3 py-3 leading-relaxed text-[#6e6e73]">{row.detail}</td>
+                              <td className="whitespace-nowrap px-3 py-3 text-right font-semibold tabular-nums text-[#1d1d1f]">{row.value}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div className="p-5 sm:p-7">
+                  <div className="rounded-2xl border border-dashed border-[#d9dce3] bg-[#fafbfc] px-5 py-10 text-center">
+                    <span className="mx-auto grid h-12 w-12 place-items-center rounded-2xl bg-sky-50 text-sky-700"><IoDocumentTextOutline className="text-xl" /></span>
+                    <p className="mt-3 text-sm font-semibold text-[#343438]">Sem registos para apresentar</p>
+                    <p className="mx-auto mt-1 max-w-md text-xs leading-relaxed text-[#86868b]">{salesDetails[salesDetail].empty}</p>
+                  </div>
+                </div>
+              )}
+            </section>
+          </div>
+        )}
         {deliveryPrompt && (
           <div className="fixed inset-0 z-[60] flex items-center justify-center bg-[#1d1d1f]/35 p-4 backdrop-blur-sm" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget && !changing) setDeliveryPrompt(null); }}>
             <section role="dialog" aria-modal="true" aria-labelledby="delivery-date-title" aria-describedby="delivery-date-description" className="w-full max-w-md rounded-[28px] border border-white/70 bg-white p-6 shadow-[0_24px_80px_rgba(0,0,0,0.18)] sm:p-7">

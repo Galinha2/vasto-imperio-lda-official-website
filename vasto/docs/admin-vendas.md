@@ -5,7 +5,7 @@ Entrar em `/admin/login`. O dashboard fica em `/admin`. Estas rotas não têm li
 ## Ativar na Vercel
 
 1. Criar um projeto em [Supabase](https://supabase.com/dashboard).
-2. No SQL Editor desse projeto, executar `supabase/admin-sales.sql`. Este ficheiro cria a tabela de vendas e o bucket **privado** `sales-pdfs`; não concede acesso a utilizadores públicos.
+2. No SQL Editor desse projeto, executar `supabase/admin-sales.sql`. Este ficheiro cria as tabelas de vendas e comissões e o bucket **privado** `sales-pdfs`; não concede acesso a utilizadores públicos. Se as vendas já estiverem configuradas, executar novamente o script para criar as tabelas de comissões e acrescentar a coluna da taxa mensal.
 3. Nas variáveis de ambiente do projeto da Vercel, definir:
 
 | Variável | Valor |
@@ -46,6 +46,7 @@ Os dados guardados localmente **não são sincronizados automaticamente** com Su
 - No simulador admin, usar **Enviar para vendas** para registar o orçamento PDF e anexar automaticamente a imagem do desenho à mesma venda.
 - Cliente, NIF, data, total sem IVA, IVA e total com IVA são extraídos automaticamente. Os documentos novos contêm também metadados para importação exata; os antigos são lidos pelo texto e pelas posições dos campos.
 - Cada registo tem três acompanhamentos independentes: estado do orçamento (**A aguardar resposta / Confirmado pelo cliente**), pagamento (**Por pagar / Entrada paga / Pago**) e entrega (**Por entregar / Entregue**). O registo fica assinalado como **Resolvido** automaticamente quando está pago e entregue.
+- A página **Comissões** calcula uma estimativa mensal sobre as vendas confirmadas sem IVA, permite definir uma percentagem própria para cada mês (com uma taxa predefinida para os restantes) e assinalar cada mês como pago. As percentagens e os estados mensais ficam sincronizados no Supabase; em desenvolvimento local, são guardados na pasta privada `.admin-data`.
 - A data original do orçamento mantém-se. Ao mudar a entrega para **Entregue**, é pedida a data de entrega; a venda passa então a contar no mês da entrega, que pode ser corrigido ao lado do estado da entrega. Antes da entrega, as vendas confirmadas contam pelo mês em que foram confirmadas e os orçamentos a aguardar resposta pelo mês de emissão.
 - Os totais de encomendas confirmadas incluem os orçamentos aceites pelo cliente, com valores sem IVA e com IVA separados. Os orçamentos que aguardam resposta são apresentados à parte; estes totais indicam valor contratado, não montantes já recebidos.
 - O mesmo conteúdo PDF não pode ser registado duas vezes, mesmo com outro nome de ficheiro.

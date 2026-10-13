@@ -3,11 +3,12 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { IoDocumentTextOutline, IoLogOutOutline, IoStatsChartOutline, IoConstructOutline, IoPieChartOutline } from "react-icons/io5";
+import { IoDocumentTextOutline, IoLogOutOutline, IoStatsChartOutline, IoConstructOutline, IoPieChartOutline, IoWalletOutline } from "react-icons/io5";
 
 const sections = [
   { href: "/admin", label: "Vendas", Icon: IoStatsChartOutline },
   { href: "/admin/estatisticas", label: "Estatísticas", Icon: IoPieChartOutline },
+  { href: "/admin/comissoes", label: "Comissões", Icon: IoWalletOutline },
   { href: "/admin/orcamentos", label: "Orçamentos", Icon: IoDocumentTextOutline },
   { href: "/admin/simulador", label: "Simulador", Icon: IoConstructOutline },
 ];

@@ -240,7 +240,7 @@ function RackPreview({ modules, height, levels, rowCount, capacityLabel, solutio
   );
 }
 
-export default function SimulatorRacks({ onQuoteDataChange, adminMode = false, adminPanel }) {
+export default function SimulatorRacks({ onQuoteDataChange, adminMode = false, adminPanel, adminDiscountPercent = null }) {
   const [orderOpen, setOrderOpen] = useState(false);
   const orderQuoteRef = useRef(null);
   const drawingRef = useRef(null);
@@ -287,7 +287,10 @@ export default function SimulatorRacks({ onQuoteDataChange, adminMode = false, a
   }, 0);
   const estimatePerRow = numericPrice(matchingFrame) * (modules.length + 1) + moduleSubtotal;
   const estimate = estimatePerRow * rowCount;
-  const discountRate = estimate >= 2600 ? 0.15 : estimate >= 1900 ? 0.10 : estimate >= 1000 ? 0.05 : 0;
+  const suggestedDiscountRate = estimate >= 2600 ? 0.15 : estimate >= 1900 ? 0.10 : estimate >= 1000 ? 0.05 : 0;
+  const discountRate = adminMode && adminDiscountPercent !== null
+    ? Math.min(100, Math.max(0, Number(adminDiscountPercent) || 0)) / 100
+    : suggestedDiscountRate;
   const discountAmount = estimate * discountRate;
   const discountedEstimate = estimate - discountAmount;
   const finalLength = modules.length ? modules.reduce((sum, moduleLength) => sum + moduleLength, 0) + 100 : 0;

@@ -3,7 +3,7 @@
 import { Fragment, useEffect, useId, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createPortal } from "react-dom";
-import { IoAddOutline, IoAlertCircleOutline, IoArrowUpOutline, IoCheckmarkCircleOutline, IoCloudUploadOutline, IoDocumentTextOutline, IoSearchOutline, IoTimeOutline, IoOpenOutline, IoCloseOutline, IoImagesOutline, IoTrashOutline, IoChevronDownOutline } from "react-icons/io5";
+import { IoAddOutline, IoAlertCircleOutline, IoArrowUpOutline, IoCheckmarkCircleOutline, IoCloudUploadOutline, IoDocumentTextOutline, IoSearchOutline, IoTimeOutline, IoOpenOutline, IoCloseOutline, IoImagesOutline, IoTrashOutline, IoChevronDownOutline, IoWalletOutline } from "react-icons/io5";
 
 const months = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
 const currency = new Intl.NumberFormat("pt-PT", { style: "currency", currency: "EUR" });
@@ -175,6 +175,7 @@ export default function SalesDashboard() {
   const inputRef = useRef(null);
   const imageInputRefs = useRef({});
   const [sales, setSales] = useState([]);
+  const [commissionData, setCommissionData] = useState(null);
   const [storage, setStorage] = useState("local");
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
@@ -239,7 +240,19 @@ export default function SalesDashboard() {
 
   useEffect(() => {
     let active = true;
-    api("/api/admin/sales").then((result) => { if (active) { setSales(result.sales); setStorage(result.storage); } }).catch((failure) => { if (active) setError(failure.message); }).finally(() => { if (active) setLoading(false); });
+    Promise.allSettled([api("/api/admin/sales"), api("/api/admin/commissions")])
+      .then(([salesResult, commissionsResult]) => {
+        if (!active) return;
+        const failures = [];
+        if (salesResult.status === "fulfilled") {
+          setSales(salesResult.value.sales);
+          setStorage(salesResult.value.storage);
+        } else failures.push(salesResult.reason.message);
+        if (commissionsResult.status === "fulfilled") setCommissionData(commissionsResult.value);
+        else failures.push(`Não foi possível carregar o resumo de comissões: ${commissionsResult.reason.message}`);
+        if (failures.length) setError(failures.join("\n"));
+      })
+      .finally(() => { if (active) setLoading(false); });
     return () => { active = false; };
   }, []);
 
@@ -413,6 +426,29 @@ export default function SalesDashboard() {
   const conversionRate = period.length ? Math.round((confirmed.length / period.length) * 100) : 0;
   const resolvedCount = confirmed.filter(isResolved).length;
   const resolvedRate = period.length ? Math.round((resolvedCount / period.length) * 100) : 0;
+  const commissionRows = [];
+  if (commissionData) {
+    const salesByMonth = new Map();
+    confirmed.forEach((sale) => {
+      const key = periodDate(sale).slice(0, 7);
+      salesByMonth.set(key, [...(salesByMonth.get(key) || []), sale]);
+    });
+    for (const [key, monthlySales] of salesByMonth) {
+      const payment = commissionData.payments?.[key];
+      const rate = payment?.commissionRate ?? commissionData.commissionRate;
+      const totalCents = Math.round(monthlySales.reduce((amount, sale) => amount + Math.round(sale.subtotal * 100), 0) * rate / 100);
+      let assignedCents = 0;
+      monthlySales.forEach((sale, index) => {
+        const cents = index === monthlySales.length - 1
+          ? totalCents - assignedCents
+          : Math.round(Math.round(sale.subtotal * 100) * rate / 100);
+        assignedCents += cents;
+        commissionRows.push({ sale, key, rate, cents, paid: Boolean(payment?.paid) });
+      });
+    }
+  }
+  const paidCommission = commissionRows.filter((item) => item.paid).reduce((amount, item) => amount + item.cents, 0) / 100;
+  const outstandingCommission = commissionRows.filter((item) => !item.paid).reduce((amount, item) => amount + item.cents, 0) / 100;
   const unresolvedSales = sales
     .filter((sale) => !isResolved(sale))
     .sort((a, b) => (unresolvedDate(a) || "9999-99-99").localeCompare(unresolvedDate(b) || "9999-99-99"));
@@ -472,7 +508,7 @@ export default function SalesDashboard() {
     const nextValue = group.options[(currentIndex + 1) % group.options.length].value;
     setHeaderSort(nextValue === "all" ? { group: "", value: "all" } : { group: group.id, value: nextValue });
   };
-  const salesDetailRows = (records) => records
+  const salesDetailRows = (records, { valueForSale = (sale) => currency.format(sale.subtotal), detailForSale = (_, detail) => detail } = {}) => records
     .slice()
     .sort((a, b) => periodDate(b).localeCompare(periodDate(a)) || b.uploadedAt.localeCompare(a.uploadedAt))
     .map((sale) => {
@@ -485,8 +521,8 @@ export default function SalesDashboard() {
         document: sale.fileName || "Documento",
         date: dateLabel(periodDate(sale)),
         status: `${statusFor(quoteStatuses, sale.status).label} · ${statusFor(paymentStatuses, sale.paymentStatus).label} · ${statusFor(deliveryStatuses, sale.deliveryStatus).label}`,
-        value: currency.format(sale.subtotal),
-        detail: articleDetail,
+        value: valueForSale(sale),
+        detail: detailForSale(sale, articleDetail),
       };
     });
   const salesDetails = {
@@ -503,6 +539,21 @@ export default function SalesDashboard() {
       rows: salesDetailRows(confirmed),
       metric: currency.format(sum(confirmed, "total")),
       empty: "Não há encomendas confirmadas neste período.",
+    },
+    commissions: {
+      title: "Comissões por receber",
+      description: `Estimativa de comissões não assinaladas como pagas, calculada pelas taxas definidas para cada mês em ${periodLabel}.`,
+      rows: salesDetailRows(commissionRows.filter((item) => !item.paid).map(({ sale, rate, cents }) => ({
+        ...sale,
+        commissionBase: sale.subtotal,
+        commissionRate: rate,
+        commissionValue: cents / 100,
+      })), {
+        valueForSale: (sale) => currency.format(sale.commissionValue),
+        detailForSale: (sale, detail) => `${detail} · Base sem IVA: ${currency.format(sale.commissionBase)} · Comissão do mês: ${sale.commissionRate}%`,
+      }),
+      metric: currency.format(outstandingCommission),
+      empty: "Não há comissões por receber neste período.",
     },
     preparing: {
       title: "Orçamentos a aguardar resposta",
@@ -672,7 +723,7 @@ export default function SalesDashboard() {
           <div className="mt-5 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
             {[
               { id: "confirmed", label: "Encomendas confirmadas", value: currency.format(sum(confirmed)), detail: "Valor confirmado · sem IVA", icon: <IoArrowUpOutline />, color: "bg-teal-50 text-teal-700 ring-teal-100" },
-              { id: "gross", label: "Total confirmado", value: currency.format(sum(confirmed, "total")), detail: `${confirmed.length} ${confirmed.length === 1 ? "encomenda confirmada" : "encomendas confirmadas"} · com IVA`, icon: <IoCheckmarkCircleOutline />, color: "bg-sky-50 text-sky-600 ring-sky-100" },
+              { id: "commissions", label: "Comissões por receber", value: commissionData ? currency.format(outstandingCommission) : "—", detail: commissionData ? `Já recebidas: ${currency.format(paidCommission)} · ${periodLabel}` : "Resumo de comissões indisponível", icon: <IoWalletOutline />, color: "bg-amber-50 text-amber-700 ring-amber-100" },
               { id: "preparing", label: "A aguardar resposta", value: currency.format(sum(preparing)), detail: `${preparing.length} ${preparing.length === 1 ? "orçamento · sem IVA" : "orçamentos · sem IVA"}`, icon: <IoTimeOutline />, color: "bg-slate-50 text-slate-600 ring-slate-200" },
               { id: "documents", label: "Documentos", value: String(period.length).padStart(2, "0"), detail: "Registados neste período", icon: <IoDocumentTextOutline />, color: "bg-violet-50 text-violet-600 ring-violet-100" },
             ].map((card) => (

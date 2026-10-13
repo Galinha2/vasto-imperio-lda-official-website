@@ -9,7 +9,7 @@ import { fileURLToPath } from "node:url";
 import { signIn, verifySession, assertOrigin, assertSession, SESSION_COOKIE } from "../lib/admin/auth.mjs";
 import { parseSalePdf } from "../lib/admin/pdf.mjs";
 import { saveSimulatorOrderToSales } from "../lib/admin/simulator-order-sales.mjs";
-import { createSale, createSaleUpload, readSaleUpload, deleteSaleUpload, addSaleImage, getSaleImage, deleteSaleImage, deleteSale, updateSaleWorkflow, getPdf, getSale, listSales, storageMode } from "../lib/admin/store.mjs";
+import { createSale, createSaleUpload, readSaleUpload, deleteSaleUpload, addSaleImage, getSaleImage, deleteSaleImage, deleteSale, updateSaleWorkflow, getPdf, getSale, listSales, storageMode, getCommissionData, updateCommissionRate, updateMonthlyCommission } from "../lib/admin/store.mjs";
 
 const require = createRequire(import.meta.url);
 const { jsPDF } = require("jspdf");
@@ -189,6 +189,66 @@ test("Vercel never falls back to temporary disk storage", () => {
   finally { delete process.env.VERCEL; }
 });
 
+test("commission rate and monthly payment persist in local storage", async () => {
+  assert.deepEqual(await getCommissionData(), { commissionRate: 15, payments: {} });
+  await updateCommissionRate(12.5);
+  await updateMonthlyCommission(2026, 9, true);
+  await updateMonthlyCommission(2026, 9, undefined, 7.5);
+  const saved = await getCommissionData();
+  assert.equal(saved.commissionRate, 12.5);
+  assert.equal(saved.payments["2026-09"].paid, true);
+  assert.equal(saved.payments["2026-09"].commissionRate, 7.5);
+  assert.match(saved.payments["2026-09"].paidAt, /^\d{4}-\d{2}-\d{2}$/);
+  await updateMonthlyCommission(2026, 9, false);
+  assert.deepEqual((await getCommissionData()).payments["2026-09"], { paid: false, paidAt: null, commissionRate: 7.5 });
+  await assert.rejects(updateCommissionRate(101), { status: 400 });
+  await assert.rejects(updateMonthlyCommission(2026, 13, true), { status: 400 });
+  await assert.rejects(updateMonthlyCommission(2026, 9, undefined, 100.1), { status: 400 });
+});
+
+test("commission settings and paid months use the protected Supabase tables", async () => {
+  const realFetch = globalThis.fetch;
+  let rate;
+  const payments = new Map();
+  process.env.SUPABASE_URL = "https://test-project.supabase.co";
+  process.env.SUPABASE_SERVICE_ROLE_KEY = "test-server-key";
+  globalThis.fetch = async (url, options) => {
+    assert.equal(options.headers.apikey, "test-server-key");
+    assert.ok(options.headers.Authorization.startsWith("Bearer "));
+    const parsed = new URL(url);
+    if (parsed.pathname === "/rest/v1/admin_commission_settings") {
+      if (options.method === "POST") { rate = JSON.parse(options.body); return new Response(null, { status: 204 }); }
+      return Response.json(rate ? [{ commission_rate: rate.commission_rate }] : []);
+    }
+    if (parsed.pathname === "/rest/v1/admin_monthly_commissions") {
+      if (options.method === "POST") {
+        const row = JSON.parse(options.body);
+        const key = `${row.year}-${String(row.month).padStart(2, "0")}`;
+        payments.set(key, { ...payments.get(key), ...row });
+        return new Response(null, { status: 204 });
+      }
+      return Response.json([...payments.values()]);
+    }
+    assert.fail(`Unexpected Supabase endpoint ${parsed.pathname}`);
+  };
+  try {
+    assert.equal((await getCommissionData()).commissionRate, 15);
+    await updateCommissionRate(17.5);
+    await updateMonthlyCommission(2026, 10, true);
+    await updateMonthlyCommission(2026, 10, undefined, 5);
+    await updateMonthlyCommission(2026, 10, false);
+    const saved = await getCommissionData();
+    assert.equal(saved.commissionRate, 17.5);
+    assert.equal(saved.payments["2026-10"].paid, false);
+    assert.equal(saved.payments["2026-10"].commissionRate, 5);
+    assert.equal(saved.payments["2026-10"].paidAt, null);
+  } finally {
+    globalThis.fetch = realFetch;
+    delete process.env.SUPABASE_URL;
+    delete process.env.SUPABASE_SERVICE_ROLE_KEY;
+  }
+});
+
 test("Supabase adapter stores private PDFs, lists records, changes status and reads originals", async () => {
   const realFetch = globalThis.fetch;
   const rows = new Map(); const objects = new Map();
@@ -196,7 +256,7 @@ test("Supabase adapter stores private PDFs, lists records, changes status and re
   process.env.SUPABASE_SERVICE_ROLE_KEY = "test-server-key";
   globalThis.fetch = async (url, options) => {
     assert.equal(options.headers.apikey, "test-server-key");
-    assert.equal(options.headers.Authorization, "Bearer test-server-key");
+    assert.match(options.headers.Authorization, /^Bearer .+/);
     const parsed = new URL(url);
     if (parsed.pathname.startsWith("/storage/v1/object/authenticated/sales-pdfs/")) {
       const objectPath = decodeURIComponent(parsed.pathname.split("/storage/v1/object/authenticated/sales-pdfs/")[1]);

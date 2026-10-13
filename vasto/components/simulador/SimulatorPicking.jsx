@@ -357,7 +357,7 @@ function RackPreview({ modules, height, levels, floorType, galvanized, reinforce
   );
 }
 
-export default function SimulatorPicking({ onQuoteDataChange, adminMode = false, adminPanel }) {
+export default function SimulatorPicking({ onQuoteDataChange, adminMode = false, adminPanel, adminDiscountPercent = null }) {
   const [orderOpen, setOrderOpen] = useState(false);
   const orderQuoteRef = useRef(null);
   const drawingRef = useRef(null);
@@ -397,7 +397,7 @@ export default function SimulatorPicking({ onQuoteDataChange, adminMode = false,
     const shelf = shelves.find((product) => product.length === moduleLength && product.depth === depth && product.material === floorType);
       return sum + (2 * numericPrice(beam) + numericPrice(shelf) + reinforcementPrice(moduleLength, depth, floorType) + numericPrice(safetyBrake) * 4) * levels * rowCount;
     }, 0);
-    const rate = gross >= 2600 ? 0.15 : gross >= 1900 ? 0.10 : gross >= 1000 ? 0.05 : 0;
+    const rate = gross >= 2600 ? 0.15 : gross >= 1900 ? 0.10 : gross >= 850 ? 0.05 : 0;
     return gross * (1 - rate);
   };
   const solutions = useMemo(() => buildSimilarSolutions(baseModules, targetLength, {
@@ -425,7 +425,10 @@ export default function SimulatorPicking({ onQuoteDataChange, adminMode = false,
   }, 0);
   const estimatePerRow = numericPrice(matchingFrame) * (modules.length + 1) + moduleSubtotal;
   const estimate = estimatePerRow * rowCount;
-  const discountRate = estimate >= 2600 ? 0.15 : estimate >= 1900 ? 0.10 : estimate >= 1000 ? 0.05 : 0;
+  const suggestedDiscountRate = estimate >= 2600 ? 0.15 : estimate >= 1900 ? 0.10 : estimate >= 850 ? 0.05 : 0;
+  const discountRate = adminMode && adminDiscountPercent !== null
+    ? Math.min(100, Math.max(0, Number(adminDiscountPercent) || 0)) / 100
+    : suggestedDiscountRate;
   const discountAmount = estimate * discountRate;
   const discountedEstimate = estimate - discountAmount;
   const finalLength = modules.length ? modules.reduce((sum, moduleLength) => sum + moduleLength, 0) + 50 : 0;

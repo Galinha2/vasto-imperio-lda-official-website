@@ -252,7 +252,7 @@ export default function SimulatorAdmin() {
         </nav>
 
         <section ref={capturaRef} aria-label={`Simulação de ${ativo.label}`} className="min-w-0">
-          <Simulator adminMode adminPanel={adminPanel} onQuoteDataChange={receberDadosOrcamento} />
+          <Simulator adminMode adminPanel={adminPanel} adminDiscountPercent={descontoManual} onQuoteDataChange={receberDadosOrcamento} />
         </section>
     </div>
   );

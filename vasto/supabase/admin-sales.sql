@@ -41,6 +41,31 @@ revoke all on public.admin_sales from anon, authenticated;
 grant usage on schema public to service_role;
 grant select, insert, update, delete on public.admin_sales to service_role;
 
+create table if not exists public.admin_commission_settings (
+  id text primary key check (id = 'global'),
+  commission_rate numeric(5, 2) not null default 15 check (commission_rate >= 0 and commission_rate <= 100),
+  updated_at timestamptz not null default now()
+);
+
+create table if not exists public.admin_monthly_commissions (
+  year integer not null check (year between 2000 and 9999),
+  month integer not null check (month between 1 and 12),
+  paid boolean not null default false,
+  paid_at date,
+  commission_rate numeric(5, 2) check (commission_rate >= 0 and commission_rate <= 100),
+  updated_at timestamptz not null default now(),
+  primary key (year, month),
+  check ((paid and paid_at is not null) or (not paid and paid_at is null))
+);
+
+alter table public.admin_monthly_commissions
+  add column if not exists commission_rate numeric(5, 2) check (commission_rate >= 0 and commission_rate <= 100);
+
+alter table public.admin_commission_settings enable row level security;
+alter table public.admin_monthly_commissions enable row level security;
+revoke all on public.admin_commission_settings, public.admin_monthly_commissions from anon, authenticated;
+grant select, insert, update on public.admin_commission_settings, public.admin_monthly_commissions to service_role;
+
 insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
 values ('sales-pdfs', 'sales-pdfs', false, 6291456, array['application/pdf', 'image/jpeg', 'image/png', 'image/webp'])
 on conflict (id) do update set

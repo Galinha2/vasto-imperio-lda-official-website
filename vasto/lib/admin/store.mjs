@@ -53,8 +53,26 @@ export function storageMode() {
 
 const directory = () => path.resolve(process.env.ADMIN_DATA_DIR || path.join(process.cwd(), ".admin-data"));
 const bucket = () => process.env.SUPABASE_SALES_BUCKET || "sales-pdfs";
+const commissionSettingsFile = () => path.join(directory(), "commission-settings.json");
+const commissionPaymentsFile = () => path.join(directory(), "commission-payments.json");
 const encodedPath = (value) => value.split("/").map(encodeURIComponent).join("/");
 const imagePath = (saleId, image) => `${saleId}.${image.id}.${imageTypes[image.contentType].extension}`;
+
+async function readLocalJson(file, fallback) {
+  try {
+    return JSON.parse(await readFile(file, "utf8"));
+  } catch (error) {
+    if (error.code === "ENOENT") return fallback;
+    throw error;
+  }
+}
+
+async function writeLocalJson(file, value) {
+  await mkdir(directory(), { recursive: true, mode: 0o700 });
+  const temp = `${file}.${randomUUID()}.tmp`;
+  await writeFile(temp, JSON.stringify(value), { mode: 0o600 });
+  await rename(temp, file);
+}
 
 async function removeCloudObjects(paths) {
   if (paths.length) {
@@ -109,6 +127,70 @@ async function cloud(endpoint, options = {}) {
     throw fail(message, 503);
   }
   return response;
+}
+
+export async function getCommissionData() {
+  if (storageMode() === "cloud") {
+    const [settingsRows, paymentRows] = await Promise.all([
+      cloud("/rest/v1/admin_commission_settings?id=eq.global&select=commission_rate").then((response) => response.json()),
+      cloud("/rest/v1/admin_monthly_commissions?select=year,month,paid,paid_at,commission_rate&order=year.desc,month.asc&limit=2000").then((response) => response.json()),
+    ]);
+    const commissionRate = Number(settingsRows[0]?.commission_rate ?? 15);
+    const payments = Object.fromEntries(paymentRows.map((row) => [
+      `${row.year}-${String(row.month).padStart(2, "0")}`,
+      { paid: row.paid, paidAt: row.paid_at, commissionRate: row.commission_rate == null ? null : Number(row.commission_rate) },
+    ]));
+    return { commissionRate, payments };
+  }
+  const settings = await readLocalJson(commissionSettingsFile(), { commissionRate: 15 });
+  const payments = await readLocalJson(commissionPaymentsFile(), {});
+  return { commissionRate: settings.commissionRate, payments };
+}
+
+export async function updateCommissionRate(commissionRate) {
+  if (!Number.isFinite(commissionRate) || commissionRate < 0 || commissionRate > 100) throw fail("A comissão deve estar entre 0% e 100%.", 400);
+  if (storageMode() === "cloud") {
+    await cloud("/rest/v1/admin_commission_settings?on_conflict=id", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Prefer: "resolution=merge-duplicates,return=minimal" },
+      body: JSON.stringify({ id: "global", commission_rate: commissionRate, updated_at: new Date().toISOString() }),
+    });
+    return;
+  }
+  const settings = await readLocalJson(commissionSettingsFile(), {});
+  await writeLocalJson(commissionSettingsFile(), { ...settings, commissionRate });
+}
+
+export async function updateMonthlyCommission(year, month, paid, commissionRate) {
+  if (!Number.isInteger(year) || year < 2000 || year > 9999 || !Number.isInteger(month) || month < 1 || month > 12
+    || (paid !== undefined && typeof paid !== "boolean")
+    || (commissionRate !== undefined && (!Number.isFinite(commissionRate) || commissionRate < 0 || commissionRate > 100))
+    || (paid === undefined && commissionRate === undefined)) {
+    throw fail("O mês ou o estado de pagamento da comissão é inválido.", 400);
+  }
+  const key = `${year}-${String(month).padStart(2, "0")}`;
+  const monthlyUpdate = {
+    ...(paid !== undefined ? { paid, paid_at: paid ? lisbonDate() : null } : {}),
+    ...(commissionRate !== undefined ? { commission_rate: commissionRate } : {}),
+  };
+  if (storageMode() === "cloud") {
+    await cloud("/rest/v1/admin_monthly_commissions?on_conflict=year,month", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Prefer: "resolution=merge-duplicates,return=minimal" },
+      body: JSON.stringify({ year, month, ...monthlyUpdate, updated_at: new Date().toISOString() }),
+    });
+    return;
+  }
+  const payments = await readLocalJson(commissionPaymentsFile(), {});
+  const current = payments[key] || { paid: false, paidAt: null, commissionRate: null };
+  await writeLocalJson(commissionPaymentsFile(), {
+    ...payments,
+    [key]: {
+      ...current,
+      ...(paid !== undefined ? { paid, paidAt: paid ? lisbonDate() : null } : {}),
+      ...(commissionRate !== undefined ? { commissionRate } : {}),
+    },
+  });
 }
 
 export async function listSales() {

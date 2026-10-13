@@ -82,6 +82,7 @@ export default function SimulatorOrderModal({ open, onClose, total, details, ite
         };
       }
       const budgetPdf = await generateBudgetPdf({
+        source: "simulador",
         linhas: items,
         descontoSelecionado: discountPercent,
         dadosEmpresa: { nome: form.nome, nif: form.nif, codigoPostal: form.moradaFiscal },

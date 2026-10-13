@@ -5,7 +5,10 @@ function formatarNumero(valor) {
   return `${inteira.replace(/\B(?=(\d{3})+(?!\d))/g, " ")},${decimal}`;
 }
 
-export default async function generateBudgetPdf({ linhas, descontoSelecionado, dadosEmpresa, nif, nomeClienteManual, additionalDetails = "", returnBlob = false }) {
+export default async function generateBudgetPdf({ linhas, descontoSelecionado, dadosEmpresa, nif, nomeClienteManual, additionalDetails = "", returnBlob = false, source = "orcamento" }) {
+    const issueParts = new Intl.DateTimeFormat("en", { timeZone: "Europe/Lisbon", year: "numeric", month: "2-digit", day: "2-digit" }).formatToParts(new Date());
+    const issuePart = (type) => issueParts.find((part) => part.type === type).value;
+    const issuedAt = `${issuePart("year")}-${issuePart("month")}-${issuePart("day")}`;
     const { default: autoTable } = await import("jspdf-autotable");
     const doc = new jsPDF({ compress: true });
     const corPretaFooter = [0, 0, 0];
@@ -62,9 +65,7 @@ export default async function generateBudgetPdf({ linhas, descontoSelecionado, d
       doc.text("VASTO IMPÉRIO, LDA", 12, y);
       y += 6;
 
-      const now = new Date();
-      const pad2 = (n) => n.toString().padStart(2, "0");
-      const dataAtualFormatada = `${pad2(now.getDate())}/${pad2(now.getMonth() + 1)}/${now.getFullYear()}`;
+      const dataAtualFormatada = `${issuePart("day")}/${issuePart("month")}/${issuePart("year")}`;
       // Data de Vencimento com o mesmo dia da emissão
       const dataVencimentoFormatada = dataAtualFormatada;
       
@@ -468,6 +469,16 @@ export default async function generateBudgetPdf({ linhas, descontoSelecionado, d
 
     doc.setProperties({
       title: nomeFinalPDF,
+      author: "Vasto Império",
+      subject: "VASTO_SALES_V1:" + btoa(String.fromCharCode(...new TextEncoder().encode(JSON.stringify({
+        customerName: dadosEmpresa?.nome || nomeClienteManual?.trim() || "Cliente",
+        nif: String(dadosEmpresa?.nif || nif || ""),
+        issuedAt,
+        subtotal: Number(linhas.reduce((sum, line) => sum + line.total * (line.isPortes ? 1 : 1 - Number(descontoSelecionado || 0) / 100), 0).toFixed(2)),
+        vat: Number(linhas.reduce((sum, line) => sum + line.total * (line.isPortes ? 1 : 1 - Number(descontoSelecionado || 0) / 100) * 0.23, 0).toFixed(2)),
+        total: Number(linhas.reduce((sum, line) => sum + line.total * (line.isPortes ? 1 : 1 - Number(descontoSelecionado || 0) / 100) * 1.23, 0).toFixed(2)),
+        source,
+      })))),
     });
     if (returnBlob) return doc.output("blob");
     const nomeFicheiro = `${nomeFinalPDF}.pdf`;

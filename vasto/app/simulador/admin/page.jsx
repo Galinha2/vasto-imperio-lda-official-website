@@ -128,6 +128,7 @@ export default function SimulatorAdminPage() {
         return;
       }
       await generateBudgetPdf({
+        source: "simulador",
         linhas: [
           ...quoteData.items,
           ...produtosExtra.filter((item) => item.produto).map((item) => {

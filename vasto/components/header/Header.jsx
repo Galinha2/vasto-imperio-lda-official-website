@@ -10,8 +10,10 @@ import LanguageSelection from "./LanguageSelection";
 import HamburgerMenu from "./HamburgerMenu";
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 export default function Header() {
+  const pathname = usePathname();
   const { language } = useLanguage();
   const content = language === "pt" ? contentpt : contenten;
   const [isOpen, setIsOpen] = useState(false);
@@ -44,6 +46,8 @@ export default function Header() {
       window.removeEventListener("resize", controlHeader);
     };
   }, []);
+
+  if (pathname === "/admin" || pathname.startsWith("/admin/")) return null;
 
   return (
     <div

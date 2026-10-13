@@ -8,6 +8,11 @@ import { IoAddOutline, IoArrowUpOutline, IoCheckmarkCircleOutline, IoCloudUpload
 const months = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
 const currency = new Intl.NumberFormat("pt-PT", { style: "currency", currency: "EUR" });
 const dateLabel = (date) => new Intl.DateTimeFormat("pt-PT", { day: "2-digit", month: "short", year: "numeric" }).format(new Date(`${date}T12:00:00`));
+const todayInLisbon = () => {
+  const parts = Object.fromEntries(new Intl.DateTimeFormat("en", { timeZone: "Europe/Lisbon", year: "numeric", month: "2-digit", day: "2-digit" }).formatToParts(new Date()).map(({ type, value }) => [type, value]));
+  return `${parts.year}-${parts.month}-${parts.day}`;
+};
+const periodDate = (sale) => sale.status === "em_preparacao" ? sale.issuedAt : sale.deliveryStatus === "entregue" && sale.deliveryDate ? sale.deliveryDate : sale.saleDate || sale.issuedAt;
 const sum = (records, field = "subtotal") => records.reduce((value, sale) => value + Math.round(sale[field] * 100), 0) / 100;
 const quoteStatuses = [
   { value: "em_preparacao", label: "A aguardar resposta", color: "bg-amber-50 text-amber-700" },
@@ -160,6 +165,8 @@ export default function SalesDashboard() {
   const [uploadingImages, setUploadingImages] = useState("");
   const [deletingImage, setDeletingImage] = useState("");
   const [saleToDelete, setSaleToDelete] = useState(null);
+  const [deliveryPrompt, setDeliveryPrompt] = useState(null);
+  const [deliveryDate, setDeliveryDate] = useState("");
   const [deletingSale, setDeletingSale] = useState(false);
   const [dragging, setDragging] = useState(false);
   const [error, setError] = useState("");
@@ -226,6 +233,29 @@ export default function SalesDashboard() {
     try {
       const result = await api(`/api/admin/sales/${sale.id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify(update) });
       setSales((current) => current.map((item) => item.id === sale.id ? result.sale : item));
+      if (update.deliveryDate) {
+        setYear(update.deliveryDate.slice(0, 4));
+        setMonth(update.deliveryDate.slice(5, 7));
+      }
+    } catch (failure) { setError(failure.message); }
+    finally { setChanging(""); }
+  }
+
+  async function confirmDelivery() {
+    if (!deliveryPrompt || !deliveryDate) return;
+    const sale = deliveryPrompt;
+    setChanging(sale.id); setError("");
+    try {
+      const result = await api(`/api/admin/sales/${sale.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ deliveryStatus: "entregue", deliveryDate }),
+      });
+      setSales((current) => current.map((item) => item.id === sale.id ? result.sale : item));
+      setYear(deliveryDate.slice(0, 4));
+      setMonth(deliveryDate.slice(5, 7));
+      setNotice(`Entrega de ${sale.customerName} registada em ${dateLabel(deliveryDate)}.`);
+      setDeliveryPrompt(null);
     } catch (failure) { setError(failure.message); }
     finally { setChanging(""); }
   }
@@ -294,13 +324,13 @@ export default function SalesDashboard() {
     }
   }
 
-  const years = [...new Set([year, String(new Date().getFullYear()), ...sales.map((sale) => sale.issuedAt.slice(0, 4))])].sort().reverse();
-  const period = sales.filter((sale) => sale.issuedAt.startsWith(year) && (month === "all" || sale.issuedAt.slice(5, 7) === month));
+  const years = [...new Set([year, String(new Date().getFullYear()), ...sales.map((sale) => periodDate(sale).slice(0, 4))])].sort().reverse();
+  const period = sales.filter((sale) => periodDate(sale).startsWith(year) && (month === "all" || periodDate(sale).slice(5, 7) === month));
   const confirmed = period.filter((sale) => sale.status !== "em_preparacao");
   const preparing = period.filter((sale) => sale.status === "em_preparacao");
-  const visibleSales = period.filter((sale) => (status === "all" || (status === "confirmada" ? sale.status !== "em_preparacao" : sale.status === "em_preparacao")) && `${sale.customerName} ${sale.nif} ${sale.fileName}`.toLocaleLowerCase("pt-PT").includes(search.toLocaleLowerCase("pt-PT"))).sort((a, b) => b.issuedAt.localeCompare(a.issuedAt) || b.uploadedAt.localeCompare(a.uploadedAt));
-  const yearSales = sales.filter((sale) => sale.status !== "em_preparacao" && sale.issuedAt.startsWith(year));
-  const monthly = months.map((_, index) => sum(yearSales.filter((sale) => sale.issuedAt.slice(5, 7) === String(index + 1).padStart(2, "0"))));
+  const visibleSales = period.filter((sale) => (status === "all" || (status === "confirmada" ? sale.status !== "em_preparacao" : sale.status === "em_preparacao")) && `${sale.customerName} ${sale.nif} ${sale.fileName}`.toLocaleLowerCase("pt-PT").includes(search.toLocaleLowerCase("pt-PT"))).sort((a, b) => periodDate(b).localeCompare(periodDate(a)) || b.uploadedAt.localeCompare(a.uploadedAt));
+  const yearSales = sales.filter((sale) => sale.status !== "em_preparacao" && periodDate(sale).startsWith(year));
+  const monthly = months.map((_, index) => sum(yearSales.filter((sale) => periodDate(sale).slice(5, 7) === String(index + 1).padStart(2, "0"))));
   const max = Math.max(...monthly, 1);
   const periodLabel = month === "all" ? `Ano ${year}` : `${months[Number(month) - 1]} ${year}`;
   const controls = "h-10 rounded-full border border-[#e5e5e7] bg-white py-2 pl-4 pr-4 text-sm text-[#424245] outline-none transition-colors hover:border-[#c7c7cc] hover:bg-[#fbfbfd] focus:border-sky-600 focus:ring-2 focus:ring-sky-600/10";
@@ -343,7 +373,7 @@ export default function SalesDashboard() {
           </div>
 
           <section className="mt-6 rounded-[28px] border border-[#e8e8ed] bg-white p-5 sm:p-7">
-            <div className="flex items-center justify-between gap-4"><div><h2 className="text-base font-semibold tracking-tight">O ano, mês a mês.</h2><p className="mt-1 text-xs text-[#86868b]">Encomendas confirmadas · sem IVA · {year}</p></div><span className="text-lg font-semibold tracking-tight">{currency.format(sum(yearSales))}</span></div>
+            <div className="flex items-center justify-between gap-4"><div><h2 className="text-base font-semibold tracking-tight">O ano, mês a mês.</h2><p className="mt-1 text-xs text-[#86868b]">Encomendas confirmadas · por data da venda · {year}</p></div><span className="text-lg font-semibold tracking-tight">{currency.format(sum(yearSales))}</span></div>
             <div className="mt-7 grid h-[145px] grid-cols-12 items-end gap-1.5 sm:gap-4">
               {monthly.map((value, index) => <button type="button" key={index} aria-label={`${months[index]} ${year}: ${currency.format(value)} de vendas sem IVA`} title={`${months[index]}: ${currency.format(value)}`} onClick={() => setMonth(String(index + 1).padStart(2, "0"))} className="group flex h-full min-w-0 cursor-pointer flex-col justify-end gap-3 rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-600"><span className={`block min-h-1 rounded-t-md transition ${month === String(index + 1).padStart(2, "0") ? "bg-orange-600" : "bg-[#dce5ef] group-hover:bg-[#afc1d4]"}`} style={{ height: `${Math.max(4, value / max * 110)}px` }} /><span className={`text-center text-[9px] sm:text-[11px] ${month === String(index + 1).padStart(2, "0") ? "font-semibold text-orange-700" : "text-[#a1a1a6]"}`}>{months[index].slice(0, 3)}</span></button>)}
             </div>
@@ -374,7 +404,7 @@ export default function SalesDashboard() {
               <div className="overflow-x-auto">
                 <table className="w-full min-w-[1120px] text-left">
                   <thead className="bg-[#fbfbfd] text-[10px] font-semibold uppercase tracking-[0.1em] text-[#86868b]">
-                    <tr><th className="px-6 py-4">Cliente / documento</th><th className="px-4 py-4">Data</th><th className="px-4 py-4 text-right">Sem IVA</th><th className="px-4 py-4 text-right">Com IVA</th><th className="px-4 py-4">Orçamento</th><th className="px-4 py-4">Pagamento</th><th className="px-4 py-4">Entrega</th><th className="px-4 py-4">Estado</th><th className="px-5 py-4 text-right">Ações</th></tr>
+                    <tr><th className="px-6 py-4">Cliente / documento</th><th className="px-4 py-4">Datas</th><th className="px-4 py-4 text-right">Sem IVA</th><th className="px-4 py-4 text-right">Com IVA</th><th className="px-4 py-4">Orçamento</th><th className="px-4 py-4">Pagamento</th><th className="px-4 py-4">Entrega</th><th className="px-4 py-4">Estado</th><th className="px-5 py-4 text-right">Ações</th></tr>
                   </thead>
                   <tbody>
                     {visibleSales.map((sale) => (
@@ -385,7 +415,9 @@ export default function SalesDashboard() {
                             <p className="mt-1 truncate text-[11px] text-[#a1a1a6]">{sale.nif ? `${sale.nif} · ` : ""}{sale.fileName}</p>
                             <span className="mt-1 inline-block text-[10px] text-[#86868b]">{sale.source === "simulador" ? "Simulador" : "Orçamento"}</span>
                           </td>
-                          <td className="whitespace-nowrap px-4 py-5 text-xs text-[#6e6e73]">{dateLabel(sale.issuedAt)}</td>
+                          <td className="whitespace-nowrap px-4 py-5">
+                            <p className="text-[10px] text-[#a1a1a6]">Orçamento · {dateLabel(sale.issuedAt)}</p>
+                          </td>
                           <td className="whitespace-nowrap px-4 py-5 text-right text-sm font-medium">{currency.format(sale.subtotal)}</td>
                           <td className="whitespace-nowrap px-4 py-5 text-right text-xs text-[#86868b]">{currency.format(sale.total)}</td>
                           <td className="px-4 py-5">
@@ -411,15 +443,38 @@ export default function SalesDashboard() {
                             />
                           </td>
                           <td className="px-4 py-5">
-                            <DashboardDropdown
-                              label={`Estado da entrega de ${sale.customerName}`}
-                              options={deliveryStatuses}
-                              value={sale.deliveryStatus}
-                              onChange={(value) => updateWorkflow(sale, { deliveryStatus: value })}
-                              className="text-[11px]"
-                              disabled={changing === sale.id}
-                              tone
-                            />
+                            <div className="flex items-center gap-2">
+                              <DashboardDropdown
+                                label={`Estado da entrega de ${sale.customerName}`}
+                                options={deliveryStatuses}
+                                value={sale.deliveryStatus}
+                                onChange={(value) => {
+                                  if (value === "entregue") {
+                                    setDeliveryDate(sale.deliveryDate || todayInLisbon());
+                                    setDeliveryPrompt(sale);
+                                  } else updateWorkflow(sale, { deliveryStatus: value });
+                                }}
+                                className="text-[11px]"
+                                disabled={changing === sale.id}
+                                tone
+                              />
+                              {sale.deliveryStatus === "entregue" && (
+                                <label className="flex items-center gap-1.5 text-[10px] font-medium text-[#6e6e73]">
+                                  Data
+                                  <input
+                                    type="date"
+                                    aria-label={`Data de entrega de ${sale.customerName}`}
+                                    value={sale.deliveryDate || ""}
+                                    max="9999-12-31"
+                                    disabled={changing === sale.id}
+                                    onChange={(event) => {
+                                      if (event.target.value) updateWorkflow(sale, { deliveryDate: event.target.value });
+                                    }}
+                                    className="h-10 w-[142px] cursor-pointer rounded-full border border-[#e5e5e7] bg-white px-3 text-xs text-[#424245] outline-none transition hover:border-[#cbd5e1] hover:bg-[#f8fafc] focus:border-sky-600 focus:ring-2 focus:ring-sky-600/10 disabled:cursor-not-allowed disabled:opacity-60"
+                                  />
+                                </label>
+                              )}
+                            </div>
                           </td>
                           <td className="px-4 py-5">
                             {isResolved(sale)
@@ -492,8 +547,40 @@ export default function SalesDashboard() {
           </section>
 
           <button type="button" disabled={uploading || loading} onClick={() => inputRef.current?.click()} onDragOver={(event) => { event.preventDefault(); if (!uploading && !loading) setDragging(true); }} onDragLeave={() => setDragging(false)} onDrop={(event) => { event.preventDefault(); setDragging(false); importFiles(event.dataTransfer.files); }} className={`mt-6 flex w-full cursor-pointer flex-col items-center justify-center gap-3 rounded-full border-2 border-dashed p-7 transition disabled:cursor-wait disabled:opacity-60 sm:flex-row sm:gap-5 ${dragging ? "border-orange-400 bg-orange-50" : "border-[#dcdce2] hover:border-orange-300 hover:bg-orange-50/50"}`}><IoCloudUploadOutline className="text-3xl text-orange-600" /><span className="text-center sm:text-left"><span className="block text-sm font-semibold">{uploading ? "A ler e registar os documentos…" : "Arraste os seus PDFs para aqui."}</span><span className="mt-1 block text-xs text-[#86868b]">Ou clique para escolher · Orçamentos e simulador · Até 6 MB por PDF</span></span></button>
-          <p className="mt-5 text-center text-[11px] leading-relaxed text-[#a1a1a6]">Os totais incluem os orçamentos aceites pelo cliente; o mês é determinado pela data do orçamento.</p>
+          <p className="mt-5 text-center text-[11px] leading-relaxed text-[#a1a1a6]">As vendas ainda não entregues contam no mês em que foram confirmadas; ao registar a entrega, passam a contar no mês da entrega. Os orçamentos a aguardar resposta contam no mês de emissão.</p>
         </div>
+        {deliveryPrompt && (
+          <div className="fixed inset-0 z-[60] flex items-center justify-center bg-[#1d1d1f]/35 p-4 backdrop-blur-sm" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget && !changing) setDeliveryPrompt(null); }}>
+            <section role="dialog" aria-modal="true" aria-labelledby="delivery-date-title" aria-describedby="delivery-date-description" className="w-full max-w-md rounded-[28px] border border-white/70 bg-white p-6 shadow-[0_24px_80px_rgba(0,0,0,0.18)] sm:p-7">
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-sky-700">Concluir entrega</p>
+                  <h2 id="delivery-date-title" className="mt-2 text-xl font-semibold tracking-tight text-[#1d1d1f]">Qual foi a data da entrega?</h2>
+                </div>
+                <button type="button" aria-label="Fechar" disabled={Boolean(changing)} onClick={() => setDeliveryPrompt(null)} className="grid h-9 w-9 cursor-pointer place-items-center rounded-full text-[#86868b] transition hover:bg-[#f5f5f7] disabled:opacity-50"><IoCloseOutline className="text-xl" /></button>
+              </div>
+              <p id="delivery-date-description" className="mt-3 text-sm leading-relaxed text-[#6e6e73]">
+                Ao registar a entrega de <strong className="font-semibold text-[#1d1d1f]">{deliveryPrompt.customerName}</strong>, a venda passa a contar no mês desta data.
+              </p>
+              <label className="mt-5 flex flex-col gap-2 text-sm font-medium text-[#424245]">
+                Data de entrega
+                <input
+                  autoFocus
+                  required
+                  type="date"
+                  value={deliveryDate}
+                  max="9999-12-31"
+                  onChange={(event) => setDeliveryDate(event.target.value)}
+                  className="h-11 cursor-pointer rounded-full border border-[#e5e5e7] bg-white px-4 text-sm outline-none transition hover:border-[#cbd5e1] hover:bg-[#f8fafc] focus:border-sky-600 focus:ring-2 focus:ring-sky-600/10"
+                />
+              </label>
+              <div className="mt-6 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+                <button type="button" disabled={Boolean(changing)} onClick={() => setDeliveryPrompt(null)} className="h-10 cursor-pointer rounded-full border border-[#e5e5e7] px-5 text-sm font-semibold text-[#424245] transition hover:bg-[#f5f5f7] disabled:opacity-50">Cancelar</button>
+                <button type="button" disabled={!deliveryDate || Boolean(changing)} onClick={confirmDelivery} className="h-10 cursor-pointer rounded-full bg-sky-700 px-5 text-sm font-semibold text-white transition hover:bg-sky-800 disabled:cursor-not-allowed disabled:opacity-50">{changing ? "A guardar…" : "Guardar entrega"}</button>
+              </div>
+            </section>
+          </div>
+        )}
         {saleToDelete && (
           <div className="fixed inset-0 z-[60] flex items-center justify-center bg-[#1d1d1f]/35 p-4 backdrop-blur-sm" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget && !deletingSale) setSaleToDelete(null); }}>
             <section role="alertdialog" aria-modal="true" aria-labelledby="delete-sale-title" aria-describedby="delete-sale-description" className="w-full max-w-md rounded-[28px] border border-white/70 bg-white p-6 shadow-[0_24px_80px_rgba(0,0,0,0.18)] sm:p-7">

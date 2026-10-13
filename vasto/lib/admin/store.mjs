@@ -15,6 +15,17 @@ const imageTypes = {
 const paymentStatuses = ["por_pagar", "entrada_paga", "pago"];
 const deliveryStatuses = ["por_entregar", "entregue"];
 const fail = (message, status = 500) => Object.assign(new Error(message), { status });
+const validDate = (date) => typeof date === "string" && /^\d{4}-\d{2}-\d{2}$/.test(date) && Number.isFinite(Date.parse(`${date}T00:00:00Z`)) && new Date(`${date}T00:00:00Z`).toISOString().slice(0, 10) === date;
+
+function lisbonDate() {
+  const parts = Object.fromEntries(new Intl.DateTimeFormat("en", {
+    timeZone: "Europe/Lisbon",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).formatToParts(new Date()).map(({ type, value }) => [type, value]));
+  return `${parts.year}-${parts.month}-${parts.day}`;
+}
 
 function normalizeSale(record) {
   const legacy = {
@@ -257,18 +268,29 @@ export async function deleteSale(id) {
 
 export async function updateSaleWorkflow(id, updates) {
   if (!updates || typeof updates !== "object" || Array.isArray(updates)) throw fail("Estados inválidos.", 400);
-  const { status, paymentStatus, deliveryStatus } = updates;
+  const { status, paymentStatus, deliveryStatus, saleDate, deliveryDate } = updates;
   if (status !== undefined && !["em_preparacao", "confirmada"].includes(status)) throw fail("Estado do orçamento inválido.", 400);
   if (paymentStatus !== undefined && !paymentStatuses.includes(paymentStatus)) throw fail("Estado do pagamento inválido.", 400);
   if (deliveryStatus !== undefined && !deliveryStatuses.includes(deliveryStatus)) throw fail("Estado da entrega inválido.", 400);
-  if (status === undefined && paymentStatus === undefined && deliveryStatus === undefined) throw fail("Indique um estado para atualizar.", 400);
+  if (saleDate !== undefined && !validDate(saleDate)) throw fail("Data da venda inválida.", 400);
+  if (deliveryDate !== undefined && !validDate(deliveryDate)) throw fail("Data de entrega inválida.", 400);
+  if (status === undefined && paymentStatus === undefined && deliveryStatus === undefined && saleDate === undefined && deliveryDate === undefined) throw fail("Indique um estado para atualizar.", 400);
   const record = await getSale(id);
   if (!record) throw fail("Encomenda não encontrada.", 404);
+  const nextStatus = status ?? record.status;
+  if (saleDate !== undefined && nextStatus !== "confirmada") throw fail("Só é possível definir a data de uma venda confirmada.", 400);
+  const nextDeliveryStatus = deliveryStatus ?? record.deliveryStatus;
+  if (deliveryDate !== undefined && nextDeliveryStatus !== "entregue") throw fail("Só é possível definir a data de uma entrega concluída.", 400);
+  if (deliveryStatus === "entregue" && !validDate(deliveryDate ?? record.deliveryDate)) throw fail("Indique uma data válida para concluir a entrega.", 400);
+  const defaultSaleDate = status === "confirmada" && record.status !== "confirmada" && !record.saleDate ? lisbonDate() : undefined;
   const updated = normalizeSale({
     ...record,
     ...(status !== undefined && { status }),
     ...(paymentStatus !== undefined && { paymentStatus }),
     ...(deliveryStatus !== undefined && { deliveryStatus }),
+    ...(saleDate !== undefined && { saleDate }),
+    ...(deliveryDate !== undefined && { deliveryDate }),
+    ...(defaultSaleDate && { saleDate: defaultSaleDate }),
     updatedAt: new Date().toISOString(),
   });
   await saveRecord(updated);

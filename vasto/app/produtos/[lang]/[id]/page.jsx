@@ -5,8 +5,8 @@ import ContactCard from "@/components/contacts/ContactCard";
 import ProductTabela from "@/components/produtos/ProductTabela";
 import Galeria from "@/components/galeria/Galeria";
 import Link from "next/link";
-import { redirect } from "next/navigation";
 import SimulatorSectionTabs from "@/components/simulador/SimulatorSectionTabs";
+import budget from "@/assets/orcamento.json";
 
 // Geração estática de todos os IDs para pt e en
 export function generateStaticParams() {
@@ -41,10 +41,6 @@ export async function generateMetadata({ params }) {
       title: "Produto não encontrado | Vasto Império",
       description: "O produto que procura não foi encontrado."
     };
-  }
-
-  if (product.id === "estantes-picking") {
-    redirect("/estantes-picking");
   }
 
   const canonicalUrl = `https://www.vastoimperio.pt/produtos/${lang}/${id}`;
@@ -87,8 +83,12 @@ export default async function Page({ params }) {
     ? "eletrico"
     : product?.id === "porta-paletes-manual"
       ? "manual"
-      : null;
+      : product?.id === "stacker"
+        ? "stacker"
+        : null;
   const tabela = product?.tabela;
+  const handlingCatalogNames = { eletrico: "Porta Paletes Elétrico - 1500Kg", manual: "Porta Paletes Manual - 3000Kg", stacker: "Stacker" };
+  const handlingProduct = handlingTab ? budget.produtos.find((item) => item.ref === 5 && item.produto === handlingCatalogNames[handlingTab]) : null;
   const hasGallery = Boolean(product?.galeria?.length);
   const contactBackground = Boolean(tabela) === hasGallery ? "white" : "gray";
 
@@ -123,7 +123,7 @@ export default async function Page({ params }) {
             </h1>
           </header>
           {handlingTab && <SimulatorSectionTabs group="handling" active={handlingTab} lang={lang} />}
-          <GalleryClient product={product} text={text} />
+          <GalleryClient product={product} text={text} handlingProduct={handlingProduct} english={lang === "en"} />
         </div>
       </main>
       {tabela && (

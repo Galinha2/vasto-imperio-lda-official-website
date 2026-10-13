@@ -4,10 +4,13 @@ import Image from "@/components/loadings/LoadingImage";
 import Link from "next/link";
 import SimulatorSectionTabs from "@/components/simulador/SimulatorSectionTabs";
 import { useLanguage } from "@/components/header/LanguageContext";
+import HandlingOrderPanel from "@/components/produtos/HandlingOrderPanel";
+import budget from "@/assets/orcamento.json";
 
 const options = [
   {
     id: "eletrico",
+    catalogName: "Porta Paletes Elétrico - 1500Kg",
     title: "Porta-paletes elétrico",
     description: "Movimente cargas com assistência elétrica e menos esforço.",
     href: "/produtos/pt/porta-paletes-eletrico",
@@ -17,6 +20,7 @@ const options = [
   },
   {
     id: "manual",
+    catalogName: "Porta Paletes Manual - 3000Kg",
     title: "Porta-paletes manual",
     description: "Uma solução prática para transportar cargas no armazém.",
     href: "/produtos/pt/porta-paletes-manual",
@@ -26,12 +30,13 @@ const options = [
   },
   {
     id: "stacker",
+    catalogName: "Stacker",
     title: "Stacker",
     description: "Peça-nos uma recomendação para elevar e movimentar as suas cargas.",
-    href: "/orcamento",
-    image: "/transport.png",
-    alt: "Equipamentos de movimentação de carga, incluindo stacker",
-    action: "Pedir informações",
+    href: "/produtos/pt/stacker",
+    image: "/produtos/2-Stacker/stacker-branco.png",
+    alt: "Stacker",
+    action: "Ver produto",
   },
 ];
 
@@ -41,7 +46,7 @@ export default function LoadHandlingSimulatorPage() {
   const translations = {
     eletrico: { title: "Electric pallet truck", description: "Move loads with electric assistance and less effort.", alt: "Electric pallet truck", action: "View product" },
     manual: { title: "Manual pallet truck", description: "A practical solution for moving loads around the warehouse.", alt: "Manual pallet truck", action: "View product" },
-    stacker: { title: "Stacker", description: "Ask us for a recommendation to lift and move your loads.", alt: "Materials handling equipment, including a stacker", action: "Request information" },
+    stacker: { title: "Stacker", description: "Ask us for a recommendation to lift and move your loads.", alt: "Stacker", action: "View product" },
   };
   const localizedOptions = options.map((option) => english
     ? { ...option, ...translations[option.id], href: option.href.replace("/pt/", "/en/") }
@@ -61,9 +66,9 @@ export default function LoadHandlingSimulatorPage() {
         <SimulatorSectionTabs group="handling" />
         <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3 xl:gap-6">
           {localizedOptions.map((option) => (
-            <Link
+            <article
               key={option.id}
-              href={option.href}
+              id={option.id}
               className="group flex min-w-0 flex-col overflow-hidden rounded-[30px] border border-[#e5e5e7] bg-white shadow-[0_2px_12px_rgba(0,0,0,0.025)] transition duration-300 hover:-translate-y-1 hover:border-[#d7d8de] hover:shadow-[0_18px_40px_rgba(0,0,0,0.09)] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-(--orange)"
             >
               <div className="relative h-56 bg-white sm:h-64">
@@ -72,11 +77,12 @@ export default function LoadHandlingSimulatorPage() {
               <div className="border-t border-[#f0f0f2] px-5 py-5 sm:px-6 sm:py-6">
                 <h2 className="text-xl font-semibold tracking-[-0.035em] text-[#1d1d1f] sm:text-2xl">{option.title}</h2>
                 <p className="mt-2 text-sm leading-relaxed text-[#6e6e73] sm:text-[15px]">{option.description}</p>
-                <span className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-(--orange) transition group-hover:gap-3">
+                <Link href={option.href} className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-(--orange) transition group-hover:gap-3">
                   {option.action}<span aria-hidden="true">→</span>
-                </span>
+                </Link>
+                <HandlingOrderPanel product={budget.produtos.find((product) => product.ref === 5 && product.produto === option.catalogName)} label={option.title} imageSrc={option.image} english={english} />
               </div>
-            </Link>
+            </article>
           ))}
         </div>
       </div>

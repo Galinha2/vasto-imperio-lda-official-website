@@ -547,6 +547,29 @@
         "description": "<span class='label'>Capacity:</span> 1500 Kg<br/><span class='label'>Weight without battery:</span> 110 Kg<br/><span class='label'>Weight with battery:</span> 116 Kg<br/><span class='label'>Voltage:</span> 25.6 V<br/><span class='label'>Battery capacity:</span> 20 Ah <span class='label'>Description:</span> Our 1500 Kg electric pallet truck is ideal for fast and safe movement of loads in warehouses, logistics centers, or factories. Equipped with an electric motor and high-capacity battery, it allows precise maneuvers with minimal effort, increasing operational efficiency and reducing operator strain. The reinforced steel structure ensures robustness and durability, while the ergonomic design ensures comfort and safety during the transport of heavy loads. A reliable solution to optimize internal logistics and increase productivity."
       },
       {
+        "id": "stacker",
+        "image": "/produtos/2-Stacker/stacker-branco.png",
+        "text": "Stacker",
+        "width": 230,
+        "height": 220,
+        "images": [
+          "/produtos/2-Stacker/stacker-branco.png",
+          "/produtos/2-Stacker/Image 2.png",
+          "/produtos/2-Stacker/Image.png",
+          "/produtos/2-Stacker/a3.jpg"
+        ],
+        "galeriaTitle": "Our clients",
+        "galeria": [
+          "/produtos/2-Stacker/a1.jpg",
+          "/produtos/2-Stacker/a2.jpg",
+          "/produtos/2-Stacker/a3.jpg",
+          "/produtos/2-Stacker/a4.jpg",
+          "/produtos/2-Stacker/a5.jpg",
+          "/produtos/2-Stacker/a6.jpg"
+        ],
+        "description": "<span class='label'>Capacity:</span> 1500 kg<br/><span class='label'>Weight without battery:</span> 110 kg<br/><span class='label'>Weight with battery:</span> 116 kg<br/><span class='label'>Voltage:</span> 25.6 V<br/><span class='label'>Battery capacity:</span> 20 Ah <span class='label'>Description:</span> Our 1500 kg electric pallet truck is ideal for fast and safe movement of loads in warehouses, logistics centers, or factories. Equipped with an electric motor and high-capacity battery, it allows precise maneuvers with minimal effort, increasing operational efficiency and reducing operator strain. The reinforced steel structure ensures robustness and durability, while the ergonomic design ensures comfort and safety during the transport of heavy loads. A reliable solution to optimize internal logistics and increase productivity."
+      },
+      {
         "id": "porta-paletes-manual",
         "image": "/produtos/6-porta-paletes-manual/i1.png",
         "text": "Manual Pallet Truck",

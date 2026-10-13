@@ -51,10 +51,10 @@ const handlingOptions = [
   {
     title: "Stacker",
     description: "Precisa de um stacker? Peça-nos uma solução adequada à sua operação.",
-    href: "/orcamento",
-    image: "/transport.png",
-    imageAlt: "Equipamento de movimentação de cargas, incluindo stacker",
-    action: "Pedir informações",
+    href: "/produtos/pt/stacker",
+    image: "/produtos/2-Stacker/stacker-branco.png",
+    imageAlt: "Stacker",
+    action: "Ver produto",
   },
 ];
 
@@ -105,7 +105,7 @@ export default function SimulatorSelectionPage() {
     "Racks para paletes": ["Pallet racking", "Configure a robust structure for pallet storage.", "Heavy loads", "Industrial pallet rack"],
     "Porta-paletes elétrico": ["Electric pallet truck", "Move loads with electric assistance and less effort.", "", "Electric pallet truck", "View product"],
     "Porta-paletes manual": ["Manual pallet truck", "A practical solution for moving loads around the warehouse.", "", "Manual pallet truck", "View product"],
-    Stacker: ["Stacker", "Need a stacker? Ask us for a solution suited to your operation.", "", "Materials handling equipment, including a stacker", "Request information"],
+    Stacker: ["Stacker", "Need a stacker? Ask us for a solution suited to your operation.", "", "Stacker", "View product"],
   };
   const translateOption = (option) => {
     if (!english || !translations[option.title]) return option;

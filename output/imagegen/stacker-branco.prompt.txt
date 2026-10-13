@@ -1,0 +1,6 @@
+Tool: built-in image_gen.imagegen
+Input: vasto/public/produtos/2-Stacker/Image 1.png
+Output: vasto/public/produtos/2-Stacker/stacker-branco.png
+Transparent background: false
+
+Use case: precise-object-edit. Asset type: existing stacker product catalog photograph. Edit target: the referenced local photograph of the orange and black JIMÃO stacker. Change only the pale gray background to a uniform pure white #FFFFFF background, including all background visible through the mast, grid, handle, chains and gaps between the forks. Preserve the exact stacker geometry, camera angle, dimensions, position, orange paint, black metal, wheels, fork lengths, logo lettering, labels, controls, fine mechanical details, sharp edges and existing realistic light on the product. Keep the full equipment visible with the same framing and proportions. Use a pure white studio floor, with only a very light natural contact shadow directly beneath the equipment. Do not redesign the equipment or alter its markings. Output an opaque image with pure white background. Intended use: website product card on a white background.

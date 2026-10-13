@@ -23,13 +23,14 @@ export default async function handler(req, res) {
     temporaryFiles = Object.values(files).flat().filter(Boolean).map((file) => file.filepath);
     const rawData = Array.isArray(fields.dados) ? fields.dados[0] : fields.dados;
     const data = JSON.parse(rawData || "{}");
-    const { nome, nif, moradaFiscal, moradaEnvioIgual, moradaEnvio, montagem, telefone, email, observacoes, total, detalhes, artigos, idioma } = data;
-    if (!nome?.trim() || !/^\d{9}$/.test(String(nif || "")) || !moradaFiscal?.trim() || !telefone?.trim() || !email?.trim() || !Number.isFinite(Number(total))) {
+    const { nome, nif, moradaFiscal, moradaEnvioIgual, moradaEnvio, montagem, telefone, email, observacoes, total, detalhes, artigos, idioma, tipoEncomenda } = data;
+    const equipmentOrder = tipoEncomenda === "equipamento";
+    if (!nome?.trim() || !/^\d{9}$/.test(String(nif || "")) || !moradaFiscal?.trim() || (!moradaEnvioIgual && !moradaEnvio?.trim()) || !telefone?.trim() || !email?.trim() || !Number.isFinite(Number(total))) {
       return res.status(400).json({ error: "Preencha os dados obrigatórios e confirme o NIF." });
     }
     const uploadedImage = Array.isArray(files.imagem) ? files.imagem[0] : files.imagem;
     const uploadedPdf = Array.isArray(files.orcamento) ? files.orcamento[0] : files.orcamento;
-    if (!uploadedImage || !uploadedPdf) return res.status(400).json({ error: "O desenho e a folha de orçamento são obrigatórios." });
+    if (!uploadedImage || !uploadedPdf) return res.status(400).json({ error: equipmentOrder ? "A imagem do equipamento e a folha de orçamento são obrigatórios." : "O desenho e a folha de orçamento são obrigatórios." });
     if (!process.env.SMTP_HOST || !process.env.SMTP_PORT || !process.env.SMTP_USER || !process.env.SMTP_PASS) {
       throw new Error("Faltam variáveis de ambiente do SMTP");
     }
@@ -52,10 +53,10 @@ export default async function handler(req, res) {
     const shippingAddress = moradaEnvioIgual ? moradaFiscal : moradaEnvio;
     const html = `
       <div style="font-family:Arial,sans-serif;color:#1d1d1f;max-width:760px;margin:auto">
-        <h2 style="margin-bottom:6px">Nova encomenda do simulador</h2>
+        <h2 style="margin-bottom:6px">${equipmentOrder ? "Nova encomenda de equipamento" : "Nova encomenda do simulador"}</h2>
         <p style="margin-top:0;color:#6e6e73">Pedido recebido através do website Vasto Império.</p>
         <table style="width:100%;border-collapse:collapse;margin:24px 0">
-          ${row("Nome", nome)}${row("NIF", nif)}${row("Morada fiscal", moradaFiscal)}${row("Morada de envio", shippingAddress)}${row("Montagem", montagem ? "Sim" : "Não")}${row("Telefone", telefone)}${row("Email", email)}${row("Observações", observacoes)}
+          ${row("Nome", nome)}${row("NIF", nif)}${row("Morada fiscal", moradaFiscal)}${row("Morada de envio", shippingAddress)}${equipmentOrder ? "" : row("Montagem", montagem ? "Sim" : "Não")}${row("Telefone", telefone)}${row("Email", email)}${row("Observações", observacoes)}
         </table>
         <h3 style="margin-bottom:8px">Lista técnica · uso interno Vasto Império</h3>
         <p style="white-space:pre-line;color:#424245">${escapeHtml(detalhes || "")}</p>
@@ -77,7 +78,7 @@ export default async function handler(req, res) {
           ${confirmationRow(english ? "Tax number" : "NIF", nif)}
           ${confirmationRow(english ? "Billing address" : "Morada fiscal", moradaFiscal)}
           ${confirmationRow(english ? "Shipping address" : "Morada de envio", shippingAddress)}
-          ${confirmationRow(english ? "Assembly" : "Montagem", montagem ? (english ? "Yes" : "Sim") : (english ? "No" : "Não"))}
+          ${equipmentOrder ? "" : confirmationRow(english ? "Assembly" : "Montagem", montagem ? (english ? "Yes" : "Sim") : (english ? "No" : "Não"))}
           ${confirmationRow(english ? "Phone" : "Contacto telefónico", telefone)}
           ${confirmationRow(english ? "Email" : "Email", email)}
           ${confirmationRow(english ? "Notes" : "Observações", observacoes)}
@@ -99,15 +100,16 @@ export default async function handler(req, res) {
       auth: { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS },
       tls: { rejectUnauthorized: false },
     });
-    const drawingAttachment = fs.readFileSync(uploadedImage.filepath);
+    const imageAttachment = fs.readFileSync(uploadedImage.filepath);
+    const imageFilename = equipmentOrder ? "imagem-equipamento.jpg" : "desenho-estante.jpg";
     await transporter.sendMail({
       from: process.env.SMTP_USER,
       to: "geral@vastoimperio.pt",
       replyTo: email,
-      subject: `Encomenda do simulador | ${nome.trim()}`,
+      subject: `${equipmentOrder ? "Encomenda de equipamento" : "Encomenda do simulador"} | ${nome.trim()}`,
       html,
       attachments: [
-        { filename: "desenho-estante.jpg", content: drawingAttachment, contentType: "image/jpeg" },
+        { filename: imageFilename, content: imageAttachment, contentType: "image/jpeg" },
         { filename: "folha-orcamento.pdf", content: fs.readFileSync(uploadedPdf.filepath), contentType: "application/pdf" },
       ],
     });
@@ -118,7 +120,7 @@ export default async function handler(req, res) {
       subject: `${english ? "Order confirmation" : "Confirmação da encomenda"} | ${nome.trim()}`,
       html: confirmationHtml,
       attachments: [
-        { filename: "desenho-estante.jpg", content: drawingAttachment, contentType: "image/jpeg" },
+        { filename: imageFilename, content: imageAttachment, contentType: "image/jpeg" },
       ],
     });
     return res.status(200).json({ message: "Encomenda enviada com sucesso." });

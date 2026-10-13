@@ -5,6 +5,7 @@ import Image from "@/components/loadings/LoadingImage";
 import Link from "next/link";
 import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
 import { IoClose } from "react-icons/io5";
+import HandlingOrderPanel from "@/components/produtos/HandlingOrderPanel";
 
 const simulatorLinks = {
   "racks-industriais": "/simulador/racks",
@@ -12,12 +13,12 @@ const simulatorLinks = {
   "estantes-picking": "/simulador/pt/estantes-picking",
 };
 
-export default function GalleryClient({ product, text }) {
+export default function GalleryClient({ product, text, handlingProduct, english = false }) {
   const images = product.images?.length ? product.images : [product.image];
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const hasMultipleImages = images.length > 1;
-  const simulatorHref = simulatorLinks[product.id];
+  const simulatorHref = simulatorLinks[product.id]?.replace("/pt/", english ? "/en/" : "/pt/");
 
   const showImage = (index) => setCurrentImageIndex((index + images.length) % images.length);
   const handleNextImage = () => showImage(currentImageIndex + 1);
@@ -114,6 +115,7 @@ export default function GalleryClient({ product, text }) {
               <span aria-hidden="true">→</span>
             </Link>
           </div>
+          {handlingProduct && <HandlingOrderPanel product={handlingProduct} label={product.text} imageSrc={product.image} english={english} embedded />}
         </aside>
       </div>
 

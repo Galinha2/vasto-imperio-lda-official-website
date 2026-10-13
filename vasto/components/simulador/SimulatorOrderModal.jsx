@@ -15,12 +15,27 @@ const initialForm = {
   observacoes: "",
 };
 
-export default function SimulatorOrderModal({ open, onClose, total, details, items = [], discountPercent = 0, drawingRef, english = false }) {
+function createEquipmentImage(image, pixelRatio, quality) {
+  const scale = Math.min(1, (1024 * pixelRatio) / Math.max(image.naturalWidth, image.naturalHeight));
+  const canvas = document.createElement("canvas");
+  canvas.width = Math.max(1, Math.round(image.naturalWidth * scale));
+  canvas.height = Math.max(1, Math.round(image.naturalHeight * scale));
+  const context = canvas.getContext("2d");
+  context.fillStyle = "#ffffff";
+  context.fillRect(0, 0, canvas.width, canvas.height);
+  context.drawImage(image, 0, 0, canvas.width, canvas.height);
+  return new Promise((resolve, reject) => {
+    canvas.toBlob((blob) => blob ? resolve(blob) : reject(new Error("Could not prepare the equipment image.")), "image/jpeg", quality);
+  });
+}
+
+export default function SimulatorOrderModal({ open, onClose, total, details, items = [], discountPercent = 0, drawingRef, imageSrc, english = false }) {
   const [form, setForm] = useState(initialForm);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [sent, setSent] = useState(false);
   const currency = new Intl.NumberFormat(english ? "en-IE" : "pt-PT", { style: "currency", currency: "EUR" });
+  const equipment = Boolean(imageSrc);
 
   useEffect(() => {
     if (!open) return;
@@ -47,13 +62,25 @@ export default function SimulatorOrderModal({ open, onClose, total, details, ite
     setError("");
     try {
       const drawing = drawingRef?.current?.querySelector('svg[role="img"]');
-      if (!drawing) throw new Error(english ? "The drawing is not available to attach." : "Não foi possível preparar o desenho da estante.");
+      if (!equipment && !drawing) throw new Error(english ? "The drawing is not available to attach." : "Não foi possível preparar o desenho da estante.");
       await document.fonts?.ready;
-      const { toJpeg } = await import("html-to-image");
-      const createDrawing = async (pixelRatio, quality) => {
-        const dataUrl = await toJpeg(drawing, { pixelRatio, quality, backgroundColor: "#ffffff", cacheBust: true });
-        return fetch(dataUrl).then((response) => response.blob());
-      };
+      let createImage;
+      if (equipment) {
+        const image = new window.Image();
+        image.src = imageSrc;
+        try {
+          await image.decode();
+        } catch {
+          throw new Error(english ? "The equipment image is not available to attach." : "Não foi possível preparar a imagem do equipamento.");
+        }
+        createImage = (pixelRatio, quality) => createEquipmentImage(image, pixelRatio, quality);
+      } else {
+        const { toJpeg } = await import("html-to-image");
+        createImage = async (pixelRatio, quality) => {
+          const dataUrl = await toJpeg(drawing, { pixelRatio, quality, backgroundColor: "#ffffff", cacheBust: true });
+          return fetch(dataUrl).then((response) => response.blob());
+        };
+      }
       const budgetPdf = await generateBudgetPdf({
         linhas: items,
         descontoSelecionado: discountPercent,
@@ -62,29 +89,29 @@ export default function SimulatorOrderModal({ open, onClose, total, details, ite
         nomeClienteManual: form.nome,
         returnBlob: true,
       });
-      const orderData = JSON.stringify({ ...form, total, detalhes: details, artigos: items, idioma: english ? "en" : "pt" });
+      const orderData = JSON.stringify({ ...form, montagem: equipment ? undefined : form.montagem, total, detalhes: details, artigos: items, idioma: english ? "en" : "pt", tipoEncomenda: equipment ? "equipamento" : "estante" });
       const maxRequestBytes = 3.9 * 1024 * 1024;
       const multipartMarginBytes = 96 * 1024;
       const fixedRequestBytes = budgetPdf.size + new Blob([orderData]).size + multipartMarginBytes;
       const imageProfiles = [[2, 0.9], [1.6, 0.86], [1.3, 0.82], [1, 0.78]];
-      let drawingBlob = null;
+      let imageBlob = null;
       let estimatedBytes = fixedRequestBytes;
       // Começa com uma imagem nítida e reduz gradualmente apenas se o pedido se aproximar do limite da Vercel.
       for (const [pixelRatio, quality] of imageProfiles) {
-        const candidate = await createDrawing(pixelRatio, quality);
+        const candidate = await createImage(pixelRatio, quality);
         estimatedBytes = fixedRequestBytes + candidate.size;
         if (estimatedBytes <= maxRequestBytes) {
-          drawingBlob = candidate;
+          imageBlob = candidate;
           break;
         }
       }
-      if (!drawingBlob) {
+      if (!imageBlob) {
         const sizeInMb = (estimatedBytes / (1024 * 1024)).toLocaleString(english ? "en-IE" : "pt-PT", { maximumFractionDigits: 1 });
         throw new Error(english ? `The order files are ${sizeInMb} MB and exceed the upload limit. Please contact us to place this order.` : `Os ficheiros da encomenda ocupam ${sizeInMb} MB e excedem o limite de envio. Contacte-nos para concluir esta encomenda.`);
       }
       const payload = new FormData();
       payload.append("dados", orderData);
-      payload.append("imagem", drawingBlob, "desenho-estante.jpg");
+      payload.append("imagem", imageBlob, equipment ? "imagem-equipamento.jpg" : "desenho-estante.jpg");
       payload.append("orcamento", budgetPdf, "folha-orcamento.pdf");
       const response = await fetch("/api/encomenda-simulador", {
         method: "POST",
@@ -96,6 +123,7 @@ export default function SimulatorOrderModal({ open, onClose, total, details, ite
         result = JSON.parse(responseText);
       } catch {
         if (response.status === 413 || /request entity too large/i.test(responseText)) {
+          if (equipment) throw new Error(english ? "The attachments exceed the server upload limit. Please contact us to place this order." : "Os anexos excedem o limite de envio do servidor. Contacte-nos para concluir esta encomenda.");
           throw new Error(english ? "The attachments exceed the server upload limit. Reduce the number of modules and try again." : "Os anexos excedem o limite de envio do servidor. Reduza o número de módulos e tente novamente.");
         }
         throw new Error(english ? "The server returned an invalid response. Please try again." : "O servidor devolveu uma resposta inválida. Tente novamente.");
@@ -163,25 +191,28 @@ export default function SimulatorOrderModal({ open, onClose, total, details, ite
                     </div>
                   </section>
 
-                  <section className="grid gap-4 sm:grid-cols-2">
-                    <fieldset className="rounded-[24px] border border-[#e8e8ed] bg-white p-4 lg:p-3">
+                  <section className={`grid gap-4 ${equipment ? "" : "sm:grid-cols-2"}`}>
+                    {!equipment && <fieldset className="rounded-[24px] border border-[#e8e8ed] bg-white p-4 lg:p-3">
                       <legend className="px-1 text-sm font-semibold text-[#424245]">{text.assembly}</legend>
                       <div className="mt-2 flex rounded-full bg-[#f5f5f7] p-1">
                         {[false, true].map((value) => <button key={String(value)} type="button" aria-pressed={form.montagem === value} onClick={() => setField("montagem", value)} className={`h-10 flex-1 cursor-pointer rounded-full px-4 text-sm font-semibold transition ${form.montagem === value ? "bg-white text-[#1d1d1f] shadow-sm" : "text-[#6e6e73] hover:text-[#1d1d1f]"}`}>{value ? text.yes : text.no}</button>)}
                       </div>
-                    </fieldset>
+                    </fieldset>}
                     <label className="block space-y-1 text-sm font-medium text-[#424245]">{text.notes}<textarea rows={2} value={form.observacoes} onChange={(event) => setField("observacoes", event.target.value)} placeholder={text.notesPlaceholder} className="min-h-[72px] w-full resize-y rounded-[20px] border border-[#d2d2d7] bg-[#fbfbfd] px-4 py-3 text-[#1d1d1f] outline-none transition placeholder:text-[#86868b] focus:border-(--blue) focus:ring-4 focus:ring-[#0879c0]/10 lg:min-h-[64px] lg:py-2" /></label>
                   </section>
                 </div>
 
                 <aside className="rounded-[24px] bg-[#f5f5f7] p-5 sm:p-6 lg:sticky lg:top-0">
                   <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[#6e6e73]">{english ? "Order summary" : "Resumo da encomenda"}</p>
+                  {equipment && <p className="mt-3 text-sm leading-relaxed text-[#424245]">{details}</p>}
                   <div className="mt-5 border-y border-[#dedee3] py-5">
                     <p className="text-sm font-medium text-[#424245]">{text.final}</p>
                     <p className="mt-2 text-3xl font-semibold tracking-[-0.05em] text-(--orange)">{currency.format(total || 0)}</p>
                     <p className="mt-2 text-xs leading-relaxed text-[#6e6e73]">{text.vat}</p>
                   </div>
-                  <p className="mt-4 text-xs leading-relaxed text-[#6e6e73]">{english ? "The technical specification and drawing will be sent to Vasto Império with your request." : "A lista técnica e o desenho seguem para a Vasto Império juntamente com o pedido."}</p>
+                  <p className="mt-4 text-xs leading-relaxed text-[#6e6e73]">{equipment
+                    ? (english ? "The item list, equipment image and quotation will be sent to Vasto Império with your request." : "A lista de artigos, a imagem do equipamento e o orçamento seguem para a Vasto Império juntamente com o pedido.")
+                    : (english ? "The technical specification and drawing will be sent to Vasto Império with your request." : "A lista técnica e o desenho seguem para a Vasto Império juntamente com o pedido.")}</p>
                 </aside>
               </div>
               {error && <p role="alert" className="mt-5 rounded-2xl bg-red-50 px-4 py-3 text-sm text-red-700">{error}</p>}

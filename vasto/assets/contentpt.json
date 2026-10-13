@@ -560,6 +560,30 @@
         "description": "<span class='label'>Capacidade:</span> 1500 kg<br/><span class='label'>Peso sem bateria:</span> 110 kg<br/><span class='label'>Peso com bateria:</span> 116 kg<br/><span class='label'>Voltagem:</span> 25,6 V<br/><span class='label'>Capacidade da bateria:</span> 20 Ah <span class='label'>Descrição:</span> O nosso porta-paletes elétrico de 1500 kg é ideal para movimentação rápida e segura de cargas em armazéns, centros logísticos ou fábricas. Equipado com motor elétrico e bateria de alta capacidade, permite manobras precisas com esforço mínimo, aumentando a eficiência operacional e reduzindo o esforço do operador. A estrutura em aço reforçado garante robustez e durabilidade, enquanto o design ergonómico assegura conforto e segurança durante o transporte de cargas pesadas. Uma solução fiável para otimizar a logística interna e aumentar a produtividade."
       },
       {
+        "id": "stacker",
+        "image": "/produtos/2-Stacker/stacker-branco.png",
+        "text": "Stacker",
+        "width": 230,
+        "height": 220,
+        "images": [
+          "/produtos/2-Stacker/stacker-branco.png",
+          "/produtos/2-Stacker/Image 2.png",
+          "/produtos/2-Stacker/Image.png",
+          "/produtos/2-Stacker/a3.jpg"
+        ],
+        "galeriaTitle": "Os nossos clientes",
+        "galeria": [
+          "/produtos/2-Stacker/a1.jpg",
+          "/produtos/2-Stacker/a2.jpg",
+          "/produtos/2-Stacker/a3.jpg",
+          "/produtos/2-Stacker/a4.jpg",
+          "/produtos/2-Stacker/a5.jpg",
+          "/produtos/2-Stacker/a6.jpg"
+        ],
+
+        "description": "<span class='label'>Capacidade:</span> 1500 kg<br/><span class='label'>Peso sem bateria:</span> 110 kg<br/><span class='label'>Peso com bateria:</span> 116 kg<br/><span class='label'>Voltagem:</span> 25,6 V<br/><span class='label'>Capacidade da bateria:</span> 20 Ah <span class='label'>Descrição:</span> O nosso porta-paletes elétrico de 1500 kg é ideal para movimentação rápida e segura de cargas em armazéns, centros logísticos ou fábricas. Equipado com motor elétrico e bateria de alta capacidade, permite manobras precisas com esforço mínimo, aumentando a eficiência operacional e reduzindo o esforço do operador. A estrutura em aço reforçado garante robustez e durabilidade, enquanto o design ergonómico assegura conforto e segurança durante o transporte de cargas pesadas. Uma solução fiável para otimizar a logística interna e aumentar a produtividade."
+      },
+      {
         "id": "porta-paletes-manual",
         "image": "/produtos/6-porta-paletes-manual/i1.png",
         "text": "Porta Paletes Manual",
@@ -732,72 +756,6 @@
         ]
       },
       {
-        "id": "porteco-z100",
-        "image": "/produtos/10-Porteco Z100/i1.png",
-        "text": "Porteco Z100",
-        "width": 250,
-        "images": [
-          "/produtos/10-Porteco Z100/i1.jpg",
-          "/produtos/10-Porteco Z100/i2.jpg",
-          "/produtos/10-Porteco Z100/i3.jpg",
-          "/produtos/10-Porteco Z100/i4.jpg",
-          "/produtos/10-Porteco Z100/i5.jpg",
-          "/produtos/10-Porteco Z100/i6.jpg"
-        ],
-
-        "description": "<span class='label'>Capacidade:</span> Até 850 kg por nível.<br/><span class='label'>Descrição:</span> Sistema de armazenagem carga média, muito versátil e resistente. É a solução indicada para armazenar mercadorias pesadas e volumosas, que são movimentadas de forma manual. Disponível em duas versões: Z100 e Z60",
-        "tabela": [
-          {
-            "codigo": "PTLZ1000-100",
-            "comprimento_mm": "Viga Z100 c/ 1000mm (AxP) conector 3 garras",
-            "acabamento": "RAL 7035",
-            "peso_kg": 1.62
-          },
-          {
-            "codigo": "PTLZ1250-100",
-            "comprimento_mm": "Viga Z100 c/ 1250mm (AxP) conector 3 garras",
-            "acabamento": "RAL 7035",
-            "peso_kg": 1.94
-          },
-          {
-            "codigo": "PTLZ1500-100",
-            "comprimento_mm": "Viga Z100 c/ 1500mm (AxP) conector 3 garras",
-            "acabamento": "RAL 7035",
-            "peso_kg": 2.26
-          },
-          {
-            "codigo": "PTLZ1750-100",
-            "comprimento_mm": "Viga Z100 c/ 1750mm (AxP) conector 3 garras",
-            "acabamento": "RAL 7035",
-            "peso_kg": 2.58
-          },
-          {
-            "codigo": "PTLZ2000-100",
-            "comprimento_mm": "Viga Z100 c/ 2000mm (AxP) conector 3 garras",
-            "acabamento": "RAL 7035",
-            "peso_kg": 2.9
-          },
-          {
-            "codigo": "PTLZ2250-100",
-            "comprimento_mm": "Viga Z100 c/ 2250mm (AxP) conector 3 garras",
-            "acabamento": "RAL 7035",
-            "peso_kg": 3.22
-          },
-          {
-            "codigo": "PTLZ2500-100",
-            "comprimento_mm": "Viga Z100 c/ 2500mm (AxP) conector 3 garras",
-            "acabamento": "RAL 7035",
-            "peso_kg": 3.54
-          },
-          {
-            "codigo": "PTLZ2750-100",
-            "comprimento_mm": "Viga Z100 c/ 2750mm (AxP) conector 3 garras",
-            "acabamento": "RAL 7035",
-            "peso_kg": 4.14
-          }
-        ]
-      },
-      {
         "id": "rangeco-pneus",
         "image": "/produtos/11-Rangeco Pneus (Rangeco Tires)/i2.png",
         "width": 220,
@@ -886,32 +844,6 @@
         ],
 
         "description": "<span class='label'>Descrição:</span> Kits de estantes Rang'Eco Pneus, que incluem: bastidores (travessas e diagonais soldadas), e vigas principais em tubo ovalizado. Existem duas tipologias de Kits: módulo Inicial (individual) e módulo seguinte, que liga ao módulo inicial, partilhando um dos bastidores. Podem apresentar 3 níveis (bastidor com 2000mm altura) ou 4 níveis (bastidor com 2400mm altura) por cada módulo. O ajuste da altura dos níveis é feito de 50mm em 50mm. Considera-se uma travessa de reforço por cada nível."
-      },
-      {
-        "id": "rangeco-plus",
-        "image": "/produtos/12-Rangeco Plus/i1.png",
-        "width": 155,
-        "text": "Rangeco Plus",
-        "images": [
-          "/produtos/12-Rangeco Plus/i1.jpg",
-          "/produtos/12-Rangeco Plus/i2.jpg",
-          "/produtos/12-Rangeco Plus/i3.jpg",
-          "/produtos/12-Rangeco Plus/i4.jpg",
-          "/produtos/12-Rangeco Plus/i5.jpg",
-          "/produtos/12-Rangeco Plus/i6.jpg",
-          "/produtos/12-Rangeco Plus/i7.jpg",
-          "/produtos/12-Rangeco Plus/i8.jpg",
-          "/produtos/12-Rangeco Plus/i9.jpg",
-          "/produtos/12-Rangeco Plus/i10.jpg",
-          "/produtos/12-Rangeco Plus/i11.jpg",
-          "/produtos/12-Rangeco Plus/i2.jpg",
-          "/produtos/12-Rangeco Plus/i13.jpg",
-          "/produtos/12-Rangeco Plus/i14.jpg",
-          "/produtos/12-Rangeco Plus/i15.jpg",
-          "/produtos/12-Rangeco Plus/i16.jpg"
-        ],
-
-        "description": "<span class='label'>Peso máx por nível:</span> Até 303 kg <br/><span class='label'>Número máx de níveis:</span> Até 7 níveis <br/><span class='label'>Número de profundidades disponíveis:</span> Até 6 profundidades diferentes <br/><span class='label'>Número de comprimentos disponíveis:</span> Até 4 comprimentos diferentes <span class='label'>Altura máxima:</span> Até 3 metros <br/><span class='label'>Descrição:</span> A Rang'Eco Plus é uma solução robusta para cargas até 303 kg por nível. Oferece maior capacidade e durabilidade, é ideal para armazéns, oficinas e instalações que necessitam de uma estrutura fiável."
       },
       {
         "id": "bancadas",
@@ -1037,20 +969,6 @@
             "peso_kg": 62.4
           }
         ]
-      },
-
-      {
-        "id": "kits-rangeco",
-        "image": "/produtos/17-Kits Rangeco (Rangeco Kits)/i1.png",
-        "width": 350,
-        "text": "Kits Rangeco (Rangeco Kits)",
-        "images": [
-          "/produtos/17-Kits Rangeco (Rangeco Kits)/i1.jpg",
-          "/produtos/17-Kits Rangeco (Rangeco Kits)/i2.jpg",
-          "/produtos/17-Kits Rangeco (Rangeco Kits)/i3.jpg"
-        ],
-
-        "description": "<span class='label'>Descrição:</span> Kits de estantes Rang'Eco, que incluem pilares, pés, estrutura das prateleiras, que consideramos como integrante: as duas vigas principais, duas travessas e tubo(s) de reforço (300 e 400mm - 1 tubo, 500 e 600mm - 2 tubos, 800mm - 3 tubos). Existem duas tipologias de Kits: módulo Inicial (individual) e módulo seguinte, que liga ao módulo inicial, partilhando dois dos pilares. Para completar os Kits deve selecionar o tipo de revestimento a colocar sobre a estrutura da prateleira, considerando duas opções: platex ou chapa metálica. Embalagem individual em película plástica termoretráctil."
       }
     ]
   },

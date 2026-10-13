@@ -163,6 +163,7 @@ export default function SalesDashboard() {
   const [changing, setChanging] = useState("");
   const [imagePanel, setImagePanel] = useState("");
   const [uploadingImages, setUploadingImages] = useState("");
+  const [imageDropTarget, setImageDropTarget] = useState("");
   const [deletingImage, setDeletingImage] = useState("");
   const [saleToDelete, setSaleToDelete] = useState(null);
   const [deliveryPrompt, setDeliveryPrompt] = useState(null);
@@ -531,40 +532,59 @@ export default function SalesDashboard() {
                                   )}
                                 </section>
                               )}
-                              <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
-                                <div>
-                                  <h3 className="text-sm font-semibold text-[#1d1d1f]">Imagens do registo</h3>
-                                  <p className="mt-1 text-xs text-[#86868b]">Opcional · JPG, PNG ou WebP · até 4 MB por imagem · máximo 10 imagens.</p>
+                              <div
+                                onDragEnter={(event) => {
+                                  event.preventDefault();
+                                  if (!uploadingImages) setImageDropTarget(sale.id);
+                                }}
+                                onDragOver={(event) => event.preventDefault()}
+                                onDragLeave={(event) => {
+                                  if (!event.currentTarget.contains(event.relatedTarget)) setImageDropTarget("");
+                                }}
+                                onDrop={(event) => {
+                                  event.preventDefault();
+                                  event.stopPropagation();
+                                  setImageDropTarget("");
+                                  if ((sale.images?.length ?? 0) < 10) addImages(sale, event.dataTransfer.files);
+                                  else setError("Este registo já atingiu o máximo de 10 imagens.");
+                                }}
+                                className={`rounded-2xl border border-dashed p-4 transition-colors sm:p-5 ${imageDropTarget === sale.id ? "border-sky-500 bg-sky-50" : "border-[#dcdce2] bg-white"}`}
+                              >
+                                <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
+                                  <div>
+                                    <h3 className="text-sm font-semibold text-[#1d1d1f]">Imagens do registo</h3>
+                                    <p className="mt-1 text-xs text-[#86868b]">Arraste imagens para aqui ou escolha ficheiros · JPG, PNG ou WebP · até 4 MB por imagem · máximo 10.</p>
+                                  </div>
+                                  <input
+                                    ref={(node) => { imageInputRefs.current[sale.id] = node; }}
+                                    type="file"
+                                    accept="image/jpeg,image/png,image/webp"
+                                    multiple
+                                    hidden
+                                    onChange={(event) => addImages(sale, event.target.files, event.currentTarget)}
+                                  />
+                                  <button type="button" disabled={Boolean(uploadingImages) || (sale.images?.length ?? 0) >= 10} onClick={() => imageInputRefs.current[sale.id]?.click()} className="inline-flex h-10 w-fit cursor-pointer items-center gap-2 rounded-full bg-orange-600 px-4 text-sm font-semibold text-white transition hover:bg-orange-700 disabled:cursor-not-allowed disabled:opacity-50">
+                                    <IoAddOutline />{uploadingImages === sale.id ? "A carregar…" : "Adicionar imagens"}
+                                  </button>
                                 </div>
-                                <input
-                                  ref={(node) => { imageInputRefs.current[sale.id] = node; }}
-                                  type="file"
-                                  accept="image/jpeg,image/png,image/webp"
-                                  multiple
-                                  hidden
-                                  onChange={(event) => addImages(sale, event.target.files, event.currentTarget)}
-                                />
-                                <button type="button" disabled={Boolean(uploadingImages) || (sale.images?.length ?? 0) >= 10} onClick={() => imageInputRefs.current[sale.id]?.click()} className="inline-flex h-10 w-fit cursor-pointer items-center gap-2 rounded-full bg-orange-600 px-4 text-sm font-semibold text-white transition hover:bg-orange-700 disabled:cursor-not-allowed disabled:opacity-50">
-                                  <IoAddOutline />{uploadingImages === sale.id ? "A carregar…" : "Adicionar imagens"}
-                                </button>
-                              </div>
-                              {sale.images?.length ? (
-                                <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
-                                  {sale.images.map((image) => (
-                                    <div key={image.id} className="group overflow-hidden rounded-2xl border border-[#e8e8ed] bg-white">
-                                      <a href={`/api/admin/sales/${sale.id}/images/${image.id}`} target="_blank" rel="noopener noreferrer" className="block aspect-[4/3] bg-[#f5f5f7]">
-                                        <img src={`/api/admin/sales/${sale.id}/images/${image.id}`} alt={image.name} loading="lazy" className="h-full w-full object-cover transition group-hover:scale-[1.02]" />
-                                      </a>
-                                      <div className="flex items-center justify-between gap-2 px-3 py-2">
-                                        <p className="min-w-0 truncate text-[11px] text-[#6e6e73]" title={image.name}>{image.name}</p>
-                                        <button type="button" disabled={deletingImage === image.id} aria-label={`Remover imagem ${image.name}`} onClick={() => removeImage(sale, image)} className="grid h-7 w-7 shrink-0 cursor-pointer place-items-center rounded-full text-[#a1a1a6] transition hover:bg-red-50 hover:text-red-600 disabled:opacity-50"><IoTrashOutline /></button>
+                                {sale.images?.length ? (
+                                  <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
+                                    {sale.images.map((image) => (
+                                      <div key={image.id} className="group overflow-hidden rounded-2xl border border-[#e8e8ed] bg-white">
+                                        <a href={`/api/admin/sales/${sale.id}/images/${image.id}`} target="_blank" rel="noopener noreferrer" className="block aspect-[4/3] bg-[#f5f5f7]">
+                                          <img src={`/api/admin/sales/${sale.id}/images/${image.id}`} alt={image.name} loading="lazy" className="h-full w-full object-cover transition group-hover:scale-[1.02]" />
+                                        </a>
+                                        <div className="flex items-center justify-between gap-2 px-3 py-2">
+                                          <p className="min-w-0 truncate text-[11px] text-[#6e6e73]" title={image.name}>{image.name}</p>
+                                          <button type="button" disabled={deletingImage === image.id} aria-label={`Remover imagem ${image.name}`} onClick={() => removeImage(sale, image)} className="grid h-7 w-7 shrink-0 cursor-pointer place-items-center rounded-full text-[#a1a1a6] transition hover:bg-red-50 hover:text-red-600 disabled:opacity-50"><IoTrashOutline /></button>
+                                        </div>
                                       </div>
-                                    </div>
-                                  ))}
-                                </div>
-                              ) : (
-                                <p className="mt-4 rounded-2xl border border-dashed border-[#dcdce2] bg-white px-4 py-5 text-center text-xs text-[#86868b]">Ainda não foram adicionadas imagens a este orçamento.</p>
-                              )}
+                                    ))}
+                                  </div>
+                                ) : (
+                                  <p className="mt-4 rounded-xl bg-[#fbfbfd] px-4 py-5 text-center text-xs text-[#86868b]">Ainda não foram adicionadas imagens. Pode arrastá-las para esta área.</p>
+                                )}
+                              </div>
                             </td>
                           </tr>
                         )}

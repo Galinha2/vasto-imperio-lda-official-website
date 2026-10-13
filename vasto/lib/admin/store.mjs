@@ -24,7 +24,26 @@ async function cloud(endpoint, options = {}) {
   });
   if (!response.ok) {
     if (response.status === 409) throw fail("Este PDF já está registado.", 409);
-    throw fail("Não foi possível guardar ou consultar as vendas. Verifique a ligação ao armazenamento.", 503);
+    let backendCode = "unknown";
+    try {
+      const body = await response.clone().json();
+      backendCode = body.code || body.statusCode || body.error || backendCode;
+    } catch {
+      // Some Supabase failures return a non-JSON response.
+    }
+    console.error("[admin-sales-storage] Supabase request failed", {
+      method: options.method || "GET",
+      endpoint: endpoint.split("?")[0],
+      httpStatus: response.status,
+      backendCode: String(backendCode).slice(0, 80),
+    });
+
+    const message = response.status === 401 || response.status === 403
+      ? "O Supabase recusou o acesso às vendas. Confirme que SUPABASE_SERVICE_ROLE_KEY contém a chave service_role do mesmo projeto indicado em SUPABASE_URL."
+      : response.status === 404
+        ? "O recurso das vendas não foi encontrado no Supabase. Confirme o projeto em SUPABASE_URL e execute supabase/admin-sales.sql no respetivo projeto."
+        : "Não foi possível guardar ou consultar as vendas no Supabase. Consulte os logs da função na Vercel para identificar a resposta do Supabase.";
+    throw fail(message, 503);
   }
   return response;
 }

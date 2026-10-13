@@ -240,7 +240,7 @@ function RackPreview({ modules, height, levels, rowCount, capacityLabel, solutio
   );
 }
 
-export default function SimulatorRacks({ onQuoteDataChange }) {
+export default function SimulatorRacks({ onQuoteDataChange, adminMode = false }) {
   const [orderOpen, setOrderOpen] = useState(false);
   const orderQuoteRef = useRef(null);
   const drawingRef = useRef(null);
@@ -339,17 +339,17 @@ export default function SimulatorRacks({ onQuoteDataChange }) {
   }
 
   return (
-    <section ref={drawingRef} className="min-h-screen bg-[#f8f8fa] px-4 py-12 sm:px-6 lg:px-10 lg:py-16">
-      <header className="mx-auto mb-9 max-w-[1800px] sm:mb-12">
+    <section ref={drawingRef} className={adminMode ? "min-h-0 bg-transparent p-0" : "min-h-screen bg-[#f8f8fa] px-4 py-12 sm:px-6 lg:px-10 lg:py-16"}>
+      {!adminMode && <header className="mx-auto mb-9 max-w-[1800px] sm:mb-12">
         <p className="mb-3 mt-[35px] text-xs font-semibold uppercase tracking-[0.16em] text-[#6e6e73] lg:mt-5">{english ? "Configurator · Pallet racking" : "Configurador · Racks industriais"}</p>
         <h1 className="max-w-4xl text-4xl font-semibold leading-[1.05] tracking-[-0.045em] text-[#1d1d1f] sm:text-5xl lg:text-6xl">{english ? "Racking tailored to your operation." : "Racks à medida da sua operação."}</h1>
         <p className="mt-4 max-w-2xl text-base leading-relaxed text-[#6e6e73] sm:text-lg">{english ? "Configure a structure for palletised loads. Dimensions, capacities and estimates update as you make your selections." : "Configure a estrutura para carga paletizada. As medidas, capacidades e estimativa acompanham a seleção em tempo real."}</p>
-      </header>
-      <div className="mx-auto grid max-w-[1800px] gap-5 lg:grid-cols-[minmax(360px,0.78fr)_minmax(0,1.75fr)] xl:gap-7">
+      </header>}
+      {!adminMode && <div className="mx-auto grid max-w-[1800px] gap-5 lg:grid-cols-[minmax(360px,0.78fr)_minmax(0,1.75fr)] xl:gap-7">
         <div className="flex justify-start"><SimulatorSectionTabs group="storage" active="racks" /></div>
         <div className="hidden lg:block" aria-hidden="true" />
-      </div>
-      <div className="mx-auto grid max-w-[1800px] items-start gap-5 lg:grid-cols-[minmax(360px,0.78fr)_minmax(0,1.75fr)] xl:gap-7">
+      </div>}
+      <div className={`mx-auto grid max-w-[1800px] items-start gap-5 lg:grid-cols-[minmax(360px,0.78fr)_minmax(0,1.75fr)] xl:gap-7 ${adminMode ? "lg:gap-4 xl:gap-5" : ""}`}>
         <div className="order-2 w-full rounded-[30px] border border-[#e5e5e7] bg-white p-5 shadow-[0_12px_40px_rgba(0,0,0,0.05)] sm:p-7 lg:order-1 lg:p-8">
           <div className="mb-6"><p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#86868b]">{english ? "1 · Configuration" : "1 · Configuração"}</p><h2 className="mt-1 text-2xl font-semibold tracking-tight text-[#1d1d1f]">{english ? "Choose dimensions" : "Escolha as medidas"}</h2></div>
           <div className="grid grid-cols-1 gap-x-4 gap-y-5 sm:grid-cols-2">
@@ -379,14 +379,14 @@ export default function SimulatorRacks({ onQuoteDataChange }) {
               <p className="col-span-2"><span className="block text-xs text-[#86868b]">{english ? "Beams by length" : "Vigas por medida"}</span><strong className="mt-0.5 block font-semibold text-[#1d1d1f]">{beamDistribution.map(({ length, count }) => `${count} × ${formatMeters(length)}`).join(" · ")}</strong></p>
               <p className="col-span-2 border-t border-[#e5e5e7] pt-2 text-[#6e6e73]">{english ? "Maximum load per beam pair" : "Carga máxima por par de vigas"} <strong className="font-semibold text-(--orange)">{capacityIsMinimum ? "> " : ""}{levelCapacity.toLocaleString(english ? "en-IE" : "pt-PT")} kg</strong></p>
             </div>}
-            <div className="mt-5 grid grid-cols-[1fr_auto] gap-3"><button type="button" disabled={isLengthUnavailable} onClick={() => setOrderOpen(true)} className="flex cursor-pointer items-center justify-center simulator-pill rounded-full bg-(--orange) px-4 py-3 text-sm font-semibold text-white shadow-sm transition hover:brightness-95 disabled:cursor-not-allowed disabled:opacity-50">{english ? "Order" : "Encomendar"}</button><button type="button" onClick={reset} className="cursor-pointer simulator-pill rounded-full border border-[#d2d2d7] bg-white px-4 py-3 text-sm font-semibold text-[#1d1d1f] transition hover:bg-[#f5f5f7]">{english ? "Reset" : "Recomeçar"}</button></div>
+            <div className={`mt-5 grid gap-3 ${adminMode ? "grid-cols-1" : "grid-cols-[1fr_auto]"}`}>{!adminMode && <button type="button" disabled={isLengthUnavailable} onClick={() => setOrderOpen(true)} className="flex cursor-pointer items-center justify-center simulator-pill rounded-full bg-(--orange) px-4 py-3 text-sm font-semibold text-white shadow-sm transition hover:brightness-95 disabled:cursor-not-allowed disabled:opacity-50">{english ? "Order" : "Encomendar"}</button>}<button type="button" onClick={reset} className="cursor-pointer simulator-pill rounded-full border border-[#d2d2d7] bg-white px-4 py-3 text-sm font-semibold text-[#1d1d1f] transition hover:bg-[#f5f5f7]">{adminMode ? (english ? "Reset configuration" : "Repor configuração") : (english ? "Reset" : "Recomeçar")}</button></div>
           </div>
           <p className="mt-4 text-xs leading-relaxed text-[#86868b]">{english ? "VAT is added at the applicable rate. Delivery is not included. Configuration is subject to technical validation." : "Ao valor acresce IVA à taxa legal. Transporte não incluído. Configuração sujeita a validação técnica."}</p>
           {!matchingFrame && <p className="mt-3 rounded-[30px] bg-amber-50 p-3 text-sm text-amber-800">{english ? "No frame with this height and depth combination is available in catalogue ref. 2." : "Não existe um bastidor com esta combinação de altura e profundidade no catálogo ref. 2."}</p>}
         </div>
         {isLengthUnavailable ? <div className="order-1 min-w-0 rounded-[30px] border border-[#e5e5e7] bg-white p-7 shadow-[0_12px_40px_rgba(0,0,0,0.05)] lg:order-2"><h2 className="text-xl font-semibold tracking-tight text-[#1d1d1f]">{english ? "2D preview" : "Pré-visualização 2D"}</h2><p className="mt-4 rounded-[30px] bg-red-50 p-4 text-sm text-red-700">{english ? "Lengths over 30.00 m are not available." : "Comprimentos superiores a 30,00 m não estão disponíveis."}</p></div> : <div className="order-1 min-w-0 lg:order-2"><RackPreview modules={modules} height={height} levels={levels} rowCount={rowCount} capacityLabel={`${english ? "Maximum load per beam pair" : "Carga máxima por par de vigas"}: ${capacityIsMinimum ? "> " : ""}${levelCapacity.toLocaleString(english ? "en-IE" : "pt-PT")} kg`} solutions={solutions} selectedSolutionId={selectedSolutionId} onSelectSolution={setSelectedSolutionId} english={english} /></div>}
       </div>
-      <SimulatorOrderModal open={orderOpen} onClose={() => setOrderOpen(false)} total={orderQuoteRef.current?.total ?? discountedEstimate} details={orderQuoteRef.current?.details} items={orderQuoteRef.current?.items} discountPercent={orderQuoteRef.current?.discountPercent ?? discountRate * 100} drawingRef={drawingRef} english={english} />
+      {!adminMode && <SimulatorOrderModal open={orderOpen} onClose={() => setOrderOpen(false)} total={orderQuoteRef.current?.total ?? discountedEstimate} details={orderQuoteRef.current?.details} items={orderQuoteRef.current?.items} discountPercent={orderQuoteRef.current?.discountPercent ?? discountRate * 100} drawingRef={drawingRef} english={english} />}
     </section>
   );
 }

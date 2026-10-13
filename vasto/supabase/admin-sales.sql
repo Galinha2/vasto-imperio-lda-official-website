@@ -10,6 +10,7 @@ create table if not exists public.admin_sales (
 create index if not exists admin_sales_uploaded_at_idx on public.admin_sales (uploaded_at desc);
 alter table public.admin_sales enable row level security;
 revoke all on public.admin_sales from anon, authenticated;
+grant usage on schema public to service_role;
 grant select, insert, update on public.admin_sales to service_role;
 
 insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)

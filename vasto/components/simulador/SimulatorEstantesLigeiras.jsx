@@ -255,7 +255,7 @@ function ShelfPreview({ modules, height, depth, levels, rowCount, bracedIndexes,
   );
 }
 
-export default function SimulatorEstantesLigeiras({ onQuoteDataChange }) {
+export default function SimulatorEstantesLigeiras({ onQuoteDataChange, adminMode = false }) {
   const [orderOpen, setOrderOpen] = useState(false);
   const orderQuoteRef = useRef(null);
   const drawingRef = useRef(null);
@@ -352,18 +352,18 @@ export default function SimulatorEstantesLigeiras({ onQuoteDataChange }) {
   }
 
   return (
-    <section ref={drawingRef} className="min-h-screen bg-[#f8f8fa] px-4 py-12 sm:px-6 lg:px-10 lg:py-16">
-      <header className="mx-auto mb-9 max-w-[1800px] sm:mb-12">
+    <section ref={drawingRef} className={adminMode ? "min-h-0 bg-transparent p-0" : "min-h-screen bg-[#f8f8fa] px-4 py-12 sm:px-6 lg:px-10 lg:py-16"}>
+      {!adminMode && <header className="mx-auto mb-9 max-w-[1800px] sm:mb-12">
         <p className="mb-3 mt-[35px] text-xs font-semibold uppercase tracking-[0.16em] text-[#6e6e73] lg:mt-5">{english ? "Configurator · Light-duty shelving" : "Configurador · Estantes ligeiras"}</p>
         <h1 className="max-w-4xl text-4xl font-semibold leading-[1.05] tracking-[-0.045em] text-[#1d1d1f] sm:text-5xl lg:text-6xl">{english ? "Shelving tailored to your space." : "Estantes à medida do seu espaço."}</h1>
         <p className="mt-4 max-w-2xl text-base leading-relaxed text-[#6e6e73] sm:text-lg">{english ? "Set the height, depth and length of your row. The estimate uses prices from the light-duty product catalogue." : "Configure a altura, profundidade e comprimento da sua fila. A estimativa usa os preços dos produtos ligeiros do catálogo."}</p>
-      </header>
-      <div className="mx-auto grid max-w-[1800px] gap-5 lg:grid-cols-[minmax(360px,0.78fr)_minmax(0,1.75fr)] xl:gap-7">
+      </header>}
+      {!adminMode && <div className="mx-auto grid max-w-[1800px] gap-5 lg:grid-cols-[minmax(360px,0.78fr)_minmax(0,1.75fr)] xl:gap-7">
         <div className="flex justify-start"><SimulatorSectionTabs group="storage" active="ligeiras" /></div>
         <div className="hidden lg:block" aria-hidden="true" />
-      </div>
+      </div>}
 
-      <div className="mx-auto grid max-w-[1800px] items-start gap-5 lg:grid-cols-[minmax(360px,0.78fr)_minmax(0,1.75fr)] xl:gap-7">
+      <div className={`mx-auto grid max-w-[1800px] items-start gap-5 lg:grid-cols-[minmax(360px,0.78fr)_minmax(0,1.75fr)] xl:gap-7 ${adminMode ? "lg:gap-4 xl:gap-5" : ""}`}>
         <div className="order-2 w-full rounded-[30px] border border-[#e5e5e7] bg-white p-5 shadow-[0_12px_40px_rgba(0,0,0,0.05)] sm:p-7 lg:order-1 lg:p-8">
           <div className="mb-6"><p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#86868b]">{english ? "1 · Configuration" : "1 · Configuração"}</p><h2 className="mt-1 text-2xl font-semibold tracking-tight text-[#1d1d1f]">{english ? "Choose dimensions" : "Escolha as medidas"}</h2></div>
           <div className="grid grid-cols-1 gap-x-4 gap-y-5 sm:grid-cols-2">
@@ -376,12 +376,12 @@ export default function SimulatorEstantesLigeiras({ onQuoteDataChange }) {
 
           <div className="mt-7 border-t border-[#e5e5e7] pt-6"><p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#86868b]">{english ? "Price estimate" : "Estimativa de preço"}</p><div className="mt-1 flex flex-wrap items-baseline gap-x-2 gap-y-1"><p className="text-4xl font-semibold tracking-[-0.04em] text-(--orange)">{isLengthUnavailable ? (english ? "Unavailable" : "Indisponível") : formatPrice(discountedEstimate)}</p>{!isLengthUnavailable && <span className="text-sm font-medium text-[#86868b]">{english ? "+ VAT" : "+ IVA"}</span>}</div><p className="mt-1 text-sm text-[#6e6e73]">{english ? `Total price for ${rowCount} identical row${rowCount === 1 ? "" : "s"}.` : `Preço total para ${rowCount} ${rowCount === 1 ? "fila" : "filas"} iguais.`}</p>{discountRate > 0 && !isLengthUnavailable && <p className="mt-2 text-sm font-semibold text-[#0879C0]">{english ? `${discountRate * 100}% discount applied: −${formatPrice(discountAmount)}` : `Desconto de ${discountRate * 100}% aplicado: −${formatPrice(discountAmount)}`}</p>}
             {!isLengthUnavailable && <div className="mt-5 grid grid-cols-2 gap-x-4 gap-y-3 rounded-[30px] bg-[#f5f5f7] p-5 text-sm"><p className="col-span-2 flex items-baseline justify-between gap-2 border-b border-[#e5e5e7] pb-2"><span className="text-[#6e6e73]">{english ? "Total row length" : "Comprimento total das filas"}</span><strong className="font-semibold text-[#1d1d1f]">{formatMeters(finalLength * rowCount)}</strong></p><p><span className="block text-xs text-[#86868b]">{english ? "Length per row" : "Comprimento por fila"}</span><strong className="mt-0.5 block font-semibold text-[#1d1d1f]">{formatMeters(finalLength)}</strong></p><p><span className="block text-xs text-[#86868b]">{english ? "Height" : "Altura"}</span><strong className="mt-0.5 block font-semibold text-[#1d1d1f]">{formatMeters(height)}</strong></p><p><span className="block text-xs text-[#86868b]">{english ? "Depth" : "Profundidade"}</span><strong className="mt-0.5 block font-semibold text-[#1d1d1f]">{formatMeters(depth)}</strong></p><p><span className="block text-xs text-[#86868b]">{english ? "Module distribution" : "Distribuição dos módulos"}</span><strong className="mt-0.5 block font-semibold text-[#1d1d1f]">{widthDistribution.map(({ width, count }) => `${count} × ${formatMeters(width)}`).join(" · ")}</strong></p><p><span className="block text-xs text-[#86868b]">{english ? "Levels" : "Níveis"}</span><strong className="mt-0.5 block font-semibold text-[#1d1d1f]">{levels}</strong></p><p className="col-span-2"><span className="block text-xs text-[#86868b]">{english ? "Shelves by length" : "Tabuleiros por medida"}</span><strong className="mt-0.5 block font-semibold text-[#1d1d1f]">{shelfDistribution.map(({ width, count }) => `${count} × ${formatMeters(width)}`).join(" · ")}</strong></p><p className="col-span-2"><span className="block text-xs text-[#86868b]">{english ? "Braces by length" : "Travamentos por medida"}</span><strong className="mt-0.5 block font-semibold text-[#1d1d1f]">{braceDistribution.map(({ width, count }) => `${count} × ${formatMeters(width)}`).join(" · ") || (english ? "None" : "Nenhum")}</strong></p><p><span className="block text-xs text-[#86868b]">{english ? "Frames" : "Bastidores"}</span><strong className="mt-0.5 block font-semibold text-[#1d1d1f]">{frameCountPerRow * rowCount}</strong></p><p><span className="block text-xs text-[#86868b]">{english ? "Maximum load per level" : "Carga máxima por nível"}</span><strong className="mt-0.5 block font-semibold text-(--orange)">{shelfCapacity} kg</strong></p></div>}
-            <div className="mt-5 grid grid-cols-[1fr_auto] gap-3"><button type="button" disabled={isLengthUnavailable} onClick={() => setOrderOpen(true)} className={`simulator-pill flex cursor-pointer items-center justify-center rounded-full bg-(--orange) px-4 py-3 text-sm font-semibold text-white shadow-sm transition hover:brightness-95 disabled:cursor-not-allowed disabled:opacity-50`}>{english ? "Order" : "Encomendar"}</button><button type="button" onClick={reset} className="simulator-pill cursor-pointer rounded-full border border-[#d2d2d7] bg-white px-4 py-3 text-sm font-semibold text-[#1d1d1f] transition hover:bg-[#f5f5f7]">{english ? "Reset" : "Recomeçar"}</button></div>
+            <div className={`mt-5 grid gap-3 ${adminMode ? "grid-cols-1" : "grid-cols-[1fr_auto]"}`}>{!adminMode && <button type="button" disabled={isLengthUnavailable} onClick={() => setOrderOpen(true)} className="simulator-pill flex cursor-pointer items-center justify-center rounded-full bg-(--orange) px-4 py-3 text-sm font-semibold text-white shadow-sm transition hover:brightness-95 disabled:cursor-not-allowed disabled:opacity-50">{english ? "Order" : "Encomendar"}</button>}<button type="button" onClick={reset} className="simulator-pill cursor-pointer rounded-full border border-[#d2d2d7] bg-white px-4 py-3 text-sm font-semibold text-[#1d1d1f] transition hover:bg-[#f5f5f7]">{adminMode ? (english ? "Reset configuration" : "Repor configuração") : (english ? "Reset" : "Recomeçar")}</button></div>
           </div><p className="mt-4 text-xs leading-relaxed text-[#86868b]">{english ? "VAT is added at the applicable rate. Delivery is not included. Configuration is subject to technical validation." : "Ao valor acresce IVA à taxa legal. Transporte não incluído. Configuração sujeita a validação técnica."}</p>
         </div>
         <div className="order-1 min-w-0 lg:order-2"><ShelfPreview modules={modules} height={height} depth={depth} levels={levels} rowCount={rowCount} bracedIndexes={bracedIndexes} capacityLabel={`${english ? "Maximum load per level" : "Carga máxima por nível"}: ${shelfCapacity.toLocaleString(english ? "en-IE" : "pt-PT")} kg`} solutions={solutions} selectedSolutionId={selectedSolutionId} onSelectSolution={setSelectedSolutionId} english={english}/></div>
       </div>
-      <SimulatorOrderModal open={orderOpen} onClose={() => setOrderOpen(false)} total={orderQuoteRef.current?.total ?? discountedEstimate} details={orderQuoteRef.current?.details} items={orderQuoteRef.current?.items} discountPercent={orderQuoteRef.current?.discountPercent ?? discountRate * 100} drawingRef={drawingRef} english={english} />
+      {!adminMode && <SimulatorOrderModal open={orderOpen} onClose={() => setOrderOpen(false)} total={orderQuoteRef.current?.total ?? discountedEstimate} details={orderQuoteRef.current?.details} items={orderQuoteRef.current?.items} discountPercent={orderQuoteRef.current?.discountPercent ?? discountRate * 100} drawingRef={drawingRef} english={english} />}
     </section>
   );
 }

@@ -24,6 +24,10 @@ Se o bucket `sales-pdfs` já existir, executar novamente `supabase/admin-sales.s
 
 Uma configuração incompleta na Vercel bloqueia o registo de vendas, para evitar guardar documentos num disco temporário. Este projeto não cria uma conta ou um projeto Supabase automaticamente.
 
+### Diagnóstico de erros de ligação
+
+Se a administração indicar que o Supabase recusou o acesso, confirme na Vercel que `SUPABASE_URL` e `SUPABASE_SERVICE_ROLE_KEY` pertencem ao mesmo projeto e que a chave é a chave secreta `service_role` (não uma chave `anon`/publishable). Se indicar que o recurso não foi encontrado, execute `supabase/admin-sales.sql` no SQL Editor desse projeto e confirme o nome do bucket. Depois de alterar variáveis ou SQL, faça novo deploy. Para outros erros, consulte os logs da função `/api/admin/sales`; o log `[admin-sales-storage]` regista apenas o método, endpoint sem parâmetros, estado HTTP e código devolvido pelo Supabase — nunca a chave nem o conteúdo das vendas.
+
 ## Desenvolvimento local
 
 Foram adicionadas credenciais locais a `.env.local`, que é ignorado pelo Git. Sem Supabase, os dados são guardados na pasta privada `.admin-data`, também ignorada pelo Git. Para escolher outro disco local persistente, definir `ADMIN_DATA_DIR`. Reiniciar o servidor de desenvolvimento depois de alterar variáveis de ambiente.
@@ -32,7 +36,7 @@ Os dados guardados localmente **não são sincronizados automaticamente** com Su
 
 ## Utilização
 
-- Importar um ou vários PDFs exportados por `/orcamento/admin` ou `/simulador/admin`, até 6 MB por ficheiro.
+- Importar um ou vários PDFs exportados pelas secções Orçamentos ou Simulador da área `/admin`, até 6 MB por ficheiro.
 - Cliente, NIF, data, total sem IVA, IVA e total com IVA são extraídos automaticamente. Os documentos novos contêm também metadados para importação exata; os antigos são lidos pelo texto e pelas posições dos campos.
 - Os PDFs entram como **Em preparação**. Alterar o seletor para **Vendida** quando a venda estiver confirmada.
 - O mês corresponde à **data do orçamento**. Alterar o estado não muda a data do documento.

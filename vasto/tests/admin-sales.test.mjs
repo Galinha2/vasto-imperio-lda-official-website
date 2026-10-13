@@ -194,3 +194,27 @@ test("Supabase adapter stores private PDFs, lists records, changes status and re
     await assert.rejects(createSale(record, buffer), { status: 409 });
   } finally { globalThis.fetch = realFetch; delete process.env.SUPABASE_URL; delete process.env.SUPABASE_SERVICE_ROLE_KEY; }
 });
+
+test("Supabase failures report actionable setup guidance without logging credentials", async () => {
+  const realFetch = globalThis.fetch;
+  const realError = console.error;
+  const originalUrl = process.env.SUPABASE_URL;
+  const originalKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  const logs = [];
+  process.env.SUPABASE_URL = "https://test-project.supabase.co";
+  process.env.SUPABASE_SERVICE_ROLE_KEY = "private-test-service-role-key";
+  globalThis.fetch = async () => Response.json({ code: "PGRST205", message: "table missing" }, { status: 404 });
+  console.error = (...args) => logs.push(args);
+  try {
+    await assert.rejects(listSales(), /execute supabase\/admin-sales\.sql/);
+    assert.match(JSON.stringify(logs), /PGRST205/);
+    assert.doesNotMatch(JSON.stringify(logs), /private-test-service-role-key/);
+  } finally {
+    globalThis.fetch = realFetch;
+    console.error = realError;
+    if (originalUrl === undefined) delete process.env.SUPABASE_URL;
+    else process.env.SUPABASE_URL = originalUrl;
+    if (originalKey === undefined) delete process.env.SUPABASE_SERVICE_ROLE_KEY;
+    else process.env.SUPABASE_SERVICE_ROLE_KEY = originalKey;
+  }
+});

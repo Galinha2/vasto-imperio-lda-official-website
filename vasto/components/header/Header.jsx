@@ -47,7 +47,12 @@ export default function Header() {
     };
   }, []);
 
-  if (pathname === "/admin" || pathname.startsWith("/admin/")) return null;
+  if (
+    pathname === "/admin" ||
+    pathname.startsWith("/admin/") ||
+    pathname === "/orcamento/admin" ||
+    pathname === "/simulador/admin"
+  ) return null;
 
   return (
     <div

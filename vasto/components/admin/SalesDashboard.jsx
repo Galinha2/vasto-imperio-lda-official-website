@@ -2,8 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
-import { IoAddOutline, IoArrowUpOutline, IoCheckmarkCircleOutline, IoCloudUploadOutline, IoDocumentTextOutline, IoLogOutOutline, IoSearchOutline, IoStatsChartOutline, IoTimeOutline, IoOpenOutline, IoCloseOutline } from "react-icons/io5";
+import { IoAddOutline, IoArrowUpOutline, IoCheckmarkCircleOutline, IoCloudUploadOutline, IoDocumentTextOutline, IoSearchOutline, IoTimeOutline, IoOpenOutline, IoCloseOutline } from "react-icons/io5";
 
 const months = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
 const currency = new Intl.NumberFormat("pt-PT", { style: "currency", currency: "EUR" });
@@ -87,11 +86,6 @@ export default function SalesDashboard() {
     finally { setChanging(""); }
   }
 
-  async function logout() {
-    try { await api("/api/admin/session", { method: "DELETE" }); router.replace("/admin/login"); router.refresh(); }
-    catch (failure) { setError(failure.message); }
-  }
-
   const years = [...new Set([year, String(new Date().getFullYear()), ...sales.map((sale) => sale.issuedAt.slice(0, 4))])].sort().reverse();
   const period = sales.filter((sale) => sale.issuedAt.startsWith(year) && (month === "all" || sale.issuedAt.slice(5, 7) === month));
   const sold = period.filter((sale) => sale.status === "vendida");
@@ -104,18 +98,7 @@ export default function SalesDashboard() {
   const controls = "h-10 rounded-xl border border-[#e5e5e7] bg-white px-3 text-sm text-[#424245] outline-none focus:border-[#0071e3] focus:ring-2 focus:ring-[#0071e3]/10";
 
   return (
-    <div className="min-h-screen lg:grid lg:grid-cols-[230px_minmax(0,1fr)]">
-      <aside className="border-b border-[#e5e5e7] bg-white px-5 py-5 lg:sticky lg:top-0 lg:flex lg:h-screen lg:flex-col lg:border-b-0 lg:border-r lg:px-6 lg:py-8">
-        <div className="flex items-center gap-3"><img src="/favicon.png" alt="" width="36" height="36" className="h-9 w-9 object-contain" /><div><p className="text-sm font-semibold tracking-tight">Vasto Império</p><p className="mt-0.5 text-[11px] text-[#86868b]">Área de administração</p></div></div>
-        <nav aria-label="Administração" className="mt-6 flex gap-2 lg:mt-10 lg:flex-col">
-          <span aria-current="page" className="flex items-center gap-3 rounded-xl bg-[#edf4ff] px-4 py-3 text-sm font-semibold text-[#0071e3]"><IoStatsChartOutline className="text-lg" />Vendas</span>
-          <Link href="/orcamento/admin" className="flex items-center gap-3 rounded-xl px-4 py-3 text-sm text-[#6e6e73] transition hover:bg-[#f5f5f7]"><IoDocumentTextOutline className="text-lg" />Orçamentos</Link>
-          <Link href="/simulador/admin" className="hidden items-center gap-3 rounded-xl px-4 py-3 text-sm text-[#6e6e73] transition hover:bg-[#f5f5f7] sm:flex"><IoAddOutline className="text-lg" />Simulador</Link>
-        </nav>
-        <div className="mt-4 flex items-center justify-between lg:mt-auto lg:block"><p className="hidden text-[11px] leading-relaxed text-[#a1a1a6] lg:block">Os seus documentos.<br />A sua visão do negócio.</p><button onClick={logout} type="button" className="flex cursor-pointer items-center gap-3 rounded-xl px-4 py-2 text-sm text-[#86868b] transition hover:bg-[#f5f5f7] hover:text-[#1d1d1f] lg:mt-6 lg:w-full"><IoLogOutOutline className="text-lg" />Terminar sessão</button></div>
-      </aside>
-
-      <main className="min-w-0 px-5 py-8 sm:px-8 lg:px-10 lg:py-10 xl:px-14">
+    <main className="min-w-0 px-5 py-8 sm:px-8 lg:px-10 lg:py-10 xl:px-14">
         <div className="mx-auto max-w-[1440px]">
           <header className="flex flex-col justify-between gap-5 sm:flex-row sm:items-center">
             <div><p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[#86868b]">Visão geral</p><h1 className="mt-2 text-4xl font-semibold tracking-[-0.055em] sm:text-[44px]">As suas vendas.</h1><p className="mt-2 text-sm text-[#86868b]">Uma visão clara de cada documento e de cada mês.</p></div>
@@ -154,7 +137,6 @@ export default function SalesDashboard() {
           <button type="button" disabled={uploading || loading} onClick={() => inputRef.current?.click()} onDragOver={(event) => { event.preventDefault(); if (!uploading && !loading) setDragging(true); }} onDragLeave={() => setDragging(false)} onDrop={(event) => { event.preventDefault(); setDragging(false); importFiles(event.dataTransfer.files); }} className={`mt-6 flex w-full cursor-pointer flex-col items-center justify-center gap-3 rounded-[24px] border-2 border-dashed p-7 transition disabled:cursor-wait disabled:opacity-60 sm:flex-row sm:gap-5 ${dragging ? "border-[#0071e3] bg-[#edf4ff]" : "border-[#dcdce2] hover:border-[#a9c7ec] hover:bg-white"}`}><IoCloudUploadOutline className="text-3xl text-[#0071e3]" /><span className="text-center sm:text-left"><span className="block text-sm font-semibold">{uploading ? "A ler e registar os documentos…" : "Arraste os seus PDFs para aqui."}</span><span className="mt-1 block text-xs text-[#86868b]">Ou clique para escolher · Orçamentos e simulador · Até 6 MB por PDF</span></span></button>
           <p className="mt-5 text-center text-[11px] leading-relaxed text-[#a1a1a6]">Os meses correspondem à data do orçamento. Apenas os documentos marcados como «Vendida» entram nos totais de vendas.</p>
         </div>
-      </main>
-    </div>
+    </main>
   );
 }

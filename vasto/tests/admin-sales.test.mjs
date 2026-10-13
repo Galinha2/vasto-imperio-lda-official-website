@@ -8,6 +8,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { signIn, verifySession, assertOrigin, assertSession, SESSION_COOKIE } from "../lib/admin/auth.mjs";
 import { parseSalePdf } from "../lib/admin/pdf.mjs";
+import { saveSimulatorOrderToSales } from "../lib/admin/simulator-order-sales.mjs";
 import { createSale, createSaleUpload, readSaleUpload, deleteSaleUpload, addSaleImage, getSaleImage, deleteSaleImage, deleteSale, updateSaleWorkflow, getPdf, getSale, listSales, storageMode } from "../lib/admin/store.mjs";
 
 const require = createRequire(import.meta.url);
@@ -273,6 +274,56 @@ test("Supabase failures report actionable setup guidance without logging credent
   } finally {
     globalThis.fetch = realFetch;
     console.error = realError;
+    if (originalUrl === undefined) delete process.env.SUPABASE_URL;
+    else process.env.SUPABASE_URL = originalUrl;
+    if (originalKey === undefined) delete process.env.SUPABASE_SERVICE_ROLE_KEY;
+    else process.env.SUPABASE_SERVICE_ROLE_KEY = originalKey;
+  }
+});
+
+test("public simulator orders are saved as confirmed sales with their image and order details", async () => {
+  const pdf = pdfWithMetadata({ ...metadata, customerName: "Encomenda pública", issuedAt: "2026-10-13" });
+  const image = Buffer.from([0xff, 0xd8, 0xff]);
+  const orderDetails = { email: "cliente@example.com", artigos: [{ produto: "Rack", unidades: 1, total: 180 }] };
+  assert.equal(await saveSimulatorOrderToSales({
+    pdfBuffer: pdf,
+    imageBuffer: image,
+    imageName: "desenho-estante.jpg",
+    imageContentType: "image/jpeg",
+    orderDetails,
+  }), true);
+
+  const parsed = await parseSalePdf(pdf, "encomenda-simulador.pdf");
+  const sale = await getSale(parsed.id);
+  assert.equal(sale.status, "confirmada");
+  assert.equal(sale.saleDate, "2026-10-13");
+  assert.deepEqual(sale.orderDetails, orderDetails);
+  assert.equal(sale.images.length, 1);
+  assert.deepEqual((await getSaleImage(sale.id, sale.images[0].id)).buffer, image);
+  await deleteSale(sale.id);
+});
+
+test("public simulator order sales sync fails open when Supabase is unavailable", async () => {
+  const originalVercel = process.env.VERCEL;
+  const originalUrl = process.env.SUPABASE_URL;
+  const originalKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  const originalError = console.error;
+  process.env.VERCEL = "1";
+  delete process.env.SUPABASE_URL;
+  delete process.env.SUPABASE_SERVICE_ROLE_KEY;
+  console.error = () => {};
+  try {
+    assert.equal(await saveSimulatorOrderToSales({
+      pdfBuffer: pdfWithMetadata(),
+      imageBuffer: Buffer.from([0xff, 0xd8, 0xff]),
+      imageName: "desenho-estante.jpg",
+      imageContentType: "image/jpeg",
+      orderDetails: {},
+    }), false);
+  } finally {
+    console.error = originalError;
+    if (originalVercel === undefined) delete process.env.VERCEL;
+    else process.env.VERCEL = originalVercel;
     if (originalUrl === undefined) delete process.env.SUPABASE_URL;
     else process.env.SUPABASE_URL = originalUrl;
     if (originalKey === undefined) delete process.env.SUPABASE_SERVICE_ROLE_KEY;

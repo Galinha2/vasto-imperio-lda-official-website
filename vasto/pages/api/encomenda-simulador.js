@@ -1,6 +1,7 @@
 import nodemailer from "nodemailer";
 import formidable from "formidable";
 import fs from "fs";
+import { saveSimulatorOrderToSales } from "../../lib/admin/simulator-order-sales.mjs";
 
 export const config = { api: { bodyParser: false } };
 
@@ -122,6 +123,31 @@ export default async function handler(req, res) {
       attachments: [
         { filename: imageFilename, content: imageAttachment, contentType: "image/jpeg" },
       ],
+    });
+    const pdfBuffer = fs.readFileSync(uploadedPdf.filepath);
+    const imageBuffer = imageAttachment;
+    const cleanText = (value, maxLength) => typeof value === "string" ? value.trim().slice(0, maxLength) : "";
+    const salesOrderDetails = {
+      email: cleanText(email, 254),
+      telefone: cleanText(telefone, 40),
+      moradaFiscal: cleanText(moradaFiscal, 500),
+      moradaEnvio: cleanText(shippingAddress, 500),
+      montagem: equipmentOrder ? null : Boolean(montagem),
+      observacoes: cleanText(observacoes, 2000),
+      detalhes: cleanText(detalhes, 8000),
+      artigos: items.filter((item) => item && typeof item === "object").slice(0, 100).map((item) => ({
+        refCompleta: cleanText(item.refCompleta, 80),
+        produto: cleanText(item.produto, 180),
+        unidades: Number.isFinite(Number(item.unidades)) ? Number(item.unidades) : 0,
+        total: Number.isFinite(Number(item.total)) ? Number(item.total) : 0,
+      })),
+    };
+    await saveSimulatorOrderToSales({
+      pdfBuffer,
+      imageBuffer,
+      imageName: imageFilename,
+      imageContentType: uploadedImage.mimetype || "image/jpeg",
+      orderDetails: salesOrderDetails,
     });
     return res.status(200).json({ message: "Encomenda enviada com sucesso." });
   } catch (error) {

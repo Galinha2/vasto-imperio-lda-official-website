@@ -508,9 +508,32 @@ export default function SalesDashboard() {
                         {imagePanel === sale.id && (
                           <tr key={`${sale.id}-images`} className="border-t border-[#f0f0f2] bg-[#fbfbfd]">
                             <td colSpan={9} className="px-5 py-5 sm:px-6">
+                              {sale.orderDetails && (
+                                <section className="mb-5 rounded-2xl border border-[#e8e8ed] bg-white p-4 sm:p-5">
+                                  <h3 className="text-sm font-semibold text-[#1d1d1f]">Detalhes da encomenda</h3>
+                                  <dl className="mt-3 grid gap-x-6 gap-y-3 text-xs sm:grid-cols-2 lg:grid-cols-3">
+                                    <div><dt className="text-[#86868b]">Email</dt><dd className="mt-0.5 break-all font-medium text-[#424245]">{sale.orderDetails.email || "—"}</dd></div>
+                                    <div><dt className="text-[#86868b]">Contacto telefónico</dt><dd className="mt-0.5 font-medium text-[#424245]">{sale.orderDetails.telefone || "—"}</dd></div>
+                                    <div><dt className="text-[#86868b]">Montagem</dt><dd className="mt-0.5 font-medium text-[#424245]">{sale.orderDetails.montagem === null ? "Não aplicável" : sale.orderDetails.montagem ? "Sim" : "Não"}</dd></div>
+                                    <div><dt className="text-[#86868b]">Morada fiscal</dt><dd className="mt-0.5 font-medium text-[#424245]">{sale.orderDetails.moradaFiscal || "—"}</dd></div>
+                                    <div><dt className="text-[#86868b]">Morada de envio</dt><dd className="mt-0.5 font-medium text-[#424245]">{sale.orderDetails.moradaEnvio || "—"}</dd></div>
+                                    {sale.orderDetails.observacoes && <div><dt className="text-[#86868b]">Observações</dt><dd className="mt-0.5 whitespace-pre-wrap font-medium text-[#424245]">{sale.orderDetails.observacoes}</dd></div>}
+                                  </dl>
+                                  {sale.orderDetails.detalhes && <div className="mt-4 border-t border-[#f0f0f2] pt-3"><p className="text-[11px] font-medium text-[#86868b]">Configuração</p><p className="mt-1 whitespace-pre-wrap text-xs leading-relaxed text-[#424245]">{sale.orderDetails.detalhes}</p></div>}
+                                  {sale.orderDetails.artigos?.length > 0 && (
+                                    <div className="mt-4 overflow-x-auto border-t border-[#f0f0f2] pt-3">
+                                      <p className="mb-2 text-[11px] font-medium text-[#86868b]">Artigos encomendados</p>
+                                      <table className="w-full min-w-[420px] text-left text-xs">
+                                        <thead className="text-[10px] uppercase tracking-wide text-[#86868b]"><tr><th className="py-1 pr-3">Ref.</th><th className="py-1 pr-3">Artigo</th><th className="py-1 pr-3 text-right">Qtd.</th><th className="py-1 text-right">Total</th></tr></thead>
+                                        <tbody>{sale.orderDetails.artigos.map((item, index) => <tr key={`${item.refCompleta}-${index}`} className="border-t border-[#f0f0f2] text-[#424245]"><td className="py-2 pr-3">{item.refCompleta || "—"}</td><td className="py-2 pr-3">{item.produto || "—"}</td><td className="py-2 pr-3 text-right">{item.unidades}</td><td className="py-2 text-right">{currency.format(item.total)}</td></tr>)}</tbody>
+                                      </table>
+                                    </div>
+                                  )}
+                                </section>
+                              )}
                               <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
                                 <div>
-                                  <h3 className="text-sm font-semibold text-[#1d1d1f]">Imagens do orçamento</h3>
+                                  <h3 className="text-sm font-semibold text-[#1d1d1f]">Imagens do registo</h3>
                                   <p className="mt-1 text-xs text-[#86868b]">Opcional · JPG, PNG ou WebP · até 4 MB por imagem · máximo 10 imagens.</p>
                                 </div>
                                 <input

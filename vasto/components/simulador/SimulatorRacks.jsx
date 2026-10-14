@@ -191,7 +191,7 @@ function RackPreview({ modules, height, levels, rowCount, capacityLabel, solutio
             const tabWidth = Math.max(2, uprightWidth * 0.5);
             return <g key={`beam-${moduleIndex}`}>
               {Array.from({ length: levels }, (_, levelIndex) => {
-                const levelY = levels === 1 ? top + topLevelInset : bottom - floorClearance - (levelIndex * (rackHeight - floorClearance)) / Math.max(1, levels - 1);
+                const levelY = levels === 1 ? (top + bottom + beamHeight) / 2 : bottom - floorClearance - (levelIndex * (rackHeight - floorClearance)) / Math.max(1, levels - 1);
                 const y = levelIndex === levels - 1 ? Math.max(levelY, top + topLevelInset) : levelY;
                 const beamTop = y - beamHeight;
                 const tabY = beamTop - (tabHeight - beamHeight) / 2;

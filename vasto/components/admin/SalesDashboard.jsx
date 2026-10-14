@@ -1,6 +1,6 @@
 "use client";
 
-import { groupQuotes } from "@/lib/admin/quote-groups.mjs";
+import { groupQuotes, sameQuoteCustomer } from "@/lib/admin/quote-groups.mjs";
 import MetricCard from "./MetricCard";
 
 import { Fragment, useEffect, useId, useRef, useState } from "react";
@@ -197,7 +197,9 @@ export default function SalesDashboard() {
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
   const [expandedQuoteGroups, setExpandedQuoteGroups] = useState({});
-  const [groupQuotesEnabled, setGroupQuotesEnabled] = useState(true);
+  const [draggedQuoteId, setDraggedQuoteId] = useState("");
+  const [quoteDropTarget, setQuoteDropTarget] = useState("");
+  const [groupingQuotes, setGroupingQuotes] = useState(false);
   const [salesDetail, setSalesDetail] = useState("");
   const [unresolvedExpanded, setUnresolvedExpanded] = useState(false);
   const unresolvedReminderRef = useRef(null);
@@ -297,6 +299,22 @@ export default function SalesDashboard() {
       }
       if (failures.length) setError(failures.join("\n"));
     } finally { setUploading(false); if (inputRef.current) inputRef.current.value = ""; }
+  }
+
+  async function changeQuoteGroup(sourceId, targetId) {
+    if (groupingQuotes || (targetId && sourceId === targetId)) return;
+    setGroupingQuotes(true); setError(""); setDraggedQuoteId(""); setQuoteDropTarget("");
+    try {
+      const result = await api("/api/admin/sales/groups", {
+        method: targetId ? "POST" : "DELETE", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(targetId ? { sourceId, targetId } : { id: sourceId }),
+      });
+      setSales(result.sales);
+      setNotice(targetId ? "Orçamentos agrupados. Clique na bolinha para ver as versões." : "Orçamento separado do grupo.");
+    } catch (failure) {
+      setError(failure.message);
+      try { const result = await api("/api/admin/sales"); setSales(result.sales); } catch { /* Keep the grouping error visible. */ }
+    } finally { setGroupingQuotes(false); }
   }
 
   async function updateWorkflow(sale, update) {
@@ -457,7 +475,7 @@ export default function SalesDashboard() {
   const unresolvedSales = sales
     .filter((sale) => !isResolved(sale))
     .sort((a, b) => (unresolvedDate(a) || "9999-99-99").localeCompare(unresolvedDate(b) || "9999-99-99"));
-  const quoteGroups = groupQuotesEnabled ? groupQuotes(visibleSales) : visibleSales.map((sale) => ({ id: sale.id, sales: [sale] }));
+  const quoteGroups = groupQuotes(visibleSales);
   const groupBySale = new Map(quoteGroups.flatMap((group) => group.sales.map((sale) => [sale.id, group])));
   const tableSales = quoteGroups.flatMap((group) => group.sales);
 
@@ -823,7 +841,7 @@ export default function SalesDashboard() {
             <div className="flex flex-col gap-4 border-b border-[#f0f0f2] p-5 sm:p-7 xl:flex-row xl:items-center xl:justify-between">
               <div className="shrink-0"><h2 className="text-base font-semibold tracking-tight">Encomendas e documentos</h2><p className="mt-1 text-xs text-[#86868b]">{quoteGroups.length} linhas · {visibleSales.length} de {period.length} {visibleSales.length === 1 ? "registo" : "registos"} · {periodLabel}</p></div>
               <div className="flex flex-wrap items-center justify-end gap-2 xl:flex-nowrap">
-                <label className="flex shrink-0 cursor-pointer items-center gap-2 text-xs text-[#6e6e73]"><input type="checkbox" checked={groupQuotesEnabled} onChange={(event) => setGroupQuotesEnabled(event.target.checked)} className="accent-[#0879c0]" />Agrupar variantes</label>
+
                 <label className="relative w-full sm:w-[240px] sm:max-w-[320px]">
                   <span className="sr-only">Pesquisar cliente, NIF ou documento</span>
                   <IoSearchOutline className="absolute left-3 top-3 text-[#a1a1a6]" />
@@ -882,6 +900,7 @@ export default function SalesDashboard() {
               </div>
             </div>
 
+            <p className="border-b border-[#f0f0f2] px-5 py-2 text-[11px] text-[#86868b]">{groupingQuotes ? "A guardar agrupamento…" : "Arraste um orçamento para cima de outro para agrupar. O nome do cliente ou o NIF tem de ser igual."}</p>
             {loading ? <div role="status" className="p-16 text-center text-sm text-[#86868b]">A carregar os seus documentos…</div> : visibleSales.length ? (
               <div className="overflow-x-auto">
                 <table className="w-full min-w-[1000px] table-fixed text-left">
@@ -916,15 +935,40 @@ export default function SalesDashboard() {
                       <Fragment key={sale.id}>
                         {(groupBySale.get(sale.id).sales[0].id === sale.id || expandedQuoteGroups[groupBySale.get(sale.id).id]) && <>
 
-                        <tr className={`border-t border-l-2 transition ${isResolved(sale) ? "border-emerald-100 border-l-emerald-500 bg-[#f5faf6] hover:bg-[#eff7f0]" : "border-[#f0f0f2] border-l-red-500 hover:bg-[#fbfbfd]"}`}>
+                        <tr
+                          draggable={!groupingQuotes && !changing}
+                          onDragStart={(event) => {
+                            if (event.target.closest("button, input, select, a")) { event.preventDefault(); return; }
+                            event.stopPropagation();
+                            event.dataTransfer.setData("application/x-vasto-quote", sale.id);
+                            event.dataTransfer.effectAllowed = "move";
+                            setDraggedQuoteId(sale.id);
+                          }}
+                          onDragEnd={() => { setDraggedQuoteId(""); setQuoteDropTarget(""); }}
+                          onDragOver={(event) => {
+                            if (!draggedQuoteId) return;
+                            event.preventDefault(); event.stopPropagation();
+                            const source = sales.find((item) => item.id === draggedQuoteId);
+                            const allowed = source && source.id !== sale.id && sameQuoteCustomer(source, sale) && !(source.quoteGroupId && source.quoteGroupId === sale.quoteGroupId);
+                            event.dataTransfer.dropEffect = allowed ? "move" : "none";
+                            setQuoteDropTarget(allowed ? sale.id : "");
+                          }}
+                          onDragLeave={(event) => { if (!event.currentTarget.contains(event.relatedTarget)) setQuoteDropTarget(""); }}
+                          onDrop={(event) => {
+                            const sourceId = event.dataTransfer.getData("application/x-vasto-quote");
+                            if (!sourceId) return;
+                            event.preventDefault(); event.stopPropagation();
+                            changeQuoteGroup(sourceId, sale.id);
+                          }}
+                          className={`${quoteDropTarget === sale.id ? "outline-2 -outline-offset-2 outline-[#0879c0] bg-sky-50 " : ""}border-t border-l-2 transition ${isResolved(sale) ? "border-emerald-100 border-l-emerald-500 bg-[#f5faf6] hover:bg-[#eff7f0]" : "border-[#f0f0f2] border-l-red-500 hover:bg-[#fbfbfd]"}`}>
                           <td className="px-3 py-5">
                             <div className="flex items-center gap-2">
                               <p className="truncate text-sm font-semibold tracking-tight">{sale.customerName}</p>
-                              {groupBySale.get(sale.id).sales.length > 1 && groupBySale.get(sale.id).sales[0].id === sale.id && <button type="button" aria-label={`${expandedQuoteGroups[groupBySale.get(sale.id).id] ? "Recolher" : "Expandir"} ${groupBySale.get(sale.id).sales.length} versões de ${sale.customerName}`} aria-expanded={!!expandedQuoteGroups[groupBySale.get(sale.id).id]} title="Possíveis versões do mesmo pedido. Clique para comparar." onClick={() => setExpandedQuoteGroups((current) => ({ ...current, [groupBySale.get(sale.id).id]: !current[groupBySale.get(sale.id).id] }))} className="inline-flex h-8 min-w-8 shrink-0 cursor-pointer items-center justify-center rounded-full bg-[#0879c0] px-2 text-xs font-semibold text-white shadow-sm transition hover:bg-[#06639e] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0879c0]">×{groupBySale.get(sale.id).sales.length}</button>}
+                              {groupBySale.get(sale.id).sales.length > 1 && groupBySale.get(sale.id).sales[0].id === sale.id && <button type="button" aria-label={`${expandedQuoteGroups[groupBySale.get(sale.id).id] ? "Recolher" : "Expandir"} ${groupBySale.get(sale.id).sales.length} versões de ${sale.customerName}`} aria-expanded={!!expandedQuoteGroups[groupBySale.get(sale.id).id]} title="Orçamentos agrupados manualmente. Clique para ver as versões." onClick={() => setExpandedQuoteGroups((current) => ({ ...current, [groupBySale.get(sale.id).id]: !current[groupBySale.get(sale.id).id] }))} className="inline-flex h-8 min-w-8 shrink-0 cursor-pointer items-center justify-center rounded-full bg-[#0879c0] px-2 text-xs font-semibold text-white shadow-sm transition hover:bg-[#06639e] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0879c0]">×{groupBySale.get(sale.id).sales.length}</button>}
                             </div>
                             {groupBySale.get(sale.id).sales.length > 1 && <p className="mt-1 text-[10px] font-medium text-[#0879c0]">{groupBySale.get(sale.id).label} · Versão {groupBySale.get(sale.id).sales.indexOf(sale) + 1}/{groupBySale.get(sale.id).sales.length}</p>}
                             {(sale.quoteDetails || sale.orderDetails?.detalhes) && <p className="mt-2 line-clamp-3 text-[10px] leading-relaxed text-[#6e6e73]" title={sale.quoteDetails || sale.orderDetails?.detalhes}>{sale.quoteDetails || sale.orderDetails?.detalhes}</p>}
-                            {sale.status === "em_preparacao" && (groupBySale.get(sale.id).sales.length > 1 || sale.quoteSeparate) && <button type="button" disabled={changing === sale.id} onClick={() => updateWorkflow(sale, { quoteSeparate: !sale.quoteSeparate })} className="mt-1 text-[10px] text-[#86868b] hover:text-[#0879c0] hover:underline disabled:opacity-50">{sale.quoteSeparate ? "Voltar a agrupar" : "Separar este orçamento"}</button>}
+                            {sale.quoteGroupId && <button type="button" disabled={groupingQuotes} onClick={() => changeQuoteGroup(sale.id)} className="mt-1 text-[10px] text-[#86868b] hover:text-[#0879c0] hover:underline disabled:opacity-50">Separar este orçamento</button>}
 
                             <p className="mt-1 truncate text-[11px] text-[#a1a1a6]">{sale.nif ? `${sale.nif} · ` : ""}{sale.fileName}</p>
                             <p className="mt-1 truncate text-[10px] text-[#86868b]">{sale.source === "simulador" ? "Simulador" : "Orçamento"} · {dateLabel(sale.issuedAt)}</p>

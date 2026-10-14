@@ -9,7 +9,7 @@ import { fileURLToPath } from "node:url";
 import { signIn, verifySession, sessionCookie, assertOrigin, assertSession, SESSION_COOKIE } from "../lib/admin/auth.mjs";
 import { parseSalePdf } from "../lib/admin/pdf.mjs";
 import { saveSimulatorOrderToSales } from "../lib/admin/simulator-order-sales.mjs";
-import { createSale, createSaleUpload, readSaleUpload, deleteSaleUpload, addSaleImage, getSaleImage, deleteSaleImage, deleteSale, updateSaleWorkflow, getPdf, getSale, listSales, storageMode, getCommissionData, updateCommissionRate, updateMonthlyCommission } from "../lib/admin/store.mjs";
+import { createSale, createSaleUpload, readSaleUpload, deleteSaleUpload, addSaleImage, getSaleImage, deleteSaleImage, deleteSale, updateSaleWorkflow, groupSaleQuotes, ungroupSaleQuote, getPdf, getSale, listSales, storageMode, getCommissionData, updateCommissionRate, updateMonthlyCommission } from "../lib/admin/store.mjs";
 
 const require = createRequire(import.meta.url);
 const { jsPDF } = require("jspdf");
@@ -436,4 +436,23 @@ test("public simulator order sales sync fails open when Supabase is unavailable"
     if (originalKey === undefined) delete process.env.SUPABASE_SERVICE_ROLE_KEY;
     else process.env.SUPABASE_SERVICE_ROLE_KEY = originalKey;
   }
+});
+
+
+test("manual grouping persists, merges groups, rejects other customers and supports separating", async () => {
+  const ids = ["a", "c", "d", "e"].map((letter) => letter.repeat(64));
+  for (const [index, id] of ids.entries()) await createSale({ ...metadata, id, customerName: index === 3 ? "Outro cliente" : metadata.customerName, nif: index === 3 ? "987654321" : metadata.nif, status: "em_preparacao", fileName: "teste.pdf" }, pdfWithMetadata());
+  try {
+    await groupSaleQuotes(ids[0], ids[1]);
+    const groupId = (await getSale(ids[0])).quoteGroupId;
+    assert.ok(groupId);
+    assert.equal((await getSale(ids[1])).quoteGroupId, groupId);
+    await groupSaleQuotes(ids[2], ids[0]);
+    assert.equal((await getSale(ids[2])).quoteGroupId, groupId);
+    await assert.rejects(groupSaleQuotes(ids[3], ids[0]), { status: 400 });
+    assert.equal((await getSale(ids[3])).quoteGroupId, undefined);
+    await ungroupSaleQuote(ids[1]);
+    assert.equal((await getSale(ids[1])).quoteGroupId, null);
+    assert.equal((await getSale(ids[0])).subtotal, metadata.subtotal);
+  } finally { for (const id of ids) await deleteSale(id); }
 });

@@ -1,3 +1,4 @@
+import { sameQuoteCustomer } from "./quote-groups.mjs";
 import { mkdir, readdir, readFile, writeFile, rename, unlink } from "node:fs/promises";
 import path from "node:path";
 import { randomUUID } from "node:crypto";
@@ -390,4 +391,40 @@ export async function getPdf(id) {
     ? Buffer.from(await (await cloud(`/storage/v1/object/authenticated/${bucket()}/${id}.pdf`)).arrayBuffer())
     : await readFile(path.join(directory(), `${id}.pdf`));
   return { record, buffer };
+}
+
+
+export async function groupSaleQuotes(sourceId, targetId) {
+  if (!validId(sourceId) || !validId(targetId) || sourceId === targetId) throw fail("Escolha dois orçamentos diferentes.", 400);
+  const sales = await listSales();
+  const source = sales.find((sale) => sale.id === sourceId);
+  const target = sales.find((sale) => sale.id === targetId);
+  if (!source || !target) throw fail("Orçamento não encontrado.", 404);
+  if (source.quoteGroupId && source.quoteGroupId === target.quoteGroupId) return sales;
+  const members = sales.filter((sale) => sale.id === sourceId || sale.id === targetId || (source.quoteGroupId && sale.quoteGroupId === source.quoteGroupId) || (target.quoteGroupId && sale.quoteGroupId === target.quoteGroupId));
+  if (members.some((sale, index) => members.slice(index + 1).some((other) => !sameQuoteCustomer(sale, other)))) {
+    throw fail("Só pode agrupar orçamentos com o mesmo nome de cliente ou o mesmo NIF.", 400);
+  }
+  const quoteGroupId = target.quoteGroupId || randomUUID();
+  const saved = [];
+  try {
+    for (const sale of members) {
+      if (sale.quoteGroupId === quoteGroupId) continue;
+      await saveRecord({ ...sale, quoteGroupId, updatedAt: new Date().toISOString() });
+      saved.push(sale);
+    }
+  } catch (error) {
+    for (const sale of saved) {
+      try { await saveRecord(sale); } catch { /* The client reloads persisted records on failure. */ }
+    }
+    throw error;
+  }
+  return listSales();
+}
+
+export async function ungroupSaleQuote(id) {
+  const record = await getSale(id);
+  if (!record) throw fail("Orçamento não encontrado.", 404);
+  await saveRecord({ ...record, quoteGroupId: null, updatedAt: new Date().toISOString() });
+  return listSales();
 }

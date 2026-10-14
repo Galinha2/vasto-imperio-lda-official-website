@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { assertSession, assertOrigin } from "@/lib/admin/auth.mjs";
-import { updateSaleWorkflow, deleteSale } from "@/lib/admin/store.mjs";
+import { updateSaleWorkflow, deleteSale, listSales } from "@/lib/admin/store.mjs";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -11,7 +11,8 @@ export async function PATCH(request, { params }) {
     assertOrigin(request);
     const { id } = await params;
     const updates = await request.json();
-    return NextResponse.json({ sale: await updateSaleWorkflow(id, updates) }, { headers: { "Cache-Control": "no-store" } });
+    const sale = await updateSaleWorkflow(id, updates);
+    return NextResponse.json({ sale, ...(updates.status && sale.quoteGroupId ? { sales: await listSales() } : {}) }, { headers: { "Cache-Control": "no-store" } });
   } catch (error) { return NextResponse.json({ error: error.status ? error.message : "Não foi possível atualizar o estado." }, { status: error.status || 500 }); }
 }
 

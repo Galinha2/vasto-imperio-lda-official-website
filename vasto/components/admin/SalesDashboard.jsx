@@ -35,7 +35,9 @@ const unresolvedAge = (date) => {
   return days === 0 ? "desde hoje" : `há ${days} ${days === 1 ? "dia" : "dias"}`;
 };
 const sum = (records, field = "subtotal") => records.reduce((value, sale) => value + Math.round(sale[field] * 100), 0) / 100;
+const quoteStatus = (sale) => sale.quoteNotSelected ? "nao_selecionado" : sale.status;
 const quoteStatuses = [
+  { value: "nao_selecionado", label: "Não selecionado", color: "bg-slate-100 text-slate-500" },
   { value: "em_preparacao", label: "A aguardar resposta", color: "bg-amber-50 text-amber-700" },
   { value: "confirmada", label: "Confirmado pelo cliente", color: "bg-sky-50 text-sky-700" },
 ];
@@ -321,7 +323,7 @@ export default function SalesDashboard() {
     setChanging(sale.id); setError("");
     try {
       const result = await api(`/api/admin/sales/${sale.id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify(update) });
-      setSales((current) => current.map((item) => item.id === sale.id ? result.sale : item));
+      setSales((current) => result.sales || current.map((item) => item.id === sale.id ? result.sale : item));
       if (update.deliveryDate) {
         setYear(update.deliveryDate.slice(0, 4));
         setMonth(update.deliveryDate.slice(5, 7));
@@ -340,7 +342,7 @@ export default function SalesDashboard() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ deliveryStatus: "entregue", deliveryDate }),
       });
-      setSales((current) => current.map((item) => item.id === sale.id ? result.sale : item));
+      setSales((current) => result.sales || current.map((item) => item.id === sale.id ? result.sale : item));
       setYear(deliveryDate.slice(0, 4));
       setMonth(deliveryDate.slice(5, 7));
       setNotice(`Entrega de ${sale.customerName} registada em ${dateLabel(deliveryDate)}.`);
@@ -416,9 +418,9 @@ export default function SalesDashboard() {
   const years = [...new Set([year, String(new Date().getFullYear()), ...sales.map((sale) => periodDate(sale).slice(0, 4))])].sort().reverse();
   const period = sales.filter((sale) => periodDate(sale).startsWith(year) && (month === "all" || periodDate(sale).slice(5, 7) === month));
   const confirmed = period.filter((sale) => sale.status !== "em_preparacao");
-  const preparing = period.filter((sale) => sale.status === "em_preparacao");
+  const preparing = period.filter((sale) => sale.status === "em_preparacao" && !sale.quoteNotSelected);
   const filteredSales = period.filter((sale) => {
-    const matchesQuote = status === "all" || (status === "confirmada" ? sale.status !== "em_preparacao" : sale.status === "em_preparacao");
+    const matchesQuote = status === "all" || quoteStatus(sale) === status;
     const matchesPayment = paymentFilter === "all" || sale.paymentStatus === paymentFilter;
     const matchesDelivery = deliveryFilter === "all" || sale.deliveryStatus === deliveryFilter;
     const matchesResolution = resolutionFilter === "all" || (resolutionFilter === "resolved" ? isResolved(sale) : !isResolved(sale));
@@ -426,7 +428,7 @@ export default function SalesDashboard() {
     return matchesQuote && matchesPayment && matchesDelivery && matchesResolution && matchesSearch;
   });
   const headerSortGroups = {
-    quote: (sale, value) => value === "em_preparacao" ? sale.status === "em_preparacao" : sale.status !== "em_preparacao",
+    quote: (sale, value) => quoteStatus(sale) === value,
     payment: (sale, value) => sale.paymentStatus === value,
     delivery: (sale, value) => sale.deliveryStatus === value,
     resolution: (sale, value) => value === "resolved" ? isResolved(sale) : !isResolved(sale),
@@ -473,7 +475,7 @@ export default function SalesDashboard() {
   const paidCommission = commissionRows.filter((item) => item.paid).reduce((amount, item) => amount + item.cents, 0) / 100;
   const outstandingCommission = commissionRows.filter((item) => !item.paid).reduce((amount, item) => amount + item.cents, 0) / 100;
   const unresolvedSales = sales
-    .filter((sale) => !isResolved(sale))
+    .filter((sale) => !sale.quoteNotSelected && !isResolved(sale))
     .sort((a, b) => (unresolvedDate(a) || "9999-99-99").localeCompare(unresolvedDate(b) || "9999-99-99"));
   const quoteGroups = groupQuotes(visibleSales);
   const groupBySale = new Map(quoteGroups.flatMap((group) => group.sales.map((sale) => [sale.id, group])));
@@ -492,6 +494,7 @@ export default function SalesDashboard() {
       options: [
         { value: "all", label: "Todos" },
         { value: "em_preparacao", label: "A aguardar resposta" },
+                    { value: "nao_selecionado", label: "Não selecionado" },
         { value: "confirmada", label: "Confirmado" },
       ],
     },
@@ -548,7 +551,7 @@ export default function SalesDashboard() {
         customer: sale.customerName || "Cliente",
         document: sale.fileName || "Documento",
         date: dateLabel(periodDate(sale)),
-        status: `${statusFor(quoteStatuses, sale.status).label} · ${statusFor(paymentStatuses, sale.paymentStatus).label} · ${statusFor(deliveryStatuses, sale.deliveryStatus).label}`,
+        status: `${statusFor(quoteStatuses, quoteStatus(sale)).label} · ${statusFor(paymentStatuses, sale.paymentStatus).label} · ${statusFor(deliveryStatuses, sale.deliveryStatus).label}`,
         value: valueForSale(sale),
         detail: detailForSale(sale, articleDetail),
       };
@@ -699,7 +702,7 @@ export default function SalesDashboard() {
                   <ul className="divide-y divide-[#f0f0f2]">
                     {unresolvedSales.slice(0, 5).map((sale) => {
                       const date = unresolvedDate(sale);
-                      const quote = statusFor(quoteStatuses, sale.status).label;
+                      const quote = statusFor(quoteStatuses, quoteStatus(sale)).label;
                       const payment = statusFor(paymentStatuses, sale.paymentStatus).label;
                       const delivery = statusFor(deliveryStatuses, sale.deliveryStatus).label;
                       return (
@@ -852,6 +855,7 @@ export default function SalesDashboard() {
                   options={[
                     { value: "all", label: "Todos os orçamentos" },
                     { value: "em_preparacao", label: "A aguardar resposta" },
+                    { value: "nao_selecionado", label: "Não selecionado" },
                     { value: "confirmada", label: "Confirmado pelo cliente" },
                   ]}
                   value={status}
@@ -960,7 +964,7 @@ export default function SalesDashboard() {
                             event.preventDefault(); event.stopPropagation();
                             changeQuoteGroup(sourceId, sale.id);
                           }}
-                          className={`${quoteDropTarget === sale.id ? "outline-2 -outline-offset-2 outline-[#0879c0] bg-sky-50 " : ""}border-t border-l-2 transition ${isResolved(sale) ? "border-emerald-100 border-l-emerald-500 bg-[#f5faf6] hover:bg-[#eff7f0]" : "border-[#f0f0f2] border-l-red-500 hover:bg-[#fbfbfd]"}`}>
+                          className={`${quoteDropTarget === sale.id ? "outline-2 -outline-offset-2 outline-[#0879c0] bg-sky-50 " : ""}border-t border-l-2 transition ${sale.quoteNotSelected ? "border-[#f0f0f2] border-l-slate-200 bg-slate-50/60 text-slate-500" : isResolved(sale) ? "border-emerald-100 border-l-emerald-500 bg-[#f5faf6] hover:bg-[#eff7f0]" : "border-[#f0f0f2] border-l-red-500 hover:bg-[#fbfbfd]"}`}>
                           <td className="px-3 py-5">
                             <div className="flex items-center gap-2">
                               <p className="truncate text-sm font-semibold tracking-tight">{sale.customerName}</p>
@@ -982,7 +986,7 @@ export default function SalesDashboard() {
                             <DashboardDropdown
                               label={`Estado do orçamento de ${sale.customerName}`}
                               options={quoteStatuses}
-                              value={sale.status}
+                              value={quoteStatus(sale)}
                               onChange={(value) => updateWorkflow(sale, { status: value })}
                               className="w-full max-w-[140px] text-[11px]"
                               disabled={changing === sale.id}

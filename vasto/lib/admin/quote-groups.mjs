@@ -29,5 +29,6 @@ export function groupQuotes(sales) {
     if (!groups.has(key)) groups.set(key, { id: key, label: "Versões", sales: [] });
     groups.get(key).sales.push(sale);
   }
+  for (const group of groups.values()) group.sales.sort((a, b) => Number(b.status === "confirmada") - Number(a.status === "confirmada"));
   return [...groups.values()];
 }

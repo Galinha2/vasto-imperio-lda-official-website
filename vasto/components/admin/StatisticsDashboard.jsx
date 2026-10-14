@@ -93,7 +93,7 @@ export default function StatisticsDashboard() {
   }, [expandedInsight]);
 
   const years = useMemo(() => [...new Set([currentYear(), ...sales.map((sale) => saleDate(sale).slice(0, 4))])].sort().reverse(), [sales]);
-  const yearSales = sales.filter((sale) => saleDate(sale).startsWith(year));
+  const yearSales = sales.filter((sale) => !sale.quoteNotSelected && saleDate(sale).startsWith(year));
   const confirmed = yearSales.filter((sale) => sale.status !== "em_preparacao");
   const awaiting = yearSales.filter((sale) => sale.status === "em_preparacao");
   const paid = confirmed.filter((sale) => sale.paymentStatus === "pago");

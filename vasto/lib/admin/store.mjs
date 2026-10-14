@@ -351,7 +351,8 @@ export async function deleteSale(id) {
 
 export async function updateSaleWorkflow(id, updates) {
   if (!updates || typeof updates !== "object" || Array.isArray(updates)) throw fail("Estados inválidos.", 400);
-  const { status, paymentStatus, deliveryStatus, saleDate, deliveryDate, quoteProject, quoteSeparate } = updates;
+  const { status: requestedStatus, paymentStatus, deliveryStatus, saleDate, deliveryDate, quoteProject, quoteSeparate } = updates;
+  const status = requestedStatus === "nao_selecionado" ? "em_preparacao" : requestedStatus;
   if (status !== undefined && !["em_preparacao", "confirmada"].includes(status)) throw fail("Estado do orçamento inválido.", 400);
   if (paymentStatus !== undefined && !paymentStatuses.includes(paymentStatus)) throw fail("Estado do pagamento inválido.", 400);
   if (deliveryStatus !== undefined && !deliveryStatuses.includes(deliveryStatus)) throw fail("Estado da entrega inválido.", 400);
@@ -370,7 +371,7 @@ export async function updateSaleWorkflow(id, updates) {
   const defaultSaleDate = status === "confirmada" && record.status !== "confirmada" && !record.saleDate ? lisbonDate() : undefined;
   const updated = normalizeSale({
     ...record,
-    ...(status !== undefined && { status }),
+    ...(status !== undefined && { status, quoteNotSelected: requestedStatus === "nao_selecionado" }),
     ...(paymentStatus !== undefined && { paymentStatus }),
     ...(deliveryStatus !== undefined && { deliveryStatus }),
     ...(saleDate !== undefined && { saleDate }),
@@ -380,7 +381,23 @@ export async function updateSaleWorkflow(id, updates) {
     ...(quoteSeparate !== undefined && { quoteSeparate }),
     updatedAt: new Date().toISOString(),
   });
-  await saveRecord(updated);
+  const siblings = requestedStatus === "confirmada" && record.quoteGroupId
+    ? (await listSales()).filter((sale) => sale.id !== id && sale.quoteGroupId === record.quoteGroupId)
+    : [];
+  if (siblings.some((sale) => sale.paymentStatus !== "por_pagar" || sale.deliveryStatus === "entregue")) {
+    throw fail("Há outra versão deste grupo com pagamento ou entrega registados. Reveja esses dados antes de escolher outra versão.", 400);
+  }
+  const saved = [];
+  try {
+    for (const sibling of siblings) {
+      await saveRecord({ ...sibling, status: "em_preparacao", quoteNotSelected: true, updatedAt: updated.updatedAt });
+      saved.push(sibling);
+    }
+    await saveRecord(updated);
+  } catch (error) {
+    for (const sibling of saved) { try { await saveRecord(sibling); } catch { /* Preserve original error. */ } }
+    throw error;
+  }
   return updated;
 }
 

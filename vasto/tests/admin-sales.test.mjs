@@ -456,3 +456,27 @@ test("manual grouping persists, merges groups, rejects other customers and suppo
     assert.equal((await getSale(ids[0])).subtotal, metadata.subtotal);
   } finally { for (const id of ids) await deleteSale(id); }
 });
+
+
+test("confirming one grouped version marks alternatives unselected and allows changing the choice", async () => {
+  const ids = ["6", "7", "8"].map((letter) => letter.repeat(64));
+  for (const id of ids) await createSale({ ...metadata, id, status: "em_preparacao", fileName: "variante.pdf" }, pdfWithMetadata());
+  try {
+    await groupSaleQuotes(ids[0], ids[1]);
+    await groupSaleQuotes(ids[2], ids[1]);
+    await updateSaleWorkflow(ids[1], { status: "confirmada" });
+    assert.equal((await getSale(ids[1])).status, "confirmada");
+    for (const id of [ids[0], ids[2]]) {
+      const sale = await getSale(id);
+      assert.equal(sale.quoteNotSelected, true);
+      assert.equal(sale.status, "em_preparacao");
+    }
+    await updateSaleWorkflow(ids[0], { status: "confirmada" });
+    assert.equal((await getSale(ids[0])).quoteNotSelected, false);
+    assert.equal((await getSale(ids[1])).quoteNotSelected, true);
+    await updateSaleWorkflow(ids[0], { paymentStatus: "entrada_paga" });
+    await assert.rejects(updateSaleWorkflow(ids[2], { status: "confirmada" }), { status: 400 });
+    assert.equal((await getSale(ids[0])).status, "confirmada");
+    assert.equal((await getSale(ids[2])).quoteNotSelected, true);
+  } finally { for (const id of ids) await deleteSale(id); }
+});

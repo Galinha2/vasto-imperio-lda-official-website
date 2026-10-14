@@ -11,6 +11,7 @@ test("manual membership collapses versions regardless of time, equipment or work
   const original = JSON.stringify(sales);
   assert.deepEqual(groupQuotes(sales).map((g) => g.sales.length), [2, 1]);
   assert.equal(JSON.stringify(sales), original);
+  assert.equal(groupQuotes(sales)[0].sales[0].id, "2");
 });
 test("matching name OR NIF permits grouping, empty identities never match", () => {
   assert.equal(sameQuoteCustomer(quote("1"), quote("2", { nif: "987654321" })), true);

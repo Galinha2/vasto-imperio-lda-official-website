@@ -8,6 +8,7 @@ const STORAGE_KEY = "vasto-google-ads-consent-v1";
 const TAG_ID = "AW-17959148068";
 
 function updateConsent(accepted) {
+  window.vastoAdsConsent = accepted;
   window.dataLayer = window.dataLayer || [];
   window.gtag = window.gtag || function () { window.dataLayer.push(arguments); };
   if (!window.vastoConsentInitialized) {
@@ -22,6 +23,11 @@ function updateConsent(accepted) {
     ad_user_data: accepted ? "granted" : "denied",
     analytics_storage: "denied", ad_personalization: "denied",
   });
+  if (accepted && !window.vastoAdsConfigured) {
+    window.gtag("js", new Date());
+    window.gtag("config", TAG_ID);
+    window.vastoAdsConfigured = true;
+  }
 }
 
 export default function GoogleAdsConsent() {
@@ -55,12 +61,7 @@ export default function GoogleAdsConsent() {
 
   return (
     <>
-      {choice === true && <Script id="vasto-google-ads" src={`https://www.googletagmanager.com/gtag/js?id=${TAG_ID}`} strategy="afterInteractive" onReady={() => {
-        if (window.vastoAdsConfigured) return;
-        window.gtag("js", new Date());
-        window.gtag("config", TAG_ID);
-        window.vastoAdsConfigured = true;
-      }} />}
+      {choice === true && <Script id="vasto-google-ads" src={`https://www.googletagmanager.com/gtag/js?id=${TAG_ID}`} strategy="afterInteractive" />}
       {choice === null || open ? (
         <section aria-label="Preferências de medição publicitária" className="fixed inset-x-4 bottom-4 z-[100] mx-auto max-w-xl rounded-2xl border border-[#e5e5e7] bg-white p-5 shadow-xl">
           <h2 className="text-sm font-semibold text-[#1d1d1f]">Medição dos anúncios</h2>

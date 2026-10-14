@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { trackSimulatorOrder } from "@/lib/google-ads.mjs";
 import generateBudgetPdf from "@/lib/generateBudgetPdf";
 
 const initialForm = {
@@ -131,6 +132,7 @@ export default function SimulatorOrderModal({ open, onClose, total, details, ite
       }
       if (!response.ok) throw new Error(result.error || (english ? "Could not submit the order." : "Não foi possível enviar a encomenda."));
       setSent(true);
+      trackSimulatorOrder();
     } catch (submitError) {
       setError(submitError.message || (english ? "Could not submit the order. Try again." : "Não foi possível enviar o pedido. Tente novamente."));
     } finally {

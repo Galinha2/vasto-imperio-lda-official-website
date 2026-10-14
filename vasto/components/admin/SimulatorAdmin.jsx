@@ -13,6 +13,7 @@ const simuladores = [
   { id: "ligeiras", label: "Estantes ligeiras", description: "Carga manual e prateleiras", image: "/prateleira inteira.png", Component: SimulatorEstantesLigeiras },
   { id: "picking", label: "Picking", description: "Estantes de picking", image: "/produtos/9-Porteco Z60/i1.png", Component: SimulatorPicking },
   { id: "racks", label: "Racks", description: "Armazenamento paletizado", image: "/recorte_DSC4798-1_c_laranja-2.png", Component: SimulatorRacks },
+  { id: "bancadas", label: "Bancadas", description: "Até 1 m de altura · 1 ou 2 níveis", image: "/produtos/14-Bancadas (Workbench)/i2.png", Component: SimulatorPicking },
 ];
 
 export default function SimulatorAdmin() {
@@ -227,7 +228,7 @@ export default function SimulatorAdmin() {
           </div>
         </header>
 
-        <nav aria-label="Escolher tipo de equipamento" className="grid gap-2 sm:grid-cols-3">
+        <nav aria-label="Escolher tipo de equipamento" className="grid gap-2 sm:grid-cols-2 xl:grid-cols-4">
           {simuladores.map(({ id, label, description, image }) => (
             <button
               key={id}
@@ -252,7 +253,7 @@ export default function SimulatorAdmin() {
         </nav>
 
         <section ref={capturaRef} aria-label={`Simulação de ${ativo.label}`} className="min-w-0">
-          <Simulator adminMode adminPanel={adminPanel} adminDiscountPercent={descontoManual} onQuoteDataChange={receberDadosOrcamento} />
+          <Simulator key={simuladorAtivo} variant={simuladorAtivo === "bancadas" ? "workbench" : undefined} adminMode adminPanel={adminPanel} adminDiscountPercent={descontoManual} onQuoteDataChange={receberDadosOrcamento} />
         </section>
     </div>
   );

@@ -107,6 +107,8 @@ export default function SimulatorAdmin() {
     }
     return {
       source: "simulador",
+      quoteType: simuladorAtivo,
+      additionalDetails: quoteData.details || "",
       linhas: [
         ...quoteData.items,
         ...produtosExtra.filter((item) => item.produto).map((item) => {

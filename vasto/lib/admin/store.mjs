@@ -350,13 +350,15 @@ export async function deleteSale(id) {
 
 export async function updateSaleWorkflow(id, updates) {
   if (!updates || typeof updates !== "object" || Array.isArray(updates)) throw fail("Estados inválidos.", 400);
-  const { status, paymentStatus, deliveryStatus, saleDate, deliveryDate } = updates;
+  const { status, paymentStatus, deliveryStatus, saleDate, deliveryDate, quoteProject, quoteSeparate } = updates;
   if (status !== undefined && !["em_preparacao", "confirmada"].includes(status)) throw fail("Estado do orçamento inválido.", 400);
   if (paymentStatus !== undefined && !paymentStatuses.includes(paymentStatus)) throw fail("Estado do pagamento inválido.", 400);
   if (deliveryStatus !== undefined && !deliveryStatuses.includes(deliveryStatus)) throw fail("Estado da entrega inválido.", 400);
   if (saleDate !== undefined && !validDate(saleDate)) throw fail("Data da venda inválida.", 400);
   if (deliveryDate !== undefined && !validDate(deliveryDate)) throw fail("Data de entrega inválida.", 400);
-  if (status === undefined && paymentStatus === undefined && deliveryStatus === undefined && saleDate === undefined && deliveryDate === undefined) throw fail("Indique um estado para atualizar.", 400);
+  if (quoteProject !== undefined && (typeof quoteProject !== "string" || quoteProject.trim().length > 100)) throw fail("O nome do projeto deve ter até 100 caracteres.", 400);
+  if (quoteSeparate !== undefined && typeof quoteSeparate !== "boolean") throw fail("Agrupamento inválido.", 400);
+  if (status === undefined && paymentStatus === undefined && deliveryStatus === undefined && saleDate === undefined && deliveryDate === undefined && quoteProject === undefined && quoteSeparate === undefined) throw fail("Indique um estado para atualizar.", 400);
   const record = await getSale(id);
   if (!record) throw fail("Encomenda não encontrada.", 404);
   const nextStatus = status ?? record.status;
@@ -373,6 +375,8 @@ export async function updateSaleWorkflow(id, updates) {
     ...(saleDate !== undefined && { saleDate }),
     ...(deliveryDate !== undefined && { deliveryDate }),
     ...(defaultSaleDate && { saleDate: defaultSaleDate }),
+    ...(quoteProject !== undefined && { quoteProject: quoteProject.trim() }),
+    ...(quoteSeparate !== undefined && { quoteSeparate }),
     updatedAt: new Date().toISOString(),
   });
   await saveRecord(updated);

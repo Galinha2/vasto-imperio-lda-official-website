@@ -1,5 +1,6 @@
 "use client";
 
+import { groupQuotes } from "@/lib/admin/quote-groups.mjs";
 import MetricCard from "./MetricCard";
 
 import { Fragment, useEffect, useId, useRef, useState } from "react";
@@ -195,6 +196,8 @@ export default function SalesDashboard() {
   const tableDragDepth = useRef(0);
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
+  const [expandedQuoteGroups, setExpandedQuoteGroups] = useState({});
+  const [groupQuotesEnabled, setGroupQuotesEnabled] = useState(true);
   const [salesDetail, setSalesDetail] = useState("");
   const [unresolvedExpanded, setUnresolvedExpanded] = useState(false);
   const unresolvedReminderRef = useRef(null);
@@ -401,7 +404,7 @@ export default function SalesDashboard() {
     const matchesPayment = paymentFilter === "all" || sale.paymentStatus === paymentFilter;
     const matchesDelivery = deliveryFilter === "all" || sale.deliveryStatus === deliveryFilter;
     const matchesResolution = resolutionFilter === "all" || (resolutionFilter === "resolved" ? isResolved(sale) : !isResolved(sale));
-    const matchesSearch = `${sale.customerName} ${sale.nif} ${sale.fileName}`.toLocaleLowerCase("pt-PT").includes(search.toLocaleLowerCase("pt-PT"));
+    const matchesSearch = `${sale.customerName} ${sale.nif} ${sale.fileName} ${sale.quoteProject || ""}`.toLocaleLowerCase("pt-PT").includes(search.toLocaleLowerCase("pt-PT"));
     return matchesQuote && matchesPayment && matchesDelivery && matchesResolution && matchesSearch;
   });
   const headerSortGroups = {
@@ -454,6 +457,11 @@ export default function SalesDashboard() {
   const unresolvedSales = sales
     .filter((sale) => !isResolved(sale))
     .sort((a, b) => (unresolvedDate(a) || "9999-99-99").localeCompare(unresolvedDate(b) || "9999-99-99"));
+  const quoteGroups = groupQuotesEnabled ? groupQuotes(visibleSales) : visibleSales.map((sale) => ({ id: sale.id, sales: [sale] }));
+  const groupBySale = new Map(quoteGroups.flatMap((group) => group.sales.map((sale) => [sale.id, group])));
+  const tableSales = quoteGroups.flatMap((group) => group.sales);
+
+
   const max = Math.max(...monthly.map(({ subtotal }) => subtotal), 1);
   const periodLabel = month === "all" ? `Ano ${year}` : `${months[Number(month) - 1]} ${year}`;
   const controls = "h-10 rounded-full border border-[#e5e5e7] bg-white py-2 pl-4 pr-4 text-sm text-[#424245] outline-none transition-colors hover:border-[#c7c7cc] hover:bg-[#fbfbfd] focus:border-sky-600 focus:ring-2 focus:ring-sky-600/10";
@@ -813,8 +821,9 @@ export default function SalesDashboard() {
               </div>
             )}
             <div className="flex flex-col gap-4 border-b border-[#f0f0f2] p-5 sm:p-7 xl:flex-row xl:items-center xl:justify-between">
-              <div className="shrink-0"><h2 className="text-base font-semibold tracking-tight">Encomendas e documentos</h2><p className="mt-1 text-xs text-[#86868b]">{visibleSales.length} de {period.length} {visibleSales.length === 1 ? "registo" : "registos"} · {periodLabel}</p></div>
+              <div className="shrink-0"><h2 className="text-base font-semibold tracking-tight">Encomendas e documentos</h2><p className="mt-1 text-xs text-[#86868b]">{quoteGroups.length} linhas · {visibleSales.length} de {period.length} {visibleSales.length === 1 ? "registo" : "registos"} · {periodLabel}</p></div>
               <div className="flex flex-wrap items-center justify-end gap-2 xl:flex-nowrap">
+                <label className="flex shrink-0 cursor-pointer items-center gap-2 text-xs text-[#6e6e73]"><input type="checkbox" checked={groupQuotesEnabled} onChange={(event) => setGroupQuotesEnabled(event.target.checked)} className="accent-[#0879c0]" />Agrupar variantes</label>
                 <label className="relative w-full sm:w-[240px] sm:max-w-[320px]">
                   <span className="sr-only">Pesquisar cliente, NIF ou documento</span>
                   <IoSearchOutline className="absolute left-3 top-3 text-[#a1a1a6]" />
@@ -872,6 +881,7 @@ export default function SalesDashboard() {
                   )}
               </div>
             </div>
+
             {loading ? <div role="status" className="p-16 text-center text-sm text-[#86868b]">A carregar os seus documentos…</div> : visibleSales.length ? (
               <div className="overflow-x-auto">
                 <table className="w-full min-w-[1000px] table-fixed text-left">
@@ -902,11 +912,20 @@ export default function SalesDashboard() {
                     </tr>
                   </thead>
                   <tbody>
-                    {visibleSales.map((sale) => (
+                    {tableSales.map((sale) => (
                       <Fragment key={sale.id}>
+                        {(groupBySale.get(sale.id).sales[0].id === sale.id || expandedQuoteGroups[groupBySale.get(sale.id).id]) && <>
+
                         <tr className={`border-t border-l-2 transition ${isResolved(sale) ? "border-emerald-100 border-l-emerald-500 bg-[#f5faf6] hover:bg-[#eff7f0]" : "border-[#f0f0f2] border-l-red-500 hover:bg-[#fbfbfd]"}`}>
                           <td className="px-3 py-5">
-                            <p className="truncate text-sm font-semibold tracking-tight">{sale.customerName}</p>
+                            <div className="flex items-center gap-2">
+                              <p className="truncate text-sm font-semibold tracking-tight">{sale.customerName}</p>
+                              {groupBySale.get(sale.id).sales.length > 1 && groupBySale.get(sale.id).sales[0].id === sale.id && <button type="button" aria-label={`${expandedQuoteGroups[groupBySale.get(sale.id).id] ? "Recolher" : "Expandir"} ${groupBySale.get(sale.id).sales.length} versões de ${sale.customerName}`} aria-expanded={!!expandedQuoteGroups[groupBySale.get(sale.id).id]} title="Possíveis versões do mesmo pedido. Clique para comparar." onClick={() => setExpandedQuoteGroups((current) => ({ ...current, [groupBySale.get(sale.id).id]: !current[groupBySale.get(sale.id).id] }))} className="inline-flex h-8 min-w-8 shrink-0 cursor-pointer items-center justify-center rounded-full bg-[#0879c0] px-2 text-xs font-semibold text-white shadow-sm transition hover:bg-[#06639e] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0879c0]">×{groupBySale.get(sale.id).sales.length}</button>}
+                            </div>
+                            {groupBySale.get(sale.id).sales.length > 1 && <p className="mt-1 text-[10px] font-medium text-[#0879c0]">{groupBySale.get(sale.id).label} · Versão {groupBySale.get(sale.id).sales.indexOf(sale) + 1}/{groupBySale.get(sale.id).sales.length}</p>}
+                            {(sale.quoteDetails || sale.orderDetails?.detalhes) && <p className="mt-2 line-clamp-3 text-[10px] leading-relaxed text-[#6e6e73]" title={sale.quoteDetails || sale.orderDetails?.detalhes}>{sale.quoteDetails || sale.orderDetails?.detalhes}</p>}
+                            {sale.status === "em_preparacao" && (groupBySale.get(sale.id).sales.length > 1 || sale.quoteSeparate) && <button type="button" disabled={changing === sale.id} onClick={() => updateWorkflow(sale, { quoteSeparate: !sale.quoteSeparate })} className="mt-1 text-[10px] text-[#86868b] hover:text-[#0879c0] hover:underline disabled:opacity-50">{sale.quoteSeparate ? "Voltar a agrupar" : "Separar este orçamento"}</button>}
+
                             <p className="mt-1 truncate text-[11px] text-[#a1a1a6]">{sale.nif ? `${sale.nif} · ` : ""}{sale.fileName}</p>
                             <p className="mt-1 truncate text-[10px] text-[#86868b]">{sale.source === "simulador" ? "Simulador" : "Orçamento"} · {dateLabel(sale.issuedAt)}</p>
                             {sale.uploadedAt && <p className="mt-0.5 truncate text-[9px] text-[#a1a1a6]" title={`Pedido recebido em ${dateLabel(sale.uploadedAt.slice(0, 10))}`}>Recebido · {dateLabel(sale.uploadedAt.slice(0, 10))}</p>}
@@ -927,6 +946,7 @@ export default function SalesDashboard() {
                             />
                           </td>
                           <td className="px-2 py-5">
+                            {sale.status === "confirmada" ? (
                             <DashboardDropdown
                               label={`Estado do pagamento de ${sale.customerName}`}
                               options={paymentStatuses}
@@ -936,8 +956,10 @@ export default function SalesDashboard() {
                               disabled={changing === sale.id}
                               tone
                             />
+                            ) : <span className="text-xs text-[#a1a1a6]">—</span>}
                           </td>
                           <td className="px-2 py-5">
+                            {sale.status === "confirmada" ? (
                             <div className="flex items-center gap-1">
                               <DashboardDropdown
                                 label={`Estado da entrega de ${sale.customerName}`}
@@ -970,6 +992,7 @@ export default function SalesDashboard() {
                                 </label>
                               )}
                             </div>
+                            ) : <span className="text-xs text-[#a1a1a6]">—</span>}
                           </td>
                           <td className="px-2 py-5">
                             {isResolved(sale)
@@ -1077,6 +1100,7 @@ export default function SalesDashboard() {
                             </td>
                           </tr>
                         )}
+                        </>}
                       </Fragment>
                     ))}
                   </tbody>

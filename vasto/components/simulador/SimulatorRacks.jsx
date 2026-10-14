@@ -29,7 +29,7 @@ const unique = (values) => [...new Set(values.filter(Boolean))].sort((a, b) => a
 const heights = unique(frames.map((frame) => frame.height));
 const depths = unique(frames.map((frame) => frame.depth));
 const beamLengths = unique(beams.map((beam) => beam.length));
-const levelOptions = Array.from({ length: 10 }, (_, index) => index + 2);
+const levelOptions = Array.from({ length: 11 }, (_, index) => index + 1);
 const verticalClearanceRatio = 0.12;
 const numericPrice = (product) => Number(product?.["preço"]) || 0;
 const formatMeters = (millimeters) => `${(millimeters / 1000).toLocaleString("pt-PT", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} m`;
@@ -118,8 +118,8 @@ function RackPreview({ modules, height, levels, rowCount, capacityLabel, solutio
   const beamHeight = Math.max(2.5, 100 * scale);
   const tabHeight = Math.max(3.5, beamHeight * 1.25);
   const topLevelInset = beamHeight + (tabHeight - beamHeight) / 2;
-  const levelSpacing = Math.round((height * (1 - verticalClearanceRatio)) / (levels - 1));
-  const levelGap = (rackHeight - floorClearance) / (levels - 1);
+  const levelSpacing = Math.round((height * (1 - verticalClearanceRatio)) / Math.max(1, levels - 1));
+  const levelGap = (rackHeight - floorClearance) / Math.max(1, levels - 1);
   const clearLevelSpacing = Math.max(0, levelSpacing - 100);
 
   return (
@@ -191,7 +191,7 @@ function RackPreview({ modules, height, levels, rowCount, capacityLabel, solutio
             const tabWidth = Math.max(2, uprightWidth * 0.5);
             return <g key={`beam-${moduleIndex}`}>
               {Array.from({ length: levels }, (_, levelIndex) => {
-                const levelY = bottom - floorClearance - (levelIndex * (rackHeight - floorClearance)) / (levels - 1);
+                const levelY = levels === 1 ? top + topLevelInset : bottom - floorClearance - (levelIndex * (rackHeight - floorClearance)) / Math.max(1, levels - 1);
                 const y = levelIndex === levels - 1 ? Math.max(levelY, top + topLevelInset) : levelY;
                 const beamTop = y - beamHeight;
                 const tabY = beamTop - (tabHeight - beamHeight) / 2;

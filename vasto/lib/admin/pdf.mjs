@@ -16,7 +16,11 @@ function validate(data) {
     if (!validDate(data.issuedAt) || !data.customerName?.trim() || data.customerName.length > 300) throw new Error();
     if (![data.subtotal, data.vat, data.total].every((value) => typeof value === "number" && Number.isFinite(value) && value >= 0 && value < 1e10)) throw new Error();
     if (Math.abs(round(data.subtotal + data.vat) - data.total) > 0.03) throw new Error();
-    return { customerName: data.customerName.trim(), nif: /^\d{9}$/.test(data.nif || "") ? data.nif : "", issuedAt: data.issuedAt, subtotal: round(data.subtotal), vat: round(data.vat), total: round(data.total), source: data.source === "simulador" ? "simulador" : "orcamento" };
+    return {
+      ...(typeof data.quoteCreatedAt === "string" && Number.isFinite(Date.parse(data.quoteCreatedAt)) && { quoteCreatedAt: new Date(data.quoteCreatedAt).toISOString() }),
+      ...(typeof data.quoteDetails === "string" && { quoteDetails: data.quoteDetails.slice(0, 4000) }),
+      ...(["bancadas", "picking", "ligeiras", "racks"].includes(data.quoteType) && { quoteType: data.quoteType }),
+      customerName: data.customerName.trim(), nif: /^\d{9}$/.test(data.nif || "") ? data.nif : "", issuedAt: data.issuedAt, subtotal: round(data.subtotal), vat: round(data.vat), total: round(data.total), source: data.source === "simulador" ? "simulador" : "orcamento" };
   } catch { throw bad("Não foi possível identificar com segurança o cliente, a data e os totais. Exporte novamente o PDF no orçamento ou simulador."); }
 }
 

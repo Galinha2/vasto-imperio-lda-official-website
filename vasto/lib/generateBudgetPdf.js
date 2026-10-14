@@ -5,7 +5,7 @@ function formatarNumero(valor) {
   return `${inteira.replace(/\B(?=(\d{3})+(?!\d))/g, " ")},${decimal}`;
 }
 
-export default async function generateBudgetPdf({ linhas, descontoSelecionado, dadosEmpresa, nif, nomeClienteManual, additionalDetails = "", returnBlob = false, source = "orcamento" }) {
+export default async function generateBudgetPdf({ linhas, descontoSelecionado, dadosEmpresa, nif, nomeClienteManual, additionalDetails = "", returnBlob = false, source = "orcamento", quoteType = "" }) {
     const issueParts = new Intl.DateTimeFormat("en", { timeZone: "Europe/Lisbon", year: "numeric", month: "2-digit", day: "2-digit" }).formatToParts(new Date());
     const issuePart = (type) => issueParts.find((part) => part.type === type).value;
     const issuedAt = `${issuePart("year")}-${issuePart("month")}-${issuePart("day")}`;
@@ -478,6 +478,9 @@ export default async function generateBudgetPdf({ linhas, descontoSelecionado, d
         vat: Number(linhas.reduce((sum, line) => sum + line.total * (line.isPortes ? 1 : 1 - Number(descontoSelecionado || 0) / 100) * 0.23, 0).toFixed(2)),
         total: Number(linhas.reduce((sum, line) => sum + line.total * (line.isPortes ? 1 : 1 - Number(descontoSelecionado || 0) / 100) * 1.23, 0).toFixed(2)),
         source,
+        quoteType,
+        quoteCreatedAt: new Date().toISOString(),
+        quoteDetails: String(additionalDetails || "").slice(0, 4000),
       })))),
     });
     if (returnBlob) return doc.output("blob");

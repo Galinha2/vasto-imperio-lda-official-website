@@ -69,6 +69,29 @@ test("remembered sessions do not expire and only remembered cookies persist", ()
   } finally { Date.now = realNow; }
 });
 
+test("quote project and separation persist without changing financial workflow", async () => {
+  const record = { ...metadata, id: "b".repeat(64), fileName: "bancadas-projeto.pdf", status: "em_preparacao" };
+  await createSale(record, pdfWithMetadata());
+  try {
+    await updateSaleWorkflow(record.id, { quoteProject: "  Oficina  ", quoteSeparate: true });
+    const stored = await getSale(record.id);
+    assert.equal(stored.quoteProject, "Oficina");
+    assert.equal(stored.quoteSeparate, true);
+    assert.equal(stored.status, "em_preparacao");
+    assert.equal(stored.subtotal, metadata.subtotal);
+    await assert.rejects(updateSaleWorkflow(record.id, { quoteProject: "x".repeat(101) }), { status: 400 });
+    await assert.rejects(updateSaleWorkflow(record.id, { quoteSeparate: "true" }), { status: 400 });
+    await updateSaleWorkflow(record.id, { quoteProject: "", quoteSeparate: false });
+    assert.equal((await getSale(record.id)).quoteSeparate, false);
+  } finally { await deleteSale(record.id); }
+});
+
+test("simulator PDF retains equipment and specifications for grouping", async () => {
+  const record = await parseSalePdf(pdfWithMetadata({ ...metadata, quoteType: "bancadas", quoteDetails: "Bancadas · Altura: 0,95 m · Níveis: 2" }), "orcamento.pdf");
+  assert.equal(record.quoteType, "bancadas");
+  assert.equal(record.quoteDetails, "Bancadas · Altura: 0,95 m · Níveis: 2");
+});
+
 test("login limits repeated invalid attempts", () => {
   for (let attempt = 0; attempt < 5; attempt++) assert.throws(() => signIn("test-admin", "bad", "limited"), { status: 401 });
   assert.throws(() => signIn("test-admin", process.env.ADMIN_PASSWORD, "limited"), { status: 429 });

@@ -167,7 +167,7 @@ function RackPreview({ modules, height, levels, floorType, galvanized, reinforce
       <div className="mb-5 flex items-center justify-between gap-3">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#86868b]">{english ? "Preview" : "Visualização"}</p>
-          <h2 className="mt-1 text-xl font-semibold tracking-tight text-[#1d1d1f]">{english ? "2D preview" : "Pré-visualização 2D"}</h2>
+          <h2 className="mt-1 text-xl font-semibold tracking-tight text-[#1d1d1f]">{english ? "Picking shelving" : "Estante de picking"}</h2><p className="mt-1 text-xs text-[#86868b]">{english ? "Your configuration · 2D preview" : "A sua configuração · Pré-visualização 2D"}</p>
         </div>
         <span className="simulator-pill rounded-full bg-[#f5f5f7] px-3 py-1.5 text-right text-sm font-medium text-[#6e6e73]">{modules.length} {english ? "module(s)" : "módulo(s)"} · {levels} {english ? "levels" : "níveis"} · {rowCount} {rowCount === 1 ? (english ? "row" : "fila") : (english ? "rows" : "filas")}</span>
       </div>
@@ -632,7 +632,7 @@ export default function SimulatorPicking({ onQuoteDataChange, adminMode = false,
         <div className="order-1 min-w-0 space-y-4 lg:order-2">
         {isLengthUnavailable ? (
           <div className="flex-1 rounded-[30px] border border-[#e5e5e7] bg-white p-7 shadow-[0_12px_40px_rgba(0,0,0,0.05)]">
-            <h2 className="text-xl font-semibold tracking-tight text-[#1d1d1f]">{english ? "2D preview" : "Pré-visualização 2D"}</h2>
+            <h2 className="text-xl font-semibold tracking-tight text-[#1d1d1f]">{english ? "Picking shelving" : "Estante de picking"}</h2><p className="mt-1 text-xs text-[#86868b]">{english ? "Your configuration · 2D preview" : "A sua configuração · Pré-visualização 2D"}</p>
             <p className="mt-4 rounded-[30px] bg-red-50 p-4 text-sm text-red-700">{english ? "Lengths over 30.00 m are not available." : "Comprimentos superiores a 30,00 m não estão disponíveis."}</p>
           </div>
         ) : (

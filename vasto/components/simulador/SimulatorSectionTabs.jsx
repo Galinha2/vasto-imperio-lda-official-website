@@ -34,9 +34,9 @@ export default function SimulatorSectionTabs({ group = "storage", active, lang }
   return (
     <nav
       aria-label={lang === "en" ? (group === "storage" ? "Shelving simulators" : "Materials handling equipment") : (group === "storage" ? "Simuladores de estantes" : "Equipamentos de movimentação de carga")}
-      className={`mt-3 mb-2 flex w-full max-w-full overflow-hidden rounded-full border border-[#e5e5e7] bg-white px-1 pt-1 ${group === "handling" ? "pb-1" : "pb-0"} shadow-[0_1px_5px_rgba(0,0,0,0.025)] sm:inline-flex sm:w-fit`}
+      className={`mt-3 mb-2 flex w-full max-w-full overflow-hidden rounded-full border border-[#e5e5e7] bg-white px-1 pt-1 ${group === "handling" ? "pb-1" : "pb-0"} shadow-[0_1px_5px_rgba(0,0,0,0.025)] sm:inline-flex ${group === "storage" ? "sm:w-full" : "sm:w-fit"}`}
     >
-      <ul className="grid w-full min-w-0 grid-cols-3 items-stretch gap-0.5 sm:flex sm:w-auto sm:min-w-max sm:items-center">
+      <ul className={`grid w-full min-w-0 grid-cols-3 items-stretch gap-0.5 ${group === "handling" ? "sm:flex sm:w-auto sm:min-w-max sm:items-center" : ""}`}>
         {options.map((option) => {
           const isActive = option.id === active;
           return (
@@ -44,7 +44,7 @@ export default function SimulatorSectionTabs({ group = "storage", active, lang }
               <Link
                 href={option.href}
                 aria-current={isActive ? "page" : undefined}
-                className={`flex min-h-[58px] w-full flex-col items-center justify-center gap-0.5 overflow-hidden rounded-full px-1 py-1 text-center text-[11px] font-medium leading-tight transition-colors duration-200 sm:inline-flex sm:min-h-10 sm:w-auto sm:flex-row sm:gap-0 sm:px-0 sm:py-0 sm:text-[13px] ${option.image ? "sm:pl-2.5" : ""} ${
+                className={`flex min-h-[58px] w-full flex-col items-center justify-center gap-0.5 overflow-hidden rounded-full px-1 py-1 text-center text-[11px] font-medium leading-tight transition-colors duration-200 sm:inline-flex sm:min-h-10 ${group === "storage" ? "sm:w-full" : "sm:w-auto"} sm:flex-row sm:gap-0 sm:px-0 sm:py-0 sm:text-[13px] ${option.image ? "sm:pl-2.5" : ""} ${
                   isActive
                     ? "bg-[#f5f5f7] text-[#1d1d1f]"
                     : "text-[#6e6e73] hover:bg-[#f5f5f7] hover:text-[#1d1d1f]"

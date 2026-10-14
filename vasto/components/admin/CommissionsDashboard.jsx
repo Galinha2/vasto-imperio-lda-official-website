@@ -1,5 +1,8 @@
 "use client";
 
+import { IoArrowUpOutline, IoTimeOutline } from "react-icons/io5";
+import MetricCard from "./MetricCard";
+
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { IoCheckmarkOutline, IoCloudDoneOutline, IoWalletOutline } from "react-icons/io5";
@@ -201,26 +204,10 @@ export default function CommissionsDashboard() {
         {notice && <p role="status" className="mt-6 flex items-center gap-2 rounded-2xl border border-emerald-100 bg-emerald-50 p-4 text-sm text-emerald-800"><IoCheckmarkOutline className="shrink-0 text-lg" />{notice}</p>}
 
         <section aria-label="Resumo das comissões" className="mt-7 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-          <article className="rounded-[24px] border border-[#e8e8ed] bg-white p-5 shadow-sm sm:p-6">
-            <p className="text-xs font-medium text-[#86868b]">Vendas confirmadas · sem IVA</p>
-            <p className="mt-4 text-[26px] font-semibold tracking-[-0.05em] text-[#1d1d1f]">{loading ? "—" : currency.format(annualSales)}</p>
-            <p className="mt-2 text-[11px] text-[#a1a1a6]">{confirmed.length} encomendas em {year}</p>
-          </article>
-          <article className="rounded-[24px] border border-[#e8e8ed] bg-white p-5 shadow-sm sm:p-6">
-            <p className="text-xs font-medium text-[#86868b]">Comissão estimada</p>
-            <p className="mt-4 text-[26px] font-semibold tracking-[-0.05em] text-sky-800">{loading ? "—" : currency.format(totalCommission)}</p>
-            <p className="mt-2 text-[11px] text-[#a1a1a6]">A percentagem pode variar por mês</p>
-          </article>
-          <article className="rounded-[24px] border border-[#e8e8ed] bg-white p-5 shadow-sm sm:p-6">
-            <p className="text-xs font-medium text-[#86868b]">Já recebido</p>
-            <p className="mt-4 text-[26px] font-semibold tracking-[-0.05em] text-emerald-700">{loading ? "—" : currency.format(paidCommission)}</p>
-            <p className="mt-2 text-[11px] text-[#a1a1a6]">{paidMonths} de 12 meses assinalados como pagos</p>
-          </article>
-          <article className="rounded-[24px] border border-[#e8e8ed] bg-white p-5 shadow-sm sm:p-6">
-            <p className="text-xs font-medium text-[#86868b]">Por receber</p>
-            <p className="mt-4 text-[26px] font-semibold tracking-[-0.05em] text-[#1d1d1f]">{loading ? "—" : currency.format(outstandingCommission)}</p>
-            <p className="mt-2 text-[11px] text-[#a1a1a6]">Comissão ainda não assinalada como paga</p>
-          </article>
+          <MetricCard label="Vendas confirmadas · sem IVA" value={loading ? "—" : currency.format(annualSales)} detail={`${confirmed.length} encomendas em ${year}`} icon={<IoArrowUpOutline />} dark tone="blue" />
+          <MetricCard label="Comissão estimada" value={loading ? "—" : currency.format(totalCommission)} detail="A percentagem pode variar por mês" icon={<IoWalletOutline />} tone="orange" />
+          <MetricCard label="Já recebido" value={loading ? "—" : currency.format(paidCommission)} detail={`${paidMonths} de 12 meses assinalados como pagos`} icon={<IoCheckmarkOutline />} dark tone="green" />
+          <MetricCard label="Por receber" value={loading ? "—" : currency.format(outstandingCommission)} detail="Comissão ainda não assinalada como paga" icon={<IoTimeOutline />} tone="orange" />
         </section>
 
         <section aria-labelledby="commission-chart-heading" className="mt-6 rounded-[28px] border border-[#e8e8ed] bg-white p-5 shadow-sm sm:p-7">

@@ -1,3 +1,4 @@
+import { notFound } from "next/navigation";
 import contentpt from "@/assets/contentpt.json";
 import contenten from "@/assets/contenten.json";
 import GalleryClient from "./GalleryClient";
@@ -56,6 +57,7 @@ export function generateStaticParams() {
 
 export async function generateMetadata({ params }) {
   const { lang, id } = await params;
+  if (!["pt", "en"].includes(lang)) notFound();
 
   const contentData = lang === "pt" ? contentpt : contenten;
 
@@ -63,12 +65,7 @@ export async function generateMetadata({ params }) {
     (item) => item.id === decodeURIComponent(String(id))
   );
 
-  if (!product) {
-    return {
-      title: "Produto não encontrado | Vasto Império",
-      description: "O produto que procura não foi encontrado."
-    };
-  }
+  if (!product) notFound();
 
   const canonicalPath = `/produtos/${lang}/${id}`;
   const localizedSeo = lang === "pt" ? portugueseProductSeo[product.id] : null;
@@ -90,6 +87,7 @@ export async function generateMetadata({ params }) {
   return {
     title,
     description,
+    robots: { index: true, follow: true },
     alternates: {
       canonical: canonicalPath,
       languages: languageAlternates,
@@ -115,6 +113,7 @@ export async function generateMetadata({ params }) {
 
 export default async function Page({ params }) {
   const { lang, id } = await params;
+  if (!["pt", "en"].includes(lang)) notFound();
 
   const content = lang === "pt" ? contentpt : contenten;
   const text = content.productsShowcase;
@@ -135,16 +134,7 @@ export default async function Page({ params }) {
   const hasGallery = Boolean(product?.galeria?.length);
   const contactBackground = Boolean(tabela) === hasGallery ? "white" : "gray";
 
-  if (!product) {
-    return (
-      <div className="mt-[76px] flex min-h-[50vh] flex-col items-center justify-center gap-5 px-5 text-center">
-        <p className="text-2xl font-semibold tracking-tight text-[#1d1d1f]">{text.produtoNe}</p>
-        <Link href={`/produtos`} className="rounded-full bg-(--orange) px-5 py-3 text-sm font-semibold text-white transition hover:bg-(--orange-hover)">
-          {lang === "pt" ? "Ver todos os produtos" : "View all products"}
-        </Link>
-      </div>
-    );
-  }
+  if (!product) notFound();
 
   return (
     <>

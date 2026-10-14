@@ -6,7 +6,7 @@ import { readFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { signIn, verifySession, assertOrigin, assertSession, SESSION_COOKIE } from "../lib/admin/auth.mjs";
+import { signIn, verifySession, sessionCookie, assertOrigin, assertSession, SESSION_COOKIE } from "../lib/admin/auth.mjs";
 import { parseSalePdf } from "../lib/admin/pdf.mjs";
 import { saveSimulatorOrderToSales } from "../lib/admin/simulator-order-sales.mjs";
 import { createSale, createSaleUpload, readSaleUpload, deleteSaleUpload, addSaleImage, getSaleImage, deleteSaleImage, deleteSale, updateSaleWorkflow, getPdf, getSale, listSales, storageMode, getCommissionData, updateCommissionRate, updateMonthlyCommission } from "../lib/admin/store.mjs";
@@ -43,6 +43,30 @@ test("signed login, tampering, expiry and protected access", () => {
   finally { Date.now = realNow; }
   assertOrigin(new Request("https://site.example/api/admin/sales", { headers: { origin: "https://site.example" } }));
   assert.throws(() => assertOrigin(new Request("https://site.example/api/admin/sales", { headers: { origin: "https://other.example" } })), { status: 403 });
+});
+
+test("remembered sessions do not expire and only remembered cookies persist", () => {
+  const now = Date.now();
+  const realNow = Date.now;
+  try {
+    Date.now = () => now;
+    const regular = signIn("test-admin", process.env.ADMIN_PASSWORD, "regular");
+    const remembered = signIn("test-admin", process.env.ADMIN_PASSWORD, "remembered", true);
+    assert.equal(Object.hasOwn(sessionCookie(regular), "maxAge"), false);
+    assert.ok(sessionCookie(remembered, false, true).maxAge > 0);
+    assert.equal(sessionCookie("", true, true).maxAge, 0);
+    assert.equal(sessionCookie(remembered, false, true).httpOnly, true);
+    Date.now = () => now + 9 * 60 * 60 * 1000;
+    assert.equal(verifySession(regular), false);
+    assert.equal(verifySession(remembered), true);
+    Date.now = () => now + 50 * 365 * 24 * 60 * 60 * 1000;
+    assert.equal(verifySession(remembered), true);
+    const originalPassword = process.env.ADMIN_PASSWORD;
+    try {
+      process.env.ADMIN_PASSWORD = "another-password-with-24-characters";
+      assert.equal(verifySession(remembered), false);
+    } finally { process.env.ADMIN_PASSWORD = originalPassword; }
+  } finally { Date.now = realNow; }
 });
 
 test("login limits repeated invalid attempts", () => {

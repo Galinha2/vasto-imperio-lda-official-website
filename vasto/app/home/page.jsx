@@ -1,7 +1,7 @@
 import { createPageMetadata } from "@/lib/seo";
 
 export const metadata = createPageMetadata({
-  title: "Racks e Estantes Metálicas em Viseu",
+  title: "Estantes Metálicas e Racks em Viseu e Portugal",
   description: "Racks industriais, estantes metálicas e porta-paletes em Viseu e Benedita. Mais de 20 anos em soluções de armazenagem, com entregas em Portugal. Peça um orçamento gratuito.",
   path: "/",
   image: "/favicon-google.png",

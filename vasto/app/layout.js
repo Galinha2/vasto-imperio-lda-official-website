@@ -55,7 +55,7 @@ const interTight = Inter_Tight({
 export const metadata = {
   metadataBase: new URL("https://vastoimperio.pt"),
   title: {
-    default: "Racks e Estantes Metálicas em Viseu | Vasto Império",
+    default: "Estantes Metálicas e Racks em Viseu e Portugal | Vasto Império",
     template: "%s | Vasto Império",
   },
   description:
@@ -73,13 +73,12 @@ export const metadata = {
   ],
   icons: {
     icon: [
-      { url: "/favicon-google.png", type: "image/png", sizes: "512x512" },
-      { url: "/favicon.ico", type: "image/x-icon", sizes: "48x48" },
+      { url: "/icon.svg", type: "image/svg+xml", sizes: "any" },
     ],
     apple: "/apple-touch-icon.png",
   },
   openGraph: {
-    title: "Racks e Estantes Metálicas em Viseu | Vasto Império",
+    title: "Estantes Metálicas e Racks em Viseu e Portugal | Vasto Império",
     description:
       "Racks industriais, estantes metálicas e porta-paletes em Viseu e Benedita. Soluções de armazenagem para empresas, com entrega em Portugal.",
     url: "https://vastoimperio.pt",

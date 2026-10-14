@@ -2,6 +2,8 @@ import { createHash, createHmac, timingSafeEqual } from "node:crypto";
 
 export const SESSION_COOKIE = "vasto_admin_session";
 const SESSION_SECONDS = 8 * 60 * 60;
+// Browsers may cap persistent cookie lifetimes independently of token validity.
+const REMEMBER_COOKIE_SECONDS = 10 * 365 * 24 * 60 * 60;
 const attempts = new Map();
 
 function configuration() {
@@ -16,7 +18,7 @@ function configuration() {
 const equal = (a, b) => timingSafeEqual(createHash("sha256").update(a).digest(), createHash("sha256").update(b).digest());
 const signature = (payload, config) => createHmac("sha256", `${config.secret}\0${config.password}`).update(payload).digest("base64url");
 
-export function signIn(username, password, address = "unknown") {
+export function signIn(username, password, address = "unknown", remember = false) {
   const config = configuration();
   const now = Date.now();
   for (const [key, attempt] of attempts) if (attempt.until < now) attempts.delete(key);
@@ -27,7 +29,7 @@ export function signIn(username, password, address = "unknown") {
     throw Object.assign(new Error("Utilizador ou palavra-passe incorretos."), { status: 401 });
   }
   attempts.delete(address);
-  const payload = Buffer.from(JSON.stringify({ user: config.username, expires: now + SESSION_SECONDS * 1000 })).toString("base64url");
+  const payload = Buffer.from(JSON.stringify({ user: config.username, expires: remember === true ? null : now + SESSION_SECONDS * 1000 })).toString("base64url");
   return `${payload}.${signature(payload, config)}`;
 }
 
@@ -39,12 +41,16 @@ export function verifySession(token) {
     const config = configuration();
     if (!equal(supplied, signature(payload, config))) return false;
     const session = JSON.parse(Buffer.from(payload, "base64url").toString());
-    return session.user === config.username && Number.isFinite(session.expires) && session.expires > Date.now();
+    return session.user === config.username && (session.expires === null || (Number.isFinite(session.expires) && session.expires > Date.now()));
   } catch { return false; }
 }
 
-export function sessionCookie(value, clear = false) {
-  return { name: SESSION_COOKIE, value, httpOnly: true, secure: process.env.NODE_ENV === "production", sameSite: "strict", path: "/", maxAge: clear ? 0 : SESSION_SECONDS };
+export function sessionCookie(value, clear = false, remember = false) {
+  return {
+    name: SESSION_COOKIE, value, httpOnly: true,
+    secure: process.env.NODE_ENV === "production", sameSite: "strict", path: "/",
+    ...(clear ? { maxAge: 0 } : remember === true ? { maxAge: REMEMBER_COOKIE_SECONDS } : {}),
+  };
 }
 
 export function assertOrigin(request) {

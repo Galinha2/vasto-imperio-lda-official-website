@@ -1,5 +1,7 @@
 "use client";
 
+import MetricCard from "./MetricCard";
+
 import { Fragment, useEffect, useId, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createPortal } from "react-dom";
@@ -726,18 +728,11 @@ export default function SalesDashboard() {
               { id: "commissions", label: "Comissões por receber", value: commissionData ? currency.format(outstandingCommission) : "—", detail: commissionData ? `Já recebidas: ${currency.format(paidCommission)} · ${periodLabel}` : "Resumo de comissões indisponível", icon: <IoWalletOutline />, color: "bg-amber-50 text-amber-700 ring-amber-100" },
               { id: "preparing", label: "A aguardar resposta", value: currency.format(sum(preparing)), detail: `${preparing.length} ${preparing.length === 1 ? "orçamento · sem IVA" : "orçamentos · sem IVA"}`, icon: <IoTimeOutline />, color: "bg-slate-50 text-slate-600 ring-slate-200" },
               { id: "documents", label: "Documentos", value: String(period.length).padStart(2, "0"), detail: "Registados neste período", icon: <IoDocumentTextOutline />, color: "bg-violet-50 text-violet-600 ring-violet-100" },
-            ].map((card) => (
-              <button
-                type="button"
-                key={card.label}
-                aria-haspopup="dialog"
-                onClick={() => setSalesDetail(card.id)}
-                className="w-full cursor-pointer rounded-[24px] border border-[#e8e8ed] bg-white p-5 text-left transition hover:border-sky-200 hover:bg-sky-50/40 hover:shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-600/30 sm:p-6"
-              >
-                <div className="flex items-center justify-between gap-2"><p className="text-xs font-medium text-[#86868b]">{card.label}</p><span className={`grid h-10 w-10 place-items-center rounded-2xl text-lg shadow-sm ring-1 ${card.color}`}>{card.icon}</span></div>
-                <p className="mt-5 text-[28px] font-semibold leading-none tracking-[-0.055em]">{loading ? "—" : card.value}</p>
-                <p className="mt-3 text-[11px] text-[#a1a1a6]">{card.detail}</p>
-              </button>
+            ].map((card, index) => (
+              <MetricCard key={card.id} label={card.label} value={loading ? "—" : card.value}
+                detail={card.detail} icon={card.icon} dark={card.id === "confirmed" || card.id === "commissions"}
+                tone={index === 1 ? "orange" : index === 3 ? "blue" : "green"}
+                onClick={() => setSalesDetail(card.id)} />
             ))}
           </div>
 

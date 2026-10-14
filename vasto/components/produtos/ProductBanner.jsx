@@ -31,7 +31,7 @@ export default function ProductBanner() {
           </h1>
           <p className="mt-5 max-w-lg text-base leading-relaxed text-[#626268] sm:text-lg">
             {language === "pt"
-              ? "Explore sistemas profissionais para armazéns, oficinas, lojas e espaços de trabalho."
+              ? "Estantes metálicas, racks e equipamentos para armazéns, oficinas e lojas. Apoio em Viseu e Benedita, com entregas em todo o Portugal."
               : "Explore professional systems for warehouses, workshops, shops and workplaces."}
           </p>
           <p className="mt-7 text-sm font-medium text-[#777980]">

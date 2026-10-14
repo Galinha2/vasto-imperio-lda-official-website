@@ -4,7 +4,7 @@ import { createPageMetadata } from "@/lib/seo";
 
 export const metadata = createPageMetadata({
   title: "Estantes Metálicas de Carga Ligeira em Viseu",
-  description: "Estantes metálicas modulares para arrumação manual em armazéns, oficinas e lojas. Peça uma configuração à medida à Vasto Império em Viseu, Benedita ou Portugal.",
+  description: "Estantes metálicas modulares para arrumação manual em armazéns, oficinas e lojas. Apoio em Viseu e Benedita, com entregas em todo o Portugal. Peça orçamento.",
   path: "/estante-carga-ligeira",
 });
 

@@ -13,13 +13,13 @@ export async function POST(request) {
     assertOrigin(request);
     const text = await request.text();
     if (text.length > 4096) return NextResponse.json({ error: "Pedido inválido." }, { status: 400 });
-    const { username, password } = JSON.parse(text);
+    const { username, password, remember } = JSON.parse(text);
     if (typeof username !== "string" || typeof password !== "string" || username.length > 128 || password.length > 256) {
       return NextResponse.json({ error: "Preencha o utilizador e a palavra-passe." }, { status: 400 });
     }
-    const token = signIn(username, password, request.headers.get("x-forwarded-for")?.split(",")[0]?.trim());
+    const token = signIn(username, password, request.headers.get("x-forwarded-for")?.split(",")[0]?.trim(), remember === true);
     const response = NextResponse.json({ authenticated: true }, { headers: { "Cache-Control": "no-store" } });
-    response.cookies.set(sessionCookie(token));
+    response.cookies.set(sessionCookie(token, false, remember === true));
     return response;
   } catch (error) {
     return NextResponse.json({ error: error.status ? error.message : "Não foi possível iniciar sessão." }, { status: error.status || 400 });

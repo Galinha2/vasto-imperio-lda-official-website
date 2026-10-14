@@ -1,5 +1,7 @@
 "use client";
 
+import MetricCard from "./MetricCard";
+
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { IoArrowUpOutline, IoCheckmarkCircleOutline, IoCloseOutline, IoDocumentTextOutline, IoTimeOutline } from "react-icons/io5";
@@ -29,7 +31,7 @@ function ProgressRing({ value, label, detail, color, onClick }) {
       type="button"
       onClick={onClick}
       aria-haspopup="dialog"
-      className="flex w-full cursor-pointer items-center gap-5 rounded-[24px] border border-[#e8e8ed] bg-white p-5 text-left transition hover:border-sky-200 hover:bg-sky-50/40 hover:shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-600/30 sm:p-6"
+      className="flex w-full cursor-pointer items-center gap-5 rounded-[48px] border border-[#20354a] bg-[#102338] p-5 text-left transition hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-600/30 sm:p-6"
     >
       <div
         role="progressbar"
@@ -38,15 +40,15 @@ function ProgressRing({ value, label, detail, color, onClick }) {
         aria-valuemax={100}
         aria-valuenow={boundedValue}
         className="grid h-[92px] w-[92px] shrink-0 place-items-center rounded-full"
-        style={{ background: `conic-gradient(${color} ${boundedValue * 3.6}deg, #ececf0 0deg)` }}
+        style={{ background: `conic-gradient(${color} ${boundedValue * 3.6}deg, #2b4055 0deg)` }}
       >
-        <div className="grid h-[70px] w-[70px] place-items-center rounded-full bg-white text-lg font-semibold tracking-tight text-[#1d1d1f]">
+        <div className="grid h-[70px] w-[70px] place-items-center rounded-full bg-[#102338] text-lg font-semibold tracking-tight text-white">
           {boundedValue}%
         </div>
       </div>
       <div className="min-w-0">
-        <h2 className="text-sm font-semibold text-[#1d1d1f]">{label}</h2>
-        <p className="mt-1 text-xs leading-relaxed text-[#86868b]">{detail}</p>
+        <h2 className="text-sm font-semibold text-white">{label}</h2>
+        <p className="mt-1 text-xs leading-relaxed text-[#bdcbd9]">{detail}</p>
       </div>
     </button>
   );
@@ -348,20 +350,10 @@ export default function StatisticsDashboard() {
 
         <section aria-label="Resumo financeiro" className="mt-7 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
           {summary.map((card, index) => (
-            <button
-              key={card.label}
-              type="button"
-              aria-haspopup="dialog"
-              onClick={() => setExpandedInsight(["summary-confirmed", "summary-gross", "summary-awaiting", "summary-average"][index])}
-              className="w-full cursor-pointer rounded-[24px] border border-[#e8e8ed] bg-white p-5 text-left transition hover:border-sky-200 hover:bg-sky-50/40 hover:shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-600/30 sm:p-6"
-            >
-              <div className="flex items-center justify-between gap-2">
-                <p className="text-xs font-medium text-[#86868b]">{card.label}</p>
-                <span className={`grid h-10 w-10 place-items-center rounded-2xl text-lg shadow-sm ring-1 ${card.tone}`}>{card.icon}</span>
-              </div>
-              <p className="mt-5 break-words text-[26px] font-semibold leading-tight tracking-[-0.05em]">{loading ? "—" : card.value}</p>
-              <p className="mt-3 text-[11px] text-[#a1a1a6]">{card.detail}</p>
-            </button>
+            <MetricCard key={card.label} label={card.label} value={loading ? "—" : card.value}
+              detail={card.detail} icon={card.icon} dark={index === 0 || index === 3}
+              tone={index === 2 ? "orange" : "blue"}
+              onClick={() => setExpandedInsight(["summary-confirmed", "summary-gross", "summary-awaiting", "summary-average"][index])} />
           ))}
         </section>
 
@@ -370,14 +362,14 @@ export default function StatisticsDashboard() {
             value={percentage(confirmed.length, yearSales.length)}
             label="Taxa de confirmação"
             detail={`${confirmed.length} confirmadas de ${yearSales.length} encomendas e orçamentos no ano`}
-            color="#0071e3"
+            color="#39b7ff"
             onClick={() => setExpandedInsight("ring-confirmation")}
           />
           <ProgressRing
             value={percentage(resolved.length, yearSales.length)}
             label="Encomendas resolvidas"
             detail={`${resolved.length} pagas e entregues de ${yearSales.length} documentos no ano`}
-            color="#34a853"
+            color="#40d9a0"
             onClick={() => setExpandedInsight("ring-resolved")}
           />
         </section>

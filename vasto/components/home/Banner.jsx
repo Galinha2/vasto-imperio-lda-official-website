@@ -28,7 +28,7 @@ export default function Banner() {
         <div className="relative z-10 max-w-3xl lg:self-center">
           <p className="mb-5 inline-flex items-center gap-2 rounded-full border border-black/10 bg-white/75 px-4 py-2 text-xs font-semibold uppercase tracking-[0.14em] text-[#52545a] shadow-sm backdrop-blur-md sm:text-sm">
             <span className="h-2 w-2 rounded-full bg-(--orange)" />
-            Vasto Império · Benedita e Viseu
+            Vasto Império · Viseu e Benedita
           </p>
           <h1
             className="max-w-3xl text-4xl font-semibold leading-[1.03] tracking-[-0.045em] text-[#15171a] sm:text-5xl md:text-6xl lg:text-7xl"

@@ -1,3 +1,4 @@
+import GoogleAdsConsent from "@/components/analytics/GoogleAdsConsent";
 import { Inter_Tight } from 'next/font/google';
 import "./globals.css";
 import Header from "@/components/header/Header";
@@ -107,6 +108,7 @@ export default function RootLayout({ children }) {
           </main>
           <Footer />
         </LanguageProvider>
+        <GoogleAdsConsent />
         <Analytics />
       </body>
     </html>

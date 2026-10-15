@@ -1,12 +1,13 @@
 "use client";
 
 import { groupQuotes, sameQuoteCustomer } from "@/lib/admin/quote-groups.mjs";
+import { isSaleInactive, lastSaleActivity } from "@/lib/admin/sale-activity.mjs";
 import MetricCard from "./MetricCard";
 
 import { Fragment, useEffect, useId, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createPortal } from "react-dom";
-import { IoAddOutline, IoAlertCircleOutline, IoArrowUpOutline, IoCheckmarkCircleOutline, IoCloudUploadOutline, IoDocumentTextOutline, IoSearchOutline, IoTimeOutline, IoOpenOutline, IoCloseOutline, IoImagesOutline, IoTrashOutline, IoChevronDownOutline, IoWalletOutline } from "react-icons/io5";
+import { IoAddOutline, IoAlertCircleOutline, IoArrowUpOutline, IoCheckmarkCircleOutline, IoCloudUploadOutline, IoDocumentTextOutline, IoSearchOutline, IoTimeOutline, IoOpenOutline, IoCloseOutline, IoImagesOutline, IoTrashOutline, IoChevronDownOutline, IoWalletOutline, IoUnlinkOutline } from "react-icons/io5";
 
 const months = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
 const currency = new Intl.NumberFormat("pt-PT", { style: "currency", currency: "EUR" });
@@ -23,7 +24,12 @@ const todayInLisbon = () => {
   return `${parts.year}-${parts.month}-${parts.day}`;
 };
 const periodDate = (sale) => sale.status === "em_preparacao" ? sale.issuedAt : sale.deliveryStatus === "entregue" && sale.deliveryDate ? sale.deliveryDate : sale.saleDate || sale.issuedAt;
-const unresolvedDate = (sale) => sale.status === "em_preparacao" ? sale.issuedAt : sale.saleDate || sale.issuedAt;
+const unresolvedDate = (sale) => {
+  const activity = lastSaleActivity(sale);
+  if (activity === null) return "";
+  const parts = Object.fromEntries(new Intl.DateTimeFormat("en", { timeZone: "Europe/Lisbon", year: "numeric", month: "2-digit", day: "2-digit" }).formatToParts(new Date(activity)).map(({ type, value }) => [type, value]));
+  return `${parts.year}-${parts.month}-${parts.day}`;
+};
 const unresolvedAge = (date) => {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(date || "")) return "data desconhecida";
   const [year, month, day] = date.split("-").map(Number);
@@ -312,7 +318,7 @@ export default function SalesDashboard() {
         body: JSON.stringify(targetId ? { sourceId, targetId } : { id: sourceId }),
       });
       setSales(result.sales);
-      setNotice(targetId ? "Orçamentos agrupados. Clique na bolinha para ver as versões." : "Orçamento separado do grupo.");
+      setNotice(targetId ? "Orçamentos agrupados. Clique em “versões” para expandir." : "Orçamento separado do grupo.");
     } catch (failure) {
       setError(failure.message);
       try { const result = await api("/api/admin/sales"); setSales(result.sales); } catch { /* Keep the grouping error visible. */ }
@@ -475,8 +481,8 @@ export default function SalesDashboard() {
   const paidCommission = commissionRows.filter((item) => item.paid).reduce((amount, item) => amount + item.cents, 0) / 100;
   const outstandingCommission = commissionRows.filter((item) => !item.paid).reduce((amount, item) => amount + item.cents, 0) / 100;
   const unresolvedSales = sales
-    .filter((sale) => !sale.quoteNotSelected && !isResolved(sale))
-    .sort((a, b) => (unresolvedDate(a) || "9999-99-99").localeCompare(unresolvedDate(b) || "9999-99-99"));
+    .filter((sale) => !sale.quoteNotSelected && !isResolved(sale) && isSaleInactive(sale))
+    .sort((a, b) => lastSaleActivity(a) - lastSaleActivity(b));
   const quoteGroups = groupQuotes(visibleSales);
   const groupBySale = new Map(quoteGroups.flatMap((group) => group.sales.map((sale) => [sale.id, group])));
   const tableSales = quoteGroups.flatMap((group) => group.sales);
@@ -968,11 +974,15 @@ export default function SalesDashboard() {
                           <td className="px-3 py-5">
                             <div className="flex items-center gap-2">
                               <p className="truncate text-sm font-semibold tracking-tight">{sale.customerName}</p>
-                              {groupBySale.get(sale.id).sales.length > 1 && groupBySale.get(sale.id).sales[0].id === sale.id && <button type="button" aria-label={`${expandedQuoteGroups[groupBySale.get(sale.id).id] ? "Recolher" : "Expandir"} ${groupBySale.get(sale.id).sales.length} versões de ${sale.customerName}`} aria-expanded={!!expandedQuoteGroups[groupBySale.get(sale.id).id]} title="Orçamentos agrupados manualmente. Clique para ver as versões." onClick={() => setExpandedQuoteGroups((current) => ({ ...current, [groupBySale.get(sale.id).id]: !current[groupBySale.get(sale.id).id] }))} className="inline-flex h-8 min-w-8 shrink-0 cursor-pointer items-center justify-center rounded-full bg-[#0879c0] px-2 text-xs font-semibold text-white shadow-sm transition hover:bg-[#06639e] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0879c0]">×{groupBySale.get(sale.id).sales.length}</button>}
+
                             </div>
-                            {groupBySale.get(sale.id).sales.length > 1 && <p className="mt-1 text-[10px] font-medium text-[#0879c0]">{groupBySale.get(sale.id).label} · Versão {groupBySale.get(sale.id).sales.indexOf(sale) + 1}/{groupBySale.get(sale.id).sales.length}</p>}
+                              {groupBySale.get(sale.id).sales.length > 1 && groupBySale.get(sale.id).sales[0].id === sale.id && <button type="button" aria-label={`${expandedQuoteGroups[groupBySale.get(sale.id).id] ? "Recolher" : "Expandir"} ${groupBySale.get(sale.id).sales.length} versões de ${sale.customerName}`} aria-expanded={!!expandedQuoteGroups[groupBySale.get(sale.id).id]} title="Orçamentos agrupados manualmente. Clique para ver as versões." onClick={() => setExpandedQuoteGroups((current) => ({ ...current, [groupBySale.get(sale.id).id]: !current[groupBySale.get(sale.id).id] }))} className="mt-2 inline-flex min-h-8 cursor-pointer items-center gap-2 rounded-xl border border-[#cfe1f1] bg-[#edf5fc] px-2.5 py-1.5 text-[11px] font-semibold text-[#0879c0] transition hover:border-[#0879c0] hover:bg-[#e0eefb] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0879c0]">
+                                <IoDocumentTextOutline aria-hidden="true" className="shrink-0 text-sm" />
+                                <span>{groupBySale.get(sale.id).sales.length} versões</span>
+                                <IoChevronDownOutline aria-hidden="true" className={`shrink-0 transition-transform motion-reduce:transition-none ${expandedQuoteGroups[groupBySale.get(sale.id).id] ? "rotate-180" : ""}`} />
+                              </button>}
+                            {groupBySale.get(sale.id).sales.length > 1 && expandedQuoteGroups[groupBySale.get(sale.id).id] && <p className="mt-1 text-[10px] font-medium text-[#0879c0]">{groupBySale.get(sale.id).label} · Versão {groupBySale.get(sale.id).sales.indexOf(sale) + 1}/{groupBySale.get(sale.id).sales.length}</p>}
                             {(sale.quoteDetails || sale.orderDetails?.detalhes) && <p className="mt-2 line-clamp-3 text-[10px] leading-relaxed text-[#6e6e73]" title={sale.quoteDetails || sale.orderDetails?.detalhes}>{sale.quoteDetails || sale.orderDetails?.detalhes}</p>}
-                            {sale.quoteGroupId && <button type="button" disabled={groupingQuotes} onClick={() => changeQuoteGroup(sale.id)} className="mt-1 text-[10px] text-[#86868b] hover:text-[#0879c0] hover:underline disabled:opacity-50">Separar este orçamento</button>}
 
                             <p className="mt-1 truncate text-[11px] text-[#a1a1a6]">{sale.nif ? `${sale.nif} · ` : ""}{sale.fileName}</p>
                             <p className="mt-1 truncate text-[10px] text-[#86868b]">{sale.source === "simulador" ? "Simulador" : "Orçamento"} · {dateLabel(sale.issuedAt)}</p>
@@ -1049,6 +1059,7 @@ export default function SalesDashboard() {
                           </td>
                           <td className="px-3 py-4">
                             <div className="flex justify-end gap-0">
+                              {sale.quoteGroupId && <button type="button" title="Retirar do grupo" aria-label={`Retirar ${sale.fileName || "orçamento"} do grupo`} disabled={groupingQuotes} onClick={() => changeQuoteGroup(sale.id)} className="grid h-8 w-8 shrink-0 cursor-pointer place-items-center rounded-full text-base text-[#86868b] transition hover:bg-[#f5f5f7] hover:text-[#424245] disabled:opacity-50"><IoUnlinkOutline /></button>}
                               <button
                                 type="button"
                                 aria-expanded={imagePanel === sale.id}

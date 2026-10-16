@@ -102,6 +102,7 @@ export default async function handler(req, res) {
       tls: { rejectUnauthorized: false },
     });
     const imageAttachment = fs.readFileSync(uploadedImage.filepath);
+    const pdfBuffer = fs.readFileSync(uploadedPdf.filepath);
     const imageFilename = equipmentOrder ? "imagem-equipamento.jpg" : "desenho-estante.jpg";
     await transporter.sendMail({
       from: process.env.SMTP_USER,
@@ -111,7 +112,7 @@ export default async function handler(req, res) {
       html,
       attachments: [
         { filename: imageFilename, content: imageAttachment, contentType: "image/jpeg" },
-        { filename: "folha-orcamento.pdf", content: fs.readFileSync(uploadedPdf.filepath), contentType: "application/pdf" },
+        { filename: "folha-orcamento.pdf", content: pdfBuffer, contentType: "application/pdf" },
       ],
     });
     await transporter.sendMail({
@@ -122,9 +123,9 @@ export default async function handler(req, res) {
       html: confirmationHtml,
       attachments: [
         { filename: imageFilename, content: imageAttachment, contentType: "image/jpeg" },
+        { filename: "folha-orcamento.pdf", content: pdfBuffer, contentType: "application/pdf" },
       ],
     });
-    const pdfBuffer = fs.readFileSync(uploadedPdf.filepath);
     const imageBuffer = imageAttachment;
     const cleanText = (value, maxLength) => typeof value === "string" ? value.trim().slice(0, maxLength) : "";
     const salesOrderDetails = {

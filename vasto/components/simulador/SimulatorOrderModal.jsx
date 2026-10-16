@@ -62,7 +62,7 @@ export default function SimulatorOrderModal({ open, onClose, total, details, ite
     setSubmitting(true);
     setError("");
     try {
-      const drawing = drawingRef?.current?.querySelector('svg[role="img"]');
+      const drawing = drawingRef?.current?.querySelector('svg[role="img"], svg[data-order-drawing]');
       if (!equipment && !drawing) throw new Error(english ? "The drawing is not available to attach." : "Não foi possível preparar o desenho da estante.");
       await document.fonts?.ready;
       let createImage;

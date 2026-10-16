@@ -366,6 +366,7 @@ export default function SimulatorEstantesLigeiras({ onQuoteDataChange, adminMode
         <div className="hidden lg:block" aria-hidden="true" />
       </div>}
 
+      <>
       <div className={`mx-auto grid max-w-[1800px] items-start gap-5 lg:grid-cols-[minmax(360px,0.78fr)_minmax(0,1.75fr)] xl:gap-7 ${adminMode ? "lg:gap-4 xl:gap-5" : ""}`}>
         <div className="order-2 w-full rounded-[30px] border border-[#e5e5e7] bg-white p-5 shadow-[0_12px_40px_rgba(0,0,0,0.05)] sm:p-7 lg:order-1 lg:p-8">
           <div className="mb-6"><p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#86868b]">{english ? "1 · Configuration" : "1 · Configuração"}</p><h2 className="mt-1 text-2xl font-semibold tracking-tight text-[#1d1d1f]">{english ? "Choose dimensions" : "Escolha as medidas"}</h2></div>
@@ -395,6 +396,7 @@ export default function SimulatorEstantesLigeiras({ onQuoteDataChange, adminMode
           {adminMode && adminPanel}
         </div>
       </div>
+      </>
       {!adminMode && <SimulatorOrderModal open={orderOpen} onClose={() => setOrderOpen(false)} total={orderQuoteRef.current?.total ?? discountedEstimate} details={orderQuoteRef.current?.details} items={orderQuoteRef.current?.items} discountPercent={orderQuoteRef.current?.discountPercent ?? discountRate * 100} drawingRef={drawingRef} english={english} />}
     </section>
   );

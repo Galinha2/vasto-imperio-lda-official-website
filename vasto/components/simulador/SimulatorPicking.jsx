@@ -9,6 +9,7 @@ import SimulatorSectionTabs from "@/components/simulador/SimulatorSectionTabs";
 import SimulatorOrderModal from "@/components/simulador/SimulatorOrderModal";
 import createQuoteLines from "@/components/simulador/createQuoteLines";
 import { isWorkbenchFrame, workbenchLevelPosition } from "@/lib/workbench.mjs";
+import { pickingDiscountRate } from "@/lib/picking-discount.mjs";
 import budget from "@/assets/orcamento.json";
 
 const products = budget.produtos.filter((product) => product.ref === 3);
@@ -405,7 +406,7 @@ export default function SimulatorPicking({ onQuoteDataChange, adminMode = false,
     const shelf = shelves.find((product) => product.length === moduleLength && product.depth === depth && product.material === floorType);
       return sum + (2 * numericPrice(beam) + numericPrice(shelf) + reinforcementPrice(moduleLength, depth, floorType) + numericPrice(safetyBrake) * 4) * levels * rowCount;
     }, 0);
-    const rate = gross >= 2600 ? 0.15 : gross >= 1900 ? 0.10 : gross >= 850 ? 0.05 : 0;
+    const rate = pickingDiscountRate(gross);
     return gross * (1 - rate);
   };
   const solutions = useMemo(() => buildSimilarSolutions(baseModules, targetLength, {
@@ -433,7 +434,7 @@ export default function SimulatorPicking({ onQuoteDataChange, adminMode = false,
   }, 0);
   const estimatePerRow = numericPrice(matchingFrame) * (modules.length + 1) + moduleSubtotal;
   const estimate = estimatePerRow * rowCount;
-  const suggestedDiscountRate = estimate >= 2600 ? 0.15 : estimate >= 1900 ? 0.10 : estimate >= 850 ? 0.05 : 0;
+  const suggestedDiscountRate = pickingDiscountRate(estimate);
   const discountRate = adminMode && adminDiscountPercent !== null
     ? Math.min(100, Math.max(0, Number(adminDiscountPercent) || 0)) / 100
     : suggestedDiscountRate;
@@ -549,6 +550,7 @@ export default function SimulatorPicking({ onQuoteDataChange, adminMode = false,
         <div className="flex justify-start"><SimulatorSectionTabs group="storage" active="picking" /></div>
         <div className="hidden lg:block" aria-hidden="true" />
       </div>}
+      <>
       <div className={`mx-auto grid max-w-[1800px] items-start gap-5 lg:grid-cols-[minmax(360px,0.78fr)_minmax(0,1.75fr)] xl:gap-7 ${adminMode ? "lg:gap-4 xl:gap-5" : ""}`}>
         <div className="order-2 w-full rounded-[30px] border border-[#e5e5e7] bg-white p-5 shadow-[0_12px_40px_rgba(0,0,0,0.05)] sm:p-7 lg:order-1 lg:p-8">
           <div className="mb-6">
@@ -651,6 +653,7 @@ export default function SimulatorPicking({ onQuoteDataChange, adminMode = false,
           {adminMode && adminPanel}
         </div>
       </div>
+      </>
       {!adminMode && <SimulatorOrderModal open={orderOpen} onClose={() => setOrderOpen(false)} total={orderQuoteRef.current?.total ?? discountedEstimate} details={orderQuoteRef.current?.details} items={orderQuoteRef.current?.items} discountPercent={orderQuoteRef.current?.discountPercent ?? discountRate * 100} drawingRef={drawingRef} english={english} />}
     </section>
   );

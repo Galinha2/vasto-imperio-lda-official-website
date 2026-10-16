@@ -19,17 +19,15 @@ export default function SimulatorConfigurationOptions({
 }) {
   const { language } = useLanguage();
   const [openInfo, setOpenInfo] = useState("");
+  const [rowInput, setRowInput] = useState(String(rowCount));
+  useEffect(() => setRowInput(String(rowCount)), [rowCount]);
   const infoRef = useRef(null);
   const infoId = useId();
   const english = language === "en";
-  const rowCountLabel = english ? "Repeat this shelving row?" : "Quer repetir esta fila de estantes?";
   const rowCountInfo = english
     ? "Each repeat adds an identical row alongside the first. The selected length applies to every row."
     : "Cada repetição acrescenta uma fila igual ao lado da primeira. O comprimento escolhido aplica-se a cada fila.";
-  const rowCountOptions = [1, 2, 3];
-  const formatRowCount = (count) => english
-    ? count === 1 ? "Do not repeat (1 row total)" : `Repeat ${count - 1} time${count > 2 ? "s" : ""} (${count} identical rows)`
-    : count === 1 ? "Não repetir (1 fila no total)" : `Repetir ${count - 1} ${count === 2 ? "vez" : "vezes"} (${count} filas iguais)`;
+
 
   useEffect(() => {
     if (!openInfo) return undefined;
@@ -52,14 +50,13 @@ export default function SimulatorConfigurationOptions({
       <div className="space-y-2">
         <div className="flex items-end gap-2">
           <div className="min-w-0 flex-1">
-            <SimulatorDropdown
-              label={rowCountLabel}
-              value={rowCount}
-              onChange={onRowCountChange}
-              options={rowCountOptions}
-              format={formatRowCount}
-              compact
-            />
+            <label className="block text-sm font-semibold text-[#424245]">
+              {english ? "Total number of identical rows" : "Número total de filas iguais"}
+              <input type="number" min="1" step="1" value={rowInput}
+                onChange={(event) => { setRowInput(event.target.value); const count = Number(event.target.value); if (Number.isSafeInteger(count) && count >= 1) onRowCountChange(count); }}
+                onBlur={() => setRowInput(String(rowCount))}
+                className="mt-2 h-11 w-full rounded-full border border-[#d2d2d7] bg-white px-4 text-sm font-medium text-[#1d1d1f] outline-none focus:border-[#ff5500]" />
+            </label>
           </div>
           <div className="simulator-info group relative shrink-0" data-open={openInfo === "row-count"}>
             <button

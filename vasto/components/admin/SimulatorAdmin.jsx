@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import Link from "next/link";
 import Image from "@/components/loadings/LoadingImage";
 import SimulatorEstantesLigeiras from "@/components/simulador/SimulatorEstantesLigeiras";
 import SimulatorPicking from "@/components/simulador/SimulatorPicking";
@@ -253,6 +254,11 @@ export default function SimulatorAdmin() {
             </button>
           ))}
         </nav>
+
+        {simuladorAtivo !== "bancadas" && <nav aria-label="Modo de simulação" className="flex flex-wrap gap-2">
+          <span className="rounded-full bg-orange-50 px-5 py-3 text-sm font-semibold text-orange-700">Configurar uma fila · 2D</span>
+          <Link href={`/admin/simulador/espaco/${simuladorAtivo}`} className="rounded-full border border-[#e5e5e7] bg-white px-5 py-3 text-sm font-semibold text-[#424245] hover:bg-[#f5f5f7]">Planear com as medidas do espaço · Vista de topo</Link>
+        </nav>}
 
         <section ref={capturaRef} aria-label={`Simulação de ${ativo.label}`} className="min-w-0">
           <Simulator key={simuladorAtivo} variant={simuladorAtivo === "bancadas" ? "workbench" : undefined} adminMode adminPanel={adminPanel} adminDiscountPercent={descontoManual} onQuoteDataChange={receberDadosOrcamento} />

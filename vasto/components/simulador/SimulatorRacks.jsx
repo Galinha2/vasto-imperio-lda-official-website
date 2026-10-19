@@ -56,8 +56,8 @@ function findBestModules(targetLength, { height, depth, levels, sameBeamLength, 
     let bestCount = 1;
     let bestDistance = Infinity;
     let cheapestCost = Infinity;
-    for (let count = 1; count * selectedLength <= maxTotal; count += 1) {
-      const distance = Math.abs(count * selectedLength + 100 - target);
+    for (let count = 1; count * (selectedLength + 100) <= maxTotal; count += 1) {
+      const distance = Math.abs(count * (selectedLength + 100) + 100 - target);
       const cost = count * moduleCosts.get(selectedLength);
       if (distance < bestDistance || (distance === bestDistance && cost < cheapestCost)) {
         bestCount = count;
@@ -72,8 +72,8 @@ function findBestModules(targetLength, { height, depth, levels, sameBeamLength, 
   bestCost[0] = 0;
   for (let current = 1; current <= maxTotal; current += 1) {
     for (const moduleLength of beamLengths) {
-      if (moduleLength <= current && bestCost[current - moduleLength] + moduleCosts.get(moduleLength) < bestCost[current]) {
-        bestCost[current] = bestCost[current - moduleLength] + moduleCosts.get(moduleLength);
+      if (moduleLength + 100 <= current && bestCost[current - moduleLength - 100] + moduleCosts.get(moduleLength) < bestCost[current]) {
+        bestCost[current] = bestCost[current - moduleLength - 100] + moduleCosts.get(moduleLength);
         previousLength[current] = moduleLength;
       }
     }
@@ -94,17 +94,17 @@ function findBestModules(targetLength, { height, depth, levels, sameBeamLength, 
   while (total > 0 && previousLength[total]) {
     const moduleLength = previousLength[total];
     modules.push(moduleLength);
-    total -= moduleLength;
+    total -= moduleLength + 100;
   }
   return modules;
 }
 
-function RackPreview({ modules, height, levels, rowCount, capacityLabel, solutions, selectedSolutionId, onSelectSolution, english }) {
+function RackPreview({ modules, height, depth, levels, rowCount, capacityLabel, solutions, selectedSolutionId, onSelectSolution, english }) {
   const formatMeters = (value) => `${(value / 1000).toLocaleString(english ? "en-IE" : "pt-PT", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} m`;
   const width = 1000;
   const bottom = 410;
   const beamLengthTotal = modules.reduce((sum, moduleLength) => sum + moduleLength, 0);
-  const totalLength = beamLengthTotal + 100;
+  const totalLength = beamLengthTotal + (modules.length + 1) * 100;
   const naturalHeight = 220 + (height / Math.max(...heights)) * 130;
   const visualRatio = totalLength / height;
   const rackHeight = Math.min(naturalHeight, (width - 260) / visualRatio);
@@ -149,6 +149,7 @@ function RackPreview({ modules, height, levels, rowCount, capacityLabel, solutio
           <text x="70" y="30" fill="#555" fontSize="18" fontWeight="600">{english ? "Front view 2D · Length per row: " : "Vista frontal 2D · Comprimento por fila: "}{formatMeters(totalLength)}</text>
           <text x={width - 70} y="30" textAnchor="end" fill="#555" fontSize="18" fontWeight="600">{english ? "Height: " : "Altura: "}{formatMeters(height)}</text>
           <line x1="35" y1={top} x2="35" y2={bottom} stroke="#a6a6a6" strokeWidth="2" /><line x1="28" y1={top} x2="42" y2={top} stroke="#a6a6a6" strokeWidth="2" /><line x1="28" y1={bottom} x2="42" y2={bottom} stroke="#a6a6a6" strokeWidth="2" />
+          <text x={width - 70} y="55" textAnchor="end" fill="#777" fontSize="14">{english ? "Depth: " : "Profundidade: "}{formatMeters(depth)}</text>
           <text x="21" y={(top + bottom) / 2} transform={`rotate(-90 21 ${(top + bottom) / 2})`} textAnchor="middle" fill="#777" fontSize="16">{formatMeters(height)}</text>
           <g aria-label={`${english ? "Total length" : "Comprimento total"} ${formatMeters(totalLength)}`}>
             <line x1={rackLeft} y1={top - 12} x2={rackRight} y2={top - 12} stroke="#a6a6a6" strokeWidth="2" />
@@ -157,7 +158,7 @@ function RackPreview({ modules, height, levels, rowCount, capacityLabel, solutio
             <text x={(rackLeft + rackRight) / 2} y={top - 20} textAnchor="middle" fill="#666" fontSize="16" fontWeight="600">{formatMeters(totalLength)}</text>
           </g>
           {Array.from({ length: modules.length + 1 }, (_, index) => {
-            const centerX = rackLeft + (50 + modules.slice(0, index).reduce((sum, item) => sum + item, 0)) * scale;
+            const centerX = rackLeft + (50 + index * 100 + modules.slice(0, index).reduce((sum, item) => sum + item, 0)) * scale;
             const frameX = centerX - uprightWidth / 2;
             const slotWidth = Math.max(1.2, uprightWidth * 0.12);
             const slotHeight = Math.max(1.6, Math.min(3.2, uprightWidth * 0.11));
@@ -182,11 +183,11 @@ function RackPreview({ modules, height, levels, rowCount, capacityLabel, solutio
           })}
           {modules.map((moduleLength, moduleIndex) => {
             const precedingLength = modules.slice(0, moduleIndex).reduce((sum, item) => sum + item, 0);
-            // Beams meet the uprights at their centerline (halfway through their inner boundary).
-            const beamX = rackLeft + (50 + precedingLength) * scale;
+            // Each clear beam span sits between two 100 mm uprights.
+            const beamX = rackLeft + (100 + moduleIndex * 100 + precedingLength) * scale;
             const beamWidth = moduleLength * scale;
-            const beamInnerX = beamX + uprightWidth / 2;
-            const beamInnerWidth = beamWidth - uprightWidth;
+            const beamInnerX = beamX;
+            const beamInnerWidth = beamWidth;
             const beam = beams.find((item) => item.length === moduleLength);
             const tabWidth = Math.max(2, uprightWidth * 0.5);
             return <g key={`beam-${moduleIndex}`}>
@@ -273,7 +274,7 @@ export default function SimulatorRacks({ onQuoteDataChange, adminMode = false, a
   };
   const solutions = useMemo(() => buildSimilarSolutions(baseModules, targetLength, {
     getModules: (target) => findBestModules(target, { height, depth, levels, sameBeamLength, desiredBeamLength }),
-    getTotalLength: (candidate) => candidate.reduce((sum, value) => sum + value, 0) + 100,
+    getTotalLength: (candidate) => candidate.reduce((sum, value) => sum + value, 0) + (candidate.length + 1) * 100,
     getPrice: estimateModules,
     step: 500,
     maxSteps: 8,
@@ -293,7 +294,7 @@ export default function SimulatorRacks({ onQuoteDataChange, adminMode = false, a
     : suggestedDiscountRate;
   const discountAmount = estimate * discountRate;
   const discountedEstimate = estimate - discountAmount;
-  const finalLength = modules.length ? modules.reduce((sum, moduleLength) => sum + moduleLength, 0) + 100 : 0;
+  const finalLength = modules.length ? modules.reduce((sum, moduleLength) => sum + moduleLength, 0) + (modules.length + 1) * 100 : 0;
   const levelCapacity = modules.length ? Math.min(...modules.map((moduleLength) => beams.find((beam) => beam.length === moduleLength)?.capacity || 0)) : 0;
   const capacityIsMinimum = modules.length > 0 && modules.every((moduleLength) => beams.find((beam) => beam.length === moduleLength)?.capacityIsMinimum);
   const beamDistribution = [...new Set(modules)].sort((a, b) => a - b).map((length) => ({
@@ -395,7 +396,7 @@ export default function SimulatorRacks({ onQuoteDataChange, adminMode = false, a
         <div className="order-1 min-w-0 space-y-4 lg:order-2">
           {isLengthUnavailable
             ? <div className="rounded-[30px] border border-[#e5e5e7] bg-white p-7 shadow-[0_12px_40px_rgba(0,0,0,0.05)]"><h2 className="text-xl font-semibold tracking-tight text-[#1d1d1f]">{english ? "Industrial pallet racking" : "Rack industrial para paletes"}</h2><p className="mt-1 text-xs text-[#86868b]">{english ? "Your configuration · 2D preview" : "A sua configuração · Pré-visualização 2D"}</p><p className="mt-4 rounded-[30px] bg-red-50 p-4 text-sm text-red-700">{english ? "Lengths over 30.00 m are not available." : "Comprimentos superiores a 30.00 m não estão disponíveis."}</p></div>
-            : <RackPreview modules={modules} height={height} levels={levels} rowCount={rowCount} capacityLabel={`${english ? "Maximum load per beam pair" : "Carga máxima por par de vigas"}: ${capacityIsMinimum ? "> " : ""}${levelCapacity.toLocaleString(english ? "en-IE" : "pt-PT")} kg`} solutions={solutions} selectedSolutionId={selectedSolutionId} onSelectSolution={setSelectedSolutionId} english={english} />}
+            : <RackPreview modules={modules} height={height} depth={depth} levels={levels} rowCount={rowCount} capacityLabel={`${english ? "Maximum load per beam pair" : "Carga máxima por par de vigas"}: ${capacityIsMinimum ? "> " : ""}${levelCapacity.toLocaleString(english ? "en-IE" : "pt-PT")} kg`} solutions={solutions} selectedSolutionId={selectedSolutionId} onSelectSolution={setSelectedSolutionId} english={english} />}
           {adminMode && adminPanel}
         </div>
       </div>

@@ -34,7 +34,7 @@ export async function POST(request) {
     }
     const buffer = Buffer.from(await file.arrayBuffer());
     const record = await parseSalePdf(buffer, file.name);
-    const sale = await createSale(record, buffer);
+    const sale = await createSale({ ...record, entryOrigin: "admin" }, buffer);
     if (!image) return NextResponse.json({ sale }, { status: 201, headers: { "Cache-Control": "no-store" } });
     try {
       const savedImage = await addSaleImage(sale.id, image.name, image.type, Buffer.from(await image.arrayBuffer()));

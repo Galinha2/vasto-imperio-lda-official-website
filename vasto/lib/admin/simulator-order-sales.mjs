@@ -10,6 +10,7 @@ export async function saveSimulatorOrderToSales({ pdfBuffer, imageBuffer, imageN
     record.status = "confirmada";
     record.saleDate = record.issuedAt;
     record.orderDetails = orderDetails;
+    record.entryOrigin = "cliente";
 
     try {
       await createSale(record, pdfBuffer);

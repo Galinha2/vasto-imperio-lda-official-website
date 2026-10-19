@@ -33,7 +33,7 @@ export async function POST(request) {
     await deleteSaleUpload(path);
     uploadRemoved = true;
     const record = await parseSalePdf(buffer, fileName);
-    return NextResponse.json({ sale: await createSale(record, buffer) }, { status: 201, headers: { "Cache-Control": "no-store" } });
+    return NextResponse.json({ sale: await createSale({ ...record, entryOrigin: "admin" }, buffer) }, { status: 201, headers: { "Cache-Control": "no-store" } });
   } catch (error) {
     if (uploadPath && !uploadRemoved) {
       try { await deleteSaleUpload(uploadPath); }

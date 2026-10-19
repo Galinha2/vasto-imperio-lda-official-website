@@ -271,6 +271,15 @@ export default function SalesDashboard() {
     return () => { active = false; };
   }, []);
 
+  useEffect(() => {
+    const addIncoming = (event) => setSales((current) => {
+      const existing = new Set(current.map((sale) => sale.id));
+      return [...event.detail.filter((sale) => !existing.has(sale.id)), ...current];
+    });
+    window.addEventListener("admin:new-sales", addIncoming);
+    return () => window.removeEventListener("admin:new-sales", addIncoming);
+  }, []);
+
   async function importFiles(files) {
     if (uploading || loading || !files?.length) return;
     setUploading(true); setError(""); setNotice("");
@@ -985,7 +994,12 @@ export default function SalesDashboard() {
                             {(sale.quoteDetails || sale.orderDetails?.detalhes) && <p className="mt-2 line-clamp-3 text-[10px] leading-relaxed text-[#6e6e73]" title={sale.quoteDetails || sale.orderDetails?.detalhes}>{sale.quoteDetails || sale.orderDetails?.detalhes}</p>}
 
                             <p className="mt-1 truncate text-[11px] text-[#a1a1a6]">{sale.nif ? `${sale.nif} · ` : ""}{sale.fileName}</p>
-                            <p className="mt-1 truncate text-[10px] text-[#86868b]">{sale.source === "simulador" ? "Simulador" : "Orçamento"} · {dateLabel(sale.issuedAt)}</p>
+                            <div className="mt-1 flex items-center gap-2">
+                              <p className="min-w-0 truncate text-[10px] text-[#86868b]">{sale.source === "simulador" ? "Simulador" : "Orçamento"} · {dateLabel(sale.issuedAt)}</p>
+                            <span title={sale.entryOrigin === "cliente" || (!sale.entryOrigin && sale.orderDetails) ? "Pedido enviado pelo cliente através do site, com envio por email." : "Orçamento introduzido através do painel de administração."} className={`shrink-0 inline-flex rounded-full px-2 py-0.5 text-[10px] font-medium ${sale.entryOrigin === "cliente" || (!sale.entryOrigin && sale.orderDetails) ? "border border-orange-200 bg-orange-50 text-orange-700" : "border border-blue-200 bg-blue-50 text-blue-700"}`}>
+                              {sale.entryOrigin === "cliente" || (!sale.entryOrigin && sale.orderDetails) ? "Cliente · Site" : "Admin"}
+                            </span>
+                            </div>
                             {sale.uploadedAt && <p className="mt-0.5 truncate text-[9px] text-[#a1a1a6]" title={`Pedido recebido em ${dateLabel(sale.uploadedAt.slice(0, 10))}`}>Recebido · {dateLabel(sale.uploadedAt.slice(0, 10))}</p>}
                           </td>
                           <td className="whitespace-nowrap px-2 py-5 text-right">

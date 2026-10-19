@@ -172,6 +172,7 @@ function ShelfPreview({ modules, height, depth, levels, rowCount, bracedIndexes,
           </defs>
           <text x="70" y="32" fill="#555" fontSize="18" fontWeight="600">{english ? "Front view · Total length: " : "Vista frontal · Comprimento total: "}{formatMeters(totalLength)}</text>
           <text x={svgWidth - 70} y="32" textAnchor="end" fill="#555" fontSize="18" fontWeight="600">{english ? "Height: " : "Altura: "}{formatMeters(height)}</text>
+          <text x={svgWidth - 70} y="57" textAnchor="end" fill="#777" fontSize="14">{english ? "Depth: " : "Profundidade: "}{formatMeters(depth)}</text>
           <line x1={left} y1={top - 17} x2={right} y2={top - 17} stroke="#a6a6a6" strokeWidth="2"/><line x1={left} y1={top - 22} x2={left} y2={top - 12} stroke="#a6a6a6" strokeWidth="2"/><line x1={right} y1={top - 22} x2={right} y2={top - 12} stroke="#a6a6a6" strokeWidth="2"/>
           <text x={(left + right) / 2} y={top - 24} textAnchor="middle" fill="#666" fontSize="16" fontWeight="600">{formatMeters(totalLength)}</text>
           <line x1={left - 30} y1={top} x2={left - 30} y2={bottom} stroke="#a6a6a6" strokeWidth="2"/><line x1={left - 36} y1={top} x2={left - 24} y2={top} stroke="#a6a6a6" strokeWidth="2"/><line x1={left - 36} y1={bottom} x2={left - 24} y2={bottom} stroke="#a6a6a6" strokeWidth="2"/>

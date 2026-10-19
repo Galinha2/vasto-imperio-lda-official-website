@@ -139,7 +139,7 @@ function findBestModules(targetLength, { height, depth, levels, floorType, galva
   return modules;
 }
 
-function RackPreview({ modules, height, levels, floorType, galvanized, reinforcedBeams, rowCount, capacityLabel, solutions, selectedSolutionId, onSelectSolution, english, workbench = false }) {
+function RackPreview({ modules, height, depth, levels, floorType, galvanized, reinforcedBeams, rowCount, capacityLabel, solutions, selectedSolutionId, onSelectSolution, english, workbench = false }) {
   const formatMeters = (value) => `${(value / 1000).toLocaleString(english ? "en-IE" : "pt-PT", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} m`;
   const width = 1000;
   const bottom = 410;
@@ -214,6 +214,7 @@ function RackPreview({ modules, height, levels, floorType, galvanized, reinforce
           <line x1="35" y1={top} x2="35" y2={bottom} stroke="#a6a6a6" strokeWidth="2" />
           <line x1="28" y1={top} x2="42" y2={top} stroke="#a6a6a6" strokeWidth="2" />
           <line x1="28" y1={bottom} x2="42" y2={bottom} stroke="#a6a6a6" strokeWidth="2" />
+          <text x={width - 70} y="55" textAnchor="end" fill="#777" fontSize="14">{english ? "Depth: " : "Profundidade: "}{formatMeters(depth)}</text>
           <text x="21" y={(top + bottom) / 2} transform={`rotate(-90 21 ${(top + bottom) / 2})`} textAnchor="middle" fill="#777" fontSize="16">{heightLabel}</text>
           <g aria-label={`${english ? "Total length" : "Comprimento total"} ${formatMeters(totalLength)}`}>
             <line x1={rackLeft} y1={top - 12} x2={rackRight} y2={top - 12} stroke="#a6a6a6" strokeWidth="2" />
@@ -647,7 +648,7 @@ export default function SimulatorPicking({ onQuoteDataChange, adminMode = false,
           </div>
         ) : (
           <div className="order-1 min-w-0 lg:order-2">
-            <RackPreview workbench={workbench} modules={modules} height={height} levels={levels} floorType={floorType} galvanized={galvanized} reinforcedBeams={reinforcedBeams} rowCount={rowCount} capacityLabel={`${english ? "Maximum load per beam pair" : "Carga máxima por par de vigas"}: ${levelCapacity.toLocaleString(english ? "en-IE" : "pt-PT")} kg`} solutions={solutions} selectedSolutionId={selectedSolutionId} onSelectSolution={setSelectedSolutionId} english={english} />
+            <RackPreview workbench={workbench} modules={modules} height={height} depth={depth} levels={levels} floorType={floorType} galvanized={galvanized} reinforcedBeams={reinforcedBeams} rowCount={rowCount} capacityLabel={`${english ? "Maximum load per beam pair" : "Carga máxima por par de vigas"}: ${levelCapacity.toLocaleString(english ? "en-IE" : "pt-PT")} kg`} solutions={solutions} selectedSolutionId={selectedSolutionId} onSelectSolution={setSelectedSolutionId} english={english} />
           </div>
         )}
           {adminMode && adminPanel}

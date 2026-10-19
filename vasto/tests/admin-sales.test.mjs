@@ -405,6 +405,7 @@ test("public simulator orders are saved as confirmed sales with their image and 
   assert.equal(sale.status, "confirmada");
   assert.equal(sale.saleDate, "2026-10-13");
   assert.deepEqual(sale.orderDetails, orderDetails);
+  assert.equal(sale.entryOrigin, "cliente");
   assert.equal(sale.images.length, 1);
   assert.deepEqual((await getSaleImage(sale.id, sale.images[0].id)).buffer, image);
   await deleteSale(sale.id);

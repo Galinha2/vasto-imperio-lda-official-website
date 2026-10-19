@@ -39,6 +39,7 @@ function normalizeSale(record) {
   const status = ["em_preparacao", "confirmada"].includes(record.status) ? record.status : legacy?.status || "em_preparacao";
   return {
     ...record,
+    entryOrigin: ["admin", "cliente"].includes(record.entryOrigin) ? record.entryOrigin : record.orderDetails ? "cliente" : "admin",
     status,
     paymentStatus: paymentStatuses.includes(record.paymentStatus) ? record.paymentStatus : legacy?.paymentStatus || "por_pagar",
     deliveryStatus: deliveryStatuses.includes(record.deliveryStatus) ? record.deliveryStatus : legacy?.deliveryStatus || "por_entregar",

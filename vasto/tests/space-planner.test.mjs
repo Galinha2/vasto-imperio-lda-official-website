@@ -140,3 +140,43 @@ test("adjacent bays share frames; separated and perpendicular bays do not", () =
   assert.equal(frames([shelf, { ...shelf, x: model.width + 0.1 }]), 4);
   assert.ok(model.levelParts.every((p) => !/reforço/i.test(p.name)));
 });
+
+test("parallel-only plans preserve direction and the requested clear gap between rows", () => {
+  for (const aisle of [0.8, 1.5, 2]) {
+    const input = { ...config, width: 8, length: 10, center: true, parallelOnly: true, aisle, optimization: "economico" };
+    const result = planSpace(input, models.filter((model) => model.type === "picking"));
+    assert.ok(result.plans.length);
+    for (const plan of result.plans) {
+      assert.ok(!plan.id.startsWith("corners") && !plan.id.startsWith("perimeter"));
+      const horizontal = plan.id.startsWith("horizontal");
+      const coordinates = [...new Set(plan.shelves.map((shelf) => horizontal ? shelf.y : shelf.x))].sort((a, b) => a - b);
+      for (let index = 1; index < coordinates.length; index++) assert.ok(coordinates[index] - coordinates[index - 1] - input.depth >= aisle - 1e-7);
+      for (const shelf of plan.shelves) assert.ok(!plan.reserved.some((reserved) => overlaps(shelf, reserved)));
+    }
+  }
+});
+
+test("manual 18 by 13 layout places six 18m rows flush to side walls with equal gaps", () => {
+  const input = { ...config, width: 18, length: 13, parallelOnly: true, rowLayout: "manual", rowDirection: "width", rowCount: 6, optimization: "economico" };
+  const result = planSpace(input, models.filter((model) => model.type === "picking"));
+  assert.equal(result.error, "");
+  const plan = result.plans[0];
+  const rows = [...new Set(plan.shelves.map((shelf) => shelf.y))].sort((a,b) => a-b);
+  assert.equal(rows.length, 6);
+  assert.equal(rows[0], 0);
+  assert.ok(Math.abs(rows[5] + input.depth - 13) < 1e-7);
+  for (let index = 1; index < rows.length; index++) assert.ok(Math.abs(rows[index] - rows[index-1] - input.depth - 1.88) < 1e-7);
+  for (const shelf of plan.shelves) assert.ok(!plan.reserved.some((rect) => overlaps(shelf, rect)));
+  assert.ok(plan.shelves.some((shelf) => shelf.central));
+  assert.ok(planSpace({ ...input, rowCount: 20 }, models).error);
+});
+
+test("fixed module length uses only the chosen nominal beam size in all layouts", () => {
+  const catalog = models.filter((model) => model.type === "picking");
+  for (const parallelOnly of [false, true]) {
+    const result = planSpace({ ...config, width: 18, length: 13, sameModuleLength: true, moduleLength: 2.5, parallelOnly, rowLayout: "manual", rowDirection: "width", rowCount: 6 }, catalog);
+    assert.equal(result.error, "");
+    assert.ok(result.plans[0].shelves.length);
+    for (const plan of result.plans) for (const shelf of plan.shelves) assert.ok(Math.abs(shelf.runWidth - 2.55) < 0.001);
+  }
+});

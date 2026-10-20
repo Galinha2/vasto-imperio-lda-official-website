@@ -12,6 +12,17 @@ export default function QuoteEmailButton({ prepare, sale, compact = false, menuI
   const [message, setMessage] = useState("Bom dia,\n\nSegue em anexo o nosso orçamento e os desenhos disponíveis para a sua apreciação.\n\nEstamos disponíveis para qualquer esclarecimento.\n\nCom os melhores cumprimentos,\nVasto Império");
   const [error, setError] = useState("");
   const [sent, setSent] = useState(false);
+  const [mailCheck, setMailCheck] = useState("");
+  const [checkingMail, setCheckingMail] = useState(false);
+  async function testMailbox() {
+    setCheckingMail(true); setMailCheck("");
+    try {
+      const response = await fetch("/api/admin/mail-check", { method: "POST" });
+      const result = await response.json();
+      setMailCheck(result.message || result.error || "Não foi possível verificar a ligação.");
+    } catch { setMailCheck("Não foi possível verificar a ligação. Tente novamente."); }
+    finally { setCheckingMail(false); }
+  }
   const [previews, setPreviews] = useState([]);
   useEffect(() => {
     if (!open) { setPreviews([]); return; }
@@ -46,7 +57,7 @@ export default function QuoteEmailButton({ prepare, sale, compact = false, menuI
       const result = await response.json();
       if (!response.ok) throw new Error(result.error || "Não foi possível enviar.");
       setSent(true);
-      if (result.sentCopySaved === false) setError("O email foi enviado ao cliente, mas não foi possível guardar a cópia na pasta Enviados. Não volte a enviar: confirme as definições IMAP.");
+      if (result.sentCopySaved === false) setError(`O email foi enviado ao cliente. ${result.sentCopyError || "Não foi possível guardar a cópia em Enviados."} Não volte a enviar o email.`);
     } catch (failure) { setError(failure.message); }
     finally { setBusy(false); }
   }
@@ -68,6 +79,7 @@ export default function QuoteEmailButton({ prepare, sale, compact = false, menuI
         </section>}
 
       </>}
+      <div className="rounded-xl bg-[#f5f5f7] p-3"><button type="button" disabled={checkingMail || busy} onClick={testMailbox} className="cursor-pointer text-xs font-semibold text-[#0879c0] disabled:opacity-50">{checkingMail ? "A verificar ligação…" : "Testar ligação à pasta Enviados"}</button>{mailCheck && <p role="status" className="mt-2 text-xs leading-relaxed text-[#424245]">{mailCheck}</p>}</div>
       {error && <p role="alert" className="text-sm text-red-700">{error}</p>}
       <div className="flex justify-end gap-3"><button type="button" disabled={busy} onClick={() => setOpen(false)} className="cursor-pointer rounded-full px-5 py-3 text-sm disabled:opacity-50">Fechar</button>{!sent && <button disabled={busy || (!sale && !attachments.length)} className="cursor-pointer rounded-full bg-orange-600 px-5 py-3 text-sm font-semibold text-white disabled:opacity-50">{busy ? "Aguarde…" : "Enviar email"}</button>}</div>
     </form></div>, document.body)}

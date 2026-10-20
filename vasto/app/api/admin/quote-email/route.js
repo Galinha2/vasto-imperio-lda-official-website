@@ -40,7 +40,7 @@ export async function POST(request) {
     if (!["SMTP_HOST", "SMTP_PORT", "SMTP_USER", "SMTP_PASS"].every((key) => process.env[key])) throw new Error("SMTP indisponível");
     const transporter = nodemailer.createTransport({ host: process.env.SMTP_HOST, port: Number(process.env.SMTP_PORT), secure: Number(process.env.SMTP_PORT) === 465, auth: { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS } });
     const delivery = await sendMailWithSentCopy(transporter, { from: process.env.SMTP_USER, to: email, replyTo: "geral@vastoimperio.pt", subject, text: message, attachments });
-    return NextResponse.json({ message: "Orçamento enviado por email.", sentCopySaved: delivery.sentCopySaved });
+    return NextResponse.json({ message: "Orçamento enviado por email.", sentCopySaved: delivery.sentCopySaved, sentCopyError: delivery.sentCopyError });
   } catch (error) {
     console.error("[admin-quote-email]", error.message);
     return NextResponse.json({ error: error.status ? error.message : "Não foi possível enviar o email. Verifique a configuração SMTP e tente novamente." }, { status: error.status || 500 });

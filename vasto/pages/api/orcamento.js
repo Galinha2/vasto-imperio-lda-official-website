@@ -1,9 +1,11 @@
+import { sendMailWithSentCopy } from "../../lib/email/send-with-sent-copy.mjs";
 // pages/api/orcamento.js
 import nodemailer from "nodemailer";
 import formidable from "formidable";
 import fs from "fs";
 
 export const config = {
+  maxDuration: 60,
   api: { bodyParser: false }, // necessário para multipart/form-data
 };
 
@@ -107,7 +109,7 @@ export default async function handler(req, res) {
   </tr>
 </table>
 `;
-    await transporter.sendMail({
+    await sendMailWithSentCopy(transporter, {
       from: process.env.SMTP_USER,
       to: process.env.RECEIVER_EMAIL,
       replyTo: emailStr,

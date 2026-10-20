@@ -516,3 +516,28 @@ test("legacy visible quote tables recover quantities, prices and discounts", asy
   assert.equal(quote.lines[0].unidades,2);
   assert.equal(quote.discount,10);
 });
+
+test("legacy original and duplicate pages with merged quantity/unit text are counted once", async () => {
+  const { editableQuote } = await import("../lib/admin/editable-quote.mjs");
+  const doc = new jsPDF();
+  for (const label of ["Original", "Duplicado"]) {
+    if (label === "Duplicado") doc.addPage();
+    doc.text(`Folha Nº 1 de 1 ${label}`, 130, 20);
+    autoTable(doc, {
+      startY: 60,
+      head: [["REF","DESCRIÇÃO","QUANT.","UNI","P. VENDA S/IVA","DESC","VALOR LIQUIDO","IVA"]],
+      body: [["3.1","Viga Z60 c/ 2000mm suporta 400Kg par de Vigas","24","un","14,64€","10%","316,22€","23%"], ["0.1","Portes de envio","1","un","20,00€","","20,00€","23%"]],
+      styles: { fontSize: 9, cellPadding: 0.5, halign: "right", valign: "middle", overflow: "hidden" },
+      headStyles: { halign: "center", cellPadding: 2 },
+      columnStyles: { 0: { halign: "left" }, 1: { halign: "left" }, 2: { halign: "right" }, 3: { halign: "left" }, 4: { halign: "right" }, 5: { halign: "center" }, 6: { halign: "right" }, 7: { halign: "right" } },
+      margin: { left: 12, right: 8 }, tableWidth: "auto",
+    });
+  }
+  const quote = await editableQuote({ subtotal: 336.22 }, Buffer.from(doc.output("arraybuffer")));
+  assert.equal(quote.lines.length, 2);
+  assert.equal(quote.lines[0].unidades, 24);
+  assert.equal(quote.lines[0].produto, "Viga Z60 c/ 2000mm suporta 400Kg par de Vigas");
+  assert.equal(quote.lines[1].isPortes, true);
+  assert.equal(quote.discount, 10);
+  await assert.rejects(editableQuote({ subtotal: 999 }, Buffer.from(doc.output("arraybuffer"))), { status: 422 });
+});

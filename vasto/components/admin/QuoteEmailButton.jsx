@@ -46,6 +46,7 @@ export default function QuoteEmailButton({ prepare, sale, compact = false, menuI
       const result = await response.json();
       if (!response.ok) throw new Error(result.error || "Não foi possível enviar.");
       setSent(true);
+      if (result.sentCopySaved === false) setError("O email foi enviado ao cliente, mas não foi possível guardar a cópia na pasta Enviados. Não volte a enviar: confirme as definições IMAP.");
     } catch (failure) { setError(failure.message); }
     finally { setBusy(false); }
   }

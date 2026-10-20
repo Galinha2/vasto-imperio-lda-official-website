@@ -1,9 +1,10 @@
+import { sendMailWithSentCopy } from "../../lib/email/send-with-sent-copy.mjs";
 import nodemailer from "nodemailer";
 import formidable from "formidable";
 import fs from "fs";
 import { saveSimulatorOrderToSales } from "../../lib/admin/simulator-order-sales.mjs";
 
-export const config = { api: { bodyParser: false } };
+export const config = { api: { bodyParser: false }, maxDuration: 60 };
 
 const escapeHtml = (value = "") => String(value).replace(/[&<>"']/g, (character) => ({
   "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;",
@@ -104,7 +105,7 @@ export default async function handler(req, res) {
     const imageAttachment = fs.readFileSync(uploadedImage.filepath);
     const pdfBuffer = fs.readFileSync(uploadedPdf.filepath);
     const imageFilename = equipmentOrder ? "imagem-equipamento.jpg" : "desenho-estante.jpg";
-    await transporter.sendMail({
+    await sendMailWithSentCopy(transporter, {
       from: process.env.SMTP_USER,
       to: "geral@vastoimperio.pt",
       replyTo: email,
@@ -115,7 +116,7 @@ export default async function handler(req, res) {
         { filename: "folha-orcamento.pdf", content: pdfBuffer, contentType: "application/pdf" },
       ],
     });
-    await transporter.sendMail({
+    await sendMailWithSentCopy(transporter, {
       from: process.env.SMTP_USER,
       to: email,
       replyTo: "geral@vastoimperio.pt",

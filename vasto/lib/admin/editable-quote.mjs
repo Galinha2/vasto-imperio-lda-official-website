@@ -26,18 +26,24 @@ export async function editableQuote(record, buffer) {
       if (validateQuoteLines(lines, record.subtotal, discount)) return { lines, discount };
     }
     const lines = []; const discounts = new Set();
+    const pages = [];
     for (let pageNumber = 1; pageNumber <= doc.numPages; pageNumber++) {
       const content = await (await doc.getPage(pageNumber)).getTextContent();
-      const items = content.items.filter((item) => item.str?.trim()).map((item) => ({ str: item.str.trim(), x: item.transform[4], y: item.transform[5] }));
+      pages.push(content.items.filter((item) => item.str?.trim()).map((item) => ({ str: item.str.trim(), x: item.transform[4], y: item.transform[5] })));
+    }
+    const hasOriginal = pages.some((items) => items.some((item) => /Folha.*Original/i.test(item.str)));
+    for (const items of pages) {
+      if (hasOriginal && items.some((item) => /Folha.*Duplicado/i.test(item.str))) continue;
       const description = items.find((item) => item.str === "DESCRIÇÃO");
       const quantity = items.find((item) => item.str === "QUANT.");
       const unit = items.find((item) => item.str === "UNI");
       if (!description || !quantity || !unit) continue;
-      const units = items.filter((item) => item.str === "un" && Math.abs(item.x - unit.x) < 25 && item.y < unit.y).sort((a, b) => b.y - a.y);
+      const units = items.filter((item) => /^(?:[\d., ]+\s+)?un$/i.test(item.str) && Math.abs(item.x - unit.x) < 50 && item.y < unit.y).sort((a, b) => b.y - a.y);
       for (let index = 0; index < units.length; index++) {
         const marker = units[index];
         const row = items.filter((item) => Math.abs(item.y - marker.y) < 2);
-        const qty = row.find((item) => item.x > description.x + 100 && item.x < marker.x && /^\d+(?:[,.]\d+)?$/.test(item.str));
+        const combinedQuantity = marker.str.match(/^([\d., ]+)\s+un$/i);
+        const qty = combinedQuantity ? { str: combinedQuantity[1] } : row.filter((item) => item.x < marker.x && item.x > quantity.x - 30 && /^\d+(?:[,.]\d+)?$/.test(item.str)).sort((a, b) => b.x - a.x)[0];
         const prices = row.filter((item) => item.x > marker.x && /€/.test(item.str)).sort((a, b) => a.x - b.x);
         if (!qty || prices.length < 2) continue;
         const nextY = units[index + 1]?.y ?? marker.y - 50;

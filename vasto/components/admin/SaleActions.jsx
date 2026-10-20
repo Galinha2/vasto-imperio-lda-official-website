@@ -15,12 +15,26 @@ export default function SaleActions({ sale, imagesOpen, onImages, onUngroup, gro
       if (!button.current?.contains(event.target) && !menu.current?.contains(event.target) && !event.target.closest('[role="dialog"]')) setPosition(null);
     };
     const escape = (event) => { if (event.key === "Escape") setPosition(null); };
-    const resize = () => setPosition(null);
+    let frame;
+    const reposition = () => {
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(() => {
+        if (!button.current) return;
+        const rect = button.current.getBoundingClientRect();
+        const height = menu.current?.offsetHeight || 290;
+        const below = rect.bottom + 6;
+        const top = below + height <= window.innerHeight - 8 ? below : rect.top - height - 6;
+        const left = Math.max(8, Math.min(rect.right - 220, window.innerWidth - 228));
+        setPosition((current) => current && current.top === top && current.left === left ? current : current ? { top, left } : null);
+      });
+    };
+    reposition();
     document.addEventListener("pointerdown", outside);
     document.addEventListener("keydown", escape);
-    window.addEventListener("resize", resize);
-    return () => { document.removeEventListener("pointerdown", outside); document.removeEventListener("keydown", escape); window.removeEventListener("resize", resize); };
-  }, [position]);
+    window.addEventListener("resize", reposition);
+    window.addEventListener("scroll", reposition, true);
+    return () => { document.removeEventListener("pointerdown", outside); document.removeEventListener("keydown", escape); window.removeEventListener("resize", reposition); window.removeEventListener("scroll", reposition, true); cancelAnimationFrame(frame); };
+  }, [!!position]);
   const item = "flex w-full cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-left text-xs text-[#424245] transition hover:bg-[#f5f5f7]";
   return <>
     <button ref={button} type="button" aria-expanded={!!position} aria-label={`Ações do orçamento de ${sale.customerName}`} onClick={() => {

@@ -1,3 +1,4 @@
+import { sendMailWithSentCopy } from "@/lib/email/send-with-sent-copy.mjs";
 import { NextResponse } from "next/server";
 import nodemailer from "nodemailer";
 import { assertSession, assertOrigin } from "@/lib/admin/auth.mjs";
@@ -38,8 +39,8 @@ export async function POST(request) {
     if (!attachments.some((file) => file.contentType === "application/pdf") || attachments.length > 11 || attachments.reduce((sum, file) => sum + file.content.length, 0) > 20 * 1024 * 1024) return NextResponse.json({ error: "Confirme os anexos: é obrigatório um orçamento PDF e o limite total é 20 MB." }, { status: 400 });
     if (!["SMTP_HOST", "SMTP_PORT", "SMTP_USER", "SMTP_PASS"].every((key) => process.env[key])) throw new Error("SMTP indisponível");
     const transporter = nodemailer.createTransport({ host: process.env.SMTP_HOST, port: Number(process.env.SMTP_PORT), secure: Number(process.env.SMTP_PORT) === 465, auth: { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS } });
-    await transporter.sendMail({ from: process.env.SMTP_USER, to: email, replyTo: "geral@vastoimperio.pt", subject, text: message, attachments });
-    return NextResponse.json({ message: "Orçamento enviado por email." });
+    const delivery = await sendMailWithSentCopy(transporter, { from: process.env.SMTP_USER, to: email, replyTo: "geral@vastoimperio.pt", subject, text: message, attachments });
+    return NextResponse.json({ message: "Orçamento enviado por email.", sentCopySaved: delivery.sentCopySaved });
   } catch (error) {
     console.error("[admin-quote-email]", error.message);
     return NextResponse.json({ error: error.status ? error.message : "Não foi possível enviar o email. Verifique a configuração SMTP e tente novamente." }, { status: error.status || 500 });

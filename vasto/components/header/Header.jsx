@@ -60,7 +60,7 @@ export default function Header() {
         showHeader ? "translate-y-0" : "-translate-y-full"
       }`}
     >
-      <div className="mx-auto flex h-14 max-w-[1320px] items-center justify-between rounded-full border border-white/70 bg-white/88 px-4 shadow-[0_8px_30px_rgba(29,29,31,0.08)] backdrop-blur-xl sm:px-6">
+      <div className="site-glass site-navigation mx-auto flex h-14 max-w-[1320px] items-center justify-between rounded-full border border-white/70 bg-white/55 px-4 shadow-[0_8px_30px_rgba(29,29,31,0.08)] backdrop-blur-xl sm:px-6">
         <Link href="/home" aria-label="Vasto Império — página inicial" className="flex shrink-0 items-center">
           <Image
             src={content.header.logo}

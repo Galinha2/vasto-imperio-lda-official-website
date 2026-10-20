@@ -72,7 +72,7 @@ export default function SimulatorConfigurationOptions({
             <span
               id={`${infoId}-row-count`}
               role="tooltip"
-              className="simulator-info-tooltip absolute right-0 top-full z-30 mt-2 hidden w-72 max-w-[calc(100vw-3rem)] rounded-2xl border border-[#e5e5e7] bg-white p-4 text-xs font-normal leading-relaxed text-[#525258] shadow-[0_10px_30px_rgba(0,0,0,0.12)]"
+              className="site-glass site-popover simulator-info-tooltip absolute right-0 top-full z-30 mt-2 hidden w-72 max-w-[calc(100vw-3rem)] rounded-2xl border border-[#e5e5e7] bg-white p-4 text-xs font-normal leading-relaxed text-[#525258] shadow-[0_10px_30px_rgba(0,0,0,0.12)]"
             >
               {rowCountInfo}
             </span>
@@ -105,7 +105,7 @@ export default function SimulatorConfigurationOptions({
               <span
                 id={`${infoId}-automatic-length`}
                 role="tooltip"
-                className="simulator-info-tooltip absolute right-0 top-full z-30 mt-2 hidden w-72 max-w-[calc(100vw-3rem)] rounded-2xl border border-[#e5e5e7] bg-white p-4 text-xs font-normal leading-relaxed text-[#525258] shadow-[0_10px_30px_rgba(0,0,0,0.12)]"
+                className="site-glass site-popover simulator-info-tooltip absolute right-0 top-full z-30 mt-2 hidden w-72 max-w-[calc(100vw-3rem)] rounded-2xl border border-[#e5e5e7] bg-white p-4 text-xs font-normal leading-relaxed text-[#525258] shadow-[0_10px_30px_rgba(0,0,0,0.12)]"
               >
                 {automaticLengthMessage}
               </span>

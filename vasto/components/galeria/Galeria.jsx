@@ -42,7 +42,7 @@ export default function Galeria({ images = [], alt = "Customer project", languag
             type="button"
             onClick={() => setActiveIndex(index)}
             aria-label={`${language === "pt" ? "Ver instalação" : "View installation"} ${index + 1}`}
-            className={`group relative cursor-zoom-in overflow-hidden rounded-[22px] border border-[#e5e5e7] bg-white text-left shadow-[0_2px_10px_rgba(0,0,0,0.035)] transition duration-300 hover:-translate-y-0.5 hover:shadow-[0_14px_30px_rgba(0,0,0,0.1)] sm:rounded-[26px] ${tileLayouts[index % tileLayouts.length]}`}
+            className={`site-glass group relative cursor-zoom-in overflow-hidden rounded-[22px] border border-[#e5e5e7] bg-white text-left shadow-[0_2px_10px_rgba(0,0,0,0.035)] transition duration-300 hover:-translate-y-0.5 hover:shadow-[0_14px_30px_rgba(0,0,0,0.1)] sm:rounded-[26px] ${tileLayouts[index % tileLayouts.length]}`}
           >
             <Image
               src={image}

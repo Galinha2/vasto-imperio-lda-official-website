@@ -32,7 +32,7 @@ export default function AdminLogin() {
           <img src="/favicon.png" alt="Vasto Império" width="64" height="64" className="mx-auto h-16 w-16 rounded-2xl object-contain" />
           <p className="mt-4 text-xs font-semibold tracking-[0.2em] text-[#86868b]">VASTO IMPÉRIO</p>
         </div>
-        <section className="rounded-[32px] border border-white bg-white/95 p-7 shadow-[0_24px_80px_rgba(30,45,70,0.08)] sm:p-10">
+        <section className="site-glass rounded-[32px] border border-white bg-white/95 p-7 shadow-[0_24px_80px_rgba(30,45,70,0.08)] sm:p-10">
           <div className="mb-7">
             <span className="inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-[#f5f5f7] text-lg text-[#6e6e73]"><IoLockClosedOutline /></span>
             <h1 className="mt-5 text-[30px] font-semibold tracking-[-0.055em]">Bem-vindo de volta.</h1>

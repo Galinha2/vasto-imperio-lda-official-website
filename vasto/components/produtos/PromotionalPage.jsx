@@ -50,7 +50,7 @@ function PromotionalPage({ produto }) {
           <span className="text-[#4e4e53]">{displayProduct.title}</span>
         </nav>
 
-        <section className="grid overflow-hidden rounded-[32px] border border-[#e5e5e7] bg-white lg:grid-cols-[1.08fr_0.92fr]">
+        <section className="site-section site-glass grid overflow-hidden rounded-[32px] border border-[#e5e5e7] bg-white lg:grid-cols-[1.08fr_0.92fr]">
           <div className="relative min-h-[300px] bg-white sm:min-h-[440px] lg:min-h-[620px]">
             <Image
               src={displayProduct.mainImage}
@@ -93,7 +93,7 @@ function PromotionalPage({ produto }) {
         {displayProduct.features?.length > 0 && (
           <section className="grid gap-4 sm:grid-cols-2">
             {displayProduct.features.map((feature, index) => (
-              <div key={`${feature.image}-${index}`} className="relative flex min-h-[260px] items-center justify-center overflow-hidden rounded-[28px] border border-[#e5e5e7] bg-white p-8 sm:min-h-[340px]">
+              <div key={`${feature.image}-${index}`} className="site-glass relative flex min-h-[260px] items-center justify-center overflow-hidden rounded-[28px] border border-[#e5e5e7] bg-white p-8 sm:min-h-[340px]">
                 <Image src={feature.image} alt={`${displayProduct.title} — ${english ? "detail" : "detalhe"} ${index + 1}`} fill sizes="(max-width: 640px) 100vw, 50vw" className="object-contain p-7 sm:p-10" />
               </div>
             ))}
@@ -114,7 +114,7 @@ function PromotionalPage({ produto }) {
         )}
 
         {tabelaFinal.length > 0 && (
-          <section className="overflow-hidden rounded-[28px] border border-[#e5e5e7] bg-white py-7 sm:py-9">
+          <section className="site-section site-glass overflow-hidden rounded-[28px] border border-[#e5e5e7] bg-white py-7 sm:py-9">
             <header className="px-5 pb-5 sm:px-9">
               <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-(--orange)">{english ? "Technical details" : "Detalhes técnicos"}</p>
               <h2 className="mt-2 text-2xl font-semibold tracking-[-0.04em] text-[#1d1d1f] sm:text-3xl">{english ? "Specifications" : "Especificações"}</h2>
@@ -145,7 +145,7 @@ function PromotionalPage({ produto }) {
 function FAQItem({ question, answer }) {
   const [open, setOpen] = React.useState(false);
   return (
-    <div className="rounded-2xl border border-[#e5e5e7] bg-white px-5 py-4 sm:px-6">
+    <div className="site-glass rounded-2xl border border-[#e5e5e7] bg-white px-5 py-4 sm:px-6">
       <button type="button" className="flex w-full cursor-pointer items-center justify-between gap-4 text-left text-base font-semibold text-[#1d1d1f]" aria-expanded={open} onClick={() => setOpen(!open)}>
         {question}
         <span className="text-xl font-normal text-(--blue)" aria-hidden="true">{open ? "−" : "+"}</span>

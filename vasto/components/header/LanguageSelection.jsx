@@ -26,7 +26,7 @@ function LanguageSelection() {
         <p>{language}</p>
       </button>
       {isOpen && (
-        <ul className="absolute right-0 z-[500] mt-2 min-w-20 rounded-2xl border border-[#e5e5e7] bg-white p-1.5 shadow-[0_12px_32px_rgba(29,29,31,0.12)]">
+        <ul className="site-glass site-popover absolute right-0 z-[500] mt-2 min-w-20 rounded-2xl border border-[#e5e5e7] bg-white p-1.5 shadow-[0_12px_32px_rgba(29,29,31,0.12)]">
           {languages.map((lang) => (
             <li
               key={lang}

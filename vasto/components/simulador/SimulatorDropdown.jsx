@@ -76,7 +76,7 @@ export default function SimulatorDropdown({ label, value, onChange, options, for
           <Chevron open={open} />
         </button>
         {open && (
-          <div className="absolute inset-x-0 top-full z-40 mt-2 max-h-64 overflow-hidden rounded-[30px] border border-[#e5e5e7] bg-white shadow-[0_12px_36px_rgba(0,0,0,0.16)]">
+          <div className="site-glass site-popover absolute inset-x-0 top-full z-40 mt-2 max-h-64 overflow-hidden rounded-[30px] border border-[#e5e5e7] bg-white shadow-[0_12px_36px_rgba(0,0,0,0.16)]">
             <div ref={listboxRef} onScroll={updateScrollbar} role="listbox" aria-label={label} className="simulator-dropdown-scroll max-h-64 overflow-y-auto py-1.5 pl-1.5 pr-4">
               {options.map((option) => {
                 const selected = option === value;

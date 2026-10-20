@@ -92,7 +92,7 @@ export default function OrcamentoInputs() {
     <div className="relative mx-auto flex w-full max-w-[1120px] flex-col items-center px-5 pb-16 pt-[96px] sm:px-8 sm:pb-20 sm:pt-[112px] lg:pb-24 lg:pt-[128px]">
       {isSubmitting && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-white/75 backdrop-blur-sm">
-          <div className="flex flex-col items-center justify-center gap-5 rounded-[28px] border border-[#e5e5e7] bg-white px-10 py-8 shadow-xl">
+          <div className="site-glass flex flex-col items-center justify-center gap-5 rounded-[28px] border border-[#e5e5e7] bg-white px-10 py-8 shadow-xl">
             <Spinner />
             <p className="text-base font-semibold text-[#1d1d1f]">{item.send}</p>
           </div>

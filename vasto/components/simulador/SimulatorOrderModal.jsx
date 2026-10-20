@@ -149,7 +149,7 @@ export default function SimulatorOrderModal({ open, onClose, total, details, ite
 
   return (
     <div className="fixed inset-0 z-[1000] flex items-stretch justify-center overflow-y-auto bg-[#1d1d1f]/45 p-0 backdrop-blur-sm sm:items-center sm:p-6">
-      <section role="dialog" aria-modal="true" aria-labelledby="simulator-order-title" className="min-h-[100dvh] w-full max-w-none overflow-y-auto rounded-none border-0 bg-white p-5 shadow-none sm:my-auto sm:min-h-0 sm:max-h-[min(92vh,900px)] sm:max-w-4xl sm:rounded-[30px] sm:border sm:border-white/70 sm:p-8 sm:shadow-[0_24px_90px_rgba(0,0,0,0.2)] lg:flex lg:max-h-[96dvh] lg:flex-col lg:overflow-hidden">
+      <section role="dialog" aria-modal="true" aria-labelledby="simulator-order-title" className="site-section site-glass min-h-[100dvh] w-full max-w-none overflow-y-auto rounded-none border-0 bg-white p-5 shadow-none sm:my-auto sm:min-h-0 sm:max-h-[min(92vh,900px)] sm:max-w-4xl sm:rounded-[30px] sm:border sm:border-white/70 sm:p-8 sm:shadow-[0_24px_90px_rgba(0,0,0,0.2)] lg:flex lg:max-h-[96dvh] lg:flex-col lg:overflow-hidden">
         {sent ? (
           <div className="py-8 text-center sm:py-12">
             <span className="mx-auto grid h-14 w-14 place-items-center rounded-full bg-emerald-50 text-2xl text-emerald-600" aria-hidden="true">✓</span>
@@ -170,7 +170,7 @@ export default function SimulatorOrderModal({ open, onClose, total, details, ite
             <form onSubmit={submit} className="lg:flex lg:min-h-0 lg:flex-1 lg:flex-col">
               <div className="grid gap-5 lg:min-h-0 lg:flex-1 lg:grid-cols-[1.45fr_0.8fr] lg:items-start lg:gap-4">
                 <div className="space-y-5 lg:space-y-3">
-                  <section className="rounded-[24px] border border-[#e8e8ed] bg-white p-4 sm:p-5 lg:p-4">
+                  <section className="site-section site-glass rounded-[24px] border border-[#e8e8ed] bg-white p-4 sm:p-5 lg:p-4">
                     <div className="mb-4 lg:mb-2">
                       <h3 className="text-base font-semibold tracking-[-0.02em] text-[#1d1d1f]">{english ? "Customer details" : "Dados do cliente"}</h3>
                       <p className="mt-1 text-xs text-[#86868b]">{english ? "Your details for the order and invoice." : "Dados para o pedido e para a faturação."}</p>
@@ -183,7 +183,7 @@ export default function SimulatorOrderModal({ open, onClose, total, details, ite
                     </div>
                   </section>
 
-                  <section className="rounded-[24px] border border-[#e8e8ed] bg-white p-4 sm:p-5 lg:p-4">
+                  <section className="site-section site-glass rounded-[24px] border border-[#e8e8ed] bg-white p-4 sm:p-5 lg:p-4">
                     <div className="mb-4 lg:mb-2">
                       <h3 className="text-base font-semibold tracking-[-0.02em] text-[#1d1d1f]">{english ? "Addresses" : "Moradas"}</h3>
                       <p className="mt-1 text-xs text-[#86868b]">{english ? "Tell us where to invoice and deliver the order." : "Indica onde faturar e entregar a encomenda."}</p>
@@ -196,13 +196,13 @@ export default function SimulatorOrderModal({ open, onClose, total, details, ite
                   </section>
 
                   <section className={`grid gap-4 ${equipment ? "" : "sm:grid-cols-2"}`}>
-                    {!equipment && <fieldset className="rounded-[24px] border border-[#e8e8ed] bg-white p-4 lg:p-3">
+                    {!equipment && <fieldset className="site-glass rounded-[24px] border border-[#e8e8ed] bg-white p-4 lg:p-3">
                       <legend className="px-1 text-sm font-semibold text-[#424245]">{text.assembly}</legend>
                       <div className="mt-2 flex rounded-full bg-[#f5f5f7] p-1">
                         {[false, true].map((value) => <button key={String(value)} type="button" aria-pressed={form.montagem === value} onClick={() => setField("montagem", value)} className={`h-10 flex-1 cursor-pointer rounded-full px-4 text-sm font-semibold transition ${form.montagem === value ? "bg-white text-[#1d1d1f] shadow-sm" : "text-[#6e6e73] hover:text-[#1d1d1f]"}`}>{value ? text.yes : text.no}</button>)}
                       </div>
                     </fieldset>}
-                    <label className="block space-y-1 text-sm font-medium text-[#424245]">{text.notes}<textarea rows={2} value={form.observacoes} onChange={(event) => setField("observacoes", event.target.value)} placeholder={text.notesPlaceholder} className="min-h-[72px] w-full resize-y rounded-[20px] border border-[#d2d2d7] bg-[#fbfbfd] px-4 py-3 text-[#1d1d1f] outline-none transition placeholder:text-[#86868b] focus:border-(--blue) focus:ring-4 focus:ring-[#0879c0]/10 lg:min-h-[64px] lg:py-2" /></label>
+                    <label className="block space-y-1 text-sm font-medium text-[#424245]">{text.notes}<textarea rows={2} value={form.observacoes} onChange={(event) => setField("observacoes", event.target.value)} placeholder={text.notesPlaceholder} className="site-glass min-h-[72px] w-full resize-y rounded-[20px] border border-[#d2d2d7] bg-[#fbfbfd] px-4 py-3 text-[#1d1d1f] outline-none transition placeholder:text-[#86868b] focus:border-(--blue) focus:ring-4 focus:ring-[#0879c0]/10 lg:min-h-[64px] lg:py-2" /></label>
                   </section>
                 </div>
 

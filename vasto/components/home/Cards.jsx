@@ -30,10 +30,10 @@ export default function Cards() {
 
   return (
     <div>
-      <section className="bg-[#f5f5f7] px-5 py-16 sm:px-8 sm:py-20 lg:py-24">
+      <section className="site-section bg-[#f5f5f7] px-5 py-16 sm:px-8 sm:py-20 lg:py-24">
         <div className="mx-auto max-w-[1480px] space-y-5">
           {cards.map((card, index) => (
-            <article key={card.pageTitle} className="grid overflow-hidden rounded-[30px] border border-[#e5e5e7] bg-white lg:min-h-[390px] lg:grid-cols-2">
+            <article key={card.pageTitle} className="site-glass grid overflow-hidden rounded-[30px] border border-[#e5e5e7] bg-white lg:min-h-[390px] lg:grid-cols-2">
               <div className={`relative min-h-[240px] bg-white ${index % 2 ? "lg:order-2" : ""}`}>
                 {card.image && <Image src={card.image} alt="" fill sizes="(max-width: 1024px) 100vw, 50vw" className="object-cover object-top" />}
               </div>
@@ -48,7 +48,7 @@ export default function Cards() {
         </div>
       </section>
 
-      <section className="border-y border-[#e5e5e7] bg-white px-5 py-16 sm:px-8 sm:py-20 lg:py-24">
+      <section className="site-section border-y border-[#e5e5e7] bg-white px-5 py-16 sm:px-8 sm:py-20 lg:py-24">
         <div className="mx-auto max-w-[1480px]">
           <div className="mb-9 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
             <div>
@@ -59,7 +59,7 @@ export default function Cards() {
           </div>
           <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
             {featuredProducts.map((product) => (
-              <Link href={product.href} key={product.id} className="group relative min-h-[360px] overflow-hidden rounded-[30px] bg-[#f5f5f7] p-7 transition duration-300 hover:-translate-y-1 hover:shadow-[0_18px_45px_rgba(0,0,0,0.09)] sm:p-9">
+              <Link href={product.href} key={product.id} className="site-glass group relative min-h-[360px] overflow-hidden rounded-[30px] bg-[#f5f5f7] p-7 transition duration-300 hover:-translate-y-1 hover:shadow-[0_18px_45px_rgba(0,0,0,0.09)] sm:p-9">
                 {product.image && <Image src={product.image} alt="" fill sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw" className="object-contain p-12 transition duration-500 group-hover:scale-[1.04]" />}
                 <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-[#f5f5f7] via-[#f5f5f7]/95 to-transparent px-7 pb-7 pt-20 sm:px-9 sm:pb-9">
                   <h3 className="text-xl font-semibold tracking-tight text-[#1d1d1f]">{product.title}</h3>

@@ -43,7 +43,7 @@ export default function PageSelectionMobile({ isOpen, setIsOpen }) {
       />
       <nav
         aria-label={language === "pt" ? "Menu principal" : "Main menu"}
-        className="absolute inset-x-3 top-[72px] mx-auto max-h-[calc(100dvh-84px)] max-w-[420px] overflow-y-auto rounded-[28px] border border-[#e5e5e7] bg-white p-4 shadow-[0_24px_70px_rgba(29,29,31,0.2)] sm:inset-x-5 sm:top-[76px] sm:p-5"
+        className="site-glass site-popover absolute inset-x-3 top-[72px] mx-auto max-h-[calc(100dvh-84px)] max-w-[420px] overflow-y-auto rounded-[28px] border border-[#e5e5e7] bg-white p-4 shadow-[0_24px_70px_rgba(29,29,31,0.2)] sm:inset-x-5 sm:top-[76px] sm:p-5"
       >
         <div className="flex items-center justify-between border-b border-[#e5e5e7] px-2 pb-4">
           <div className="flex items-center gap-3">

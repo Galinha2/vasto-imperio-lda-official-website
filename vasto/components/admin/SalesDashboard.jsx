@@ -668,7 +668,7 @@ export default function SalesDashboard() {
     },
   };
   return (
-    <main className="min-w-0 px-4 py-8 sm:px-6 lg:px-6 lg:py-10 xl:px-8">
+    <main className={`${styles.dashboard} min-w-0 px-4 py-8 sm:px-6 lg:px-6 lg:py-10 xl:px-8`}>
         <div className="mx-auto w-full max-w-[1500px]">
           <header className="flex flex-col justify-between gap-5 sm:flex-row sm:items-center">
             <div><p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[#86868b]">Visão geral</p><h1 className="mt-2 text-4xl font-semibold tracking-[-0.055em] sm:text-[44px]">As suas vendas.</h1><p className="mt-2 text-sm text-[#86868b]">Uma visão clara de cada documento e de cada mês.</p></div>
@@ -853,7 +853,7 @@ export default function SalesDashboard() {
 
           <section
             id="sales-documents"
-            className={`relative mt-6 overflow-hidden rounded-[28px] border bg-white transition-colors ${tableDropActive ? "border-2 border-dashed border-orange-400" : "border-[#e8e8ed]"}`}
+            className={`${styles.documents} relative mt-6 overflow-hidden rounded-[28px] border bg-white transition-colors ${tableDropActive ? "border-2 border-dashed border-orange-400" : "border-[#e8e8ed]"}`}
             onDragEnter={(event) => {
               event.preventDefault();
               if (uploading || loading || !Array.from(event.dataTransfer.items || []).some((item) => item.kind === "file")) return;
@@ -1017,7 +1017,8 @@ export default function SalesDashboard() {
                             setDraggedQuoteId(""); setQuoteDropTarget("");
                             setQuoteCombination({ sourceId, targetId: sale.id });
                           }}
-                          className={`${styles.quoteRow} ${quoteDropTarget === sale.id ? "outline-2 -outline-offset-2 outline-[#0879c0] bg-sky-50 " : ""}cursor-pointer border-t border-l-2 transition ${sale.quoteNotSelected ? "border-[#f0f0f2] border-l-slate-200 bg-slate-50/60 text-slate-500" : isResolved(sale) ? "border-emerald-100 border-l-emerald-500 bg-[#f5faf6] hover:bg-[#eff7f0]" : "border-[#f0f0f2] border-l-red-500 hover:bg-[#fbfbfd]"}`}>
+                          style={{ "--quote-accent": sale.quoteNotSelected ? "#94a3b8" : isResolved(sale) ? "#10b981" : sale.status === "confirmada" ? "#1687f8" : "#f05252" }}
+                          className={`${styles.quoteRow} ${quoteDropTarget === sale.id ? "outline-2 -outline-offset-2 outline-[#0879c0] bg-sky-50 " : ""}cursor-pointer transition ${sale.quoteNotSelected ? "text-slate-500" : ""}`}>
                           <td className="px-3 py-5">
                             <div className="flex items-center gap-2">
                               <button type="button" aria-expanded={imagePanel === sale.id} aria-label={`${imagePanel === sale.id ? "Fechar" : "Ver"} PDF e desenhos de ${sale.customerName}`} onClick={() => setImagePanel((current) => current === sale.id ? "" : sale.id)} className="flex min-w-0 cursor-pointer items-center gap-2 text-left text-sm font-semibold tracking-tight hover:text-[#0879c0]"><span className="truncate">{sale.customerName}</span><IoChevronDownOutline aria-hidden="true" className={`shrink-0 text-xs text-[#a1a1a6] transition-transform ${imagePanel === sale.id ? "rotate-180" : ""}`} /></button>

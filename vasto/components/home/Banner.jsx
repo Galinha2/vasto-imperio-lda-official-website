@@ -14,7 +14,7 @@ export default function Banner() {
   const plainTitle = item.title.replace(/<[^>]*>/g, "");
 
   return (
-    <section className="home-hero relative isolate overflow-hidden border-b border-[#dedee3] bg-white">
+    <section className="site-section home-hero relative isolate overflow-hidden border-b border-[#dedee3] bg-white">
       <Image
         src={content.homeHeader.background}
         alt=""

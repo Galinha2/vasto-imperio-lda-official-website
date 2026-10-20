@@ -8,7 +8,7 @@ export default function ContactHeader() {
 
   return (
     <section className="mx-auto mb-8 max-w-[1480px] px-5 sm:px-8 lg:mb-12 lg:px-12">
-      <div className="relative isolate grid min-h-[360px] overflow-hidden rounded-[32px] border border-[#e5e5e7] bg-white sm:min-h-[420px] lg:grid-cols-[1.1fr_0.9fr]">
+      <div className="site-glass relative isolate grid min-h-[360px] overflow-hidden rounded-[32px] border border-[#e5e5e7] bg-white sm:min-h-[420px] lg:grid-cols-[1.1fr_0.9fr]">
         <div className="relative z-10 flex flex-col items-start justify-center p-7 sm:p-10 lg:p-14">
           <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-black/[0.07] bg-white/80 px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-[#6e6e73] shadow-sm">
             <span className="h-2 w-2 rounded-full bg-(--orange)" />

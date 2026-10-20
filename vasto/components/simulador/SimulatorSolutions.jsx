@@ -40,7 +40,7 @@ export default function SimulatorSolutions({ solutions, selectedId, onSelect }) 
       <div className="flex gap-3 overflow-x-auto pb-2">
         {solutions.map((solution) => (
           <button key={solution.id} type="button" onClick={() => onSelect(solution.id)} aria-pressed={selectedId === solution.id}
-            className={`min-w-[155px] shrink-0 cursor-pointer rounded-[30px] border p-4 text-left transition hover:-translate-y-0.5 hover:border-[#0071e3] hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0071e3] ${selectedId === solution.id ? "border-[#0071e3] bg-[#f5faff] shadow-sm" : "border-[#e5e5e7] bg-white"}`}>
+            className={`site-glass min-w-[155px] shrink-0 cursor-pointer rounded-[30px] border p-4 text-left transition hover:-translate-y-0.5 hover:border-[#0071e3] hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0071e3] ${selectedId === solution.id ? "border-[#0071e3] bg-[#f5faff] shadow-sm" : "border-[#e5e5e7] bg-white"}`}>
             <span className="block text-xs font-medium text-[#6e6e73]">{english ? ({ chosen: "Your choice", shorter: "Shorter", longer: "Longer" }[solution.id] ?? solution.label) : solution.label}</span>
             <strong className="mt-1 block text-lg font-semibold tracking-tight text-[#1d1d1f]">{formatMeters(solution.totalLength)}</strong>
             <span className="mt-1 block text-xs text-[#6e6e73]">{solution.modules.length} {english ? "modules" : "módulos"}</span>

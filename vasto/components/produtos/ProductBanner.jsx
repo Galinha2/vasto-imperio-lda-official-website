@@ -10,7 +10,7 @@ export default function ProductBanner() {
   const content = language === "pt" ? contentpt : contenten;
 
   return (
-    <section className="product-hero relative isolate overflow-hidden border-b border-[#dedee3] bg-white">
+    <section className="site-section product-hero relative isolate overflow-hidden border-b border-[#dedee3] bg-white">
       <Image
         src={content.productBanner.background}
         alt=""

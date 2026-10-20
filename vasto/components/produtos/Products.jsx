@@ -28,7 +28,7 @@ export default function Products() {
   ];
 
   return (
-    <section className="bg-[#f5f5f7] px-5 py-16 sm:px-8 sm:py-20 lg:py-24">
+    <section className="site-section bg-[#f5f5f7] px-5 py-16 sm:px-8 sm:py-20 lg:py-24">
       <div className="mx-auto max-w-[1440px]">
         <header className="mb-10 flex flex-col gap-5 border-b border-[#e5e5e7] pb-8 sm:mb-12 sm:flex-row sm:items-end sm:justify-between sm:pb-9">
           <div className="max-w-3xl">
@@ -51,7 +51,7 @@ export default function Products() {
             <Link
               key={product.id}
               href={`/produtos/${language}/${product.id}`}
-              className={`group relative isolate col-span-1 row-span-1 flex min-h-[360px] min-w-0 flex-col overflow-hidden rounded-[28px] border border-[#e5e5e7] bg-white shadow-[0_2px_10px_rgba(0,0,0,0.025)] transition duration-300 hover:-translate-y-1 hover:border-[#d7d8de] hover:shadow-[0_18px_40px_rgba(0,0,0,0.09)] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-(--orange) lg:min-h-0 ${bentoSizes[index % bentoSizes.length]}`}
+              className={`site-glass group relative isolate col-span-1 row-span-1 flex min-h-[360px] min-w-0 flex-col overflow-hidden rounded-[28px] border border-[#e5e5e7] bg-white shadow-[0_2px_10px_rgba(0,0,0,0.025)] transition duration-300 hover:-translate-y-1 hover:border-[#d7d8de] hover:shadow-[0_18px_40px_rgba(0,0,0,0.09)] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-(--orange) lg:min-h-0 ${bentoSizes[index % bentoSizes.length]}`}
             >
               <div className="relative min-h-0 flex-1">
                 <Image

@@ -63,7 +63,7 @@ export default function GoogleAdsConsent() {
     <>
       {choice === true && <Script id="vasto-google-ads" src={`https://www.googletagmanager.com/gtag/js?id=${TAG_ID}`} strategy="afterInteractive" />}
       {choice === null || open ? (
-        <section aria-label="Preferências de medição publicitária" className="fixed inset-x-4 bottom-4 z-[100] mx-auto max-w-xl rounded-2xl border border-[#e5e5e7] bg-white p-5 shadow-xl">
+        <section aria-label="Preferências de medição publicitária" className="site-section site-glass fixed inset-x-4 bottom-4 z-[100] mx-auto max-w-xl rounded-2xl border border-[#e5e5e7] bg-white p-5 shadow-xl">
           <h2 className="text-sm font-semibold text-[#1d1d1f]">Medição dos anúncios</h2>
           <p className="mt-2 text-xs leading-relaxed text-[#6e6e73]">Podemos usar cookies do Google Ads e partilhar dados de navegação com a Google para medir os resultados dos nossos anúncios. A personalização de anúncios fica desativada. Pode recusar e continuar a usar o site, ou alterar a escolha em “Cookies de publicidade”.</p>
           <div className="mt-4 flex flex-wrap gap-3">

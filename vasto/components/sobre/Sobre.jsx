@@ -7,7 +7,7 @@ import Image from "@/components/loadings/LoadingImage";
 
 function StoryCard({ title, children, accent = "orange" }) {
   return (
-    <article className="rounded-[28px] border border-[#e5e5e7] bg-white p-7 sm:p-9">
+    <article className="site-glass rounded-[28px] border border-[#e5e5e7] bg-white p-7 sm:p-9">
       <span className="text-xs font-semibold uppercase tracking-[0.16em] text-[#86868b]">Vasto Império</span>
       <h2 className={`mt-5 text-2xl font-semibold leading-tight tracking-[-0.04em] sm:text-3xl ${accent === "blue" ? "text-(--blue)" : "text-(--orange)"}`}>{title}</h2>
       <p className="mt-4 text-base leading-7 text-[#626268] sm:text-lg">{children}</p>
@@ -22,7 +22,7 @@ function Sobre() {
 
   return (
     <div className="overflow-hidden">
-      <section className="bg-white px-5 pb-14 pt-[100px] sm:px-8 sm:pb-20 sm:pt-[112px] lg:pb-28 lg:pt-[128px]">
+      <section className="site-section bg-white px-5 pb-14 pt-[100px] sm:px-8 sm:pb-20 sm:pt-[112px] lg:pb-28 lg:pt-[128px]">
         <div className="mx-auto grid max-w-[1320px] gap-8 lg:grid-cols-[1.05fr_0.95fr] lg:items-stretch lg:gap-12">
           <div className="flex flex-col justify-center py-3 sm:py-8 lg:py-12">
             <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-(--orange)">{language === "pt" ? "Quem somos" : "About us"}</p>
@@ -38,7 +38,7 @@ function Sobre() {
               </div>
             </div>
           </div>
-          <div className="relative flex min-h-[300px] flex-col items-center justify-center overflow-hidden rounded-[32px] border border-[#e5e5e7] bg-[#f5f5f7] p-8 sm:min-h-[420px] lg:min-h-[600px]">
+          <div className="site-glass relative flex min-h-[300px] flex-col items-center justify-center overflow-hidden rounded-[32px] border border-[#e5e5e7] bg-[#f5f5f7] p-8 sm:min-h-[420px] lg:min-h-[600px]">
             <div className="absolute -right-16 -top-16 h-64 w-64 rounded-full bg-[#eaf2ff] blur-3xl" />
             <div className="absolute -bottom-16 -left-16 h-64 w-64 rounded-full bg-[#fff0e8] blur-3xl" />
             <Image src={content.header.logo} alt="Vasto Império" width={720} height={320} priority className="relative z-10 h-auto w-full max-w-[480px] object-contain" />
@@ -50,7 +50,7 @@ function Sobre() {
         </div>
       </section>
 
-      <section className="bg-[#f5f5f7] px-5 py-14 sm:px-8 sm:py-20 lg:py-24">
+      <section className="site-section bg-[#f5f5f7] px-5 py-14 sm:px-8 sm:py-20 lg:py-24">
         <div className="mx-auto grid max-w-[1320px] gap-5 lg:grid-cols-2 lg:gap-6">
           <StoryCard title={item.p3t}>{item.p3}</StoryCard>
           <StoryCard title={item.p4t} accent="blue">{item.p4}</StoryCard>

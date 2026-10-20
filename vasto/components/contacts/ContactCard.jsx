@@ -15,8 +15,8 @@ export default function ContactCard({ sectionBackground = "gray", wide = false }
   const item = (language === "pt" ? contentpt : contenten).homeContacts;
 
   return (
-    <section className={`${sectionBackground === "white" ? "bg-white" : "bg-[#f5f5f7]"} px-5 py-16 sm:px-8 sm:py-20 lg:py-24`}>
-      <div className={`mx-auto ${wide ? "max-w-[1480px]" : "max-w-[1320px]"} rounded-[32px] border border-[#e5e5e7] bg-white px-6 py-10 text-[#1d1d1f] shadow-[0_8px_30px_rgba(0,0,0,0.05)] sm:px-10 sm:py-14 lg:px-14`}>
+    <section className={`site-section ${sectionBackground === "white" ? "bg-white" : "bg-[#f5f5f7]"} px-5 py-16 sm:px-8 sm:py-20 lg:py-24`}>
+      <div className={`site-glass site-glass-warm mx-auto ${wide ? "max-w-[1480px]" : "max-w-[1320px]"} rounded-[32px] border border-[#e5e5e7] bg-white px-6 py-10 text-[#1d1d1f] shadow-[0_8px_30px_rgba(0,0,0,0.05)] sm:px-10 sm:py-14 lg:px-14`}>
         <div className="mx-auto max-w-2xl text-center">
           <p className="text-xs font-semibold uppercase tracking-[0.16em] text-(--orange)">{language === "pt" ? "Estamos perto de si" : "Here for you"}</p>
           <h2 className="mt-3 text-3xl font-semibold leading-tight tracking-[-0.035em] sm:text-4xl">{item.title}</h2>
@@ -30,9 +30,9 @@ export default function ContactCard({ sectionBackground = "gray", wide = false }
               <a key="mail" href={`mailto:${mail}`} className="break-all transition-colors hover:text-(--orange)">{mail}</a>,
             ];
             return (
-              <article key={`${location}-${index}`} className="rounded-[24px] border border-[#e8e8eb] bg-[#f5f5f7] p-5 sm:p-6">
+              <article key={`${location}-${index}`} className="site-glass rounded-[24px] border border-[#e8e8eb] bg-[#f5f5f7] p-5 sm:p-6">
                 <div className="flex items-center gap-3 border-b border-[#e1e1e5] pb-4">
-                  <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-white text-(--orange) shadow-sm"><LuStore className="text-2xl" aria-hidden="true" /></span>
+                  <span className="site-glass flex h-11 w-11 items-center justify-center rounded-2xl bg-white text-(--orange) shadow-sm"><LuStore className="text-2xl" aria-hidden="true" /></span>
                   <h3 className="text-lg font-semibold">{location}</h3>
                 </div>
                 <div className="mt-4 space-y-3">

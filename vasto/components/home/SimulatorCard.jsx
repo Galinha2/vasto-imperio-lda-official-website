@@ -21,8 +21,8 @@ export default function SimulatorCard() {
       </div>
       <div className="grid gap-5 sm:grid-cols-2 sm:gap-6 lg:flex-1">
         {items.map((item) => (
-          <article key={item.title} className="group flex min-h-[510px] flex-col overflow-hidden rounded-[28px] border border-[#e2e3e8] bg-[#f0f1f6] p-3.5 shadow-[0_2px_10px_rgba(0,0,0,0.035)] transition duration-300 hover:-translate-y-1 hover:shadow-[0_16px_36px_rgba(0,0,0,0.09)] sm:p-4 lg:h-full">
-          <div className="relative flex h-[280px] shrink-0 items-center justify-center overflow-hidden rounded-[21px] border border-transparent bg-transparent sm:h-[320px]">
+          <article key={item.title} className="site-glass group flex min-h-[510px] flex-col overflow-hidden rounded-[28px] border border-[#e2e3e8] bg-[#f0f1f6] p-3.5 shadow-[0_2px_10px_rgba(0,0,0,0.035)] transition duration-300 hover:-translate-y-1 hover:shadow-[0_16px_36px_rgba(0,0,0,0.09)] sm:p-4 lg:h-full">
+          <div className="site-glass relative flex h-[280px] shrink-0 items-center justify-center overflow-hidden rounded-[21px] border border-transparent bg-transparent sm:h-[320px]">
               <Image src={item.image} alt="" fill sizes="(max-width: 640px) 90vw, 460px" className="object-contain p-2 transition duration-500 group-hover:scale-[1.035]" />
             </div>
             <div className="flex flex-1 flex-col items-start px-2 pb-2 pt-5 sm:px-3 sm:pt-6">

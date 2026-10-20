@@ -30,7 +30,7 @@ export default function ProductTabela({ tabela = [] }) {
           {isPT ? "Medidas e especificações" : "Dimensions and specifications"}
         </h2>
       </header>
-      <div className="overflow-x-auto rounded-[24px] border border-[#e5e5e7] bg-white shadow-[0_2px_12px_rgba(0,0,0,0.035)]">
+      <div className="site-glass overflow-x-auto rounded-[24px] border border-[#e5e5e7] bg-white shadow-[0_2px_12px_rgba(0,0,0,0.035)]">
         <table className="w-full min-w-[720px] border-collapse text-left text-sm">
           <thead>
             <tr className="bg-[#f5f5f7] text-xs font-semibold uppercase tracking-[0.08em] text-[#626268]">

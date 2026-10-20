@@ -7,6 +7,7 @@ import SimulatorEstantesLigeiras from "@/components/simulador/SimulatorEstantesL
 import SimulatorPicking from "@/components/simulador/SimulatorPicking";
 import SimulatorRacks from "@/components/simulador/SimulatorRacks";
 import SimulatorAdminQuoteTools from "@/components/admin/SimulatorAdminQuoteTools";
+import QuoteEmailButton from "./QuoteEmailButton";
 import generateBudgetPdf from "@/lib/generateBudgetPdf";
 import orcamento from "@/assets/orcamento.json";
 
@@ -180,6 +181,7 @@ export default function SimulatorAdmin() {
       const result = await response.json();
       if (response.status === 401) throw new Error("A sessão de administração expirou. Inicie sessão novamente.");
       if (!response.ok) throw new Error(result.error || "Não foi possível enviar a simulação para as vendas.");
+      window.dispatchEvent(new Event("admin:sales-changed"));
       setMensagem(`Simulação de ${result.sale.customerName} enviada para as vendas com o PDF e a imagem.`);
       setMensagemSucesso(true);
     } catch (error) {
@@ -259,6 +261,18 @@ export default function SimulatorAdmin() {
           <span className="rounded-full bg-orange-50 px-5 py-3 text-sm font-semibold text-orange-700">Configurar uma fila · 2D</span>
           <Link href={`/admin/simulador/espaco/${simuladorAtivo}`} className="rounded-full border border-[#e5e5e7] bg-white px-5 py-3 text-sm font-semibold text-[#424245] hover:bg-[#f5f5f7]">Planear com as medidas do espaço · Vista de topo</Link>
         </nav>}
+
+        <div className="flex justify-end"><QuoteEmailButton prepare={async () => {
+          const data = obterDadosPdf();
+          if (!data) throw new Error("Confirme a configuração e os dados do cliente.");
+          await document.fonts?.ready;
+          const drawing = capturaRef.current?.querySelector('svg[role="img"]');
+          if (!drawing) throw new Error("O desenho não está disponível.");
+          const { toJpeg } = await import("html-to-image");
+          const blob = await generateBudgetPdf({ ...data, returnBlob: true });
+          const url = await toJpeg(drawing, { pixelRatio: 1.5, quality: 0.85, backgroundColor: "#ffffff", cacheBust: true });
+          return [{ blob, name: "orcamento.pdf" }, { blob: await (await fetch(url)).blob(), name: "desenho.jpg" }];
+        }} /></div>
 
         <section ref={capturaRef} aria-label={`Simulação de ${ativo.label}`} className="min-w-0">
           <Simulator key={simuladorAtivo} variant={simuladorAtivo === "bancadas" ? "workbench" : undefined} adminMode adminPanel={adminPanel} adminDiscountPercent={descontoManual} onQuoteDataChange={receberDadosOrcamento} />

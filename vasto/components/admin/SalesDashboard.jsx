@@ -2,6 +2,7 @@
 
 import { groupQuotes, sameQuoteCustomer } from "@/lib/admin/quote-groups.mjs";
 import { isSaleInactive, lastSaleActivity } from "@/lib/admin/sale-activity.mjs";
+import SaleActions from "./SaleActions";
 import MetricCard from "./MetricCard";
 
 import { Fragment, useEffect, useId, useRef, useState } from "react";
@@ -1072,21 +1073,7 @@ export default function SalesDashboard() {
                               : <span className="inline-flex whitespace-nowrap rounded-full border border-[#e5e5e7] bg-white/80 px-2.5 py-1.5 text-[10px] font-medium text-[#86868b]">Não resolvido</span>}
                           </td>
                           <td className="px-3 py-4">
-                            <div className="flex justify-end gap-0">
-                              {sale.quoteGroupId && <button type="button" title="Retirar do grupo" aria-label={`Retirar ${sale.fileName || "orçamento"} do grupo`} disabled={groupingQuotes} onClick={() => changeQuoteGroup(sale.id)} className="grid h-8 w-8 shrink-0 cursor-pointer place-items-center rounded-full text-base text-[#86868b] transition hover:bg-[#f5f5f7] hover:text-[#424245] disabled:opacity-50"><IoUnlinkOutline /></button>}
-                              <button
-                                type="button"
-                                aria-expanded={imagePanel === sale.id}
-                                aria-label={`${imagePanel === sale.id ? "Fechar imagens" : "Gerir imagens"} de ${sale.customerName}`}
-                                onClick={() => setImagePanel((current) => current === sale.id ? "" : sale.id)}
-                                className={`relative grid h-8 min-w-8 cursor-pointer place-items-center rounded-full px-1 text-base transition ${imagePanel === sale.id ? "bg-[#f5f5f7] text-[#424245]" : "text-[#86868b] hover:bg-[#f5f5f7] hover:text-[#424245]"}`}
-                              >
-                                <IoImagesOutline />
-                                {(sale.images?.length ?? 0) > 0 && <span className="ml-1 text-[10px] font-semibold">{sale.images.length}</span>}
-                              </button>
-                              <a href={`/api/admin/sales/${sale.id}/pdf`} target="_blank" rel="noopener noreferrer" aria-label={`Abrir PDF de ${sale.customerName}`} className="grid h-8 w-8 place-items-center rounded-full text-base text-[#86868b] transition hover:bg-[#f5f5f7] hover:text-[#424245]"><IoOpenOutline /></a>
-                              <button type="button" aria-label={`Eliminar orçamento de ${sale.customerName}`} onClick={() => setSaleToDelete(sale)} className="grid h-8 w-8 cursor-pointer place-items-center rounded-full text-base text-[#a1a1a6] transition hover:bg-red-50 hover:text-red-600"><IoTrashOutline /></button>
-                            </div>
+                            <SaleActions sale={sale} imagesOpen={imagePanel === sale.id} onImages={() => setImagePanel((current) => current === sale.id ? "" : sale.id)} onUngroup={() => changeQuoteGroup(sale.id)} grouping={groupingQuotes} onDelete={() => setSaleToDelete(sale)} />
                           </td>
                         </tr>
                         {imagePanel === sale.id && (

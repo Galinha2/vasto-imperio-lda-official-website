@@ -5,10 +5,11 @@ import { IoIosArrowDown } from "react-icons/io";
 import { IoIosAdd } from "react-icons/io";
 import { IoCloudUploadOutline } from "react-icons/io5";
 import orcamento from "@/assets/orcamento.json";
+import QuoteEmailButton from "./QuoteEmailButton";
 import generateBudgetPdf from "@/lib/generateBudgetPdf";
 import { MdOutlineDelete } from "react-icons/md";
 
-export default function BudgetBuilder() {
+export default function BudgetBuilder({ editSaleId = "" }) {
   const [linhas, setLinhas] = useState([
     { produto: null, preco: 0, unidades: 0, total: 0, refCompleta: "", isPortes: false },
   ]);
@@ -23,6 +24,25 @@ export default function BudgetBuilder() {
   const [loadingNif, setLoadingNif] = useState(false);
   const [popupMensagem, setPopupMensagem] = useState(null);
   const [sendingToSales, setSendingToSales] = useState(false);
+
+  const [editingRecord, setEditingRecord] = useState(null);
+  const [loadingQuote, setLoadingQuote] = useState(!!editSaleId);
+  const [quoteLoadError, setQuoteLoadError] = useState("");
+  useEffect(() => {
+    if (!editSaleId) return;
+    let active = true;
+    setLoadingQuote(true); setQuoteLoadError("");
+    fetch(`/api/admin/sales/${encodeURIComponent(editSaleId)}/quote`, { cache: "no-store" })
+      .then(async (response) => { const result = await response.json(); if (!response.ok) throw new Error(result.error); return result; })
+      .then(({ record, lines, discount }) => {
+        if (!active) return;
+        setEditingRecord(record); setLinhas(lines); setDescontoSelecionado(discount);
+        setNif(record.nif || ""); setNomeClienteManual(record.customerName);
+        setDadosEmpresa({ nome: record.customerName, nif: record.nif, codigoPostal: record.orderDetails?.moradaFiscal || "" });
+      }).catch((error) => { if (active) setQuoteLoadError(error.message); })
+      .finally(() => { if (active) setLoadingQuote(false); });
+    return () => { active = false; };
+  }, [editSaleId]);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -176,7 +196,7 @@ export default function BudgetBuilder() {
   });
 
   const enviarParaVendas = async () => {
-    if (sendingToSales) return;
+    if (sendingToSales || loadingQuote || (editSaleId && !editingRecord)) return;
     if (dadosEmpresa?.nome === "NIF não encontrado") {
       setPopupMensagem("Não é possível enviar o orçamento: NIF não encontrado.");
       return;
@@ -197,11 +217,18 @@ export default function BudgetBuilder() {
 
       const form = new FormData();
       form.append("pdf", pdf, `orcamento-${new Date().toISOString().slice(0, 10)}.pdf`);
-      const response = await fetch("/api/admin/sales", { method: "POST", body: form, cache: "no-store" });
+      if (editingRecord) {
+        form.append("updatedAt", editingRecord.updatedAt);
+        form.append("lines", JSON.stringify(linhas.filter((line) => line.produto)));
+        form.append("discount", String(descontoSelecionado));
+      }
+      const response = await fetch(editingRecord ? `/api/admin/sales/${editingRecord.id}/quote` : "/api/admin/sales", { method: editingRecord ? "PUT" : "POST", body: form, cache: "no-store" });
       const result = await response.json();
       if (response.status === 401) throw new Error("A sessão de administração expirou. Inicie sessão novamente.");
       if (!response.ok) throw new Error(result.error || "Não foi possível enviar o orçamento para as vendas.");
-      setPopupMensagem(`Orçamento de ${result.sale.customerName} enviado para as vendas.`);
+      window.dispatchEvent(new Event("admin:sales-changed"));
+      if (editingRecord) setEditingRecord(result.sale);
+      setPopupMensagem(editingRecord ? "Alterações guardadas no mesmo orçamento. PDF atualizado; desenhos e estados mantidos." : `Orçamento de ${result.sale.customerName} enviado para as vendas.`);
     } catch (error) {
       console.error("Não foi possível enviar o orçamento para as vendas.", error);
       setPopupMensagem(error.message || "Não foi possível enviar o orçamento para as vendas.");
@@ -217,12 +244,15 @@ export default function BudgetBuilder() {
       .map((p) => ({ ...p, refCompleta: `${refFamilia}.${contador++}` }));
   };
 
+  if (loadingQuote) return <p className="p-6 text-sm text-gray-500">A carregar os artigos do orçamento…</p>;
+  if (quoteLoadError) return <p role="alert" className="rounded-2xl bg-red-50 p-6 text-sm text-red-700">{quoteLoadError}</p>;
+
   return (
     <div onCopy={handleCopy} className="mx-auto flex w-full max-w-[1440px] flex-col gap-6">
         <header className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.16em] text-(--orange)">Área de gestão</p>
-            <h1 className="mt-2 text-3xl font-semibold tracking-[-0.05em] text-[#1d1d1f] sm:text-4xl">Criar orçamento</h1>
+            <h1 className="mt-2 text-3xl font-semibold tracking-[-0.05em] text-[#1d1d1f] sm:text-4xl">{editingRecord ? "Editar orçamento" : "Criar orçamento"}</h1>
             <p className="mt-2 text-sm text-[#6e6e73]">Adicione produtos, indique os dados do cliente e gere a proposta.</p>
           </div>
           <span className="inline-flex w-fit items-center gap-2 rounded-full border border-[#e5e5e7] bg-white px-4 py-2 text-sm font-medium text-[#6e6e73]">
@@ -231,6 +261,7 @@ export default function BudgetBuilder() {
           </span>
         </header>
 
+        {editingRecord && <p className="rounded-2xl border border-orange-100 bg-orange-50 p-4 text-sm text-orange-800">A editar o orçamento de <strong>{editingRecord.customerName}</strong>. Guardar atualiza este registo e o PDF. Os desenhos anexados mantêm-se; não são redesenhados ao alterar os artigos.</p>}
         <section aria-label="Linhas do orçamento" className="rounded-[28px] border border-[#e5e5e7] bg-white p-3 shadow-[0_8px_30px_rgba(0,0,0,0.035)] sm:p-5 lg:p-6">
           <div className="mb-4 hidden grid-cols-[minmax(0,1fr)_80px_100px_100px_44px] gap-3 px-3 text-xs font-semibold uppercase tracking-[0.1em] text-[#86868b] sm:grid">
             <span>Produto</span><span className="text-center">Qtd.</span><span className="text-center">Preço unit.</span><span className="text-center">Total</span><span />
@@ -459,9 +490,10 @@ export default function BudgetBuilder() {
               <div className="flex items-center justify-between gap-4 text-(--orange)"><span>Desconto · {descontoSelecionado}%</span><span className="font-semibold">−{(totalSemDesconto - totalComDesconto).toFixed(2).replace(".", ",")}€</span></div>
             )}
             <div className="mt-2 flex items-baseline justify-between gap-4 border-t border-[#e8e8eb] pt-4">
-              <span className="font-semibold text-[#1d1d1f]">Total com IVA</span>
-              <span className="text-2xl font-semibold tracking-[-0.04em] text-(--blue)">{totalComIVA.toFixed(2).replace(".", ",")}€</span>
+              <span className="font-semibold text-[#1d1d1f]">Valor líquido sem IVA</span>
+              <span className="text-2xl font-semibold tracking-[-0.04em] text-(--blue)">{totalComDesconto.toFixed(2).replace(".", ",")}€</span>
             </div>
+            <div className="flex items-center justify-between gap-4"><span>Total com IVA</span><span>{totalComIVA.toFixed(2).replace(".", ",")}€</span></div>
             </div>
             <div className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-3">
               <button
@@ -491,12 +523,18 @@ export default function BudgetBuilder() {
               <button
                 type="button"
                 onClick={enviarParaVendas}
-                disabled={sendingToSales || loadingNif}
+                disabled={sendingToSales || loadingNif || loadingQuote || !!quoteLoadError}
                 className="inline-flex h-12 cursor-pointer items-center justify-center gap-2 rounded-full bg-sky-700 px-5 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:bg-sky-800 disabled:cursor-wait disabled:opacity-60"
               >
                 <IoCloudUploadOutline />
-                {sendingToSales ? "A enviar…" : "Enviar para vendas"}
+                {sendingToSales ? "A guardar…" : editingRecord ? "Guardar alterações" : "Enviar para vendas"}
               </button>
+              <QuoteEmailButton prepare={async () => {
+                if (loadingNif || dadosEmpresa?.nome === "NIF não encontrado") throw new Error("Confirme os dados do cliente antes de enviar.");
+                if (!linhas.some((line) => line.produto && line.unidades > 0)) throw new Error("Adicione artigos ao orçamento.");
+                const blob = await generateBudgetPdf({ linhas, descontoSelecionado, dadosEmpresa, nif, nomeClienteManual, returnBlob: true });
+                return [{ blob, name: "orcamento.pdf" }];
+              }} />
             </div>
           </div>
         </section>

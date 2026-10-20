@@ -446,3 +446,31 @@ export async function ungroupSaleQuote(id) {
   await saveRecord({ ...record, quoteGroupId: null, updatedAt: new Date().toISOString() });
   return listSales();
 }
+
+export async function reviseSaleQuote(id, pdf, expectedUpdatedAt, lines, discount) {
+  const existing = await getSale(id);
+  if (!existing) throw fail("Orçamento não encontrado.", 404);
+  if (existing.updatedAt !== expectedUpdatedAt) throw fail("Este orçamento foi alterado entretanto. Volte a abri-lo antes de guardar.", 409);
+  const { parseSalePdf } = await import("./pdf.mjs");
+  const { validateQuoteLines } = await import("./editable-quote.mjs");
+  const parsed = await parseSalePdf(pdf, existing.fileName);
+  if (!validateQuoteLines(lines, parsed.subtotal, discount)) throw fail("Os artigos não correspondem aos totais do orçamento.", 400);
+  const { buffer: originalPdf } = await getPdf(id);
+  const revision = randomUUID();
+  const archive = `revisions/${id}/${revision}`;
+  const updated = { ...existing, customerName: parsed.customerName, nif: parsed.nif, subtotal: parsed.subtotal, vat: parsed.vat, total: parsed.total, updatedAt: new Date().toISOString(), quoteRevision: (existing.quoteRevision || 0) + 1, quoteLines: lines, discountPercent: discount, previousQuoteRevision: archive, orderDetails: { ...existing.orderDetails, artigos: lines } };
+  const savePdf = async (bytes) => {
+    if (storageMode() === "cloud") await cloud(`/storage/v1/object/${bucket()}/${id}.pdf`, { method: "POST", headers: { "Content-Type": "application/pdf", "x-upsert": "true" }, body: bytes });
+    else { const temp = path.join(directory(), `${id}.${revision}.pdf.tmp`); await writeFile(temp, bytes, { mode: 0o600 }); await rename(temp, path.join(directory(), `${id}.pdf`)); }
+  };
+  if (storageMode() === "cloud") {
+    for (const [suffix, content, type] of [["pdf", originalPdf, "application/pdf"], ["json", JSON.stringify(existing), "application/json"]]) await cloud(`/storage/v1/object/${bucket()}/${archive}.${suffix}`, { method: "POST", headers: { "Content-Type": type }, body: content });
+  } else {
+    await mkdir(path.dirname(path.join(directory(), archive)), { recursive: true, mode: 0o700 });
+    await writeFile(path.join(directory(), `${archive}.pdf`), originalPdf, { mode: 0o600 });
+    await writeFile(path.join(directory(), `${archive}.json`), JSON.stringify(existing), { mode: 0o600 });
+  }
+  await savePdf(pdf);
+  try { await saveRecord(updated); } catch (error) { await savePdf(originalPdf); throw error; }
+  return updated;
+}

@@ -481,3 +481,38 @@ test("confirming one grouped version marks alternatives unselected and allows ch
     assert.equal((await getSale(ids[2])).quoteNotSelected, true);
   } finally { for (const id of ids) await deleteSale(id); }
 });
+
+test("editing keeps the sale identity, workflow and images while updating totals and rejecting stale saves", async () => {
+  const { reviseSaleQuote } = await import("../lib/admin/store.mjs");
+  const { editableQuote } = await import("../lib/admin/editable-quote.mjs");
+  const lines = [{ produto: "Viga", refCompleta: "3.1", unidades: 2, preco: 100, total: 200, isPortes: false }];
+  const pdf = pdfWithMetadata({ ...metadata, customerName: "Editar teste", quoteLines: lines, discountPercent: 10 });
+  const parsed = await parseSalePdf(pdf, "editar.pdf");
+  await createSale({ ...parsed, entryOrigin: "admin" }, pdf);
+  const before = await getSale(parsed.id);
+  assert.deepEqual(await editableQuote(before, pdf), { lines, discount: 10 });
+  const changed = [{ ...lines[0], unidades: 3, total: 300 }];
+  const revisedPdf = pdfWithMetadata({ ...metadata, customerName: "Editar teste", subtotal: 270, vat: 62.1, total: 332.1, quoteLines: changed, discountPercent: 10 });
+  const after = await reviseSaleQuote(before.id, revisedPdf, before.updatedAt, changed, 10);
+  assert.equal(after.id, before.id);
+  assert.equal(after.status, before.status);
+  assert.equal(after.entryOrigin, "admin");
+  assert.equal(after.subtotal, 270);
+  assert.equal(after.quoteRevision, 1);
+  assert.deepEqual((await getPdf(after.id)).buffer, revisedPdf);
+  assert.deepEqual(await readFile(path.join(process.env.ADMIN_DATA_DIR, `${after.previousQuoteRevision}.pdf`)), pdf);
+  await assert.rejects(reviseSaleQuote(before.id, revisedPdf, "stale", changed, 10), { status: 409 });
+  await deleteSale(before.id);
+});
+
+test("legacy visible quote tables recover quantities, prices and discounts", async () => {
+  const { editableQuote } = await import("../lib/admin/editable-quote.mjs");
+  const doc = new jsPDF();
+  const columns = [22,67,15,13,25,13,22,15];
+  autoTable(doc, { startY: 60, head: [["REF","DESCRIÇÃO","QUANT.","UNI","P. VENDA S/IVA","DESC","VALOR LIQUIDO","IVA"]], body: [["3.1","Viga Z60 1000mm","2","un","100,00€","10%","180,00€","23%"]], styles: { fontSize:9, cellPadding:0.5, halign:"right" }, headStyles: { halign:"center" }, columnStyles:Object.fromEntries(columns.map((width,index)=>[index,{cellWidth:width,...(index===1?{halign:"left"}:{})}])) });
+  const quote = await editableQuote({ subtotal:180 }, Buffer.from(doc.output("arraybuffer")));
+  assert.equal(quote.lines.length,1);
+  assert.equal(quote.lines[0].preco,100);
+  assert.equal(quote.lines[0].unidades,2);
+  assert.equal(quote.discount,10);
+});

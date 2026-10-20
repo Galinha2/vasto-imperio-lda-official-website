@@ -478,6 +478,8 @@ export default async function generateBudgetPdf({ linhas, descontoSelecionado, d
         vat: Number(linhas.reduce((sum, line) => sum + line.total * (line.isPortes ? 1 : 1 - Number(descontoSelecionado || 0) / 100) * 0.23, 0).toFixed(2)),
         total: Number(linhas.reduce((sum, line) => sum + line.total * (line.isPortes ? 1 : 1 - Number(descontoSelecionado || 0) / 100) * 1.23, 0).toFixed(2)),
         source,
+        quoteLines: linhas.filter((line) => line.produto).map((line) => ({ produto: String(line.produto), refCompleta: String(line.refCompleta || ""), unidades: Number(line.unidades), preco: Number(line.preco), total: Number(line.total), isPortes: !!line.isPortes })),
+        discountPercent: Number(descontoSelecionado || 0),
         quoteType,
         quoteCreatedAt: new Date().toISOString(),
         quoteDetails: String(additionalDetails || "").slice(0, 4000),

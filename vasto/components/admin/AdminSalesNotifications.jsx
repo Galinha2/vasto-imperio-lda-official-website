@@ -53,8 +53,14 @@ export default function AdminSalesNotifications() {
   useEffect(() => {
     let stopped = false;
     let timeout;
+    let checking = false;
+    let pending = false;
     const controller = new AbortController();
     async function check() {
+      if (stopped) return;
+      if (checking) { pending = true; return; }
+      clearTimeout(timeout);
+      checking = true;
       try {
         const response = await fetch("/api/admin/sales", { cache: "no-store", signal: controller.signal });
         if (stopped) return;
@@ -109,10 +115,24 @@ export default function AdminSalesNotifications() {
           }
         }
       } catch { /* Retry transient network failures on the next poll. */ }
-      finally { if (!stopped) timeout = setTimeout(check, 20000); }
+      finally {
+        checking = false;
+        if (!stopped) timeout = setTimeout(check, pending ? 0 : 3000);
+        pending = false;
+      }
     }
+    const refresh = () => { void check(); };
+    const visible = () => { if (document.visibilityState === "visible") refresh(); };
+    window.addEventListener("admin:sales-changed", refresh);
+    window.addEventListener("focus", refresh);
+    document.addEventListener("visibilitychange", visible);
     check();
-    return () => { stopped = true; clearTimeout(timeout); controller.abort(); };
+    return () => {
+      stopped = true; clearTimeout(timeout); controller.abort();
+      window.removeEventListener("admin:sales-changed", refresh);
+      window.removeEventListener("focus", refresh);
+      document.removeEventListener("visibilitychange", visible);
+    };
   }, [sound, router]);
 
   useEffect(() => {

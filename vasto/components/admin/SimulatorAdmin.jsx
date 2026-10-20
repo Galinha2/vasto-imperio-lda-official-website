@@ -25,6 +25,7 @@ export default function SimulatorAdmin() {
   const [mensagemSucesso, setMensagemSucesso] = useState(false);
   const [quoteData, setQuoteData] = useState(null);
   const [nomeCliente, setNomeCliente] = useState("");
+  const [savedCustomer, setSavedCustomer] = useState(null);
   const [nifCliente, setNifCliente] = useState("");
   const [descontoManual, setDescontoManual] = useState(null);
   const [produtosExtra, setProdutosExtra] = useState([]);
@@ -50,6 +51,11 @@ export default function SimulatorAdmin() {
   }, []);
 
   useEffect(() => {
+    if (savedCustomer && savedCustomer.nif === nifCliente) {
+      setDadosEmpresa({ nome: savedCustomer.name, nif: savedCustomer.nif, codigoPostal: savedCustomer.address });
+      setLoadingNif(false);
+      return;
+    }
     if (!/^\d{9}$/.test(nifCliente)) {
       setDadosEmpresa(null);
       setLoadingNif(false);
@@ -59,17 +65,17 @@ export default function SimulatorAdmin() {
     setLoadingNif(true);
     fetch(`/api/nifs?nif=${nifCliente}`, { signal: controller.signal })
       .then((response) => response.json())
-      .then((data) => setDadosEmpresa({
+      .then((data) => { if (!controller.signal.aborted) setDadosEmpresa({
         nome: data?.nome || "Cliente",
         nif: data?.nif || nifCliente,
         codigoPostal: data?.codigoPostal || "V/ Morada",
-      }))
+      }); })
       .catch((error) => {
         if (error.name !== "AbortError") setDadosEmpresa({ nome: "Cliente", nif: nifCliente, codigoPostal: "V/ Morada" });
       })
       .finally(() => { if (!controller.signal.aborted) setLoadingNif(false); });
     return () => controller.abort();
-  }, [nifCliente]);
+  }, [nifCliente, savedCustomer]);
 
   async function gerarImagem() {
     if (!capturaRef.current || aExportar) return;
@@ -206,6 +212,7 @@ export default function SimulatorAdmin() {
       pesquisaProdutoExtra={pesquisaProdutoExtra}
       setPesquisaProdutoExtra={setPesquisaProdutoExtra}
       produtosCatalogo={produtosCatalogo}
+      onCustomerSelect={(customer) => { setSavedCustomer(customer); setNomeCliente(customer.name); setNifCliente(customer.nif); }}
       nomeCliente={nomeCliente}
       setNomeCliente={setNomeCliente}
       nifCliente={nifCliente}

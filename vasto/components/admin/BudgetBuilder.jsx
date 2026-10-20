@@ -1,10 +1,11 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Image from "@/components/loadings/LoadingImage";
 import { IoIosArrowDown } from "react-icons/io";
 import { IoIosAdd } from "react-icons/io";
 import { IoCloudUploadOutline } from "react-icons/io5";
 import orcamento from "@/assets/orcamento.json";
+import CustomerSuggestionInput from "./CustomerSuggestionInput";
 import QuoteEmailButton from "./QuoteEmailButton";
 import generateBudgetPdf from "@/lib/generateBudgetPdf";
 import { MdOutlineDelete } from "react-icons/md";
@@ -52,7 +53,14 @@ export default function BudgetBuilder({ editSaleId = "" }) {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  const nifLookupVersion = useRef(0);
+  const selectCustomer = (customer) => {
+    nifLookupVersion.current++;
+    setNif(customer.nif); setNomeClienteManual(customer.name); setLoadingNif(false);
+    setDadosEmpresa({ nome: customer.name, nif: customer.nif, codigoPostal: customer.address });
+  };
   const procurarNif = async (valorNif) => {
+    const version = ++nifLookupVersion.current;
     if (!/^\d{9}$/.test(valorNif)) {
       setDadosEmpresa(null);
       return;
@@ -64,6 +72,7 @@ export default function BudgetBuilder({ editSaleId = "" }) {
     try {
       const res = await fetch(`/api/nifs?nif=${valorNif}`);
       const data = await res.json();
+      if (version !== nifLookupVersion.current) return;
 
       setDadosEmpresa({
         nome: data?.nome || "Cliente",
@@ -71,13 +80,14 @@ export default function BudgetBuilder({ editSaleId = "" }) {
         codigoPostal: data?.codigoPostal || "V/ Morada",
       });
     } catch (err) {
+      if (version !== nifLookupVersion.current) return;
       setDadosEmpresa({
         nome: "Cliente",
         nif: valorNif,
         codigoPostal: "V/ Morada",
       });
     } finally {
-      setLoadingNif(false);
+      if (version === nifLookupVersion.current) setLoadingNif(false);
     }
   };
 
@@ -428,7 +438,7 @@ export default function BudgetBuilder({ editSaleId = "" }) {
               </span>
             </label>
             <div className="flex min-w-0 flex-1 flex-col gap-3 sm:max-w-md">
-              <input
+              <CustomerSuggestionInput field="nif" onSelect={selectCustomer}
                 type="text"
                 className="h-12 w-full rounded-full border border-[#e5e5e7] bg-[#f5f5f7] px-4 text-sm outline-none transition placeholder:text-[#86868b] focus:border-(--blue) focus:ring-4 focus:ring-[#0879c0]/10"
                 placeholder="NIF"
@@ -436,6 +446,7 @@ export default function BudgetBuilder({ editSaleId = "" }) {
                 value={nif}
                 onChange={(e) => {
                   const valor = e.target.value.replace(/[^0-9]/g, "");
+                  nifLookupVersion.current++;
                   setNif(valor);
                   if (valor.length === 9) {
                     procurarNif(valor);
@@ -444,7 +455,7 @@ export default function BudgetBuilder({ editSaleId = "" }) {
                   }
                 }}
               />
-              <input
+              <CustomerSuggestionInput field="name" onSelect={selectCustomer}
                 type="text"
                 className="h-12 w-full rounded-full border border-[#e5e5e7] bg-[#f5f5f7] px-4 text-sm outline-none transition placeholder:text-[#86868b] focus:border-(--blue) focus:ring-4 focus:ring-[#0879c0]/10"
                 placeholder="Nome do Cliente"

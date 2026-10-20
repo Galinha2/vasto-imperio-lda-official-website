@@ -1,5 +1,6 @@
 "use client";
 
+import CustomerSuggestionInput from "./CustomerSuggestionInput";
 import Image from "@/components/loadings/LoadingImage";
 import { IoIosArrowDown } from "react-icons/io";
 
@@ -14,6 +15,7 @@ export default function SimulatorAdminQuoteTools({
   pesquisaProdutoExtra,
   setPesquisaProdutoExtra,
   produtosCatalogo,
+  onCustomerSelect,
   nomeCliente,
   setNomeCliente,
   nifCliente,
@@ -160,13 +162,13 @@ export default function SimulatorAdminQuoteTools({
             </div>
           )}
           <div className="mt-4 grid gap-3 sm:grid-cols-2">
-            <input
+            <CustomerSuggestionInput field="name" onSelect={onCustomerSelect}
               value={nomeCliente}
               onChange={(event) => setNomeCliente(event.target.value)}
               placeholder="Nome do cliente (opcional)"
               className="h-11 w-full rounded-full border border-[#e5e5e7] bg-[#f5f5f7] px-4 text-sm outline-none transition placeholder:text-[#86868b] focus:border-(--blue)"
             />
-            <input
+            <CustomerSuggestionInput field="nif" onSelect={onCustomerSelect}
               value={nifCliente}
               onChange={(event) => setNifCliente(event.target.value.replace(/\D/g, "").slice(0, 9))}
               inputMode="numeric"

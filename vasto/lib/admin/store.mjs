@@ -463,7 +463,7 @@ export async function reviseSaleQuote(id, pdf, expectedUpdatedAt, lines, discoun
   const archive = `revisions/${id}/${revision}`;
   const { quoteRevisions: previousRevisions = [], ...snapshot } = existing;
   const quoteRevisions = [...previousRevisions, { path: archive, record: snapshot }];
-  const updated = { ...existing, quoteRevisions, customerName: parsed.customerName, nif: parsed.nif, subtotal: parsed.subtotal, vat: parsed.vat, total: parsed.total, updatedAt: new Date().toISOString(), quoteRevision: (existing.quoteRevision || 0) + 1, quoteLines: lines, discountPercent: discount, previousQuoteRevision: archive, orderDetails: { ...existing.orderDetails, ...(contactEmail !== undefined ? { email: contactEmail } : {}), artigos: lines } };
+  const updated = { ...existing, ...(parsed.quoteNumber ? { quoteNumber: parsed.quoteNumber } : {}), quoteRevisions, customerName: parsed.customerName, nif: parsed.nif, subtotal: parsed.subtotal, vat: parsed.vat, total: parsed.total, updatedAt: new Date().toISOString(), quoteRevision: (existing.quoteRevision || 0) + 1, quoteLines: lines, discountPercent: discount, previousQuoteRevision: archive, orderDetails: { ...existing.orderDetails, ...(contactEmail !== undefined ? { email: contactEmail } : {}), artigos: lines } };
   const savePdf = async (bytes) => {
     if (storageMode() === "cloud") await cloud(`/storage/v1/object/${bucket()}/${id}.pdf`, { method: "POST", headers: { "Content-Type": "application/pdf", "x-upsert": "true" }, body: bytes });
     else { const temp = path.join(directory(), `${id}.${revision}.pdf.tmp`); await writeFile(temp, bytes, { mode: 0o600 }); await rename(temp, path.join(directory(), `${id}.pdf`)); }
@@ -528,4 +528,26 @@ export async function separateMergedSale(id) {
     for (const original of saved) { try { await saveRecord(original); } catch {} }
     throw error;
   }
+}
+
+// Serialize local reservations; Supabase reserves atomically across server instances.
+let numberReservation = Promise.resolve();
+export async function reserveQuoteNumber() {
+  if (storageMode() === "cloud") {
+    const response = await cloud("/rest/v1/rpc/reserve_quote_number", {
+      method: "POST", headers: { "Content-Type": "application/json" }, body: "{}",
+    });
+    return String(await response.json());
+  }
+  const operation = numberReservation.then(async () => {
+    const file = path.join(directory(), "quote-counter.json");
+    const previous = await readLocalJson(file, null);
+    const sales = await listSales();
+    const highest = Math.max(0, ...sales.map((sale) => /^\d{1,9}$/.test(sale.quoteNumber || "") ? Number(sale.quoteNumber) : 0));
+    const next = Math.max(previous?.value || 0, sales.length, highest) + 1;
+    await writeLocalJson(file, { value: next });
+    return String(next);
+  });
+  numberReservation = operation.catch(() => {});
+  return operation;
 }

@@ -37,6 +37,7 @@ export default function SimulatorAdmin() {
   const [dadosEmpresa, setDadosEmpresa] = useState(null);
   const [loadingNif, setLoadingNif] = useState(false);
   const capturaRef = useRef(null);
+  const quoteNumberRef = useRef(null);
   const receberDadosOrcamento = useCallback((data) => {
     setQuoteData((current) => JSON.stringify(current) === JSON.stringify(data) ? current : data);
   }, []);
@@ -117,6 +118,7 @@ export default function SimulatorAdmin() {
       return null;
     }
     return {
+      quoteNumberRef,
       source: "simulador",
       quoteType: simuladorAtivo,
       additionalDetails: quoteData.details || "",

@@ -72,3 +72,38 @@ on conflict (id) do update set
   public = false,
   file_size_limit = 6291456,
   allowed_mime_types = array['application/pdf', 'image/jpeg', 'image/png', 'image/webp'];
+
+-- Numeração persistente e atómica dos orçamentos.
+create table if not exists public.admin_quote_counter (
+  id text primary key check (id = 'global'),
+  value bigint not null check (value >= 0)
+);
+alter table public.admin_quote_counter enable row level security;
+revoke all on public.admin_quote_counter from anon, authenticated;
+grant select, insert, update on public.admin_quote_counter to service_role;
+
+create or replace function public.reserve_quote_number()
+returns bigint
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  next_number bigint;
+begin
+  insert into public.admin_quote_counter (id, value)
+  select 'global', greatest(count(*), coalesce(max(case
+    when record->>'quoteNumber' ~ '^[0-9]{1,9}$' then (record->>'quoteNumber')::bigint
+    else 0 end), 0))
+  from public.admin_sales
+  where coalesce(record->>'mergedInto', '') = ''
+    and coalesce(record->>'mergeArchived', 'false') <> 'true'
+  on conflict (id) do nothing;
+
+  update public.admin_quote_counter set value = value + 1
+  where id = 'global' returning value into next_number;
+  return next_number;
+end;
+$$;
+revoke all on function public.reserve_quote_number() from public, anon, authenticated;
+grant execute on function public.reserve_quote_number() to service_role;

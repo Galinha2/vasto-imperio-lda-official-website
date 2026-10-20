@@ -7,7 +7,21 @@ function formatarNumero(valor) {
   return `${inteira.replace(/\B(?=(\d{3})+(?!\d))/g, " ")},${decimal}`;
 }
 
-export default async function generateBudgetPdf({ linhas, descontoSelecionado, dadosEmpresa, nif, nomeClienteManual, additionalDetails = "", returnBlob = false, source = "orcamento", quoteType = "" }) {
+export default async function generateBudgetPdf({ linhas, descontoSelecionado, dadosEmpresa, nif, nomeClienteManual, additionalDetails = "", returnBlob = false, source = "orcamento", quoteType = "", quoteNumber = "", quoteNumberRef = null }) {
+    let documentNumber = quoteNumber || quoteNumberRef?.current;
+    if (!documentNumber) {
+      const reservation = async () => {
+        const response = await fetch("/api/quote-number", { method: "POST" });
+        const result = await response.json();
+        if (!response.ok) throw new Error(result.error || "Não foi possível numerar o orçamento.");
+        return String(result.quoteNumber);
+      };
+      if (quoteNumberRef) quoteNumberRef.current = reservation();
+      try { documentNumber = await (quoteNumberRef?.current || reservation()); }
+      catch (error) { if (quoteNumberRef) quoteNumberRef.current = null; throw error; }
+      if (quoteNumberRef) quoteNumberRef.current = documentNumber;
+    } else documentNumber = await documentNumber;
+
     const resolvedCustomerName = resolveCustomerName(dadosEmpresa, nomeClienteManual);
     const issueParts = new Intl.DateTimeFormat("en", { timeZone: "Europe/Lisbon", year: "numeric", month: "2-digit", day: "2-digit" }).formatToParts(new Date());
     const issuePart = (type) => issueParts.find((part) => part.type === type).value;
@@ -24,9 +38,9 @@ export default async function generateBudgetPdf({ linhas, descontoSelecionado, d
       const x = pageWidth - 12;
       let y = 15;
       doc.setFont("helvetica", "normal");
-      doc.setFontSize(17);
+      doc.setFontSize(documentNumber.length > 10 ? 13 : 17);
       doc.setTextColor(...corPretaFooter);
-      doc.text("Orçamento", x, y, { align: "right" });
+      doc.text(`Orçamento ${documentNumber}`, x, y, { align: "right" });
       y += 3;
       doc.setDrawColor(...corBlack);
       doc.setLineWidth(0.05);
@@ -476,6 +490,7 @@ export default async function generateBudgetPdf({ linhas, descontoSelecionado, d
         quoteLines: linhas.filter((line) => line.produto).map((line) => ({ produto: String(line.produto), refCompleta: String(line.refCompleta || ""), unidades: Number(line.unidades), preco: Number(line.preco), total: Number(line.total), isPortes: !!line.isPortes })),
         discountPercent: Number(descontoSelecionado || 0),
         quoteType,
+        quoteNumber: documentNumber,
         quoteCreatedAt: new Date().toISOString(),
         quoteDetails: String(additionalDetails || "").slice(0, 4000),
       })))),

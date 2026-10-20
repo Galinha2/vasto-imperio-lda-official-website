@@ -28,6 +28,7 @@ export default function BudgetBuilder({ editSaleId = "" }) {
   const [popupMensagem, setPopupMensagem] = useState(null);
   const [sendingToSales, setSendingToSales] = useState(false);
 
+  const quoteNumberRef = useRef(null);
   const [editingRecord, setEditingRecord] = useState(null);
   const [loadingQuote, setLoadingQuote] = useState(!!editSaleId);
   const [quoteLoadError, setQuoteLoadError] = useState("");
@@ -39,6 +40,7 @@ export default function BudgetBuilder({ editSaleId = "" }) {
       .then(async (response) => { const result = await response.json(); if (!response.ok) throw new Error(result.error); return result; })
       .then(({ record, lines, discount }) => {
         if (!active) return;
+        quoteNumberRef.current = record.quoteNumber || quoteNumberRef.current;
         setEditingRecord(record); setLinhas(lines); setDescontoSelecionado(discount);
         setEmailCliente(record.orderDetails?.email || "");
         setNif(record.nif || ""); setNomeClienteManual(record.customerName);
@@ -200,7 +202,7 @@ export default function BudgetBuilder({ editSaleId = "" }) {
     }, 1000);
   };
 
-  const gerarPDF = () => generateBudgetPdf({
+  const gerarPDF = () => generateBudgetPdf({ quoteNumberRef,
     linhas,
     descontoSelecionado,
     dadosEmpresa,
@@ -217,7 +219,7 @@ export default function BudgetBuilder({ editSaleId = "" }) {
 
     setSendingToSales(true);
     try {
-      const pdf = await generateBudgetPdf({
+      const pdf = await generateBudgetPdf({ quoteNumberRef,
         source: "orcamento",
         linhas,
         descontoSelecionado,
@@ -536,7 +538,7 @@ export default function BudgetBuilder({ editSaleId = "" }) {
               <QuoteEmailButton initialEmail={emailCliente} prepare={async () => {
                 if (loadingNif || (dadosEmpresa?.nome === "NIF não encontrado" && !hasCustomerName(nomeClienteManual))) throw new Error("Confirme os dados do cliente antes de enviar.");
                 if (!linhas.some((line) => line.produto && line.unidades > 0)) throw new Error("Adicione artigos ao orçamento.");
-                const blob = await generateBudgetPdf({ linhas, descontoSelecionado, dadosEmpresa, nif, nomeClienteManual, returnBlob: true });
+                const blob = await generateBudgetPdf({ quoteNumberRef, linhas, descontoSelecionado, dadosEmpresa, nif, nomeClienteManual, returnBlob: true });
                 return [{ blob, name: quoteFilename({ lines: linhas, customerName: resolveCustomerName(dadosEmpresa, nomeClienteManual) }) }];
               }} />
             </div>

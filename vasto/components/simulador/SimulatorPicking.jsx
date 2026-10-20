@@ -10,6 +10,10 @@ import SimulatorOrderModal from "@/components/simulador/SimulatorOrderModal";
 import createQuoteLines from "@/components/simulador/createQuoteLines";
 import { isWorkbenchFrame, workbenchLevelPosition } from "@/lib/workbench.mjs";
 import { pickingDiscountRate } from "@/lib/picking-discount.mjs";
+import { levelClearance } from "@/lib/editable-levels.mjs";
+import useEditableLevels from "./useEditableLevels";
+import FloorLevelDimension from "./FloorLevelDimension";
+import LevelRemovalTargets from "./LevelRemovalTargets";
 import budget from "@/assets/orcamento.json";
 
 const products = budget.produtos.filter((product) => product.ref === 3);
@@ -139,7 +143,7 @@ function findBestModules(targetLength, { height, depth, levels, floorType, galva
   return modules;
 }
 
-function RackPreview({ modules, height, depth, levels, floorType, galvanized, reinforcedBeams, rowCount, capacityLabel, solutions, selectedSolutionId, onSelectSolution, english, workbench = false }) {
+function RackPreview({ activeLevels, removeLevel, restoreLevels, modules, height, depth, levels, floorType, galvanized, reinforcedBeams, rowCount, capacityLabel, solutions, selectedSolutionId, onSelectSolution, english, workbench = false }) {
   const formatMeters = (value) => `${(value / 1000).toLocaleString(english ? "en-IE" : "pt-PT", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} m`;
   const width = 1000;
   const bottom = 410;
@@ -174,9 +178,13 @@ function RackPreview({ modules, height, depth, levels, floorType, galvanized, re
           <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#86868b]">{english ? "Preview" : "Visualização"}</p>
           <h2 className="mt-1 text-xl font-semibold tracking-tight text-[#1d1d1f]">{workbench ? (english ? "Workbench" : "Bancada") : (english ? "Picking shelving" : "Estante de picking")}</h2><p className="mt-1 text-xs text-[#86868b]">{english ? "Your configuration · 2D preview" : "A sua configuração · Pré-visualização 2D"}</p>
         </div>
-        <span className="simulator-pill rounded-full bg-[#f5f5f7] px-3 py-1.5 text-right text-sm font-medium text-[#6e6e73]">{modules.length} {english ? "module(s)" : "módulo(s)"} · {levels} {english ? "levels" : "níveis"} · {rowCount} {rowCount === 1 ? (english ? "row" : "fila") : (english ? "rows" : "filas")}</span>
+        <span className="simulator-pill rounded-full bg-[#f5f5f7] px-3 py-1.5 text-right text-sm font-medium text-[#6e6e73]">{modules.length} {english ? "module(s)" : "módulo(s)"} · {activeLevels.length} {english ? "levels" : "níveis"} · {rowCount} {rowCount === 1 ? (english ? "row" : "fila") : (english ? "rows" : "filas")}</span>
       </div>
       <div className="w-full overflow-hidden">
+        <div className="mb-3 flex flex-wrap items-center justify-between gap-2 text-xs text-[#86868b]">
+          <p>{english ? "Click a level to remove it from the entire row. Other levels keep their height." : "Clique num nível para o retirar de toda a fila. Os restantes mantêm a altura."}</p>
+          {activeLevels.length < levels && <button type="button" onClick={restoreLevels} className="cursor-pointer rounded-full border border-[#e5e5e7] px-3 py-1.5 font-medium text-[#0879c0]">{english ? "Restore levels" : "Repor níveis"}</button>}
+        </div>
         <svg viewBox={`0 0 ${width} 490`} role="img" aria-label={english ? `Front view of a row with ${modules.length} modules, ${heightLabel} high, ${levels} levels, repeated ${rowCount} times` : `Vista frontal de uma fila com ${modules.length} módulos, ${heightLabel} de altura, ${levels} níveis e repetida ${rowCount} vezes`} className="h-auto w-full">
           <defs>
             <linearGradient id="pickingFrameMetalFinish" x1="0" x2="1" y1="0" y2="0">
@@ -260,7 +268,7 @@ function RackPreview({ modules, height, depth, levels, floorType, galvanized, re
             const beam = beams.find((product) => product.length === moduleLength && product.produto.includes(beamProfile));
             return (
               <g key={`${moduleIndex}-${moduleLength}`}>
-                {Array.from({ length: levels }, (_, index) => {
+                {activeLevels.map((index) => {
                   const levelY = levelPosition(index);
                   // Keep the top shelf and its beams inside the upright's top edge.
                   const y = index === levels - 1 ? Math.max(levelY, top + topLevelInset) : levelY;
@@ -306,7 +314,7 @@ function RackPreview({ modules, height, depth, levels, floorType, galvanized, re
             const tabWidth = Math.max(2, uprightWidth * 0.5);
             return (
               <g key={`beam-end-tabs-${moduleIndex}`}>
-                {Array.from({ length: levels }, (_, levelIndex) => {
+                {activeLevels.map((levelIndex) => {
                   const levelY = levelPosition(levelIndex);
                   const y = levelIndex === levels - 1 ? Math.max(levelY, top + topLevelInset) : levelY;
                   const beamTop = y - beamHeight;
@@ -330,10 +338,12 @@ function RackPreview({ modules, height, depth, levels, floorType, galvanized, re
               </g>
             );
           })}
-          {Array.from({ length: levels - 1 }, (_, index) => {
+          <FloorLevelDimension x={rackRight + 5} floorY={bottom} firstLevelY={levelPosition(activeLevels[0])} scale={scale} format={formatMeters} english={english} />
+          {activeLevels.slice(0, -1).map((index, gapIndex) => {
+            const nextIndex = activeLevels[gapIndex + 1];
             const lowerY = levelPosition(index);
-            const nominalUpperY = levelPosition(index + 1);
-            const upperY = index + 1 === levels - 1
+            const nominalUpperY = levelPosition(nextIndex);
+            const upperY = nextIndex === levels - 1
               ? Math.max(nominalUpperY, top + topLevelInset)
               : nominalUpperY;
             const lowerBeamTop = lowerY - beamHeight;
@@ -343,7 +353,7 @@ function RackPreview({ modules, height, depth, levels, floorType, galvanized, re
                 {lowerBeamTop > upperY && <line x1={rackRight + 5} y1={upperY} x2={rackRight + 5} y2={lowerBeamTop} stroke="#a6a6a6" strokeWidth="1.5" />}
                 <line x1={rackRight + 1} y1={upperY} x2={rackRight + 9} y2={upperY} stroke="#a6a6a6" strokeWidth="1.5" />
                 {lowerBeamTop > upperY && <line x1={rackRight + 1} y1={lowerBeamTop} x2={rackRight + 9} y2={lowerBeamTop} stroke="#a6a6a6" strokeWidth="1.5" />}
-                <text x={rackRight + 16} y={middleY + 6} fill="#666" fontSize="14">{formatMeters(workbench ? Math.max(0, (lowerBeamTop - upperY) / scale) : clearLevelSpacing)}</text>
+                <text x={rackRight + 16} y={middleY + 6} fill="#666" fontSize="14">{formatMeters(workbench ? Math.max(0, (lowerBeamTop - upperY) / scale) : levelClearance(index, nextIndex, levelSpacing, reinforcedBeams ? 110 : 75))}</text>
               </g>
             );
           })}
@@ -353,6 +363,7 @@ function RackPreview({ modules, height, depth, levels, floorType, galvanized, re
             <rect x="92" width="8" height="8" fill="url(#pickingBeamFinish)" stroke="#b9bec8" /><text x="105" y="8">{english ? "Beam" : "Viga"}</text>
             <rect x="155" width="8" height="8" fill={floorType === "Aglomerado" ? "url(#pickingWoodShelfFinish)" : "url(#pickingMetalShelfFinish)"} stroke={floorType === "Aglomerado" ? "#4a3508" : "#687580"} /><text x="168" y="8">{english ? "Shelf" : "Tampo"}</text>
           </g>
+          <LevelRemovalTargets activeLevels={activeLevels} yForLevel={(index) => levelPosition(index) - beamHeight / 2} left={rackLeft} right={rackRight} removeLevel={removeLevel} english={english} />
         </svg>
       </div>
       <p className="mt-2 text-xs leading-relaxed text-[#86868b] sm:text-sm">
@@ -381,7 +392,7 @@ export default function SimulatorPicking({ onQuoteDataChange, adminMode = false,
   const [desiredBeamLength, setDesiredBeamLength] = useState(beamLengths[0] || 1000);
   const [height, setHeight] = useState(workbench ? defaultFrame?.height || 1000 : 2000);
   const [depth, setDepth] = useState(workbench ? defaultFrame?.depth || 600 : 400);
-  const [levels, setLevels] = useState(workbench ? 2 : 4);
+  const { levels, setLevels, levelSlots, activeLevels, removeLevel, restoreLevels } = useEditableLevels(workbench ? 2 : 4);
   const [floorType, setFloorType] = useState("Aglomerado");
   const [galvanized, setGalvanized] = useState(true);
   const [reinforcedBeams, setReinforcedBeams] = useState(false);
@@ -478,12 +489,12 @@ export default function SimulatorPicking({ onQuoteDataChange, adminMode = false,
       items: createQuoteLines(entries, 3),
       discountPercent: discountRate * 100,
       total: discountedEstimate,
-      details: `${workbench ? "Bancadas" : "Estantes picking"} · Comprimento por fila: ${format(finalLength)} m · Comprimento total: ${format(finalLength * rowCount)} m · Altura: ${format(height)} m · Profundidade: ${format(depth)} m · Níveis: ${levels} · Linhas de estantes lado a lado: ${rowCount} · Piso: ${floorType} · Bastidores: ${galvanized ? "galvanizados" : "pintados"} · Vigas: ${profile} · Carga máxima por par de vigas: ${levelCapacity.toLocaleString("pt-PT")} kg`,
+      details: `${workbench ? "Bancadas" : "Estantes picking"} · Comprimento por fila: ${format(finalLength)} m · Comprimento total: ${format(finalLength * rowCount)} m · Altura: ${format(height)} m · Profundidade: ${format(depth)} m · Níveis: ${levels} (posições mantidas, de baixo para cima: ${activeLevels.map((index) => index + 1).join(", ")} de ${levelSlots}) · Linhas de estantes lado a lado: ${rowCount} · Piso: ${floorType} · Bastidores: ${galvanized ? "galvanizados" : "pintados"} · Vigas: ${profile} · Carga máxima por par de vigas: ${levelCapacity.toLocaleString("pt-PT")} kg`,
       unavailable: isLengthUnavailable || !matchingFrame || modules.length === 0,
     };
     orderQuoteRef.current = quote;
     onQuoteDataChange?.(quote);
-  }, [workbench, onQuoteDataChange, matchingFrame, modules, levels, rowCount, depth, floorType, safetyBrake, reinforcedBeams, galvanized, discountRate, discountedEstimate, finalLength, height, levelCapacity, isLengthUnavailable]);
+  }, [activeLevels.join(","), levelSlots, workbench, onQuoteDataChange, matchingFrame, modules, levels, rowCount, depth, floorType, safetyBrake, reinforcedBeams, galvanized, discountRate, discountedEstimate, finalLength, height, levelCapacity, isLengthUnavailable]);
 
   function hasPricedShelf(shelfDepth, material) {
     return shelves.some((shelf) => shelf.depth === shelfDepth && shelf.material === material && typeof shelf["preço"] === "number");
@@ -648,7 +659,7 @@ export default function SimulatorPicking({ onQuoteDataChange, adminMode = false,
           </div>
         ) : (
           <div className="order-1 min-w-0 lg:order-2">
-            <RackPreview workbench={workbench} modules={modules} height={height} depth={depth} levels={levels} floorType={floorType} galvanized={galvanized} reinforcedBeams={reinforcedBeams} rowCount={rowCount} capacityLabel={`${english ? "Maximum load per beam pair" : "Carga máxima por par de vigas"}: ${levelCapacity.toLocaleString(english ? "en-IE" : "pt-PT")} kg`} solutions={solutions} selectedSolutionId={selectedSolutionId} onSelectSolution={setSelectedSolutionId} english={english} />
+            <RackPreview workbench={workbench} modules={modules} height={height} depth={depth} levels={levelSlots} activeLevels={activeLevels} removeLevel={removeLevel} restoreLevels={restoreLevels} floorType={floorType} galvanized={galvanized} reinforcedBeams={reinforcedBeams} rowCount={rowCount} capacityLabel={`${english ? "Maximum load per beam pair" : "Carga máxima por par de vigas"}: ${levelCapacity.toLocaleString(english ? "en-IE" : "pt-PT")} kg`} solutions={solutions} selectedSolutionId={selectedSolutionId} onSelectSolution={setSelectedSolutionId} english={english} />
           </div>
         )}
           {adminMode && adminPanel}

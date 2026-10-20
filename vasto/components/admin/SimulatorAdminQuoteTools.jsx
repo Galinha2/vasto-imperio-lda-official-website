@@ -17,6 +17,8 @@ export default function SimulatorAdminQuoteTools({
   setPesquisaProdutoExtra,
   produtosCatalogo,
   onCustomerSelect,
+  emailCliente,
+  setEmailCliente,
   nomeCliente,
   setNomeCliente,
   nifCliente,
@@ -178,6 +180,7 @@ export default function SimulatorAdminQuoteTools({
             />
           </div>
           {dadosEmpresa && !loadingNif && !hasCustomerName(dadosEmpresa.nome) && <p className="mt-2 text-xs text-[#86868b]">Nome indisponível para este NIF. Preencha o nome manualmente; será usado no PDF e nas vendas.</p>}
+          <input type="email" value={emailCliente} onChange={(event) => setEmailCliente(event.target.value)} placeholder="Email do cliente (opcional)" aria-label="Email do cliente" className="mt-3 h-11 w-full rounded-full border border-[#e5e5e7] bg-[#f5f5f7] px-4 text-sm outline-none focus:border-[#0879c0]" />
           {loadingNif && <p className="mt-2 text-xs text-[#86868b]">A procurar dados do NIF…</p>}
           {dadosEmpresa && !loadingNif && <p className="mt-2 text-xs text-[#6e6e73]">{resolveCustomerName(dadosEmpresa, nomeCliente)} · {dadosEmpresa.codigoPostal}</p>}
         </div>

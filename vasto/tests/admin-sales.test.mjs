@@ -1,3 +1,4 @@
+import { quoteFilename } from "../lib/quote-filenames.mjs";
 import test from "node:test";
 import { resolveCustomerName } from "../lib/customer-identity.mjs";
 import assert from "node:assert/strict";
@@ -138,12 +139,13 @@ test("actual shared PDF generator round trip, including discount and delivery", 
   }
   const source = (await readFile(path.join(root, "lib/generateBudgetPdf.js"), "utf8"))
     .replace('import jsPDF from "jspdf";', "")
+    .replace('import { quoteFilename } from "./quote-filenames.mjs";', "")
     .replace('import { resolveCustomerName } from "./customer-identity.mjs";', "")
     .replace('const { default: autoTable } = await import("jspdf-autotable");', "")
     .replace("export default async function", "async function");
   let generatedDocument;
   function RecordingPdf(options) { generatedDocument = new jsPDF(options); return generatedDocument; }
-  const generate = new Function("jsPDF", "autoTable", "window", "resolveCustomerName", `${source}; return generateBudgetPdf;`)(RecordingPdf, autoTable, { Image: LocalImage }, resolveCustomerName);
+  const generate = new Function("jsPDF", "autoTable", "window", "resolveCustomerName", "quoteFilename", `${source}; return generateBudgetPdf;`)(RecordingPdf, autoTable, { Image: LocalImage }, resolveCustomerName, quoteFilename);
   try {
     const blob = await generate({ linhas: [{ produto: "Bastidor", refCompleta: "3.1", preco: 100, unidades: 2, total: 200, isPortes: false }, { produto: "Portes", preco: 20, unidades: 1, total: 20, isPortes: true }], descontoSelecionado: 10, dadosEmpresa: { nome: "João & Companhia", nif: "123456789", codigoPostal: "2475-014 Benedita" }, nif: "123456789", nomeClienteManual: "", additionalDetails: "Configuração técnica que não deve aparecer no PDF", returnBlob: true, source: "simulador" });
     const record = await parseSalePdf(Buffer.from(await blob.arrayBuffer()), "gerador-real.pdf");
@@ -504,7 +506,8 @@ test("editing keeps the sale identity, workflow and images while updating totals
   assert.deepEqual(await editableQuote(before, pdf), { lines, discount: 10 });
   const changed = [{ ...lines[0], unidades: 3, total: 300 }];
   const revisedPdf = pdfWithMetadata({ ...metadata, customerName: "Editar teste", subtotal: 270, vat: 62.1, total: 332.1, quoteLines: changed, discountPercent: 10 });
-  const after = await reviseSaleQuote(before.id, revisedPdf, before.updatedAt, changed, 10);
+  const after = await reviseSaleQuote(before.id, revisedPdf, before.updatedAt, changed, 10, "cliente@example.com");
+  assert.equal((await getSale(before.id)).orderDetails.email, "cliente@example.com");
   assert.equal(after.id, before.id);
   assert.equal(after.status, before.status);
   assert.equal(after.entryOrigin, "admin");

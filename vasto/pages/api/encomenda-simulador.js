@@ -1,3 +1,4 @@
+import { quoteFilename } from "../../lib/quote-filenames.mjs";
 import { sendMailWithSentCopy } from "../../lib/email/send-with-sent-copy.mjs";
 import nodemailer from "nodemailer";
 import formidable from "formidable";
@@ -104,7 +105,8 @@ export default async function handler(req, res) {
     });
     const imageAttachment = fs.readFileSync(uploadedImage.filepath);
     const pdfBuffer = fs.readFileSync(uploadedPdf.filepath);
-    const imageFilename = equipmentOrder ? "imagem-equipamento.jpg" : "desenho-estante.jpg";
+    const fileInfo = { customerName: nome, details: detalhes, lines: items };
+    const imageFilename = quoteFilename(fileInfo, equipmentOrder ? "Equipamento" : "Desenho", "jpg");
     await sendMailWithSentCopy(transporter, {
       from: process.env.SMTP_USER,
       to: "geral@vastoimperio.pt",
@@ -113,7 +115,7 @@ export default async function handler(req, res) {
       html,
       attachments: [
         { filename: imageFilename, content: imageAttachment, contentType: "image/jpeg" },
-        { filename: "folha-orcamento.pdf", content: pdfBuffer, contentType: "application/pdf" },
+        { filename: quoteFilename(fileInfo), content: pdfBuffer, contentType: "application/pdf" },
       ],
     });
     await sendMailWithSentCopy(transporter, {
@@ -124,7 +126,7 @@ export default async function handler(req, res) {
       html: confirmationHtml,
       attachments: [
         { filename: imageFilename, content: imageAttachment, contentType: "image/jpeg" },
-        { filename: "folha-orcamento.pdf", content: pdfBuffer, contentType: "application/pdf" },
+        { filename: quoteFilename(fileInfo), content: pdfBuffer, contentType: "application/pdf" },
       ],
     });
     const imageBuffer = imageAttachment;

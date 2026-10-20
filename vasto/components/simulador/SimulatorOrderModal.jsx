@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { trackSimulatorOrder } from "@/lib/google-ads.mjs";
+import { quoteFilename } from "@/lib/quote-filenames.mjs";
 import generateBudgetPdf from "@/lib/generateBudgetPdf";
 
 const initialForm = {
@@ -113,8 +114,8 @@ export default function SimulatorOrderModal({ open, onClose, total, details, ite
       }
       const payload = new FormData();
       payload.append("dados", orderData);
-      payload.append("imagem", imageBlob, equipment ? "imagem-equipamento.jpg" : "desenho-estante.jpg");
-      payload.append("orcamento", budgetPdf, "folha-orcamento.pdf");
+      payload.append("imagem", imageBlob, quoteFilename({ customerName: form.nome, details, lines: items }, equipment ? "Equipamento" : "Desenho", "jpg"));
+      payload.append("orcamento", budgetPdf, quoteFilename({ customerName: form.nome, details, lines: items }));
       const response = await fetch("/api/encomenda-simulador", {
         method: "POST",
         body: payload,

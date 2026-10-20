@@ -1,3 +1,4 @@
+import { quoteFilename } from "./quote-filenames.mjs";
 import { resolveCustomerName } from "./customer-identity.mjs";
 import jsPDF from "jspdf";
 
@@ -480,7 +481,7 @@ export default async function generateBudgetPdf({ linhas, descontoSelecionado, d
       })))),
     });
     if (returnBlob) return doc.output("blob");
-    const nomeFicheiro = `${nomeFinalPDF}.pdf`;
+    const nomeFicheiro = quoteFilename({ quoteType, lines: linhas, customerName: resolvedCustomerName, issuedAt });
     doc.save(nomeFicheiro);
 }
 

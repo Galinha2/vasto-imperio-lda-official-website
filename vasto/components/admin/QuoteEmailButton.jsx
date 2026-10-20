@@ -1,11 +1,12 @@
 "use client";
 import { attachmentAccept, attachmentType } from "@/lib/email/attachments.mjs";
+import { quoteFilename } from "@/lib/quote-filenames.mjs";
 import { emailSignature } from "@/lib/email/signature.mjs";
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { IoMailOutline } from "react-icons/io5";
 
-export default function QuoteEmailButton({ prepare, sale, compact = false, menuItem = false, inlineAction = false }) {
+export default function QuoteEmailButton({ prepare, sale, compact = false, menuItem = false, inlineAction = false, initialEmail = "" }) {
   const [open, setOpen] = useState(false);
   const [busy, setBusy] = useState(false);
   const [attachments, setAttachments] = useState([]);
@@ -20,8 +21,8 @@ export default function QuoteEmailButton({ prepare, sale, compact = false, menuI
     if (!open) { setPreviews([]); return; }
     const files = [...(!sale ? attachments : []), ...extraAttachments.map((file) => ({ blob: file, name: file.name }))].map(({ blob, name }) => ({ name, type: attachmentType(name) || blob.type, url: URL.createObjectURL(blob) }));
     const saved = sale ? [
-      { name: "Orçamento PDF", type: "application/pdf", url: `/api/admin/sales/${sale.id}/pdf` },
-      ...(sale.images || []).map((image) => ({ name: image.name || "Desenho", type: image.contentType, url: `/api/admin/sales/${sale.id}/images/${image.id}` })),
+      { name: quoteFilename(sale), type: "application/pdf", url: `/api/admin/sales/${sale.id}/pdf` },
+      ...(sale.images || []).map((image) => ({ name: quoteFilename(sale, "Desenho", image.contentType === "image/png" ? "png" : image.contentType === "image/webp" ? "webp" : "jpg", (sale.images || []).indexOf(image) + 1), type: image.contentType, url: `/api/admin/sales/${sale.id}/images/${image.id}` })),
     ] : [];
     setPreviews([...saved, ...files]);
     return () => files.forEach((file) => URL.revokeObjectURL(file.url));
@@ -40,7 +41,7 @@ export default function QuoteEmailButton({ prepare, sale, compact = false, menuI
 
   async function start() {
     setOpen(true); setBusy(true); setError(""); setSent(false); setAttachments([]); setExtraAttachments([]);
-    setEmail(sale?.orderDetails?.email || "");
+    setEmail(initialEmail || sale?.orderDetails?.email || "");
     try { if (!sale) setAttachments(await prepare()); }
     catch (failure) { setError(failure.message || "Não foi possível preparar os anexos."); }
     finally { setBusy(false); }

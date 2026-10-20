@@ -1,3 +1,4 @@
+import { customerEmail } from "@/lib/admin/customer-email.mjs";
 import { NextResponse } from "next/server";
 import { assertSession, assertOrigin } from "@/lib/admin/auth.mjs";
 import { listSales, createSale, addSaleImage, deleteSale, storageMode } from "@/lib/admin/store.mjs";
@@ -24,6 +25,7 @@ export async function POST(request) {
     assertOrigin(request);
     storageMode();
     const data = await request.formData();
+    const email = customerEmail(data.get("email"));
     const file = data.get("pdf");
     if (!file || typeof file.arrayBuffer !== "function" || file.size > 6 * 1024 * 1024) {
       return NextResponse.json({ error: "Escolha um ficheiro PDF com até 6 MB." }, { status: 400 });
@@ -34,7 +36,7 @@ export async function POST(request) {
     }
     const buffer = Buffer.from(await file.arrayBuffer());
     const record = await parseSalePdf(buffer, file.name);
-    const sale = await createSale({ ...record, entryOrigin: "admin" }, buffer);
+    const sale = await createSale({ ...record, entryOrigin: "admin", ...(email ? { orderDetails: { email } } : {}) }, buffer);
     if (!image) return NextResponse.json({ sale }, { status: 201, headers: { "Cache-Control": "no-store" } });
     try {
       const savedImage = await addSaleImage(sale.id, image.name, image.type, Buffer.from(await image.arrayBuffer()));

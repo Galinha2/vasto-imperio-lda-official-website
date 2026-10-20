@@ -317,7 +317,7 @@ export async function getSaleImage(id, imageId) {
   const buffer = storageMode() === "cloud"
     ? Buffer.from(await (await cloud(`/storage/v1/object/authenticated/${encodeURIComponent(bucket())}/${encodedPath(imagePath(id, image))}`)).arrayBuffer())
     : await readFile(path.join(directory(), imagePath(id, image)));
-  return { image, buffer };
+  return { image, buffer, record };
 }
 
 export async function deleteSaleImage(id, imageId) {
@@ -448,12 +448,14 @@ export async function ungroupSaleQuote(id) {
   return listSales();
 }
 
-export async function reviseSaleQuote(id, pdf, expectedUpdatedAt, lines, discount) {
+export async function reviseSaleQuote(id, pdf, expectedUpdatedAt, lines, discount, email) {
   const existing = await getSale(id);
   if (!existing) throw fail("Orçamento não encontrado.", 404);
   if (existing.updatedAt !== expectedUpdatedAt) throw fail("Este orçamento foi alterado entretanto. Volte a abri-lo antes de guardar.", 409);
   const { parseSalePdf } = await import("./pdf.mjs");
   const { validateQuoteLines } = await import("./editable-quote.mjs");
+  const { customerEmail } = await import("./customer-email.mjs");
+  const contactEmail = email === undefined ? existing.orderDetails?.email : customerEmail(email);
   const parsed = await parseSalePdf(pdf, existing.fileName);
   if (!validateQuoteLines(lines, parsed.subtotal, discount)) throw fail("Os artigos não correspondem aos totais do orçamento.", 400);
   const { buffer: originalPdf } = await getPdf(id);
@@ -461,7 +463,7 @@ export async function reviseSaleQuote(id, pdf, expectedUpdatedAt, lines, discoun
   const archive = `revisions/${id}/${revision}`;
   const { quoteRevisions: previousRevisions = [], ...snapshot } = existing;
   const quoteRevisions = [...previousRevisions, { path: archive, record: snapshot }];
-  const updated = { ...existing, quoteRevisions, customerName: parsed.customerName, nif: parsed.nif, subtotal: parsed.subtotal, vat: parsed.vat, total: parsed.total, updatedAt: new Date().toISOString(), quoteRevision: (existing.quoteRevision || 0) + 1, quoteLines: lines, discountPercent: discount, previousQuoteRevision: archive, orderDetails: { ...existing.orderDetails, artigos: lines } };
+  const updated = { ...existing, quoteRevisions, customerName: parsed.customerName, nif: parsed.nif, subtotal: parsed.subtotal, vat: parsed.vat, total: parsed.total, updatedAt: new Date().toISOString(), quoteRevision: (existing.quoteRevision || 0) + 1, quoteLines: lines, discountPercent: discount, previousQuoteRevision: archive, orderDetails: { ...existing.orderDetails, ...(contactEmail !== undefined ? { email: contactEmail } : {}), artigos: lines } };
   const savePdf = async (bytes) => {
     if (storageMode() === "cloud") await cloud(`/storage/v1/object/${bucket()}/${id}.pdf`, { method: "POST", headers: { "Content-Type": "application/pdf", "x-upsert": "true" }, body: bytes });
     else { const temp = path.join(directory(), `${id}.${revision}.pdf.tmp`); await writeFile(temp, bytes, { mode: 0o600 }); await rename(temp, path.join(directory(), `${id}.pdf`)); }
@@ -482,6 +484,7 @@ export async function reviseSaleQuote(id, pdf, expectedUpdatedAt, lines, discoun
 
 export async function mergeSaleQuotes(sourceId, targetId, expected, pdf, image) {
   const { assertMergeable } = await import("./merge-quotes.mjs");
+  const { quoteTypeLabel } = await import("../quote-filenames.mjs");
   const { parseSalePdf } = await import("./pdf.mjs");
   const source = await getSale(sourceId), target = await getSale(targetId);
   assertMergeable(source, target);
@@ -492,7 +495,7 @@ export async function mergeSaleQuotes(sourceId, targetId, expected, pdf, image) 
   let created;
   const saved = [];
   try {
-    created = await createSale({ ...parsed, entryOrigin:"admin", mergedQuoteIds:[target.id, source.id], status: source.status === "confirmada" || target.status === "confirmada" ? "confirmada" : "em_preparacao", orderDetails:{...target.orderDetails, detalhes:parsed.quoteDetails || "Orçamento conjunto"} }, pdf);
+    created = await createSale({ ...parsed, entryOrigin:"admin", documentTypeLabel:[...new Set([quoteTypeLabel(target),quoteTypeLabel(source)])].join(" e "), mergedQuoteIds:[target.id, source.id], status: source.status === "confirmada" || target.status === "confirmada" ? "confirmada" : "em_preparacao", orderDetails:{...target.orderDetails, detalhes:parsed.quoteDetails || "Orçamento conjunto"} }, pdf);
     if (image) await addSaleImage(created.id,"desenhos-conjuntos.jpg","image/jpeg",image);
     // Recheck before hiding originals. Preserve their files, images and workflow for undo.
     for (const original of [source,target]) {

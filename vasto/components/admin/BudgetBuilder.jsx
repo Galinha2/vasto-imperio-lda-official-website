@@ -6,6 +6,7 @@ import { IoIosAdd } from "react-icons/io";
 import { IoCloudUploadOutline } from "react-icons/io5";
 import orcamento from "@/assets/orcamento.json";
 import { hasCustomerName, resolveCustomerName } from "@/lib/customer-identity.mjs";
+import { quoteFilename } from "@/lib/quote-filenames.mjs";
 import CustomerSuggestionInput from "./CustomerSuggestionInput";
 import QuoteEmailButton from "./QuoteEmailButton";
 import generateBudgetPdf from "@/lib/generateBudgetPdf";
@@ -19,6 +20,7 @@ export default function BudgetBuilder({ editSaleId = "" }) {
   const [descontoSelecionado, setDescontoSelecionado] = useState(0);
   const [copiado, setCopiado] = useState(false);
   const [pesquisaProduto, setPesquisaProduto] = useState("");
+  const [emailCliente, setEmailCliente] = useState("");
   const [nif, setNif] = useState("");
   const [nomeClienteManual, setNomeClienteManual] = useState("");
   const [dadosEmpresa, setDadosEmpresa] = useState(null);
@@ -38,6 +40,7 @@ export default function BudgetBuilder({ editSaleId = "" }) {
       .then(({ record, lines, discount }) => {
         if (!active) return;
         setEditingRecord(record); setLinhas(lines); setDescontoSelecionado(discount);
+        setEmailCliente(record.orderDetails?.email || "");
         setNif(record.nif || ""); setNomeClienteManual(record.customerName);
         setDadosEmpresa({ nome: record.customerName, nif: record.nif, codigoPostal: record.orderDetails?.moradaFiscal || "" });
       }).catch((error) => { if (active) setQuoteLoadError(error.message); })
@@ -57,6 +60,7 @@ export default function BudgetBuilder({ editSaleId = "" }) {
   const nifLookupVersion = useRef(0);
   const selectCustomer = (customer) => {
     nifLookupVersion.current++;
+    setEmailCliente(customer.email || "");
     setNif(customer.nif); setNomeClienteManual(customer.name); setLoadingNif(false);
     setDadosEmpresa({ nome: customer.name, nif: customer.nif, codigoPostal: customer.address });
   };
@@ -225,7 +229,8 @@ export default function BudgetBuilder({ editSaleId = "" }) {
       if (pdf.size > 6 * 1024 * 1024) throw new Error("O PDF gerado ultrapassa o limite de 6 MB.");
 
       const form = new FormData();
-      form.append("pdf", pdf, `orcamento-${new Date().toISOString().slice(0, 10)}.pdf`);
+      form.append("email", emailCliente.trim());
+      form.append("pdf", pdf, quoteFilename({ lines: linhas, customerName: resolveCustomerName(dadosEmpresa, nomeClienteManual) }));
       if (editingRecord) {
         form.append("updatedAt", editingRecord.updatedAt);
         form.append("lines", JSON.stringify(linhas.filter((line) => line.produto)));
@@ -466,6 +471,7 @@ export default function BudgetBuilder({ editSaleId = "" }) {
               {loadingNif && (
                 <span className="text-xs mt-1">A procurar dados...</span>
               )}
+              <input type="email" value={emailCliente} onChange={(event) => setEmailCliente(event.target.value)} placeholder="Email do cliente (opcional)" aria-label="Email do cliente" className="h-12 w-full rounded-full border border-[#e5e5e7] bg-[#f5f5f7] px-4 text-sm outline-none focus:border-[#0879c0]" />
               {dadosEmpresa && !loadingNif && !hasCustomerName(dadosEmpresa.nome) && <p className="text-xs leading-relaxed text-[#86868b]">Não foi encontrado um nome para este NIF. Escreva o nome do cliente no campo acima; será usado no orçamento e guardado nas vendas.</p>}
               {dadosEmpresa && !loadingNif && (
                 <div className="mt-1 rounded-2xl border border-[#e5e5e7] bg-[#f5f5f7] p-4 text-sm text-[#6e6e73]">
@@ -527,11 +533,11 @@ export default function BudgetBuilder({ editSaleId = "" }) {
                 <IoCloudUploadOutline />
                 {sendingToSales ? "A guardar…" : editingRecord ? "Guardar alterações" : "Enviar para vendas"}
               </button>
-              <QuoteEmailButton prepare={async () => {
+              <QuoteEmailButton initialEmail={emailCliente} prepare={async () => {
                 if (loadingNif || (dadosEmpresa?.nome === "NIF não encontrado" && !hasCustomerName(nomeClienteManual))) throw new Error("Confirme os dados do cliente antes de enviar.");
                 if (!linhas.some((line) => line.produto && line.unidades > 0)) throw new Error("Adicione artigos ao orçamento.");
                 const blob = await generateBudgetPdf({ linhas, descontoSelecionado, dadosEmpresa, nif, nomeClienteManual, returnBlob: true });
-                return [{ blob, name: "orcamento.pdf" }];
+                return [{ blob, name: quoteFilename({ lines: linhas, customerName: resolveCustomerName(dadosEmpresa, nomeClienteManual) }) }];
               }} />
             </div>
           </div>

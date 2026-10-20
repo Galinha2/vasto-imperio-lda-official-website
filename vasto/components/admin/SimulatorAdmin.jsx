@@ -7,7 +7,8 @@ import SimulatorEstantesLigeiras from "@/components/simulador/SimulatorEstantesL
 import SimulatorPicking from "@/components/simulador/SimulatorPicking";
 import SimulatorRacks from "@/components/simulador/SimulatorRacks";
 import SimulatorAdminQuoteTools from "@/components/admin/SimulatorAdminQuoteTools";
-import { hasCustomerName } from "@/lib/customer-identity.mjs";
+import { quoteFilename } from "@/lib/quote-filenames.mjs";
+import { hasCustomerName, resolveCustomerName } from "@/lib/customer-identity.mjs";
 import QuoteEmailButton from "./QuoteEmailButton";
 import generateBudgetPdf from "@/lib/generateBudgetPdf";
 import orcamento from "@/assets/orcamento.json";
@@ -25,6 +26,7 @@ export default function SimulatorAdmin() {
   const [mensagem, setMensagem] = useState("");
   const [mensagemSucesso, setMensagemSucesso] = useState(false);
   const [quoteData, setQuoteData] = useState(null);
+  const [emailCliente, setEmailCliente] = useState("");
   const [nomeCliente, setNomeCliente] = useState("");
   const [savedCustomer, setSavedCustomer] = useState(null);
   const [nifCliente, setNifCliente] = useState("");
@@ -94,7 +96,7 @@ export default function SimulatorAdmin() {
         cacheBust: true,
       });
       const link = document.createElement("a");
-      link.download = `desenho-${simuladorAtivo}-${new Date().toISOString().slice(0, 10)}.png`;
+      link.download = quoteFilename({ quoteType: simuladorAtivo, customerName: resolveCustomerName(dadosEmpresa, nomeCliente) }, "Desenho", "png");
       link.href = dataUrl;
       link.click();
     } catch (error) {
@@ -182,8 +184,9 @@ export default function SimulatorAdmin() {
 
       const nomeBase = `simulacao-${simuladorAtivo}-${new Date().toISOString().slice(0, 10)}`;
       const form = new FormData();
-      form.append("pdf", pdf, `${nomeBase}.pdf`);
-      form.append("image", imagemBlob, `${nomeBase}.jpg`);
+      form.append("email", emailCliente.trim());
+      form.append("pdf", pdf, quoteFilename({ quoteType: simuladorAtivo, customerName: resolveCustomerName(dadosEmpresa, nomeCliente) }));
+      form.append("image", imagemBlob, quoteFilename({ quoteType: simuladorAtivo, customerName: resolveCustomerName(dadosEmpresa, nomeCliente) }, "Desenho", "jpg"));
       const response = await fetch("/api/admin/sales", { method: "POST", body: form, cache: "no-store" });
       const result = await response.json();
       if (response.status === 401) throw new Error("A sessão de administração expirou. Inicie sessão novamente.");
@@ -213,7 +216,8 @@ export default function SimulatorAdmin() {
       pesquisaProdutoExtra={pesquisaProdutoExtra}
       setPesquisaProdutoExtra={setPesquisaProdutoExtra}
       produtosCatalogo={produtosCatalogo}
-      onCustomerSelect={(customer) => { setSavedCustomer(customer); setNomeCliente(customer.name); setNifCliente(customer.nif); }}
+      emailCliente={emailCliente} setEmailCliente={setEmailCliente}
+      onCustomerSelect={(customer) => { setEmailCliente(customer.email || ""); setSavedCustomer(customer); setNomeCliente(customer.name); setNifCliente(customer.nif); }}
       nomeCliente={nomeCliente}
       setNomeCliente={setNomeCliente}
       nifCliente={nifCliente}
@@ -270,7 +274,7 @@ export default function SimulatorAdmin() {
           <Link href={`/admin/simulador/espaco/${simuladorAtivo}`} className="rounded-full border border-[#e5e5e7] bg-white px-5 py-3 text-sm font-semibold text-[#424245] hover:bg-[#f5f5f7]">Planear com as medidas do espaço · Vista de topo</Link>
         </nav>}
 
-        <div className="flex justify-end"><QuoteEmailButton prepare={async () => {
+        <div className="flex justify-end"><QuoteEmailButton initialEmail={emailCliente} prepare={async () => {
           const data = obterDadosPdf();
           if (!data) throw new Error("Confirme a configuração e os dados do cliente.");
           await document.fonts?.ready;
@@ -279,7 +283,7 @@ export default function SimulatorAdmin() {
           const { toJpeg } = await import("html-to-image");
           const blob = await generateBudgetPdf({ ...data, returnBlob: true });
           const url = await toJpeg(drawing, { pixelRatio: 1.5, quality: 0.85, backgroundColor: "#ffffff", cacheBust: true });
-          return [{ blob, name: "orcamento.pdf" }, { blob: await (await fetch(url)).blob(), name: "desenho.jpg" }];
+          return [{ blob, name: quoteFilename({ quoteType: simuladorAtivo, customerName: resolveCustomerName(dadosEmpresa, nomeCliente) }) }, { blob: await (await fetch(url)).blob(), name: quoteFilename({ quoteType: simuladorAtivo, customerName: resolveCustomerName(dadosEmpresa, nomeCliente) }, "Desenho", "jpg") }];
         }} /></div>
 
         <section ref={capturaRef} aria-label={`Simulação de ${ativo.label}`} className="min-w-0">

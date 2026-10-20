@@ -1,3 +1,4 @@
+import { quoteFilename } from "@/lib/quote-filenames.mjs";
 import { validateAttachment } from "@/lib/email/attachments.mjs";
 import { readFile } from "node:fs/promises";
 import path from "node:path";
@@ -25,10 +26,10 @@ export async function POST(request) {
     const id = form.get("saleId");
     if (id) {
       const { record, buffer } = await getPdf(String(id));
-      attachments.push({ filename: "orcamento.pdf", content: buffer, contentType: "application/pdf" });
+      attachments.push({ filename: quoteFilename(record), content: buffer, contentType: "application/pdf" });
       for (const image of record.images || []) {
         const saved = await getSaleImage(String(id), image.id);
-        attachments.push({ filename: image.name, content: saved.buffer, contentType: image.contentType });
+        attachments.push({ filename: quoteFilename(record, "Desenho", image.contentType === "image/png" ? "png" : image.contentType === "image/webp" ? "webp" : "jpg", (record.images || []).indexOf(image) + 1), content: saved.buffer, contentType: image.contentType });
       }
     }
     const uploaded = [...(!id ? form.getAll("attachments") : []), ...form.getAll("extraAttachments")];

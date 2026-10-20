@@ -197,14 +197,6 @@ export default async function generateBudgetPdf({ linhas, descontoSelecionado, d
       doc.line(xContribuinte, yCondicoes + 1, xContribuinte + larguraContribuinte, yCondicoes + 1);
 
       y = yCondicoes + 8;
-      if (additionalDetails) {
-        doc.setFont("helvetica", "normal");
-        doc.setFontSize(8);
-        doc.setTextColor(...corPretaFooter);
-        const detalheLinhas = doc.splitTextToSize(additionalDetails, pageWidth - 24);
-        doc.text(detalheLinhas, 12, y);
-        y += detalheLinhas.length * 4 + 3;
-      }
 
       const tableCols = [
         { title: "REF", dataKey: "referencia", width: 22 },

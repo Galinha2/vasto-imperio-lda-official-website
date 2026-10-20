@@ -33,9 +33,8 @@ export default function QuoteCombinationDialog({ sourceId, targetId, separateId,
       else {
         const preparation=await fetch(`/api/admin/sales/merge?sourceId=${sourceId}&targetId=${targetId}`,{cache:"no-store"});
         const data=await preparation.json();if(!preparation.ok)throw new Error(data.error);
-        const details=data.sources.map((source,index)=>`Configuração ${index+1}: ${source.details||"Orçamento original"}`).join("\n");
         const [pdf,image]=await Promise.all([
-          generateBudgetPdf({linhas:data.lines,descontoSelecionado:0,dadosEmpresa:{nome:data.customer.customerName,nif:data.customer.nif,codigoPostal:data.customer.orderDetails?.moradaFiscal||""},nif:data.customer.nif,nomeClienteManual:data.customer.customerName,additionalDetails:`Orçamento conjunto. Os preços já incluem os descontos dos documentos originais.\n${details}`,returnBlob:true}),
+          generateBudgetPdf({linhas:data.lines,descontoSelecionado:0,dadosEmpresa:{nome:data.customer.customerName,nif:data.customer.nif,codigoPostal:data.customer.orderDetails?.moradaFiscal||""},nif:data.customer.nif,nomeClienteManual:data.customer.customerName,returnBlob:true}),
           combineDrawings(data.sources),
         ]);
         if(pdf.size+(image?.size||0)>3.7*1024*1024)throw new Error("Os desenhos juntos ultrapassam o limite de envio. Reduza o tamanho das imagens antes de juntar.");

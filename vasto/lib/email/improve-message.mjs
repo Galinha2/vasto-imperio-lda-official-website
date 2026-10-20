@@ -14,7 +14,14 @@ export async function improveEmailMessage(message, { apiKey = process.env.OPENAI
       }),
     });
   } catch { throw failure('A IA não respondeu a tempo. O texto original foi mantido. Tente novamente.', 504); }
-  if (!response.ok) throw failure(response.status === 429 ? 'A IA está sem saldo ou atingiu o limite de pedidos. Verifique a conta da API ou tente mais tarde.' : 'Não foi possível melhorar o texto. Verifique a chave e o acesso ao modelo da OpenAI.', 502);
+  if (!response.ok) {
+    let code = "";
+    try { const body = await response.json(); code = body.error?.code || body.error?.type || ""; } catch { /* Keep a safe fallback for non-JSON errors. */ }
+    if (code === "insufficient_quota" || code === "billing_hard_limit_reached") throw failure('A conta OpenAI API não tem quota disponível. Verifique o saldo e a faturação em platform.openai.com/settings/organization/billing/overview e os limites do projeto. A subscrição do ChatGPT não inclui saldo da API.', 502);
+    if (response.status === 429 && code === "rate_limit_exceeded") throw failure('Atingiu o limite temporário de pedidos da OpenAI. Aguarde um pouco e tente novamente.', 502);
+    if (response.status === 429) throw failure('A OpenAI recusou o pedido por um limite de utilização. Verifique o saldo e os limites da sua conta da API.', 502);
+    throw failure('Não foi possível melhorar o texto. Verifique a chave e o acesso ao modelo da OpenAI.', 502);
+  }
   const data = await response.json();
   const text = (data.output || []).filter((item) => item.type === 'message').flatMap((item) => item.content || []).filter((item) => item.type === 'output_text').map((item) => item.text).join('\n').trim();
   if (data.status === 'incomplete' || !text || text.length > 10000) throw failure('A IA não devolveu uma mensagem completa. O texto original foi mantido.', 502);

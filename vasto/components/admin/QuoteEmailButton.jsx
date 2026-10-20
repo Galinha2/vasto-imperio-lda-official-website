@@ -1,4 +1,5 @@
 "use client";
+import { polishEmailMessage } from "@/lib/email/polish-message.mjs";
 import { attachmentAccept, attachmentType } from "@/lib/email/attachments.mjs";
 import { quoteFilename } from "@/lib/quote-filenames.mjs";
 import { emailSignature } from "@/lib/email/signature.mjs";
@@ -55,10 +56,8 @@ export default function QuoteEmailButton({ prepare, sale, groupSales, compact = 
     const original = message;
     setImproving(true); setError("");
     try {
-      const response = await fetch("/api/admin/improve-email", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ message: original }) });
-      const result = await response.json();
-      if (!response.ok) throw new Error(result.error || "Não foi possível melhorar o texto.");
-      setOriginalMessage(original); setMessage(result.message);
+      const improved = polishEmailMessage(original);
+      setOriginalMessage(original); setMessage(improved);
     } catch (failure) { setError(failure.message); }
     finally { setImproving(false); }
   }
@@ -89,7 +88,7 @@ export default function QuoteEmailButton({ prepare, sale, groupSales, compact = 
         <label className="block text-sm">Email do cliente<input required type="email" value={email} onChange={(event) => setEmail(event.target.value)} className="mt-1 w-full rounded-xl border border-gray-200 p-3" /></label>
         <label className="block text-sm">Assunto<input required maxLength={180} value={subject} onChange={(event) => setSubject(event.target.value)} className="mt-1 w-full rounded-xl border border-gray-200 p-3" /></label>
         <label className="block text-sm">Mensagem<textarea disabled={improving} required maxLength={10000} rows={7} value={message} onChange={(event) => setMessage(event.target.value)} className="mt-1 w-full rounded-xl border border-gray-200 p-3" /></label>
-        <div className="flex flex-wrap items-center gap-3"><button type="button" disabled={busy || improving || !message.trim()} onClick={improveMessage} className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-purple-200 bg-purple-50 px-4 py-2 text-xs font-semibold text-purple-700 transition hover:bg-purple-100 disabled:cursor-default disabled:opacity-50"><IoSparklesOutline aria-hidden="true" />{improving ? "A melhorar…" : "Melhorar com IA"}</button>{originalMessage !== null && <button type="button" disabled={busy || improving} onClick={() => { setMessage(originalMessage); setOriginalMessage(null); }} className="cursor-pointer text-xs text-gray-500 hover:text-gray-800">Repor texto anterior</button>}<span role="status" className="text-xs text-gray-500">{improving ? "A rever a mensagem…" : originalMessage !== null ? "Texto melhorado. Reveja antes de enviar." : ""}</span></div>
+        <div className="flex flex-wrap items-center gap-3"><button type="button" disabled={busy || improving || !message.trim()} onClick={improveMessage} className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-purple-200 bg-purple-50 px-4 py-2 text-xs font-semibold text-purple-700 transition hover:bg-purple-100 disabled:cursor-default disabled:opacity-50"><IoSparklesOutline aria-hidden="true" />{improving ? "A melhorar…" : "Melhorar texto"}</button>{originalMessage !== null && <button type="button" disabled={busy || improving} onClick={() => { setMessage(originalMessage); setOriginalMessage(null); }} className="cursor-pointer text-xs text-gray-500 hover:text-gray-800">Repor texto anterior</button>}<span role="status" className="text-xs text-gray-500">{improving ? "A rever a mensagem…" : originalMessage !== null ? "Texto melhorado. Reveja antes de enviar." : ""}</span></div>
         <section aria-label="Assinatura do email" className="rounded-2xl border border-[#e5e5e7] bg-white p-4"><p className="text-xs text-[#86868b]">Assinatura incluída automaticamente</p><div dangerouslySetInnerHTML={{ __html: emailSignature("/logo.png") }} /></section>
       </div>
       <aside aria-label="Anexos do email" className="min-w-0 space-y-4 lg:max-h-[70vh] lg:overflow-y-auto lg:pr-2">

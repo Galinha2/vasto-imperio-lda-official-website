@@ -19,3 +19,13 @@ test('missing configuration, invalid input, upstream errors and incomplete outpu
   await assert.rejects(improveEmailMessage('texto', { apiKey: 'test', fetcher: async () => new Response('', { status: 429 }) }), { status: 502 });
   await assert.rejects(improveEmailMessage('texto', { apiKey: 'test', fetcher: async () => Response.json({ status: 'incomplete', output: [] }) }), { status: 502 });
 });
+
+test('quota exhaustion is distinguished from temporary rate limits without exposing provider details', async () => {
+  for (const [code, expected] of [['insufficient_quota', /não tem quota disponível/], ['rate_limit_exceeded', /limite temporário/]]) {
+    await assert.rejects(improveEmailMessage('texto', { apiKey: 'test', fetcher: async () => Response.json({ error: { code, message: 'private provider details' } }, { status: 429 }) }), (error) => {
+      assert.match(error.message, expected);
+      assert.ok(!error.message.includes('private provider details'));
+      return true;
+    });
+  }
+});

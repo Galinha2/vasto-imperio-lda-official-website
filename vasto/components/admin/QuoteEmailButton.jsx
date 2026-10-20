@@ -1,4 +1,5 @@
 "use client";
+import { emailSignature } from "@/lib/email/signature.mjs";
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { IoMailOutline } from "react-icons/io5";
@@ -9,7 +10,7 @@ export default function QuoteEmailButton({ prepare, sale, compact = false, menuI
   const [attachments, setAttachments] = useState([]);
   const [email, setEmail] = useState("");
   const [subject, setSubject] = useState("Orçamento · Vasto Império");
-  const [message, setMessage] = useState("Bom dia,\n\nSegue em anexo o nosso orçamento e os desenhos disponíveis para a sua apreciação.\n\nEstamos disponíveis para qualquer esclarecimento.\n\nCom os melhores cumprimentos,\nVasto Império");
+  const [message, setMessage] = useState("Bom dia,\n\nSegue em anexo o nosso orçamento e os desenhos disponíveis para a sua apreciação.\n\nEstamos disponíveis para qualquer esclarecimento.\n\nCom os melhores cumprimentos,");
   const [error, setError] = useState("");
   const [sent, setSent] = useState(false);
   const [previews, setPreviews] = useState([]);
@@ -58,6 +59,7 @@ export default function QuoteEmailButton({ prepare, sale, compact = false, menuI
         <label className="block text-sm">Email do cliente<input required type="email" value={email} onChange={(event) => setEmail(event.target.value)} className="mt-1 w-full rounded-xl border border-gray-200 p-3" /></label>
         <label className="block text-sm">Assunto<input required maxLength={180} value={subject} onChange={(event) => setSubject(event.target.value)} className="mt-1 w-full rounded-xl border border-gray-200 p-3" /></label>
         <label className="block text-sm">Mensagem<textarea required maxLength={10000} rows={7} value={message} onChange={(event) => setMessage(event.target.value)} className="mt-1 w-full rounded-xl border border-gray-200 p-3" /></label>
+        <section aria-label="Assinatura do email" className="rounded-2xl border border-[#e5e5e7] bg-white p-4"><p className="text-xs text-[#86868b]">Assinatura incluída automaticamente</p><div dangerouslySetInnerHTML={{ __html: emailSignature("/logo.png") }} /></section>
         <p className="text-xs text-gray-500">{busy ? "A preparar/enviar…" : sale ? `Anexos: orçamento PDF e ${sale.images?.length || 0} desenho(s) guardado(s).` : `Anexos: ${attachments.map((file) => file.name).join(", ") || "indisponíveis"}`}</p>
         {!!previews.length && <section aria-label="Pré-visualização dos anexos" className="space-y-4 rounded-2xl border border-[#e5e5e7] bg-[#f8f8fa] p-4">
           <div><h3 className="text-sm font-semibold text-[#1d1d1f]">Confirmar anexos</h3><p className="mt-1 text-xs text-[#86868b]">Estes são os ficheiros que seguem com o email.</p></div>

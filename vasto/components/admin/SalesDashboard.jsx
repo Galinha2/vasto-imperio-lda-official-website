@@ -521,6 +521,7 @@ export default function SalesDashboard() {
   const unresolvedSales = sales
     .filter((sale) => !sale.quoteNotSelected && !isResolved(sale) && isSaleInactive(sale))
     .sort((a, b) => lastSaleActivity(a) - lastSaleActivity(b));
+  const emailGroups = new Map(groupQuotes(sales).flatMap((group) => group.sales.map((sale) => [sale.id, group.sales])));
   const quoteGroups = groupQuotes(visibleSales);
   const groupBySale = new Map(quoteGroups.flatMap((group) => group.sales.map((sale) => [sale.id, group])));
   const tableSales = quoteGroups.flatMap((group) => group.sales);
@@ -1109,7 +1110,7 @@ export default function SalesDashboard() {
                               : <span className="inline-flex whitespace-nowrap rounded-full border border-[#e5e5e7] bg-white/80 px-2.5 py-1.5 text-[10px] font-medium text-[#86868b]">Não resolvido</span>}
                           </td>
                           <td className="px-3 py-4">
-                            <SaleActions groupSales={groupBySale.get(sale.id).sales} onSeparate={() => setQuoteCombination({ separateId: sale.id })} sale={sale} imagesOpen={imagePanel === sale.id} onImages={() => setImagePanel((current) => current === sale.id ? "" : sale.id)} onUngroup={() => changeQuoteGroup(sale.id)} grouping={groupingQuotes} onDelete={() => setSaleToDelete(sale)} />
+                            <SaleActions groupSales={emailGroups.get(sale.id)} onSeparate={() => setQuoteCombination({ separateId: sale.id })} sale={sale} imagesOpen={imagePanel === sale.id} onImages={() => setImagePanel((current) => current === sale.id ? "" : sale.id)} onUngroup={() => changeQuoteGroup(sale.id)} grouping={groupingQuotes} onDelete={() => setSaleToDelete(sale)} />
                           </td>
                         </tr>
                         {imagePanel === sale.id && (

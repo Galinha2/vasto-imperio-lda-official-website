@@ -1,3 +1,4 @@
+import { validateAttachment } from "@/lib/email/attachments.mjs";
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { signedEmail } from "@/lib/email/signature.mjs";
@@ -29,17 +30,14 @@ export async function POST(request) {
         const saved = await getSaleImage(String(id), image.id);
         attachments.push({ filename: image.name, content: saved.buffer, contentType: image.contentType });
       }
-    } else {
-      for (const file of form.getAll("attachments")) {
-        if (!file || typeof file.arrayBuffer !== "function") throw Object.assign(new Error("Anexo inválido."), { status: 400 });
-        const content = Buffer.from(await file.arrayBuffer());
-        const pdf = file.type === "application/pdf" && content.subarray(0, 5).toString() === "%PDF-";
-        const jpeg = file.type === "image/jpeg" && content[0] === 255 && content[1] === 216 && content[2] === 255;
-        if (!pdf && !jpeg) throw Object.assign(new Error("Formato de anexo inválido."), { status: 400 });
-        attachments.push({ filename: pdf ? "orcamento.pdf" : "desenho.jpg", content, contentType: file.type });
-      }
     }
-    if (!attachments.some((file) => file.contentType === "application/pdf") || attachments.length > 11 || attachments.reduce((sum, file) => sum + file.content.length, 0) > 20 * 1024 * 1024) return NextResponse.json({ error: "Confirme os anexos: é obrigatório um orçamento PDF e o limite total é 20 MB." }, { status: 400 });
+    const uploaded = [...(!id ? form.getAll("attachments") : []), ...form.getAll("extraAttachments")];
+    if (form.getAll("extraAttachments").length > 10 || uploaded.length > 12) return NextResponse.json({ error: "Pode adicionar até 10 anexos extra por email." }, { status: 400 });
+    for (const file of uploaded) {
+      if (!file || typeof file.arrayBuffer !== "function") throw Object.assign(new Error("Anexo inválido."), { status: 400 });
+      attachments.push(validateAttachment(file.name, Buffer.from(await file.arrayBuffer())));
+    }
+    if (!attachments.some((file) => file.contentType === "application/pdf") || attachments.length > 21 || attachments.reduce((sum, file) => sum + file.content.length, 0) > 20 * 1024 * 1024) return NextResponse.json({ error: "Confirme os anexos: é obrigatório um orçamento PDF e o limite total é 20 MB." }, { status: 400 });
     if (!["SMTP_HOST", "SMTP_PORT", "SMTP_USER", "SMTP_PASS"].every((key) => process.env[key])) throw new Error("SMTP indisponível");
     const transporter = nodemailer.createTransport({ host: process.env.SMTP_HOST, port: Number(process.env.SMTP_PORT), secure: Number(process.env.SMTP_PORT) === 465, auth: { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS } });
     const signatureLogo = await readFile(path.join(process.cwd(), "public", "logo.png"));

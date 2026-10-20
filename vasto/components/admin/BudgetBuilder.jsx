@@ -14,7 +14,6 @@ export default function BudgetBuilder({ editSaleId = "" }) {
     { produto: null, preco: 0, unidades: 0, total: 0, refCompleta: "", isPortes: false },
   ]);
   const [openProdutoIndex, setOpenProdutoIndex] = useState(null);
-  const [openDesc, setOpenDesc] = useState(false);
   const [descontoSelecionado, setDescontoSelecionado] = useState(0);
   const [copiado, setCopiado] = useState(false);
   const [pesquisaProduto, setPesquisaProduto] = useState("");
@@ -48,7 +47,6 @@ export default function BudgetBuilder({ editSaleId = "" }) {
     const handleClickOutside = (event) => {
       if (!event.target.closest("[data-produto-dropdown]"))
         setOpenProdutoIndex(null);
-      if (!event.target.closest("[data-desc-dropdown]")) setOpenDesc(false);
     };
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
@@ -419,14 +417,16 @@ export default function BudgetBuilder({ editSaleId = "" }) {
             <h2 className="text-lg font-semibold tracking-[-0.03em] text-[#1d1d1f]">Dados do cliente</h2>
             <p className="mt-1 text-sm text-[#6e6e73]">Opcional · o NIF preenche os dados da empresa.</p>
           <div data-desc-dropdown className="relative mt-5 flex flex-col gap-4 sm:flex-row sm:items-start">
-            <button
-              type="button"
-              onClick={() => setOpenDesc(!openDesc)}
-              className="flex h-12 w-28 cursor-pointer items-center justify-between rounded-full border border-[#e5e5e7] bg-[#f5f5f7] px-4 text-sm font-medium transition hover:border-[#c8c9cf]"
-            >
-              <p>{descontoSelecionado}%</p>
-              <IoIosArrowDown />
-            </button>
+            <label className="block shrink-0 text-xs font-medium text-[#6e6e73]">
+              Desconto
+              <span className="mt-1 flex h-12 w-32 items-center gap-1 rounded-full border border-[#e5e5e7] bg-[#f5f5f7] px-4 focus-within:border-[#0879c0] focus-within:ring-4 focus-within:ring-[#0879c0]/10">
+                <input type="number" min="0" max="100" step="0.01" inputMode="decimal" aria-label="Percentagem de desconto" value={descontoSelecionado}
+                  onChange={(event) => { const value = event.target.value; setDescontoSelecionado(value === "" ? "" : Math.min(100, Math.max(0, Number(value) || 0))); }}
+                  onBlur={() => { if (descontoSelecionado === "") setDescontoSelecionado(0); }}
+                  className="min-w-0 w-full bg-transparent text-sm font-medium text-[#1d1d1f] outline-none" />
+                <span className="text-sm">%</span>
+              </span>
+            </label>
             <div className="flex min-w-0 flex-1 flex-col gap-3 sm:max-w-md">
               <input
                 type="text"
@@ -463,22 +463,7 @@ export default function BudgetBuilder({ editSaleId = "" }) {
               )}
             </div>
 
-            {openDesc && (
-              <div className="absolute left-0 top-14 z-20 w-28 rounded-2xl border border-[#e5e5e7] bg-white p-1 shadow-[0_12px_30px_rgba(0,0,0,0.12)]">
-                {orcamento.descontos.map((d, i) => (
-                  <div
-                    key={i}
-                    onClick={() => {  
-                      setDescontoSelecionado(Number(d.desconto));
-                      setOpenDesc(false);
-                    }}
-                    className="cursor-pointer rounded-full px-3 py-2 text-center text-sm transition hover:bg-[#f5f5f7]"
-                  >
-                    {d.desconto}%
-                  </div>
-                ))}
-              </div>
-            )}
+
           </div>
 
           </div>

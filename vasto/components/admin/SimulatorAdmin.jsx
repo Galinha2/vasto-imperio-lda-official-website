@@ -7,6 +7,7 @@ import SimulatorEstantesLigeiras from "@/components/simulador/SimulatorEstantesL
 import SimulatorPicking from "@/components/simulador/SimulatorPicking";
 import SimulatorRacks from "@/components/simulador/SimulatorRacks";
 import SimulatorAdminQuoteTools from "@/components/admin/SimulatorAdminQuoteTools";
+import { hasCustomerName } from "@/lib/customer-identity.mjs";
 import QuoteEmailButton from "./QuoteEmailButton";
 import generateBudgetPdf from "@/lib/generateBudgetPdf";
 import orcamento from "@/assets/orcamento.json";
@@ -109,7 +110,7 @@ export default function SimulatorAdmin() {
       setMensagem("A configuração atual não tem dados suficientes para gerar o orçamento.");
       return null;
     }
-    if (dadosEmpresa?.nome === "NIF não encontrado") {
+    if (dadosEmpresa?.nome === "NIF não encontrado" && !hasCustomerName(nomeCliente)) {
       setMensagem("Não é possível gerar o PDF: NIF não encontrado.");
       return null;
     }

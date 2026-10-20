@@ -1,3 +1,4 @@
+import { resolveCustomerName } from "./customer-identity.mjs";
 import jsPDF from "jspdf";
 
 function formatarNumero(valor) {
@@ -6,6 +7,7 @@ function formatarNumero(valor) {
 }
 
 export default async function generateBudgetPdf({ linhas, descontoSelecionado, dadosEmpresa, nif, nomeClienteManual, additionalDetails = "", returnBlob = false, source = "orcamento", quoteType = "" }) {
+    const resolvedCustomerName = resolveCustomerName(dadosEmpresa, nomeClienteManual);
     const issueParts = new Intl.DateTimeFormat("en", { timeZone: "Europe/Lisbon", year: "numeric", month: "2-digit", day: "2-digit" }).formatToParts(new Date());
     const issuePart = (type) => issueParts.find((part) => part.type === type).value;
     const issuedAt = `${issuePart("year")}-${issuePart("month")}-${issuePart("day")}`;
@@ -92,7 +94,7 @@ export default async function generateBudgetPdf({ linhas, descontoSelecionado, d
       let clienteNome, clienteMorada, clienteNif;
 
       if (dadosEmpresa) {
-        clienteNome = dadosEmpresa.nome || "Cliente";
+        clienteNome = resolvedCustomerName;
         clienteMorada = dadosEmpresa.codigoPostal || "V/ Morada";
         clienteNif = dadosEmpresa.nif || nif;
       } else if (nomeClienteManual.trim() !== "") {
@@ -461,8 +463,8 @@ export default async function generateBudgetPdf({ linhas, descontoSelecionado, d
     desenharPagina("Original", logoPreload);
 
     let nomeFinalPDF = "Orçamento";
-    if (dadosEmpresa && dadosEmpresa.nome && dadosEmpresa.nome !== "Cliente") {
-      nomeFinalPDF = `Orçamento | ${dadosEmpresa.nome}`;
+    if (resolvedCustomerName !== "Cliente") {
+      nomeFinalPDF = `Orçamento | ${resolvedCustomerName}`;
     } else if (nomeClienteManual.trim() !== "") {
       nomeFinalPDF = `Orçamento | ${nomeClienteManual}`;
     }
@@ -471,7 +473,7 @@ export default async function generateBudgetPdf({ linhas, descontoSelecionado, d
       title: nomeFinalPDF,
       author: "Vasto Império",
       subject: "VASTO_SALES_V1:" + btoa(String.fromCharCode(...new TextEncoder().encode(JSON.stringify({
-        customerName: dadosEmpresa?.nome || nomeClienteManual?.trim() || "Cliente",
+        customerName: resolvedCustomerName,
         nif: String(dadosEmpresa?.nif || nif || ""),
         issuedAt,
         subtotal: Number(linhas.reduce((sum, line) => sum + line.total * (line.isPortes ? 1 : 1 - Number(descontoSelecionado || 0) / 100), 0).toFixed(2)),

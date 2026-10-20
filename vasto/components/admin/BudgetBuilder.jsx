@@ -5,6 +5,7 @@ import { IoIosArrowDown } from "react-icons/io";
 import { IoIosAdd } from "react-icons/io";
 import { IoCloudUploadOutline } from "react-icons/io5";
 import orcamento from "@/assets/orcamento.json";
+import { hasCustomerName, resolveCustomerName } from "@/lib/customer-identity.mjs";
 import CustomerSuggestionInput from "./CustomerSuggestionInput";
 import QuoteEmailButton from "./QuoteEmailButton";
 import generateBudgetPdf from "@/lib/generateBudgetPdf";
@@ -205,7 +206,7 @@ export default function BudgetBuilder({ editSaleId = "" }) {
 
   const enviarParaVendas = async () => {
     if (sendingToSales || loadingQuote || (editSaleId && !editingRecord)) return;
-    if (dadosEmpresa?.nome === "NIF não encontrado") {
+    if ((dadosEmpresa?.nome === "NIF não encontrado" && !hasCustomerName(nomeClienteManual))) {
       setPopupMensagem("Não é possível enviar o orçamento: NIF não encontrado.");
       return;
     }
@@ -465,9 +466,10 @@ export default function BudgetBuilder({ editSaleId = "" }) {
               {loadingNif && (
                 <span className="text-xs mt-1">A procurar dados...</span>
               )}
+              {dadosEmpresa && !loadingNif && !hasCustomerName(dadosEmpresa.nome) && <p className="text-xs leading-relaxed text-[#86868b]">Não foi encontrado um nome para este NIF. Escreva o nome do cliente no campo acima; será usado no orçamento e guardado nas vendas.</p>}
               {dadosEmpresa && !loadingNif && (
                 <div className="mt-1 rounded-2xl border border-[#e5e5e7] bg-[#f5f5f7] p-4 text-sm text-[#6e6e73]">
-                  <p><strong>{dadosEmpresa.nome}</strong></p>
+                  <p><strong>{resolveCustomerName(dadosEmpresa, nomeClienteManual)}</strong></p>
                   <p>NIF: {dadosEmpresa.nif}</p>
                   <p>{dadosEmpresa.codigoPostal}</p>
                 </div>
@@ -505,7 +507,7 @@ export default function BudgetBuilder({ editSaleId = "" }) {
               <button
                 type="button"
                 onClick={() => {
-                  if (dadosEmpresa?.nome === "NIF não encontrado") {
+                  if ((dadosEmpresa?.nome === "NIF não encontrado" && !hasCustomerName(nomeClienteManual))) {
                     setPopupMensagem("Não é possível gerar PDF: NIF não encontrado.");
                     return;
                   }
@@ -526,7 +528,7 @@ export default function BudgetBuilder({ editSaleId = "" }) {
                 {sendingToSales ? "A guardar…" : editingRecord ? "Guardar alterações" : "Enviar para vendas"}
               </button>
               <QuoteEmailButton prepare={async () => {
-                if (loadingNif || dadosEmpresa?.nome === "NIF não encontrado") throw new Error("Confirme os dados do cliente antes de enviar.");
+                if (loadingNif || (dadosEmpresa?.nome === "NIF não encontrado" && !hasCustomerName(nomeClienteManual))) throw new Error("Confirme os dados do cliente antes de enviar.");
                 if (!linhas.some((line) => line.produto && line.unidades > 0)) throw new Error("Adicione artigos ao orçamento.");
                 const blob = await generateBudgetPdf({ linhas, descontoSelecionado, dadosEmpresa, nif, nomeClienteManual, returnBlob: true });
                 return [{ blob, name: "orcamento.pdf" }];

@@ -1,5 +1,6 @@
 "use client";
 
+import { hasCustomerName, resolveCustomerName } from "@/lib/customer-identity.mjs";
 import CustomerSuggestionInput from "./CustomerSuggestionInput";
 import Image from "@/components/loadings/LoadingImage";
 import { IoIosArrowDown } from "react-icons/io";
@@ -176,8 +177,9 @@ export default function SimulatorAdminQuoteTools({
               className="h-11 w-full rounded-full border border-[#e5e5e7] bg-[#f5f5f7] px-4 text-sm outline-none transition placeholder:text-[#86868b] focus:border-(--blue)"
             />
           </div>
+          {dadosEmpresa && !loadingNif && !hasCustomerName(dadosEmpresa.nome) && <p className="mt-2 text-xs text-[#86868b]">Nome indisponível para este NIF. Preencha o nome manualmente; será usado no PDF e nas vendas.</p>}
           {loadingNif && <p className="mt-2 text-xs text-[#86868b]">A procurar dados do NIF…</p>}
-          {dadosEmpresa && !loadingNif && <p className="mt-2 text-xs text-[#6e6e73]">{dadosEmpresa.nome} · {dadosEmpresa.codigoPostal}</p>}
+          {dadosEmpresa && !loadingNif && <p className="mt-2 text-xs text-[#6e6e73]">{resolveCustomerName(dadosEmpresa, nomeCliente)} · {dadosEmpresa.codigoPostal}</p>}
         </div>
         <div className="grid gap-3 sm:grid-cols-3">
           <button

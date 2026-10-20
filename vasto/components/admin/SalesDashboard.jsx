@@ -1109,7 +1109,7 @@ export default function SalesDashboard() {
                               : <span className="inline-flex whitespace-nowrap rounded-full border border-[#e5e5e7] bg-white/80 px-2.5 py-1.5 text-[10px] font-medium text-[#86868b]">Não resolvido</span>}
                           </td>
                           <td className="px-3 py-4">
-                            <SaleActions onSeparate={() => setQuoteCombination({ separateId: sale.id })} sale={sale} imagesOpen={imagePanel === sale.id} onImages={() => setImagePanel((current) => current === sale.id ? "" : sale.id)} onUngroup={() => changeQuoteGroup(sale.id)} grouping={groupingQuotes} onDelete={() => setSaleToDelete(sale)} />
+                            <SaleActions groupSales={groupBySale.get(sale.id).sales} onSeparate={() => setQuoteCombination({ separateId: sale.id })} sale={sale} imagesOpen={imagePanel === sale.id} onImages={() => setImagePanel((current) => current === sale.id ? "" : sale.id)} onUngroup={() => changeQuoteGroup(sale.id)} grouping={groupingQuotes} onDelete={() => setSaleToDelete(sale)} />
                           </td>
                         </tr>
                         {imagePanel === sale.id && (

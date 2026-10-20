@@ -6,7 +6,9 @@ import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { IoMailOutline } from "react-icons/io5";
 
-export default function QuoteEmailButton({ prepare, sale, compact = false, menuItem = false, inlineAction = false, initialEmail = "" }) {
+export default function QuoteEmailButton({ prepare, sale, groupSales, compact = false, menuItem = false, inlineAction = false, initialEmail = "" }) {
+  const [includeGroup, setIncludeGroup] = useState(false);
+  const selectedSales = sale ? (includeGroup && groupSales?.length > 1 ? groupSales : [sale]) : [];
   const [open, setOpen] = useState(false);
   const [busy, setBusy] = useState(false);
   const [attachments, setAttachments] = useState([]);
@@ -20,13 +22,13 @@ export default function QuoteEmailButton({ prepare, sale, compact = false, menuI
   useEffect(() => {
     if (!open) { setPreviews([]); return; }
     const files = [...(!sale ? attachments : []), ...extraAttachments.map((file) => ({ blob: file, name: file.name }))].map(({ blob, name }) => ({ name, type: attachmentType(name) || blob.type, url: URL.createObjectURL(blob) }));
-    const saved = sale ? [
-      { name: quoteFilename(sale), type: "application/pdf", url: `/api/admin/sales/${sale.id}/pdf` },
-      ...(sale.images || []).map((image) => ({ name: quoteFilename(sale, "Desenho", image.contentType === "image/png" ? "png" : image.contentType === "image/webp" ? "webp" : "jpg", (sale.images || []).indexOf(image) + 1), type: image.contentType, url: `/api/admin/sales/${sale.id}/images/${image.id}` })),
-    ] : [];
+    const saved = selectedSales.flatMap((sale, index) => [
+      { name: (selectedSales.length > 1 ? `${index + 1} - ` : "") + quoteFilename(sale), type: "application/pdf", url: `/api/admin/sales/${sale.id}/pdf` },
+      ...(sale.images || []).map((image) => ({ name: (selectedSales.length > 1 ? `${index + 1} - ` : "") + quoteFilename(sale, "Desenho", image.contentType === "image/png" ? "png" : image.contentType === "image/webp" ? "webp" : "jpg", (sale.images || []).indexOf(image) + 1), type: image.contentType, url: `/api/admin/sales/${sale.id}/images/${image.id}` })),
+    ]);
     setPreviews([...saved, ...files]);
     return () => files.forEach((file) => URL.revokeObjectURL(file.url));
-  }, [open, attachments, extraAttachments, sale]);
+  }, [open, attachments, extraAttachments, sale, groupSales, includeGroup]);
 
   function addAttachments(event) {
     const selected = [...event.target.files];
@@ -40,7 +42,7 @@ export default function QuoteEmailButton({ prepare, sale, compact = false, menuI
   }
 
   async function start() {
-    setOpen(true); setBusy(true); setError(""); setSent(false); setAttachments([]); setExtraAttachments([]);
+    setIncludeGroup(false); setOpen(true); setBusy(true); setError(""); setSent(false); setAttachments([]); setExtraAttachments([]);
     setEmail(initialEmail || sale?.orderDetails?.email || "");
     try { if (!sale) setAttachments(await prepare()); }
     catch (failure) { setError(failure.message || "Não foi possível preparar os anexos."); }
@@ -51,7 +53,7 @@ export default function QuoteEmailButton({ prepare, sale, compact = false, menuI
     try {
       const payload = new FormData();
       payload.append("email", email); payload.append("subject", subject); payload.append("message", message);
-      if (sale) payload.append("saleId", sale.id);
+      if (sale) { payload.append("saleId", sale.id); if (includeGroup) payload.append("includeGroup", "true"); }
       else attachments.forEach(({ blob, name }) => payload.append("attachments", blob, name));
       extraAttachments.forEach((file) => payload.append("extraAttachments", file, file.name));
       if (extraAttachments.reduce((sum, file) => sum + file.size, 0) + (!sale ? attachments.reduce((sum, file) => sum + file.blob.size, 0) : 0) > 3.7 * 1024 * 1024) throw new Error("Os anexos ultrapassam o limite de envio. Guarde nas vendas e envie a partir desse registo.");
@@ -68,11 +70,12 @@ export default function QuoteEmailButton({ prepare, sale, compact = false, menuI
     {open && createPortal(<div className="fixed inset-0 z-[1200] flex items-center justify-center overflow-y-auto bg-black/30 p-4 backdrop-blur-sm"><form onSubmit={send} role="dialog" aria-modal="true" aria-label="Enviar orçamento por email" className="my-auto w-full max-w-3xl space-y-4 rounded-[28px] bg-white p-6 shadow-xl">
       <h2 className="text-xl font-semibold">Enviar orçamento por email</h2>
       {sent ? <p role="status" className="text-sm text-emerald-700">Email enviado com o orçamento e os desenhos disponíveis.</p> : <>
+        {groupSales?.length > 1 && <label className="flex cursor-pointer items-start gap-3 rounded-2xl border border-orange-200 bg-orange-50/60 p-4 text-sm"><input type="checkbox" checked={includeGroup} onChange={(event) => setIncludeGroup(event.target.checked)} className="mt-1 accent-orange-600" /><span><strong>Enviar grupo completo ({groupSales.length} orçamentos)</strong><span className="mt-1 block text-xs text-gray-500">Inclui todos os PDFs e desenhos deste grupo num único email. Confirme os anexos abaixo.</span></span></label>}
         <label className="block text-sm">Email do cliente<input required type="email" value={email} onChange={(event) => setEmail(event.target.value)} className="mt-1 w-full rounded-xl border border-gray-200 p-3" /></label>
         <label className="block text-sm">Assunto<input required maxLength={180} value={subject} onChange={(event) => setSubject(event.target.value)} className="mt-1 w-full rounded-xl border border-gray-200 p-3" /></label>
         <label className="block text-sm">Mensagem<textarea required maxLength={10000} rows={7} value={message} onChange={(event) => setMessage(event.target.value)} className="mt-1 w-full rounded-xl border border-gray-200 p-3" /></label>
         <section aria-label="Assinatura do email" className="rounded-2xl border border-[#e5e5e7] bg-white p-4"><p className="text-xs text-[#86868b]">Assinatura incluída automaticamente</p><div dangerouslySetInnerHTML={{ __html: emailSignature("/logo.png") }} /></section>
-        <p className="text-xs text-gray-500">{busy ? "A preparar/enviar…" : sale ? `Anexos: orçamento PDF e ${sale.images?.length || 0} desenho(s) guardado(s).` : `Anexos: ${attachments.map((file) => file.name).join(", ") || "indisponíveis"}`}</p>
+        <p className="text-xs text-gray-500">{busy ? "A preparar/enviar…" : sale ? `Anexos: ${selectedSales.length} orçamento(s) PDF e ${selectedSales.reduce((sum, item) => sum + (item.images?.length || 0), 0)} desenho(s) guardado(s).` : `Anexos: ${attachments.map((file) => file.name).join(", ") || "indisponíveis"}`}</p>
         <section className="space-y-3 rounded-2xl border border-dashed border-orange-200 bg-orange-50/40 p-4">
           <label className={`inline-flex items-center rounded-full border border-orange-200 bg-white px-4 py-2 text-xs font-semibold text-orange-700 ${busy ? "opacity-50" : "cursor-pointer hover:bg-orange-50"}`}>Adicionar imagens ou anexos<input type="file" multiple accept={attachmentAccept} disabled={busy} onChange={addAttachments} className="sr-only" /></label>
           <p className="text-xs leading-relaxed text-[#86868b]">Até 10 ficheiros extra · PDF, imagens, Word, Excel, TXT, CSV ou ZIP · 3,7 MB por carregamento. Seguem apenas neste email.</p>

@@ -1,0 +1,18 @@
+.table { width: 100%; table-layout: fixed; }
+.quoteRow > td { overflow-wrap: break-word; }
+@media (max-width: 1535px) {
+  .table, .table > tbody { display: block; width: 100%; }
+  .table > thead { display: none; }
+  .quoteRow { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; padding: 16px; }
+  .quoteRow > td { display: block; min-width: 0; padding: 0; white-space: normal; text-align: left; }
+  .quoteRow > td:first-child { grid-column: 1 / -1; }
+  .quoteRow > td:last-child { grid-column: 2 / -1; align-self: end; }
+  .quoteRow > td[data-label]::before { content: attr(data-label); display: block; margin-bottom: 6px; color: #86868b; font-size: 10px; }
+  .quoteRow > td > div { flex-wrap: wrap; }
+  .expanded { display: block; width: 100%; }
+  .expanded > td { display: block; width: 100%; min-width: 0; padding: 16px; }
+}
+@media (max-width: 639px) {
+  .quoteRow { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .quoteRow > td:last-child { grid-column: 1 / -1; }
+}

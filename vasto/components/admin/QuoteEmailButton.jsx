@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { IoMailOutline } from "react-icons/io5";
 
-export default function QuoteEmailButton({ prepare, sale, compact = false, menuItem = false }) {
+export default function QuoteEmailButton({ prepare, sale, compact = false, menuItem = false, inlineAction = false }) {
   const [open, setOpen] = useState(false);
   const [busy, setBusy] = useState(false);
   const [attachments, setAttachments] = useState([]);
@@ -63,7 +63,7 @@ export default function QuoteEmailButton({ prepare, sale, compact = false, menuI
     finally { setBusy(false); }
   }
   return <>
-    <button type="button" onClick={start} title="Enviar orçamento por email" aria-label="Enviar orçamento por email" className={menuItem ? "flex w-full cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-left text-xs text-[#424245] hover:bg-[#f5f5f7]" : compact ? "grid h-8 w-8 cursor-pointer place-items-center rounded-full text-[#86868b] hover:bg-orange-50 hover:text-orange-600" : "inline-flex h-12 cursor-pointer items-center justify-center gap-2 rounded-full border border-orange-200 bg-orange-50 px-5 text-sm font-semibold text-orange-700 hover:bg-orange-100"}><IoMailOutline />{!compact && "Enviar por email"}</button>
+    <button type="button" onClick={start} title="Enviar orçamento por email" aria-label="Enviar orçamento por email" className={inlineAction ? "inline-flex h-9 min-w-[56px] flex-1 cursor-pointer items-center justify-center whitespace-nowrap rounded-full border border-orange-200 bg-orange-50 px-2.5 text-xs font-semibold text-orange-700 transition hover:bg-orange-100" : menuItem ? "flex w-full cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-left text-xs text-[#424245] hover:bg-[#f5f5f7]" : compact ? "grid h-8 w-8 cursor-pointer place-items-center rounded-full text-[#86868b] hover:bg-orange-50 hover:text-orange-600" : "inline-flex h-12 cursor-pointer items-center justify-center gap-2 rounded-full border border-orange-200 bg-orange-50 px-5 text-sm font-semibold text-orange-700 hover:bg-orange-100"}>{!inlineAction && <IoMailOutline />}{inlineAction ? "Email" : !compact && "Enviar por email"}</button>
     {open && createPortal(<div className="fixed inset-0 z-[1200] flex items-center justify-center overflow-y-auto bg-black/30 p-4 backdrop-blur-sm"><form onSubmit={send} role="dialog" aria-modal="true" aria-label="Enviar orçamento por email" className="my-auto w-full max-w-3xl space-y-4 rounded-[28px] bg-white p-6 shadow-xl">
       <h2 className="text-xl font-semibold">Enviar orçamento por email</h2>
       {sent ? <p role="status" className="text-sm text-emerald-700">Email enviado com o orçamento e os desenhos disponíveis.</p> : <>

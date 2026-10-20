@@ -1,4 +1,5 @@
 import test from "node:test";
+import { resolveCustomerName } from "../lib/customer-identity.mjs";
 import assert from "node:assert/strict";
 import { createRequire } from "node:module";
 import { readFile, writeFile, mkdtemp } from "node:fs/promises";
@@ -137,11 +138,12 @@ test("actual shared PDF generator round trip, including discount and delivery", 
   }
   const source = (await readFile(path.join(root, "lib/generateBudgetPdf.js"), "utf8"))
     .replace('import jsPDF from "jspdf";', "")
+    .replace('import { resolveCustomerName } from "./customer-identity.mjs";', "")
     .replace('const { default: autoTable } = await import("jspdf-autotable");', "")
     .replace("export default async function", "async function");
   let generatedDocument;
   function RecordingPdf(options) { generatedDocument = new jsPDF(options); return generatedDocument; }
-  const generate = new Function("jsPDF", "autoTable", "window", `${source}; return generateBudgetPdf;`)(RecordingPdf, autoTable, { Image: LocalImage });
+  const generate = new Function("jsPDF", "autoTable", "window", "resolveCustomerName", `${source}; return generateBudgetPdf;`)(RecordingPdf, autoTable, { Image: LocalImage }, resolveCustomerName);
   try {
     const blob = await generate({ linhas: [{ produto: "Bastidor", refCompleta: "3.1", preco: 100, unidades: 2, total: 200, isPortes: false }, { produto: "Portes", preco: 20, unidades: 1, total: 20, isPortes: true }], descontoSelecionado: 10, dadosEmpresa: { nome: "João & Companhia", nif: "123456789", codigoPostal: "2475-014 Benedita" }, nif: "123456789", nomeClienteManual: "", returnBlob: true, source: "simulador" });
     const record = await parseSalePdf(Buffer.from(await blob.arrayBuffer()), "gerador-real.pdf");
@@ -540,4 +542,37 @@ test("legacy original and duplicate pages with merged quantity/unit text are cou
   assert.equal(quote.lines[1].isPortes, true);
   assert.equal(quote.discount, 10);
   await assert.rejects(editableQuote({ subtotal: 999 }, Buffer.from(doc.output("arraybuffer"))), { status: 422 });
+});
+
+test("joining estimates preserves discounted totals and originals, and undo restores each document", async () => {
+  const { mergeSaleQuotes, separateMergedSale } = await import("../lib/admin/store.mjs");
+  const { assertMergeable, combinedQuoteLines } = await import("../lib/admin/merge-quotes.mjs");
+  const { editableQuote } = await import("../lib/admin/editable-quote.mjs");
+  const sourceLines=[{produto:"Picking",refCompleta:"3.1",preco:100,unidades:2,total:200,isPortes:false}];
+  const targetLines=[{produto:"Rack",refCompleta:"2.1",preco:300,unidades:1,total:300,isPortes:false}];
+  const sourcePdf=pdfWithMetadata({...metadata,customerName:"Junção Teste",quoteLines:sourceLines,discountPercent:10});
+  const targetPdf=pdfWithMetadata({...metadata,customerName:"Junção Teste",subtotal:240,vat:55.2,total:295.2,quoteLines:targetLines,discountPercent:20});
+  const source=await createSale(await parseSalePdf(sourcePdf,"source.pdf"),sourcePdf);
+  const target=await createSale(await parseSalePdf(targetPdf,"target.pdf"),targetPdf);
+  const lines=combinedQuoteLines([{lines:targetLines,discount:20},{lines:sourceLines,discount:10}]);
+  assert.equal(lines.reduce((sum,line)=>sum+line.total,0),420);
+  const combinedPdf=pdfWithMetadata({...metadata,customerName:"Junção Teste",subtotal:420,vat:96.6,total:516.6,quoteLines:lines,discountPercent:0});
+  const image=Buffer.from([255,216,255]);
+  const sales=await mergeSaleQuotes(source.id,target.id,{source:source.updatedAt,target:target.updatedAt},combinedPdf,image);
+  const merged=sales.find((sale)=>sale.mergedQuoteIds?.includes(source.id));
+  assert.ok(merged);
+  assert.ok(!sales.some((sale)=>[source.id,target.id].includes(sale.id)));
+  assert.equal(merged.subtotal,420);
+  assert.equal(merged.images.length,1);
+  assert.deepEqual((await getPdf(source.id)).buffer,sourcePdf);
+  assert.equal((await editableQuote(merged,combinedPdf)).lines.length,2);
+  await assert.rejects(deleteSale(merged.id),{status:400});
+  const restored=await separateMergedSale(merged.id);
+  assert.ok(restored.some((sale)=>sale.id===source.id));
+  assert.ok(restored.some((sale)=>sale.id===target.id));
+  assert.ok(!restored.some((sale)=>sale.id===merged.id));
+  assert.equal((await getSale(source.id)).subtotal,180);
+  assert.throws(()=>assertMergeable({...source,customerName:"Outro",nif:"987654321"},target),{status:400});
+  assert.throws(()=>assertMergeable({...source,paymentStatus:"pago"},target),{status:400});
+  for(const id of [source.id,target.id,merged.id])await deleteSale(id);
 });

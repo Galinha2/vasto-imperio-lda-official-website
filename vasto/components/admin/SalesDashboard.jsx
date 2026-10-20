@@ -2,7 +2,9 @@
 
 import { groupQuotes, sameQuoteCustomer } from "@/lib/admin/quote-groups.mjs";
 import { isSaleInactive, lastSaleActivity } from "@/lib/admin/sale-activity.mjs";
+import QuoteCombinationDialog from "./QuoteCombinationDialog";
 import SaleActions from "./SaleActions";
+import styles from "./SalesDashboard.module.css";
 import MetricCard from "./MetricCard";
 
 import { Fragment, useEffect, useId, useRef, useState } from "react";
@@ -206,6 +208,8 @@ export default function SalesDashboard() {
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
   const [expandedQuoteGroups, setExpandedQuoteGroups] = useState({});
+  const [quoteCombination, setQuoteCombination] = useState(null);
+  const dragClickBlockedUntil = useRef(0);
   const [draggedQuoteId, setDraggedQuoteId] = useState("");
   const [quoteDropTarget, setQuoteDropTarget] = useState("");
   const [groupingQuotes, setGroupingQuotes] = useState(false);
@@ -645,6 +649,7 @@ export default function SalesDashboard() {
             <div><p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[#86868b]">Visão geral</p><h1 className="mt-2 text-4xl font-semibold tracking-[-0.055em] sm:text-[44px]">As suas vendas.</h1><p className="mt-2 text-sm text-[#86868b]">Uma visão clara de cada documento e de cada mês.</p></div>
           </header>
 
+          {quoteCombination && <QuoteCombinationDialog {...quoteCombination} onClose={() => setQuoteCombination(null)} onVersions={changeQuoteGroup} onSaved={(updated, separated) => { setSales(updated); setNotice(separated ? "Orçamentos separados. Os documentos originais foram recuperados." : "Orçamento conjunto criado com o PDF e os desenhos. Pode separar em Ações."); }} />}
           <input ref={inputRef} type="file" accept="application/pdf,.pdf" multiple hidden onChange={(event) => importFiles(event.target.files)} />
           <div className="mt-8 flex flex-wrap items-center justify-between gap-4">
             <h2 className="text-lg font-semibold tracking-[-0.025em]">{periodLabel}</h2>
@@ -922,8 +927,8 @@ export default function SalesDashboard() {
 
             <p className="border-b border-[#f0f0f2] px-5 py-2 text-[11px] text-[#86868b]">{groupingQuotes ? "A guardar agrupamento…" : "Arraste um orçamento para cima de outro para agrupar. O nome do cliente ou o NIF tem de ser igual."}</p>
             {loading ? <div role="status" className="p-16 text-center text-sm text-[#86868b]">A carregar os seus documentos…</div> : visibleSales.length ? (
-              <div className="overflow-x-auto">
-                <table className="w-full min-w-[1000px] table-fixed text-left">
+              <div className="min-w-0 max-w-full">
+                <table className={`${styles.table} text-left`}>
                   <thead className="bg-[#fbfbfd] text-[10px] font-semibold uppercase tracking-[0.1em] text-[#86868b]">
                     <tr>
                       <th className="w-[17%] px-3 py-4">Cliente / documento</th>
@@ -933,7 +938,7 @@ export default function SalesDashboard() {
                         const selected = group.options.find((option) => option.value === headerValue) || group.options[0];
                         const active = selected.value !== "all";
                         return (
-                          <th key={group.label} className={`px-2 py-1.5 ${group.label === "Orçamento" ? "w-[13%]" : group.label === "Pagamento" ? "w-[11%]" : group.label === "Entrega" ? "w-[24%]" : "w-[9%]"}`}>
+                          <th key={group.label} className={`px-2 py-1.5 ${group.label === "Orçamento" ? "w-[13%]" : group.label === "Pagamento" ? "w-[11%]" : group.label === "Entrega" ? "w-[18%]" : "w-[9%]"}`}>
                             <button
                               type="button"
                               aria-label={`Ordenar por ${group.label.toLocaleLowerCase("pt-PT")}: ${selected.label}. Clique para alternar a prioridade.`}
@@ -947,7 +952,7 @@ export default function SalesDashboard() {
                           </th>
                         );
                       })}
-                      <th className="w-[12%] px-3 py-4 text-right">Ações</th>
+                      <th className="w-[18%] px-3 py-4 text-right">Ações</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -956,6 +961,10 @@ export default function SalesDashboard() {
                         {(groupBySale.get(sale.id).sales[0].id === sale.id || expandedQuoteGroups[groupBySale.get(sale.id).id]) && <>
 
                         <tr
+                          onClick={(event) => {
+                            if (!event.currentTarget.contains(event.target) || Date.now() < dragClickBlockedUntil.current || event.target.closest("button, input, select, textarea, a, [role='dialog'], [role='listbox'], [role='option']") || window.getSelection()?.toString()) return;
+                            setImagePanel((current) => current === sale.id ? "" : sale.id);
+                          }}
                           draggable={!groupingQuotes && !changing}
                           onDragStart={(event) => {
                             if (event.target.closest("button, input, select, a")) { event.preventDefault(); return; }
@@ -964,12 +973,12 @@ export default function SalesDashboard() {
                             event.dataTransfer.effectAllowed = "move";
                             setDraggedQuoteId(sale.id);
                           }}
-                          onDragEnd={() => { setDraggedQuoteId(""); setQuoteDropTarget(""); }}
+                          onDragEnd={() => { dragClickBlockedUntil.current = Date.now() + 300; setDraggedQuoteId(""); setQuoteDropTarget(""); }}
                           onDragOver={(event) => {
                             if (!draggedQuoteId) return;
                             event.preventDefault(); event.stopPropagation();
                             const source = sales.find((item) => item.id === draggedQuoteId);
-                            const allowed = source && source.id !== sale.id && sameQuoteCustomer(source, sale) && !(source.quoteGroupId && source.quoteGroupId === sale.quoteGroupId);
+                            const allowed = source && source.id !== sale.id && sameQuoteCustomer(source, sale);
                             event.dataTransfer.dropEffect = allowed ? "move" : "none";
                             setQuoteDropTarget(allowed ? sale.id : "");
                           }}
@@ -978,12 +987,15 @@ export default function SalesDashboard() {
                             const sourceId = event.dataTransfer.getData("application/x-vasto-quote");
                             if (!sourceId) return;
                             event.preventDefault(); event.stopPropagation();
-                            changeQuoteGroup(sourceId, sale.id);
+                            const source = sales.find((item) => item.id === sourceId);
+                            if (!source || sourceId === sale.id || !sameQuoteCustomer(source, sale)) { setDraggedQuoteId(""); setQuoteDropTarget(""); return; }
+                            setDraggedQuoteId(""); setQuoteDropTarget("");
+                            setQuoteCombination({ sourceId, targetId: sale.id });
                           }}
-                          className={`${quoteDropTarget === sale.id ? "outline-2 -outline-offset-2 outline-[#0879c0] bg-sky-50 " : ""}border-t border-l-2 transition ${sale.quoteNotSelected ? "border-[#f0f0f2] border-l-slate-200 bg-slate-50/60 text-slate-500" : isResolved(sale) ? "border-emerald-100 border-l-emerald-500 bg-[#f5faf6] hover:bg-[#eff7f0]" : "border-[#f0f0f2] border-l-red-500 hover:bg-[#fbfbfd]"}`}>
+                          className={`${styles.quoteRow} ${quoteDropTarget === sale.id ? "outline-2 -outline-offset-2 outline-[#0879c0] bg-sky-50 " : ""}cursor-pointer border-t border-l-2 transition ${sale.quoteNotSelected ? "border-[#f0f0f2] border-l-slate-200 bg-slate-50/60 text-slate-500" : isResolved(sale) ? "border-emerald-100 border-l-emerald-500 bg-[#f5faf6] hover:bg-[#eff7f0]" : "border-[#f0f0f2] border-l-red-500 hover:bg-[#fbfbfd]"}`}>
                           <td className="px-3 py-5">
                             <div className="flex items-center gap-2">
-                              <p className="truncate text-sm font-semibold tracking-tight">{sale.customerName}</p>
+                              <button type="button" aria-expanded={imagePanel === sale.id} aria-label={`${imagePanel === sale.id ? "Fechar" : "Ver"} PDF e desenhos de ${sale.customerName}`} onClick={() => setImagePanel((current) => current === sale.id ? "" : sale.id)} className="flex min-w-0 cursor-pointer items-center gap-2 text-left text-sm font-semibold tracking-tight hover:text-[#0879c0]"><span className="truncate">{sale.customerName}</span><IoChevronDownOutline aria-hidden="true" className={`shrink-0 text-xs text-[#a1a1a6] transition-transform ${imagePanel === sale.id ? "rotate-180" : ""}`} /></button>
 
                             </div>
                               {groupBySale.get(sale.id).sales.length > 1 && groupBySale.get(sale.id).sales[0].id === sale.id && <button type="button" aria-label={`${expandedQuoteGroups[groupBySale.get(sale.id).id] ? "Recolher" : "Expandir"} ${groupBySale.get(sale.id).sales.length} versões de ${sale.customerName}`} aria-expanded={!!expandedQuoteGroups[groupBySale.get(sale.id).id]} title="Orçamentos agrupados manualmente. Clique para ver as versões." onClick={() => setExpandedQuoteGroups((current) => ({ ...current, [groupBySale.get(sale.id).id]: !current[groupBySale.get(sale.id).id] }))} className="mt-2 inline-flex min-h-8 cursor-pointer items-center gap-2 rounded-xl border border-[#cfe1f1] bg-[#edf5fc] px-2.5 py-1.5 text-[11px] font-semibold text-[#0879c0] transition hover:border-[#0879c0] hover:bg-[#e0eefb] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0879c0]">
@@ -1003,11 +1015,11 @@ export default function SalesDashboard() {
                             </div>
                             {sale.uploadedAt && <p className="mt-0.5 truncate text-[9px] text-[#a1a1a6]" title={`Pedido recebido em ${dateLabel(sale.uploadedAt.slice(0, 10))}`}>Recebido · {dateLabel(sale.uploadedAt.slice(0, 10))}</p>}
                           </td>
-                          <td className="whitespace-nowrap px-2 py-5 text-right">
+                          <td data-label="Valores" className="whitespace-nowrap px-2 py-5 text-right">
                             <p className="text-sm font-medium">{currency.format(sale.subtotal)}</p>
                             <p className="mt-1 text-[10px] text-[#86868b]">c/ IVA {currency.format(sale.total)}</p>
                           </td>
-                          <td className="px-2 py-5">
+                          <td data-label="Orçamento" className="px-2 py-5">
                             <DashboardDropdown
                               label={`Estado do orçamento de ${sale.customerName}`}
                               options={quoteStatuses}
@@ -1018,7 +1030,7 @@ export default function SalesDashboard() {
                               tone
                             />
                           </td>
-                          <td className="px-2 py-5">
+                          <td data-label="Pagamento" className="px-2 py-5">
                             {sale.status === "confirmada" ? (
                             <DashboardDropdown
                               label={`Estado do pagamento de ${sale.customerName}`}
@@ -1031,7 +1043,7 @@ export default function SalesDashboard() {
                             />
                             ) : <span className="text-xs text-[#a1a1a6]">—</span>}
                           </td>
-                          <td className="px-2 py-5">
+                          <td data-label="Entrega" className="px-2 py-5">
                             {sale.status === "confirmada" ? (
                             <div className="flex items-center gap-1">
                               <DashboardDropdown
@@ -1067,41 +1079,18 @@ export default function SalesDashboard() {
                             </div>
                             ) : <span className="text-xs text-[#a1a1a6]">—</span>}
                           </td>
-                          <td className="px-2 py-5">
+                          <td data-label="Estado" className="px-2 py-5">
                             {isResolved(sale)
                               ? <span className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-full border border-[#e5e5e7] bg-[#f5f5f7] px-2.5 py-1.5 text-[10px] font-semibold text-[#424245]"><IoCheckmarkCircleOutline className="text-sm text-emerald-600" />Resolvido</span>
                               : <span className="inline-flex whitespace-nowrap rounded-full border border-[#e5e5e7] bg-white/80 px-2.5 py-1.5 text-[10px] font-medium text-[#86868b]">Não resolvido</span>}
                           </td>
                           <td className="px-3 py-4">
-                            <SaleActions sale={sale} imagesOpen={imagePanel === sale.id} onImages={() => setImagePanel((current) => current === sale.id ? "" : sale.id)} onUngroup={() => changeQuoteGroup(sale.id)} grouping={groupingQuotes} onDelete={() => setSaleToDelete(sale)} />
+                            <SaleActions onSeparate={() => setQuoteCombination({ separateId: sale.id })} sale={sale} imagesOpen={imagePanel === sale.id} onImages={() => setImagePanel((current) => current === sale.id ? "" : sale.id)} onUngroup={() => changeQuoteGroup(sale.id)} grouping={groupingQuotes} onDelete={() => setSaleToDelete(sale)} />
                           </td>
                         </tr>
                         {imagePanel === sale.id && (
-                          <tr key={`${sale.id}-images`} className="border-t border-[#f0f0f2] bg-[#fbfbfd]">
-                            <td colSpan={9} className="px-5 py-5 sm:px-6">
-                              {sale.orderDetails && (
-                                <section className="mb-5 rounded-2xl border border-[#e8e8ed] bg-white p-4 sm:p-5">
-                                  <h3 className="text-sm font-semibold text-[#1d1d1f]">Detalhes da encomenda</h3>
-                                  <dl className="mt-3 grid gap-x-6 gap-y-3 text-xs sm:grid-cols-2 lg:grid-cols-3">
-                                    <div><dt className="text-[#86868b]">Email</dt><dd className="mt-0.5 break-all font-medium text-[#424245]">{sale.orderDetails.email || "—"}</dd></div>
-                                    <div><dt className="text-[#86868b]">Contacto telefónico</dt><dd className="mt-0.5 font-medium text-[#424245]">{sale.orderDetails.telefone || "—"}</dd></div>
-                                    <div><dt className="text-[#86868b]">Montagem</dt><dd className="mt-0.5 font-medium text-[#424245]">{sale.orderDetails.montagem === null ? "Não aplicável" : sale.orderDetails.montagem ? "Sim" : "Não"}</dd></div>
-                                    <div><dt className="text-[#86868b]">Morada fiscal</dt><dd className="mt-0.5 font-medium text-[#424245]">{sale.orderDetails.moradaFiscal || "—"}</dd></div>
-                                    <div><dt className="text-[#86868b]">Morada de envio</dt><dd className="mt-0.5 font-medium text-[#424245]">{sale.orderDetails.moradaEnvio || "—"}</dd></div>
-                                    {sale.orderDetails.observacoes && <div><dt className="text-[#86868b]">Observações</dt><dd className="mt-0.5 whitespace-pre-wrap font-medium text-[#424245]">{sale.orderDetails.observacoes}</dd></div>}
-                                  </dl>
-                                  {sale.orderDetails.detalhes && <div className="mt-4 border-t border-[#f0f0f2] pt-3"><p className="text-[11px] font-medium text-[#86868b]">Configuração</p><p className="mt-1 whitespace-pre-wrap text-xs leading-relaxed text-[#424245]">{sale.orderDetails.detalhes}</p></div>}
-                                  {sale.orderDetails.artigos?.length > 0 && (
-                                    <div className="mt-4 overflow-x-auto border-t border-[#f0f0f2] pt-3">
-                                      <p className="mb-2 text-[11px] font-medium text-[#86868b]">Artigos encomendados</p>
-                                      <table className="w-full min-w-[420px] text-left text-xs">
-                                        <thead className="text-[10px] uppercase tracking-wide text-[#86868b]"><tr><th className="py-1 pr-3">Ref.</th><th className="py-1 pr-3">Artigo</th><th className="py-1 pr-3 text-right">Qtd.</th><th className="py-1 text-right">Total</th></tr></thead>
-                                        <tbody>{sale.orderDetails.artigos.map((item, index) => <tr key={`${item.refCompleta}-${index}`} className="border-t border-[#f0f0f2] text-[#424245]"><td className="py-2 pr-3">{item.refCompleta || "—"}</td><td className="py-2 pr-3">{item.produto || "—"}</td><td className="py-2 pr-3 text-right">{item.unidades}</td><td className="py-2 text-right">{currency.format(item.total)}</td></tr>)}</tbody>
-                                      </table>
-                                    </div>
-                                  )}
-                                </section>
-                              )}
+                          <tr key={`${sale.id}-images`} className={`${styles.expanded} border-t border-[#f0f0f2] bg-[#fbfbfd]`}>
+                            <td colSpan={7} className="px-5 py-5 sm:px-6">
                               <div
                                 onDragEnter={(event) => {
                                   event.preventDefault();
@@ -1120,7 +1109,7 @@ export default function SalesDashboard() {
                                   if ((sale.images?.length ?? 0) < 10) addImages(sale, event.dataTransfer.files);
                                   else setError("Este registo já atingiu o máximo de 10 imagens.");
                                 }}
-                                className={`rounded-2xl border border-dashed p-4 transition-colors sm:p-5 ${imageDropTarget === sale.id ? "border-sky-500 bg-sky-50" : "border-[#dcdce2] bg-white"}`}
+                                className={`mb-5 rounded-2xl border border-dashed p-4 transition-colors sm:p-5 ${imageDropTarget === sale.id ? "border-sky-500 bg-sky-50" : "border-[#dcdce2] bg-white"}`}
                               >
                                 <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
                                   <div>
@@ -1144,10 +1133,11 @@ export default function SalesDashboard() {
                                     {sale.images.map((image) => (
                                       <div key={image.id} className="group overflow-hidden rounded-2xl border border-[#e8e8ed] bg-white">
                                         <a href={`/api/admin/sales/${sale.id}/images/${image.id}`} target="_blank" rel="noopener noreferrer" className="block aspect-[4/3] bg-[#f5f5f7]">
-                                          <img src={`/api/admin/sales/${sale.id}/images/${image.id}`} alt={image.name} loading="lazy" className="h-full w-full object-cover transition group-hover:scale-[1.02]" />
+                                          <img src={`/api/admin/sales/${sale.id}/images/${image.id}`} alt={image.name} loading="lazy" className="h-full w-full object-contain p-2 transition group-hover:scale-[1.02]" />
                                         </a>
                                         <div className="flex items-center justify-between gap-2 px-3 py-2">
                                           <p className="min-w-0 truncate text-[11px] text-[#6e6e73]" title={image.name}>{image.name}</p>
+                                          <a href={`/api/admin/sales/${sale.id}/images/${image.id}?download=1`} download={image.name} className="shrink-0 rounded-full bg-orange-50 px-3 py-1.5 text-[11px] font-semibold text-orange-700 hover:bg-orange-100">Transferir</a>
                                           <button type="button" disabled={deletingImage === image.id} aria-label={`Remover imagem ${image.name}`} onClick={() => removeImage(sale, image)} className="grid h-7 w-7 shrink-0 cursor-pointer place-items-center rounded-full text-[#a1a1a6] transition hover:bg-red-50 hover:text-red-600 disabled:opacity-50"><IoTrashOutline /></button>
                                         </div>
                                       </div>
@@ -1157,6 +1147,34 @@ export default function SalesDashboard() {
                                   <p className="mt-4 rounded-xl bg-[#fbfbfd] px-4 py-5 text-center text-xs text-[#86868b]">Ainda não foram adicionadas imagens. Pode arrastá-las para esta área.</p>
                                 )}
                               </div>
+                              <section className="mb-5 overflow-hidden rounded-2xl border border-[#e8e8ed] bg-white">
+                                <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#e8e8ed] px-4 py-3"><h3 className="text-sm font-semibold">Orçamento PDF</h3><div className="flex items-center gap-3"><a href={`/api/admin/sales/${sale.id}/pdf`} target="_blank" rel="noopener noreferrer" className="text-xs font-medium text-[#6e6e73] hover:underline">Abrir</a><a href={`/api/admin/sales/${sale.id}/pdf?download=1`} download className="rounded-full bg-orange-50 px-4 py-2 text-xs font-semibold text-orange-700 hover:bg-orange-100">Transferir PDF</a></div></div>
+                                <iframe src={`/api/admin/sales/${sale.id}/pdf`} title={`Orçamento de ${sale.customerName}`} loading="lazy" className="h-[520px] w-full border-0" />
+                              </section>
+                              {sale.orderDetails && (
+                                <section className="mb-5 rounded-2xl border border-[#e8e8ed] bg-white p-4 sm:p-5">
+                                  <h3 className="text-sm font-semibold text-[#1d1d1f]">Detalhes da encomenda</h3>
+                                  <dl className="mt-3 grid gap-x-6 gap-y-3 text-xs sm:grid-cols-2 lg:grid-cols-3">
+                                    <div><dt className="text-[#86868b]">Email</dt><dd className="mt-0.5 break-all font-medium text-[#424245]">{sale.orderDetails.email || "—"}</dd></div>
+                                    <div><dt className="text-[#86868b]">Contacto telefónico</dt><dd className="mt-0.5 font-medium text-[#424245]">{sale.orderDetails.telefone || "—"}</dd></div>
+                                    <div><dt className="text-[#86868b]">Montagem</dt><dd className="mt-0.5 font-medium text-[#424245]">{sale.orderDetails.montagem === null ? "Não aplicável" : sale.orderDetails.montagem ? "Sim" : "Não"}</dd></div>
+                                    <div><dt className="text-[#86868b]">Morada fiscal</dt><dd className="mt-0.5 font-medium text-[#424245]">{sale.orderDetails.moradaFiscal || "—"}</dd></div>
+                                    <div><dt className="text-[#86868b]">Morada de envio</dt><dd className="mt-0.5 font-medium text-[#424245]">{sale.orderDetails.moradaEnvio || "—"}</dd></div>
+                                    {sale.orderDetails.observacoes && <div><dt className="text-[#86868b]">Observações</dt><dd className="mt-0.5 whitespace-pre-wrap font-medium text-[#424245]">{sale.orderDetails.observacoes}</dd></div>}
+                                  </dl>
+                                  {sale.orderDetails.detalhes && <div className="mt-4 border-t border-[#f0f0f2] pt-3"><p className="text-[11px] font-medium text-[#86868b]">Configuração</p><p className="mt-1 whitespace-pre-wrap text-xs leading-relaxed text-[#424245]">{sale.orderDetails.detalhes}</p></div>}
+                                  {sale.orderDetails.artigos?.length > 0 && (
+                                    <div className="mt-4 overflow-x-auto border-t border-[#f0f0f2] pt-3">
+                                      <p className="mb-2 text-[11px] font-medium text-[#86868b]">Artigos encomendados</p>
+                                      <table className="w-full table-fixed text-left text-xs break-words">
+                                        <thead className="text-[10px] uppercase tracking-wide text-[#86868b]"><tr><th className="py-1 pr-3">Ref.</th><th className="py-1 pr-3">Artigo</th><th className="py-1 pr-3 text-right">Qtd.</th><th className="py-1 text-right">Total</th></tr></thead>
+                                        <tbody>{sale.orderDetails.artigos.map((item, index) => <tr key={`${item.refCompleta}-${index}`} className="border-t border-[#f0f0f2] text-[#424245]"><td className="py-2 pr-3">{item.refCompleta || "—"}</td><td className="py-2 pr-3">{item.produto || "—"}</td><td className="py-2 pr-3 text-right">{item.unidades}</td><td className="py-2 text-right">{currency.format(item.total)}</td></tr>)}</tbody>
+                                      </table>
+                                    </div>
+                                  )}
+                                </section>
+                              )}
+
                             </td>
                           </tr>
                         )}

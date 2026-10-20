@@ -13,7 +13,7 @@ export async function GET(request, { params }) {
     return new Response(new Uint8Array(buffer), { headers: {
       "Content-Type": image.contentType,
       "Content-Length": String(buffer.length),
-      "Content-Disposition": `inline; filename="imagem"; filename*=UTF-8''${encodeURIComponent(image.name).replace(/[!'()*]/g, (char) => `%${char.charCodeAt(0).toString(16).toUpperCase()}`)}`,
+      "Content-Disposition": `${new URL(request.url).searchParams.get("download") === "1" ? "attachment" : "inline"}; filename="imagem"; filename*=UTF-8''${encodeURIComponent(image.name).replace(/[!'()*]/g, (char) => `%${char.charCodeAt(0).toString(16).toUpperCase()}`)}`,
       "Cache-Control": "private, no-store",
       "X-Content-Type-Options": "nosniff",
       "Content-Security-Policy": "sandbox",

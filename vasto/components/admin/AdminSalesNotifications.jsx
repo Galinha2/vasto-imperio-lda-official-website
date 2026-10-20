@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { IoNotificationsOutline, IoVolumeHighOutline, IoVolumeMuteOutline } from "react-icons/io5";
+import styles from "./AdminSalesNotifications.module.css";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
@@ -81,7 +82,7 @@ export default function AdminSalesNotifications() {
         seen.current ||= new Set();
         sales.forEach((sale) => seen.current.add(sale.id));
         if (incoming.length) {
-          setNotice({ count: incoming.length, name: incoming[0].customerName });
+          setNotice({ count: incoming.length, name: incoming[0].customerName, key: incoming.map((sale) => sale.id).join("-") });
           window.dispatchEvent(new CustomEvent("admin:new-sales", { detail: incoming }));
           if ("Notification" in window && Notification.permission === "granted") {
             try {
@@ -151,16 +152,14 @@ export default function AdminSalesNotifications() {
         <span aria-hidden="true" className={`pointer-events-none absolute left-0.5 grid h-[22px] w-[22px] place-items-center rounded-full bg-white text-xs text-[#6e6e73] shadow-sm transition-transform duration-200 motion-reduce:transition-none ${sound ? "translate-x-5" : "translate-x-0"}`}>{sound ? <IoVolumeHighOutline /> : <IoVolumeMuteOutline />}</span>
       </button>
     </div>
-    {notice && <div role="status" aria-live="polite" className="fixed bottom-5 right-5 z-[100] w-[370px] max-w-[calc(100vw-2.5rem)] overflow-hidden rounded-[26px] border border-white/70 bg-white/75 p-5 shadow-[0_8px_40px_rgba(0,0,0,0.14),inset_0_1px_0_rgba(255,255,255,0.8)] backdrop-blur-2xl backdrop-saturate-150 sm:bottom-7 sm:right-7">
-      <div className="flex items-start gap-3.5">
-        <span className="grid h-11 w-11 shrink-0 place-items-center rounded-[14px] border border-white/80 bg-white/80 shadow-sm"><img src="/favicon-google.png" alt="" width="30" height="30" className="h-[30px] w-[30px] object-contain" /></span>
-        <div className="min-w-0 flex-1">
-          <div className="flex items-center justify-between gap-3"><span className="text-[10px] font-semibold uppercase tracking-[0.1em] text-[#6e6e73]">Vasto Império</span><span className="text-[10px] text-[#86868b]">agora</span></div>
-          <p className="mt-1 text-[13px] font-semibold leading-snug tracking-tight text-[#1d1d1f]">{notice.count === 1 ? "Novo orçamento recebido" : `${notice.count} novos orçamentos recebidos`}</p>
-          <p className="mt-1 break-words text-xs leading-relaxed text-[#6e6e73]">{notice.name}</p>
-        </div>
+    {notice && <div key={notice.key} role="status" aria-live="polite" className={`${styles.toast} fixed bottom-[max(1.25rem,env(safe-area-inset-bottom))] left-1/2 z-[100] flex w-[460px] max-w-[calc(100vw-1.5rem)] -translate-x-1/2 items-center gap-3 rounded-full border border-white/50 bg-white/45 py-3 pl-3 pr-3 shadow-[0_12px_48px_rgba(0,0,0,0.14),inset_0_1px_0_rgba(255,255,255,0.65)] backdrop-blur-[32px] backdrop-saturate-[180%] sm:bottom-7 sm:gap-4 sm:pr-4`}>
+      <span className="grid h-11 w-11 shrink-0 place-items-center rounded-full border border-white/60 bg-white/55 shadow-sm"><img src="/favicon-google.png" alt="" width="30" height="30" className="h-[30px] w-[30px] object-contain" /></span>
+      <div className="min-w-0 flex-1">
+        <p className="text-xs font-semibold leading-snug tracking-tight text-[#1d1d1f] sm:text-[13px]">{notice.count === 1 ? "Novo orçamento recebido" : `${notice.count} novos orçamentos recebidos`}</p>
+        <p className="mt-0.5 truncate text-[11px] text-[#6e6e73]" title={notice.name}>{notice.name}</p>
       </div>
-      <div className="mt-4 flex items-center justify-end gap-2 border-t border-black/5 pt-3"><button type="button" onClick={() => setNotice(null)} className="cursor-pointer rounded-full px-4 py-2 text-xs font-medium text-[#6e6e73] transition hover:bg-black/5">Fechar</button><Link href="/admin" onClick={() => setNotice(null)} className="rounded-full bg-white/80 px-4 py-2 text-xs font-semibold text-[#1d1d1f] shadow-sm transition hover:bg-white">Ver vendas</Link></div>
+      <Link href="/admin" onClick={() => setNotice(null)} className="shrink-0 rounded-full bg-white/50 px-3 py-2 text-xs font-semibold text-[#1d1d1f] shadow-sm transition hover:bg-white/75">Ver</Link>
+      <button type="button" onClick={() => setNotice(null)} aria-label="Fechar notificação" className="grid h-7 w-7 shrink-0 cursor-pointer place-items-center rounded-full text-lg leading-none text-[#6e6e73] transition hover:bg-black/5">×</button>
     </div>}
 
   </>;

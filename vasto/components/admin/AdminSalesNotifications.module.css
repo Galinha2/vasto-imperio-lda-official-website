@@ -1,0 +1,28 @@
+.toast {
+  transform-origin: bottom center;
+  animation: toastEnter 620ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes toastEnter {
+  0% {
+    opacity: 0;
+    transform: translateY(70px) scale(0.82);
+  }
+  65% {
+    opacity: 1;
+    transform: translateY(-4px) scale(1.025);
+  }
+  85% {
+    transform: translateY(1px) scale(0.995);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .toast {
+    animation: none;
+  }
+}

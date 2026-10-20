@@ -203,11 +203,11 @@ export async function listSales() {
       records.push(...rows.map((row) => normalizeSale(row.record)));
       if (rows.length < 500) break;
     }
-    return records;
+    return records.filter((record) => !record.mergedInto && !record.mergeArchived);
   }
   await mkdir(directory(), { recursive: true, mode: 0o700 });
   const files = (await readdir(directory())).filter((file) => /^[a-f0-9]{64}\.json$/.test(file));
-  return Promise.all(files.map(async (file) => normalizeSale(JSON.parse(await readFile(path.join(directory(), file), "utf8")))));
+  return (await Promise.all(files.map(async (file) => normalizeSale(JSON.parse(await readFile(path.join(directory(), file), "utf8")))))).filter((record) => !record.mergedInto && !record.mergeArchived);
 }
 
 export async function getSale(id) {
@@ -333,10 +333,11 @@ export async function deleteSaleImage(id, imageId) {
   return updated;
 }
 
-export async function deleteSale(id) {
+export async function deleteSale(id, { allowMerged = false } = {}) {
   if (!validId(id)) throw fail("Orçamento inválido.", 400);
   const record = await getSale(id);
   if (!record) throw fail("Orçamento não encontrado.", 404);
+  if (!allowMerged && record.mergedQuoteIds?.length && !record.mergeArchived) throw fail("Separe primeiro o orçamento conjunto em Ações, para conservar o acesso aos originais.",400);
   const images = Array.isArray(record.images) ? record.images : [];
   if (storageMode() === "cloud") {
     await removeCloudObjects([`${id}.pdf`, ...images.filter((image) => Object.hasOwn(imageTypes, image.contentType)).map((image) => imagePath(id, image))]);
@@ -473,4 +474,51 @@ export async function reviseSaleQuote(id, pdf, expectedUpdatedAt, lines, discoun
   await savePdf(pdf);
   try { await saveRecord(updated); } catch (error) { await savePdf(originalPdf); throw error; }
   return updated;
+}
+
+export async function mergeSaleQuotes(sourceId, targetId, expected, pdf, image) {
+  const { assertMergeable } = await import("./merge-quotes.mjs");
+  const { parseSalePdf } = await import("./pdf.mjs");
+  const source = await getSale(sourceId), target = await getSale(targetId);
+  assertMergeable(source, target);
+  if (source.updatedAt !== expected.source || target.updatedAt !== expected.target) throw fail("Um dos orçamentos foi alterado. Volte a iniciar a junção.",409);
+  const parsed = await parseSalePdf(pdf, "orcamento-conjunto.pdf");
+  if (Math.abs(parsed.subtotal - source.subtotal - target.subtotal) > 0.05) throw fail("O total do documento conjunto não corresponde aos dois orçamentos.",400);
+  if (!sameQuoteCustomer(parsed, target)) throw fail("O cliente do PDF não corresponde ao orçamento.",400);
+  let created;
+  const saved = [];
+  try {
+    created = await createSale({ ...parsed, entryOrigin:"admin", mergedQuoteIds:[target.id, source.id], status: source.status === "confirmada" || target.status === "confirmada" ? "confirmada" : "em_preparacao", orderDetails:{...target.orderDetails, detalhes:parsed.quoteDetails || "Orçamento conjunto"} }, pdf);
+    if (image) await addSaleImage(created.id,"desenhos-conjuntos.jpg","image/jpeg",image);
+    // Recheck before hiding originals. Preserve their files, images and workflow for undo.
+    for (const original of [source,target]) {
+      const current = await getSale(original.id);
+      if (current.updatedAt !== original.updatedAt || current.mergedInto) throw fail("Um dos orçamentos foi alterado durante a junção.",409);
+      await saveRecord({ ...original, mergedInto:created.id });
+      saved.push(original);
+    }
+    return await listSales();
+  } catch (error) {
+    for (const original of saved) { try { await saveRecord(original); } catch {} }
+    if (created) { try { await deleteSale(created.id, { allowMerged:true }); } catch {} }
+    throw error;
+  }
+}
+
+export async function separateMergedSale(id) {
+  const record = await getSale(id);
+  if (!record?.mergedQuoteIds?.length || record.mergedInto || record.mergeArchived) throw fail("Este orçamento não tem uma junção ativa para separar.",400);
+  if (record.paymentStatus !== "por_pagar" || record.deliveryStatus === "entregue") throw fail("Este orçamento já tem pagamento ou entrega registados. Reveja os estados antes de separar.",400);
+  const originals = await Promise.all(record.mergedQuoteIds.map(getSale));
+  if (originals.some((original)=>!original || original.mergedInto !== id)) throw fail("Não foi possível recuperar todos os originais desta junção.",409);
+  const saved=[];
+  try {
+    for (const original of originals) { await saveRecord({...original,mergedInto:null}); saved.push(original); }
+    // Keep the joint PDF archived, including any edits made after merging.
+    await saveRecord({...record,mergeArchived:true,updatedAt:new Date().toISOString()});
+    return await listSales();
+  } catch(error) {
+    for (const original of saved) { try { await saveRecord(original); } catch {} }
+    throw error;
+  }
 }

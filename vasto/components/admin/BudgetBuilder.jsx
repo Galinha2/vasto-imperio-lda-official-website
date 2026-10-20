@@ -276,7 +276,7 @@ export default function BudgetBuilder({ editSaleId = "" }) {
         </header>
 
         {editingRecord && <p className="rounded-2xl border border-orange-100 bg-orange-50 p-4 text-sm text-orange-800">A editar o orçamento de <strong>{editingRecord.customerName}</strong>. Guardar atualiza este registo e o PDF. Os desenhos anexados mantêm-se; não são redesenhados ao alterar os artigos.</p>}
-        <section aria-label="Linhas do orçamento" className="rounded-[28px] border border-[#e5e5e7] bg-white p-3 shadow-[0_8px_30px_rgba(0,0,0,0.035)] sm:p-5 lg:p-6">
+        <section aria-label="Linhas do orçamento" className="admin-surface rounded-[28px] border border-[#e5e5e7] bg-white p-3 shadow-[0_8px_30px_rgba(0,0,0,0.035)] sm:p-5 lg:p-6">
           <div className="mb-4 hidden grid-cols-[minmax(0,1fr)_80px_100px_100px_44px] gap-3 px-3 text-xs font-semibold uppercase tracking-[0.1em] text-[#86868b] sm:grid">
             <span>Produto</span><span className="text-center">Qtd.</span><span className="text-center">Preço unit.</span><span className="text-center">Total</span><span />
           </div>
@@ -429,7 +429,7 @@ export default function BudgetBuilder({ editSaleId = "" }) {
         </section>
 
         <section aria-label="Dados do cliente e totais" className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(360px,0.8fr)]">
-          <div className="rounded-[28px] border border-[#e5e5e7] bg-white p-5 shadow-[0_8px_30px_rgba(0,0,0,0.035)] sm:p-6">
+          <div className="admin-surface rounded-[28px] border border-[#e5e5e7] bg-white p-5 shadow-[0_8px_30px_rgba(0,0,0,0.035)] sm:p-6">
             <h2 className="text-lg font-semibold tracking-[-0.03em] text-[#1d1d1f]">Dados do cliente</h2>
             <p className="mt-1 text-sm text-[#6e6e73]">Opcional · o NIF preenche os dados da empresa.</p>
           <div data-desc-dropdown className="relative mt-5 flex flex-col gap-4 sm:flex-row sm:items-start">
@@ -486,7 +486,7 @@ export default function BudgetBuilder({ editSaleId = "" }) {
           </div>
 
           </div>
-          <div className="rounded-[28px] border border-[#e5e5e7] bg-white p-5 shadow-[0_8px_30px_rgba(0,0,0,0.035)] sm:p-6">
+          <div className="admin-surface rounded-[28px] border border-[#e5e5e7] bg-white p-5 shadow-[0_8px_30px_rgba(0,0,0,0.035)] sm:p-6">
             <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#86868b]">Resumo do orçamento</p>
             <div className="mt-4 flex flex-col gap-2 text-sm text-[#6e6e73]">
             <div className="flex items-center justify-between gap-4"><span>Total bruto</span><span className="font-medium text-[#1d1d1f]">{totalSemDesconto.toFixed(2).replace(".", ",")}€</span></div>

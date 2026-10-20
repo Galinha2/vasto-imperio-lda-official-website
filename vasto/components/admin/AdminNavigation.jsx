@@ -1,5 +1,6 @@
 "use client";
 
+import styles from "./AdminNavigation.module.css";
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -34,10 +35,10 @@ export default function AdminNavigation({ children }) {
   }
 
   return (
-    <div className="min-h-screen bg-[#f5f5f7] lg:grid lg:grid-cols-[240px_minmax(0,1fr)]">
-      <aside className="sticky top-0 z-40 border-b border-[#e5e5e7] bg-white px-4 py-3 lg:flex lg:h-screen lg:flex-col lg:border-b-0 lg:border-r lg:px-6 lg:py-8">
-        <div className="flex items-center justify-between gap-3">
-          <Link href="/" aria-label="Ir para a página inicial da Vasto Império" className="flex min-w-0 items-center gap-3 rounded-lg outline-none focus-visible:ring-2 focus-visible:ring-[#0071e3]/40">
+    <div className={`${styles.shell} lg:grid`}>
+      <aside className={`${styles.sidebar} sticky top-0 z-40 border-b px-4 py-3 lg:flex lg:flex-col`}>
+        <div className={`${styles.brandHeader} flex items-center justify-between gap-3`}>
+          <Link href="/" aria-label="Ir para a página inicial da Vasto Império" className={`${styles.brand} flex min-w-0 items-center gap-3 rounded-2xl outline-none focus-visible:ring-2 focus-visible:ring-orange-300`}>
             <img src="/favicon-google.png" alt="" width="36" height="36" className="h-9 w-9 shrink-0 object-contain" />
             <div className="min-w-0">
               <p className="truncate text-sm font-semibold tracking-tight">Vasto Império</p>
@@ -51,16 +52,16 @@ export default function AdminNavigation({ children }) {
         </div>
         <nav aria-label="Administração" className="mt-3 flex gap-2 overflow-x-auto pb-0.5 lg:mt-10 lg:flex-col lg:overflow-visible">
           {sections.map(({ href, label, Icon }) => {
-            const active = pathname === href;
+            const active = pathname === href || (href !== "/admin" && pathname.startsWith(`${href}/`));
             return (
               <Link
                 key={href}
                 href={href}
                 aria-current={active ? "page" : undefined}
-                className={`flex shrink-0 items-center gap-2.5 rounded-xl px-3 py-2.5 text-sm transition lg:gap-3 lg:px-4 lg:py-3 ${
+                className={`flex shrink-0 items-center gap-2.5 rounded-full px-3 py-2.5 text-sm transition lg:gap-3 lg:px-4 lg:py-3 ${
                   active
-                    ? "bg-[#edf4ff] font-semibold text-[#0071e3]"
-                    : "text-[#6e6e73] hover:bg-[#f5f5f7]"
+                    ? "border border-white/90 bg-white/80 font-semibold text-[#d95b24] shadow-[0_4px_16px_rgba(0,0,0,0.04)]"
+                    : "border border-transparent text-[#6e6e73] hover:bg-white/55"
                 }`}
               >
                 <Icon className="text-lg" />{label}
@@ -76,7 +77,7 @@ export default function AdminNavigation({ children }) {
           </button>
         </div>
       </aside>
-      <div className="min-w-0">{children}</div>
+      <div className={styles.content}>{children}</div>
     </div>
   );
 }

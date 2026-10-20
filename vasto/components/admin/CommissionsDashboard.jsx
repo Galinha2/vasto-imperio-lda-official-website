@@ -210,7 +210,7 @@ export default function CommissionsDashboard() {
           <MetricCard label="Por receber" value={loading ? "—" : currency.format(outstandingCommission)} detail="Comissão ainda não assinalada como paga" icon={<IoTimeOutline />} tone="orange" />
         </section>
 
-        <section aria-labelledby="commission-chart-heading" className="mt-6 rounded-[28px] border border-[#e8e8ed] bg-white p-5 shadow-sm sm:p-7">
+        <section aria-labelledby="commission-chart-heading" className="admin-surface mt-6 rounded-[28px] border border-[#e8e8ed] bg-white p-5 shadow-sm sm:p-7">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
             <div>
               <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-sky-700">Evolução anual</p>
@@ -253,7 +253,7 @@ export default function CommissionsDashboard() {
           </div>
         </section>
 
-        <section aria-labelledby="commission-table-heading" className="mt-6 overflow-hidden rounded-[28px] border border-[#e8e8ed] bg-white shadow-sm">
+        <section aria-labelledby="commission-table-heading" className="admin-surface mt-6 overflow-hidden rounded-[28px] border border-[#e8e8ed] bg-white shadow-sm">
           <div className="flex flex-col gap-3 border-b border-[#f0f0f2] p-5 sm:flex-row sm:items-center sm:justify-between sm:px-7">
             <div>
               <h2 id="commission-table-heading" className="text-base font-semibold tracking-tight text-[#1d1d1f]">Resumo mensal</h2>

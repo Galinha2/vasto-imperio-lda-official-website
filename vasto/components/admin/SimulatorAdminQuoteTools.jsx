@@ -34,7 +34,7 @@ export default function SimulatorAdminQuoteTools({
 }) {
   return (
     <div className="space-y-4">
-      <section aria-label="Ajustes do orçamento" className="rounded-[24px] border border-[#e5e5e7] bg-white p-5 shadow-[0_8px_30px_rgba(0,0,0,0.035)] sm:p-6">
+      <section aria-label="Ajustes do orçamento" className="admin-surface rounded-[24px] border border-[#e5e5e7] bg-white p-5 shadow-[0_8px_30px_rgba(0,0,0,0.035)] sm:p-6">
         <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
           <div>
             <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#86868b]">Preparar proposta</p>
@@ -154,7 +154,7 @@ export default function SimulatorAdminQuoteTools({
         </button>
       </section>
 
-      <section aria-label="Exportar simulação" className="flex flex-col justify-between gap-4 rounded-[24px] border border-[#e5e5e7] bg-white p-5 shadow-[0_8px_30px_rgba(0,0,0,0.035)] sm:px-6">
+      <section aria-label="Exportar simulação" className="admin-surface flex flex-col justify-between gap-4 rounded-[24px] border border-[#e5e5e7] bg-white p-5 shadow-[0_8px_30px_rgba(0,0,0,0.035)] sm:px-6">
         <div>
           <h2 className="text-base font-semibold text-[#1d1d1f]">Guardar esta configuração</h2>
           <p className="mt-1 text-sm text-[#6e6e73]">A imagem guarda apenas o desenho e as cotas. O PDF gera a folha de orçamento com artigos, quantidades, preços e desconto.</p>

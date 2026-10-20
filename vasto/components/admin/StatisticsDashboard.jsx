@@ -388,7 +388,7 @@ export default function StatisticsDashboard() {
                   type="button"
                   aria-haspopup="dialog"
                   onClick={() => setExpandedInsight((current) => current === card.id ? "" : card.id)}
-                  className="group cursor-pointer rounded-[22px] border border-[#e8e8ed] bg-white p-5 text-left transition hover:border-sky-200 hover:bg-sky-50/40 hover:shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-600/30"
+                  className="admin-surface group cursor-pointer rounded-[22px] border border-[#e8e8ed] bg-white p-5 text-left transition hover:border-sky-200 hover:bg-sky-50/40 hover:shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-600/30"
                 >
                   <span className="block text-[10px] font-semibold uppercase tracking-[0.12em] text-[#86868b]">{card.label}</span>
                   <span className={`mt-4 block truncate font-semibold text-[#1d1d1f] ${card.id === "recurring" || card.id === "confirmation" ? "text-2xl tracking-tight" : "text-base"}`} title={card.title}>{loading ? "—" : card.value}</span>
@@ -406,7 +406,7 @@ export default function StatisticsDashboard() {
                 role="dialog"
                 aria-modal="true"
                 aria-labelledby="insight-dialog-title"
-                className="max-h-[min(85vh,48rem)] w-full max-w-3xl overflow-y-auto rounded-[26px] border border-[#e8e8ed] bg-white shadow-[0_24px_80px_rgba(0,0,0,0.22)]"
+                className="admin-surface max-h-[min(85vh,48rem)] w-full max-w-3xl overflow-y-auto rounded-[26px] border border-[#e8e8ed] bg-white shadow-[0_24px_80px_rgba(0,0,0,0.22)]"
               >
                 <div className="border-b border-[#e8e8ed] bg-gradient-to-br from-sky-50 via-white to-white px-5 py-5 sm:px-7 sm:py-6">
                   <div className="flex items-start justify-between gap-4">
@@ -478,7 +478,7 @@ export default function StatisticsDashboard() {
         </section>
 
         <section className="mt-6 grid gap-4 lg:grid-cols-[minmax(0,1.45fr)_minmax(280px,0.75fr)]">
-          <div className="rounded-[28px] border border-[#e8e8ed] bg-white p-5 sm:p-7">
+          <div className="admin-surface rounded-[28px] border border-[#e8e8ed] bg-white p-5 sm:p-7">
             <div className="flex flex-wrap items-start justify-between gap-4">
               <div><h2 className="text-base font-semibold tracking-tight">Vendas mês a mês</h2><p className="mt-1 text-xs text-[#86868b]">Valor sem IVA · encomendas confirmadas · {year}</p></div>
               <p className="text-sm font-semibold">{currency.format(total(confirmed))}<span className="ml-1 text-xs font-normal text-[#86868b]">sem IVA</span></p>
@@ -502,7 +502,7 @@ export default function StatisticsDashboard() {
             </div>
           </div>
 
-          <section aria-labelledby="orders-detail-heading" className="rounded-[28px] border border-[#e8e8ed] bg-white p-5 sm:p-7">
+          <section aria-labelledby="orders-detail-heading" className="admin-surface rounded-[28px] border border-[#e8e8ed] bg-white p-5 sm:p-7">
             <h2 id="orders-detail-heading" className="text-base font-semibold tracking-tight">Detalhe das encomendas</h2>
             <p className="mt-1 text-xs text-[#86868b]">Estado atual das vendas do ano selecionado.</p>
             <div className="mt-5 divide-y divide-[#f0f0f2]">

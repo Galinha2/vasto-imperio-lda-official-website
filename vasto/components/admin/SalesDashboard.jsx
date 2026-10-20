@@ -157,7 +157,7 @@ function DashboardDropdown({ label, options, value, onChange, className = "", to
           role="listbox"
           aria-label={label}
           style={{ position: "fixed", left: position.left, top: position.top, width: position.width, maxHeight: position.maxHeight }}
-          className="z-[100] overflow-y-auto rounded-2xl border border-[#e8e8ed] bg-white p-1.5 shadow-[0_12px_36px_rgba(0,0,0,0.14)]"
+          className="admin-surface z-[100] overflow-y-auto rounded-2xl border border-[#e8e8ed] bg-white p-1.5 shadow-[0_12px_36px_rgba(0,0,0,0.14)]"
         >
           {options.map((option, index) => (
             <button
@@ -810,7 +810,7 @@ export default function SalesDashboard() {
             ))}
           </div>
 
-          <section className="mt-6 rounded-[28px] border border-[#e8e8ed] bg-white p-5 sm:p-7">
+          <section className="admin-surface mt-6 rounded-[28px] border border-[#e8e8ed] bg-white p-5 sm:p-7">
             <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-start">
               <div><h2 className="text-base font-semibold tracking-tight">O ano, mês a mês.</h2><p className="mt-1 text-xs text-[#86868b]">Encomendas confirmadas · por data da venda · {year}</p></div>
               <div className="flex flex-col gap-2 sm:text-right">
@@ -879,7 +879,7 @@ export default function SalesDashboard() {
           >
             {tableDropActive && (
               <div className="pointer-events-none absolute inset-0 z-20 grid place-items-center bg-white/85 backdrop-blur-[2px]" role="status">
-                <div className="rounded-2xl border border-orange-200 bg-white px-6 py-5 text-center shadow-lg">
+                <div className="admin-surface rounded-2xl border border-orange-200 bg-white px-6 py-5 text-center shadow-lg">
                   <IoCloudUploadOutline className="mx-auto text-3xl text-orange-600" />
                   <p className="mt-2 text-sm font-semibold text-[#1d1d1f]">Largue os PDFs para registar</p>
                   <p className="mt-1 text-xs text-[#86868b]">Orçamentos ou simulações · até 6 MB por PDF</p>
@@ -1155,7 +1155,7 @@ export default function SalesDashboard() {
                                 {sale.images?.length ? (
                                   <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
                                     {sale.images.map((image) => (
-                                      <div key={image.id} className="group overflow-hidden rounded-2xl border border-[#e8e8ed] bg-white">
+                                      <div key={image.id} className="admin-surface group overflow-hidden rounded-2xl border border-[#e8e8ed] bg-white">
                                         <a href={`/api/admin/sales/${sale.id}/images/${image.id}`} target="_blank" rel="noopener noreferrer" className="block aspect-[4/3] bg-[#f5f5f7]">
                                           <img src={`/api/admin/sales/${sale.id}/images/${image.id}`} alt={image.name} loading="lazy" className="h-full w-full object-contain p-2 transition group-hover:scale-[1.02]" />
                                         </a>
@@ -1171,12 +1171,12 @@ export default function SalesDashboard() {
                                   <p className="mt-4 rounded-xl bg-[#fbfbfd] px-4 py-5 text-center text-xs text-[#86868b]">Ainda não foram adicionadas imagens. Pode arrastá-las para esta área.</p>
                                 )}
                               </div>
-                              <section className="mb-5 overflow-hidden rounded-2xl border border-[#e8e8ed] bg-white">
+                              <section className="admin-surface mb-5 overflow-hidden rounded-2xl border border-[#e8e8ed] bg-white">
                                 <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#e8e8ed] px-4 py-3"><h3 className="text-sm font-semibold">Orçamento PDF</h3><div className="flex items-center gap-3"><a href={`/api/admin/sales/${sale.id}/pdf`} target="_blank" rel="noopener noreferrer" className="text-xs font-medium text-[#6e6e73] hover:underline">Abrir</a><a href={`/api/admin/sales/${sale.id}/pdf?download=1`} download className="rounded-full bg-orange-50 px-4 py-2 text-xs font-semibold text-orange-700 hover:bg-orange-100">Transferir PDF</a></div></div>
                                 <iframe src={`/api/admin/sales/${sale.id}/pdf`} title={`Orçamento de ${sale.customerName}`} loading="lazy" className="h-[520px] w-full border-0" />
                               </section>
                               {sale.orderDetails && (
-                                <section className="mb-5 rounded-2xl border border-[#e8e8ed] bg-white p-4 sm:p-5">
+                                <section className="admin-surface mb-5 rounded-2xl border border-[#e8e8ed] bg-white p-4 sm:p-5">
                                   <h3 className="text-sm font-semibold text-[#1d1d1f]">Detalhes da encomenda</h3>
                                   <dl className="mt-3 grid gap-x-6 gap-y-3 text-xs sm:grid-cols-2 lg:grid-cols-3">
                                     <div><dt className="text-[#86868b]">Email</dt><dd className="mt-0.5 break-all font-medium text-[#424245]">{sale.orderDetails.email || "—"}</dd></div>
@@ -1223,7 +1223,7 @@ export default function SalesDashboard() {
               role="dialog"
               aria-modal="true"
               aria-labelledby="sales-detail-title"
-              className="max-h-[min(85vh,48rem)] w-full max-w-3xl overflow-y-auto rounded-[26px] border border-[#e8e8ed] bg-white shadow-[0_24px_80px_rgba(0,0,0,0.22)]"
+              className="admin-surface max-h-[min(85vh,48rem)] w-full max-w-3xl overflow-y-auto rounded-[26px] border border-[#e8e8ed] bg-white shadow-[0_24px_80px_rgba(0,0,0,0.22)]"
             >
               <div className="border-b border-[#e8e8ed] bg-gradient-to-br from-sky-50 via-white to-white px-5 py-5 sm:px-7 sm:py-6">
                 <div className="flex items-start justify-between gap-4">
@@ -1293,7 +1293,7 @@ export default function SalesDashboard() {
         )}
         {deliveryPrompt && (
           <div className="fixed inset-0 z-[60] flex items-center justify-center bg-[#1d1d1f]/35 p-4 backdrop-blur-sm" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget && !changing) setDeliveryPrompt(null); }}>
-            <section role="dialog" aria-modal="true" aria-labelledby="delivery-date-title" aria-describedby="delivery-date-description" className="w-full max-w-md rounded-[28px] border border-white/70 bg-white p-6 shadow-[0_24px_80px_rgba(0,0,0,0.18)] sm:p-7">
+            <section role="dialog" aria-modal="true" aria-labelledby="delivery-date-title" aria-describedby="delivery-date-description" className="admin-surface w-full max-w-md rounded-[28px] border border-white/70 bg-white p-6 shadow-[0_24px_80px_rgba(0,0,0,0.18)] sm:p-7">
               <div className="flex items-start justify-between gap-4">
                 <div>
                   <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-sky-700">Concluir entrega</p>
@@ -1325,7 +1325,7 @@ export default function SalesDashboard() {
         )}
         {saleToDelete && (
           <div className="fixed inset-0 z-[60] flex items-center justify-center bg-[#1d1d1f]/35 p-4 backdrop-blur-sm" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget && !deletingSale) setSaleToDelete(null); }}>
-            <section role="alertdialog" aria-modal="true" aria-labelledby="delete-sale-title" aria-describedby="delete-sale-description" className="w-full max-w-md rounded-[28px] border border-white/70 bg-white p-6 shadow-[0_24px_80px_rgba(0,0,0,0.18)] sm:p-7">
+            <section role="alertdialog" aria-modal="true" aria-labelledby="delete-sale-title" aria-describedby="delete-sale-description" className="admin-surface w-full max-w-md rounded-[28px] border border-white/70 bg-white p-6 shadow-[0_24px_80px_rgba(0,0,0,0.18)] sm:p-7">
               <div className="flex items-start justify-between gap-4">
                 <div>
                   <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-red-600">Ação permanente</p>

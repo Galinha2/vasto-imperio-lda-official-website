@@ -1,15 +1,17 @@
 .table { width: 100%; table-layout: fixed; }
 .quoteRow > td { overflow-wrap: break-word; }
+.quoteRow { background-color: rgb(255 255 255 / 26%); }
+.quoteRow:hover { background-color: rgb(255 255 255 / 62%); }
 @media (max-width: 1535px) {
   .table, .table > tbody { display: block; width: 100%; }
   .table > thead { display: none; }
-  .quoteRow { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; padding: 16px; }
+  .quoteRow { margin: 10px; border: 1px solid rgb(255 255 255 / 80%); border-left-width: 3px; border-radius: 26px; box-shadow: 0 4px 18px rgb(30 40 70 / 3%); display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; padding: 16px; }
   .quoteRow > td { display: block; min-width: 0; padding: 0; white-space: normal; text-align: left; }
   .quoteRow > td:first-child { grid-column: 1 / -1; }
   .quoteRow > td:last-child { grid-column: 2 / -1; align-self: end; }
   .quoteRow > td[data-label]::before { content: attr(data-label); display: block; margin-bottom: 6px; color: #86868b; font-size: 10px; }
   .quoteRow > td > div { flex-wrap: wrap; }
-  .expanded { display: block; width: 100%; }
+  .expanded { display: block; width: 100%; background: transparent; border: 0; }
   .expanded > td { display: block; width: 100%; min-width: 0; padding: 16px; }
 }
 @media (max-width: 639px) {

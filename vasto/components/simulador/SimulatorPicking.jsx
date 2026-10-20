@@ -595,7 +595,7 @@ export default function SimulatorPicking({ onQuoteDataChange, adminMode = false,
             </label>
             <SimulatorDropdown label={english ? "Frame height (m)" : "Altura do bastidor (m)"} value={height} onChange={handleHeightChange} options={availableHeights.length ? availableHeights : workbench ? [] : heights} format={formatMeters} />
             <SimulatorDropdown label={english ? "Depth (m)" : "Profundidade (m)"} value={depth} onChange={handleDepthChange} options={availableDepths.length ? availableDepths : depths} format={formatMeters} />
-            <SimulatorDropdown label={english ? "Number of levels" : "N.º de níveis"} value={levels} onChange={setLevels} options={workbench ? [1, 2] : levelOptions} />
+            <SimulatorDropdown label={english ? "Number of levels" : "N.º de níveis"} value={levels} onChange={setLevels} options={workbench ? [1, 2, 3] : levelOptions} />
             <SimulatorDropdown label={english ? "Shelf material" : "Tipo de piso"} value={floorType} onChange={handleFloorTypeChange} options={["Aglomerado", "Metálica"]} format={(value) => english ? (value === "Aglomerado" ? "Chipboard" : "Metal") : value} />
             <SimulatorConfigurationOptions
               rowCount={rowCount}

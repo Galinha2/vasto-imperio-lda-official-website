@@ -26,3 +26,8 @@ test("single-level benches retain their worktop; two-level benches add a mid-hei
   assert.equal(lowerShelf, 190);
   assert.ok(lowerShelf > worktop && lowerShelf < top + height);
 });
+
+test("three workbench levels have distinct lower, middle and worktop positions", () => {
+  const positions = [0, 1, 2].map((index) => workbenchLevelPosition(index, 3, 80, 100, 12));
+  assert.deepEqual(positions, [168, 135, 92]);
+});

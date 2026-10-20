@@ -17,7 +17,7 @@ const simuladores = [
   { id: "ligeiras", label: "Estantes ligeiras", description: "Carga manual e prateleiras", image: "/prateleira inteira.png", Component: SimulatorEstantesLigeiras },
   { id: "picking", label: "Picking", description: "Estantes de picking", image: "/produtos/9-Porteco Z60/i1.png", Component: SimulatorPicking },
   { id: "racks", label: "Racks", description: "Armazenamento paletizado", image: "/recorte_DSC4798-1_c_laranja-2.png", Component: SimulatorRacks },
-  { id: "bancadas", label: "Bancadas", description: "Até 1 m de altura · 1 ou 2 níveis", image: "/produtos/14-Bancadas (Workbench)/i2.png", Component: SimulatorPicking },
+  { id: "bancadas", label: "Bancadas", description: "Até 1 m de altura · 1 a 3 níveis", image: "/produtos/14-Bancadas (Workbench)/i2.png", Component: SimulatorPicking },
 ];
 
 export default function SimulatorAdmin() {

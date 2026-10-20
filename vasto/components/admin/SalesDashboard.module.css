@@ -166,3 +166,9 @@
     pointer-events: none;
   }
 }
+
+.dashboard .deleteDialog:global(.admin-surface) {
+  background-color: rgb(255 255 255 / 97%) !important;
+  border-color: rgb(255 255 255 / 95%) !important;
+  box-shadow: 0 24px 80px rgb(0 0 0 / 18%), inset 0 1px 0 white;
+}

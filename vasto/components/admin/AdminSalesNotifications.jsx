@@ -24,6 +24,11 @@ export default function AdminSalesNotifications() {
   }
   const [sound, setSound] = useState(true);
   const [notice, setNotice] = useState(null);
+  useEffect(() => {
+    if (!notice) return;
+    const timer = window.setTimeout(() => setNotice(null), 5000);
+    return () => window.clearTimeout(timer);
+  }, [notice]);
 
   async function prepareAudio() {
     try {

@@ -82,7 +82,7 @@ export default function AdminSalesNotifications() {
         seen.current ||= new Set();
         sales.forEach((sale) => seen.current.add(sale.id));
         if (incoming.length) {
-          setNotice({ count: incoming.length, name: incoming[0].customerName, key: incoming.map((sale) => sale.id).join("-") });
+          setNotice({ count: incoming.length, name: incoming[0].customerName, saleId: incoming[0].id, key: incoming.map((sale) => sale.id).join("-") });
           window.dispatchEvent(new CustomEvent("admin:new-sales", { detail: incoming }));
           if ("Notification" in window && Notification.permission === "granted") {
             try {
@@ -95,7 +95,7 @@ export default function AdminSalesNotifications() {
               notification.onclose = () => desktopNotices.current.delete(notification);
               notification.onclick = () => {
                 window.focus();
-                router.push("/admin");
+                router.push(`/admin?orcamento=${encodeURIComponent(incoming[0].id)}`);
                 notification.close();
               };
             } catch { /* Some browsers require installed web apps; retain the in-page alert. */ }
@@ -158,7 +158,7 @@ export default function AdminSalesNotifications() {
         <p className="text-xs font-semibold leading-snug tracking-tight text-[#1d1d1f] sm:text-[13px]">{notice.count === 1 ? "Novo orçamento recebido" : `${notice.count} novos orçamentos recebidos`}</p>
         <p className="mt-0.5 truncate text-[11px] text-[#6e6e73]" title={notice.name}>{notice.name}</p>
       </div>
-      <Link href="/admin" onClick={() => setNotice(null)} className="shrink-0 rounded-full bg-white/50 px-3 py-2 text-xs font-semibold text-[#1d1d1f] shadow-sm transition hover:bg-white/75">Ver</Link>
+      <Link href={`/admin?orcamento=${encodeURIComponent(notice.saleId)}`} onClick={() => setNotice(null)} className="shrink-0 rounded-full bg-white/50 px-3 py-2 text-xs font-semibold text-[#1d1d1f] shadow-sm transition hover:bg-white/75">Ver</Link>
       <button type="button" onClick={() => setNotice(null)} aria-label="Fechar notificação" className="grid h-7 w-7 shrink-0 cursor-pointer place-items-center rounded-full text-lg leading-none text-[#6e6e73] transition hover:bg-black/5">×</button>
     </div>}
 

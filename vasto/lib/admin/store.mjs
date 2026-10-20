@@ -459,13 +459,17 @@ export async function reviseSaleQuote(id, pdf, expectedUpdatedAt, lines, discoun
   const { buffer: originalPdf } = await getPdf(id);
   const revision = randomUUID();
   const archive = `revisions/${id}/${revision}`;
-  const updated = { ...existing, customerName: parsed.customerName, nif: parsed.nif, subtotal: parsed.subtotal, vat: parsed.vat, total: parsed.total, updatedAt: new Date().toISOString(), quoteRevision: (existing.quoteRevision || 0) + 1, quoteLines: lines, discountPercent: discount, previousQuoteRevision: archive, orderDetails: { ...existing.orderDetails, artigos: lines } };
+  const { quoteRevisions: previousRevisions = [], ...snapshot } = existing;
+  const quoteRevisions = [...previousRevisions, { path: archive, record: snapshot }];
+  const updated = { ...existing, quoteRevisions, customerName: parsed.customerName, nif: parsed.nif, subtotal: parsed.subtotal, vat: parsed.vat, total: parsed.total, updatedAt: new Date().toISOString(), quoteRevision: (existing.quoteRevision || 0) + 1, quoteLines: lines, discountPercent: discount, previousQuoteRevision: archive, orderDetails: { ...existing.orderDetails, artigos: lines } };
   const savePdf = async (bytes) => {
     if (storageMode() === "cloud") await cloud(`/storage/v1/object/${bucket()}/${id}.pdf`, { method: "POST", headers: { "Content-Type": "application/pdf", "x-upsert": "true" }, body: bytes });
     else { const temp = path.join(directory(), `${id}.${revision}.pdf.tmp`); await writeFile(temp, bytes, { mode: 0o600 }); await rename(temp, path.join(directory(), `${id}.pdf`)); }
   };
   if (storageMode() === "cloud") {
-    for (const [suffix, content, type] of [["pdf", originalPdf, "application/pdf"], ["json", JSON.stringify(existing), "application/json"]]) await cloud(`/storage/v1/object/${bucket()}/${archive}.${suffix}`, { method: "POST", headers: { "Content-Type": type }, body: content });
+    // The private bucket accepts PDF/images only. Revision metadata belongs in
+    // the sale's existing JSONB record, not in an application/json Storage object.
+    await cloud(`/storage/v1/object/${bucket()}/${archive}.pdf`, { method: "POST", headers: { "Content-Type": "application/pdf" }, body: originalPdf });
   } else {
     await mkdir(path.dirname(path.join(directory(), archive)), { recursive: true, mode: 0o700 });
     await writeFile(path.join(directory(), `${archive}.pdf`), originalPdf, { mode: 0o600 });

@@ -8,7 +8,7 @@ import styles from "./SalesDashboard.module.css";
 import MetricCard from "./MetricCard";
 
 import { Fragment, useEffect, useId, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { createPortal } from "react-dom";
 import { IoAddOutline, IoAlertCircleOutline, IoArrowUpOutline, IoCheckmarkCircleOutline, IoCloudUploadOutline, IoDocumentTextOutline, IoSearchOutline, IoTimeOutline, IoOpenOutline, IoCloseOutline, IoImagesOutline, IoTrashOutline, IoChevronDownOutline, IoWalletOutline, IoUnlinkOutline } from "react-icons/io5";
 
@@ -186,6 +186,9 @@ function DashboardDropdown({ label, options, value, onChange, className = "", to
 
 export default function SalesDashboard() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const requestedQuote = searchParams.get("orcamento");
+  const openedNotificationQuote = useRef("");
   const inputRef = useRef(null);
   const imageInputRefs = useRef({});
   const [sales, setSales] = useState([]);
@@ -284,6 +287,27 @@ export default function SalesDashboard() {
     window.addEventListener("admin:new-sales", addIncoming);
     return () => window.removeEventListener("admin:new-sales", addIncoming);
   }, []);
+
+  useEffect(() => {
+    if (!requestedQuote) { openedNotificationQuote.current = ""; return; }
+    if (loading || openedNotificationQuote.current === requestedQuote) return;
+    const sale = sales.find((item) => item.id === requestedQuote);
+    if (!sale) return;
+    openedNotificationQuote.current = requestedQuote;
+    const date = periodDate(sale);
+    setYear(date.slice(0, 4)); setMonth(date.slice(5, 7));
+    setStatus("all"); setPaymentFilter("all"); setDeliveryFilter("all"); setResolutionFilter("all"); setSearch("");
+    const group = groupQuotes(sales).find((item) => item.sales.some((entry) => entry.id === sale.id));
+    if (group) setExpandedQuoteGroups((current) => ({ ...current, [group.id]: true }));
+    setImagePanel(sale.id);
+    let finished = false;
+    const timer = window.setTimeout(() => {
+      finished = true;
+      document.getElementById(`sale-${sale.id}`)?.scrollIntoView({ behavior: "smooth", block: "start" });
+      router.replace("/admin", { scroll: false });
+    }, 150);
+    return () => { window.clearTimeout(timer); if (!finished) openedNotificationQuote.current = ""; };
+  }, [requestedQuote, loading, sales, router]);
 
   async function importFiles(files) {
     if (uploading || loading || !files?.length) return;
@@ -960,7 +984,7 @@ export default function SalesDashboard() {
                       <Fragment key={sale.id}>
                         {(groupBySale.get(sale.id).sales[0].id === sale.id || expandedQuoteGroups[groupBySale.get(sale.id).id]) && <>
 
-                        <tr
+                        <tr id={`sale-${sale.id}`}
                           onClick={(event) => {
                             if (!event.currentTarget.contains(event.target) || Date.now() < dragClickBlockedUntil.current || event.target.closest("button, input, select, textarea, a, [role='dialog'], [role='listbox'], [role='option']") || window.getSelection()?.toString()) return;
                             setImagePanel((current) => current === sale.id ? "" : sale.id);

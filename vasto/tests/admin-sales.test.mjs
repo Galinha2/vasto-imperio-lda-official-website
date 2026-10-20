@@ -576,3 +576,48 @@ test("joining estimates preserves discounted totals and originals, and undo rest
   assert.throws(()=>assertMergeable({...source,paymentStatus:"pago"},target),{status:400});
   for(const id of [source.id,target.id,merged.id])await deleteSale(id);
 });
+
+test("cloud quote edits keep metadata in JSONB and upload only PDFs to the restricted bucket", async () => {
+  const { reviseSaleQuote } = await import("../lib/admin/store.mjs");
+  const originalFetch=globalThis.fetch;
+  const originalUrl=process.env.SUPABASE_URL, originalKey=process.env.SUPABASE_SERVICE_ROLE_KEY;
+  const originalPdf=pdfWithMetadata();
+  const original=await parseSalePdf(originalPdf,"original.pdf");
+  let record=original;
+  const objects=new Map([[`${record.id}.pdf`,originalPdf]]);
+  process.env.SUPABASE_URL="https://test-project.supabase.co";
+  process.env.SUPABASE_SERVICE_ROLE_KEY="test-key";
+  globalThis.fetch=async(url,options)=>{
+    const parsed=new URL(url);
+    if(parsed.pathname==="/rest/v1/admin_sales") {
+      if(options.method==="PATCH") { record=JSON.parse(options.body).record; return new Response(null,{status:204}); }
+      return Response.json([{record}]);
+    }
+    const download="/storage/v1/object/authenticated/sales-pdfs/";
+    if(parsed.pathname.startsWith(download))return new Response(objects.get(parsed.pathname.slice(download.length)));
+    const upload="/storage/v1/object/sales-pdfs/";
+    assert.ok(parsed.pathname.startsWith(upload));
+    assert.equal(options.headers["Content-Type"],"application/pdf","JSON is not allowed in sales-pdfs");
+    assert.ok(parsed.pathname.endsWith(".pdf"));
+    objects.set(parsed.pathname.slice(upload.length),options.body);
+    return Response.json({success:true});
+  };
+  try {
+    const lines=[{produto:"Viga",preco:100,unidades:3,total:300,isPortes:false}];
+    const revisedPdf=pdfWithMetadata({...metadata,subtotal:270,vat:62.1,total:332.1});
+    const updated=await reviseSaleQuote(record.id,revisedPdf,record.updatedAt,lines,10);
+    assert.equal(updated.subtotal,270);
+    assert.equal(updated.quoteRevisions.length,1);
+    assert.equal(updated.quoteRevisions[0].record.subtotal,180);
+    assert.deepEqual(objects.get(`${updated.previousQuoteRevision}.pdf`),originalPdf);
+    assert.deepEqual(objects.get(`${updated.id}.pdf`),revisedPdf);
+    const nextPdf=pdfWithMetadata({...metadata,subtotal:300,vat:69,total:369});
+    const again=await reviseSaleQuote(record.id,nextPdf,updated.updatedAt,lines,0);
+    assert.equal(again.quoteRevisions.length,2);
+    assert.equal(again.quoteRevisions[1].record.quoteRevisions,undefined,"History snapshots must not recursively duplicate history");
+  } finally {
+    globalThis.fetch=originalFetch;
+    if(originalUrl===undefined)delete process.env.SUPABASE_URL;else process.env.SUPABASE_URL=originalUrl;
+    if(originalKey===undefined)delete process.env.SUPABASE_SERVICE_ROLE_KEY;else process.env.SUPABASE_SERVICE_ROLE_KEY=originalKey;
+  }
+});

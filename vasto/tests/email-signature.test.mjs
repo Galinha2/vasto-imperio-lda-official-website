@@ -15,3 +15,10 @@ test("message markup is escaped and preview uses the local logo", () => {
   assert.match(result.html, /&lt;script&gt;/);
   assert.match(emailSignature("/logo.png"), /src="\/logo.png"/);
 });
+
+test('closing is part of the signature and is not repeated when already at the end of the draft', () => {
+  const result = signedEmail('Bom dia,\nSegue orçamento.\n\nCom os melhores cumprimentos,');
+  assert.equal((result.text.match(/Com os melhores cumprimentos,/g) || []).length, 1);
+  assert.equal((result.html.match(/Com os melhores cumprimentos,/g) || []).length, 1);
+  assert.match(emailSignature('/logo.png'), /Com os melhores cumprimentos,/);
+});

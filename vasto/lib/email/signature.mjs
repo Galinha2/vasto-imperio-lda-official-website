@@ -1,7 +1,8 @@
-export const signatureText = "Henrique Galinha | Vasto Império Lda.\n\nRua Principal n31 - Cabecinha\n2475-014 - Benedita\n\nT. +351 928 348 117 (Chamada para a rede móvel nacional)\nE. geral@vastoimperio.pt\nW. vastoimperio.pt";
+export const signatureText = "Com os melhores cumprimentos,\n\nHenrique Galinha | Vasto Império Lda.\n\nRua Principal n31 - Cabecinha\n2475-014 - Benedita\n\nT. +351 928 348 117 (Chamada para a rede móvel nacional)\nE. geral@vastoimperio.pt\nW. vastoimperio.pt";
 
 export function emailSignature(logo = "cid:vasto-signature-logo") {
   return `<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin-top:24px;font-family:Arial,Helvetica,sans-serif;color:#252525;max-width:540px;width:100%">
+    <tr><td style="padding:0 0 18px;font-size:14px;line-height:22px">Com os melhores cumprimentos,</td></tr>
     <tr><td style="padding:0 0 14px;font-size:14px;line-height:22px;font-weight:bold">Henrique Galinha <span style="color:#a1a1a6;font-weight:normal">|</span> Vasto Império Lda.</td></tr>
     <tr><td><table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr>
       <td width="110" valign="top" style="padding:0 18px 0 0"><a href="https://www.vastoimperio.pt/" style="text-decoration:none"><img src="${logo}" alt="Vasto Império" width="100" height="75" style="display:block;width:100px;height:75px;border:0;object-fit:contain" /></a></td>
@@ -17,6 +18,7 @@ export function emailSignature(logo = "cid:vasto-signature-logo") {
 }
 
 export function signedEmail(message) {
+  message = message.replace(/(?:\r?\n)*\s*Com os melhores cumprimentos[,!.]?\s*$/i, "").trimEnd();
   const escaped = message.replace(/[&<>"']/g, (character) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[character]));
   return {
     text: `${message}\n\n${signatureText}`,

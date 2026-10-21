@@ -53,7 +53,7 @@ const quoteStatuses = [
 const paymentStatuses = [
   { value: "por_pagar", label: "Por pagar", color: "bg-amber-50 text-amber-700" },
   { value: "entrada_paga", label: "Entrada paga", color: "bg-sky-50 text-sky-700" },
-  { value: "pago", label: "Pago", color: "bg-[#f5f5f7] text-[#424245]" },
+  { value: "pago", label: "Pago", color: "bg-emerald-50 text-emerald-700" },
 ];
 const deliveryStatuses = [
   { value: "por_entregar", label: "Por entregar", color: "bg-orange-50 text-orange-700" },

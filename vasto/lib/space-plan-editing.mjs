@@ -1,3 +1,5 @@
+export const topViewIsVertical = (shelf) => Number.isFinite(shelf.runWidth) ? Math.abs(shelf.w - shelf.runWidth) > 0.001 : shelf.h > shelf.w;
+
 export function shelfKey(shelf) {
   return [shelf.x, shelf.y, shelf.w, shelf.h, shelf.wall || ""].join(":");
 }
@@ -17,7 +19,7 @@ export function editSpacePlan(plan, removed = [], excludedWalls = []) {
 }
 
 export function sharesStartFrame(shelf, shelves) {
-  const vertical = (s) => ["left", "right", "center"].includes(s.wall) || (!s.wall && s.h > s.w);
+  const vertical = topViewIsVertical;
   const close = (a, b) => Math.abs(a - b) < 0.0001;
   const isVertical = vertical(shelf);
   return shelves.some((other) => other !== shelf && vertical(other) === isVertical && close(other.height, shelf.height) && (isVertical

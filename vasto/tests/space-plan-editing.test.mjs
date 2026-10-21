@@ -49,3 +49,12 @@ test("drawing suppresses only the shared starting frame and restores it after re
     assert.equal(sharesStartFrame({ ...next, x: next.x + 0.1 }, [first]), false);
   }
 });
+
+test('horizontal central rows keep their orientation and share the adjoining frame', async () => {
+  const { topViewIsVertical, sharesStartFrame } = await import('../lib/space-plan-editing.mjs');
+  const first = { x: 0, y: 2, w: 2, h: 0.6, depth: 0.6, runWidth: 2, height: 2, wall: 'center' };
+  const second = { ...first, x: 2 };
+  assert.equal(topViewIsVertical(first), false);
+  assert.equal(sharesStartFrame(second, [first, second]), true);
+  assert.equal(topViewIsVertical({ ...first, w: 0.6, h: 2 }), true);
+});

@@ -24,3 +24,14 @@ export function removeModuleLevel(state, moduleIndex, index) {
   if (active.length <= 1 || !active.includes(index)) return state;
   return { ...state, modules: { ...state.modules, [moduleIndex]: [...(state.modules[moduleIndex] || []), index] } };
 }
+
+export function levelDimensionGroups(modules, levelsForModule) {
+  const groups = new Map();
+  modules.forEach((_, index) => {
+    const levels = levelsForModule(index);
+    const key = levels.join(",");
+    if (!groups.has(key)) groups.set(key, { levels, moduleIndexes: [] });
+    groups.get(key).moduleIndexes.push(index);
+  });
+  return [...groups.values()];
+}

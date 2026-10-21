@@ -1,4 +1,5 @@
 "use client";
+import { levelDimensionGroups } from "@/lib/editable-levels.mjs";
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useLanguage } from "@/components/header/LanguageContext";
@@ -144,6 +145,7 @@ function findBestModules(targetLength, { height, depth, levels, floorType, galva
 
 function RackPreview({ activeLevels, levelsForModule, hasRemovedLevels, removeLevel, restoreLevels, modules, height, depth, levels, floorType, galvanized, reinforcedBeams, rowCount, capacityLabel, solutions, selectedSolutionId, onSelectSolution, english, workbench = false }) {
   const formatMeters = (value) => `${(value / 1000).toLocaleString(english ? "en-IE" : "pt-PT", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} m`;
+  const dimensionGroups = levelDimensionGroups(modules, levelsForModule);
   const width = 1000;
   const bottom = 410;
   const beamLengthTotal = modules.reduce((sum, moduleLength) => sum + moduleLength, 0);
@@ -184,7 +186,7 @@ function RackPreview({ activeLevels, levelsForModule, hasRemovedLevels, removeLe
           <p>{english ? "Click a level to remove it from that module only. Other modules remain unchanged." : "Clique num nível para o retirar apenas desse módulo. As restantes estantes mantêm-se."}</p>
           {hasRemovedLevels && <button type="button" onClick={restoreLevels} className="cursor-pointer rounded-full border border-[#e5e5e7] px-3 py-1.5 font-medium text-[#0879c0]">{english ? "Restore levels" : "Repor níveis"}</button>}
         </div>
-        <svg viewBox={`0 0 ${width} 490`} role="img" aria-label={english ? `Front view of a row with ${modules.length} modules, ${heightLabel} high, ${levels} levels, repeated ${rowCount} times` : `Vista frontal de uma fila com ${modules.length} módulos, ${heightLabel} de altura, ${levels} níveis e repetida ${rowCount} vezes`} className="h-auto w-full">
+        <svg viewBox={`0 0 ${hasRemovedLevels ? width : Math.max(width, rackRight + dimensionGroups.length * 90 + 30)} 490`} role="img" aria-label={english ? `Front view of a row with ${modules.length} modules, ${heightLabel} high, ${levels} levels, repeated ${rowCount} times` : `Vista frontal de uma fila com ${modules.length} módulos, ${heightLabel} de altura, ${levels} níveis e repetida ${rowCount} vezes`} className="h-auto w-full">
           <defs>
             <linearGradient id="pickingFrameMetalFinish" x1="0" x2="1" y1="0" y2="0">
               <stop offset="0" stopColor="#64717d" />
@@ -347,9 +349,11 @@ function RackPreview({ activeLevels, levelsForModule, hasRemovedLevels, removeLe
             const left = rackLeft + (25 + modules.slice(0, moduleIndex).reduce((sum, value) => sum + value, 0)) * scale + uprightWidth / 2;
             const right = left + length * scale - uprightWidth;
             const moduleLevels = levelsForModule(moduleIndex);
+            const dimensionIndex = dimensionGroups.findIndex((group) => group.moduleIndexes.includes(moduleIndex));
+            const dimensionGroup = dimensionGroups[dimensionIndex];
             const yForLevel = (index) => levelPosition(index);
             return <g key={`module-controls-${moduleIndex}`}>
-              <ModuleLevelDimensions activeLevels={moduleLevels} yForLevel={yForLevel} thickness={beamHeight} x={right - Math.min(55, (right - left) * 0.35)} floorY={bottom} scale={scale} format={formatMeters} english={english} />
+              {(hasRemovedLevels || dimensionGroup.moduleIndexes[0] === moduleIndex) && <ModuleLevelDimensions label={!hasRemovedLevels && dimensionGroups.length > 1 ? `${english ? "Module" : "Módulo"} ${dimensionGroup.moduleIndexes.map((index) => index + 1).join(", ")}` : ""} labelY={top - 8} activeLevels={moduleLevels} yForLevel={yForLevel} thickness={beamHeight} x={hasRemovedLevels ? right - Math.min(55, (right - left) * 0.35) : rackRight + 20 + dimensionIndex * 90} floorY={bottom} scale={scale} format={formatMeters} english={english} />}
               <LevelRemovalTargets activeLevels={moduleLevels} yForLevel={(index) => yForLevel(index) - beamHeight / 2} left={left} right={right} removeLevel={(index) => removeLevel(index, moduleIndex)} english={english} />
             </g>;
           })}

@@ -45,3 +45,11 @@ test('module level edits reject invalid targets and keep at least one level per 
   assert.equal(removeModuleLevel(updated, -1, 0), updated);
   assert.deepEqual(moduleLevels(updated, 1), [0, 1, 2]);
 });
+
+test('external dimension columns combine identical modules and distinguish edited profiles', async () => {
+  const { levelDimensionGroups } = await import('../lib/editable-levels.mjs');
+  assert.deepEqual(levelDimensionGroups([1000, 1000, 1000], (index) => index === 1 ? [1, 3] : [0, 1, 2, 3]), [
+    { levels: [0, 1, 2, 3], moduleIndexes: [0, 2] },
+    { levels: [1, 3], moduleIndexes: [1] },
+  ]);
+});

@@ -1,3 +1,4 @@
+import { markSaleEmailSent } from "@/lib/admin/store.mjs";
 import { quoteEmailAttachments } from "@/lib/admin/quote-email-attachments.mjs";
 import { validateAttachment } from "@/lib/email/attachments.mjs";
 import { readFile } from "node:fs/promises";
@@ -23,7 +24,12 @@ export async function POST(request) {
     if (!/^[^\s@,;<>]+@[^\s@,;<>]+\.[^\s@,;<>]+$/.test(email) || email.length > 254 || !subject || subject.length > 180 || /[\r\n]/.test(subject) || !message || message.length > 10000) return NextResponse.json({ error: "Confirme o email, o assunto e a mensagem." }, { status: 400 });
     const attachments = [];
     const id = form.get("saleId");
-    if (id) attachments.push(...await quoteEmailAttachments(String(id), form.get("includeGroup") === "true"));
+    let saleIds = [];
+    if (id) {
+      const selected = await quoteEmailAttachments(String(id), form.get("includeGroup") === "true");
+      attachments.push(...selected.attachments);
+      saleIds = selected.saleIds;
+    }
     const uploaded = [...(!id ? form.getAll("attachments") : []), ...form.getAll("extraAttachments")];
     if (form.getAll("extraAttachments").length > 10 || uploaded.length > 12) return NextResponse.json({ error: "Pode adicionar até 10 anexos extra por email." }, { status: 400 });
     for (const file of uploaded) {
@@ -36,7 +42,13 @@ export async function POST(request) {
     const signatureLogo = await readFile(path.join(process.cwd(), "public", "logo.png"));
     attachments.push({ filename: "vasto-imperio.png", content: signatureLogo, contentType: "image/png", cid: "vasto-signature-logo", contentDisposition: "inline" });
     const delivery = await sendMailWithSentCopy(transporter, { from: process.env.SMTP_USER, to: email, replyTo: "geral@vastoimperio.pt", subject, ...signedEmail(message), attachments });
-    return NextResponse.json({ message: "Orçamento enviado por email.", sentCopySaved: delivery.sentCopySaved, sentCopyError: delivery.sentCopyError });
+    const sentSales = [];
+    let trackingWarning = "";
+    for (const saleId of saleIds) {
+      try { sentSales.push(await markSaleEmailSent(saleId, email)); }
+      catch { trackingWarning = "O email foi enviado, mas não foi possível atualizar o indicador de envio em todos os orçamentos. Não volte a enviar por esse motivo."; }
+    }
+    return NextResponse.json({ sentSales, trackingWarning, message: "Orçamento enviado por email.", sentCopySaved: delivery.sentCopySaved, sentCopyError: delivery.sentCopyError });
   } catch (error) {
     console.error("[admin-quote-email]", error.message);
     return NextResponse.json({ error: error.status ? error.message : "Não foi possível enviar o email. Verifique a configuração SMTP e tente novamente." }, { status: error.status || 500 });

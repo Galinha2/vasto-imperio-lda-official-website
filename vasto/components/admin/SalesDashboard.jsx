@@ -280,6 +280,15 @@ export default function SalesDashboard() {
   }, []);
 
   useEffect(() => {
+    const updateEmail = (event) => {
+      const sent = new Map((event.detail?.sales || []).map((sale) => [sale.id, sale]));
+      setSales((current) => current.map((sale) => sent.has(sale.id) ? { ...sale, emailSentAt: sent.get(sale.id).emailSentAt, emailSentTo: sent.get(sale.id).emailSentTo } : sale));
+    };
+    window.addEventListener("admin:email-sent", updateEmail);
+    return () => window.removeEventListener("admin:email-sent", updateEmail);
+  }, []);
+
+  useEffect(() => {
     const addIncoming = (event) => setSales((current) => {
       const existing = new Set(current.map((sale) => sale.id));
       return [...event.detail.filter((sale) => !existing.has(sale.id)), ...current];

@@ -551,3 +551,10 @@ export async function reserveQuoteNumber() {
   numberReservation = operation.catch(() => {});
   return operation;
 }
+
+export async function markSaleEmailSent(id, email) {
+  const record = await getSale(id);
+  const updated = { ...record, emailSentAt: new Date().toISOString(), emailSentTo: email };
+  await saveRecord(updated);
+  return updated;
+}

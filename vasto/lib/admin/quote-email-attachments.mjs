@@ -18,5 +18,5 @@ export async function quoteEmailAttachments(id, includeGroup, storage = { getPdf
       attachments.push({ filename: prefix + quoteFilename(sale, 'Desenho', extension, imageIndex + 1), content: saved.buffer, contentType: image.contentType });
     }
   }
-  return attachments;
+  return { attachments, saleIds: records.map((sale) => sale.id) };
 }

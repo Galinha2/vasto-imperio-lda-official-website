@@ -635,3 +635,15 @@ test("cloud quote edits keep metadata in JSONB and upload only PDFs to the restr
     if(originalKey===undefined)delete process.env.SUPABASE_SERVICE_ROLE_KEY;else process.env.SUPABASE_SERVICE_ROLE_KEY=originalKey;
   }
 });
+
+test('successful email tracking persists without changing quote amounts or workflow', async () => {
+  const { markSaleEmailSent } = await import('../lib/admin/store.mjs');
+  const buffer = pdfWithMetadata({ ...metadata, customerName: 'Cliente envio rastreado' });
+  const sale = await createSale(await parseSalePdf(buffer, 'envio.pdf'), buffer);
+  const updated = await markSaleEmailSent(sale.id, 'cliente@example.com');
+  assert.ok(Number.isFinite(Date.parse(updated.emailSentAt)));
+  assert.equal((await getSale(sale.id)).emailSentTo, 'cliente@example.com');
+  assert.equal(updated.subtotal, sale.subtotal);
+  assert.equal(updated.status, sale.status);
+  assert.equal(updated.updatedAt, sale.updatedAt);
+});

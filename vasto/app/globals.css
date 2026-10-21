@@ -446,3 +446,10 @@ html body {
 @media (prefers-reduced-motion: reduce) {
   .email-compose-field { transition: none; }
 }
+
+.quote-email-sent {
+  color: #047857 !important;
+  background-color: rgb(209 250 229 / 85%) !important;
+  border-color: rgb(110 231 183 / 80%) !important;
+}
+.quote-email-sent:hover { background-color: #a7f3d0 !important; }

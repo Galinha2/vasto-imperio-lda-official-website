@@ -10,6 +10,13 @@ import { IoSparklesOutline, IoMailOutline } from "react-icons/io5";
 export default function QuoteEmailButton({ prepare, sale, groupSales, compact = false, menuItem = false, inlineAction = false, initialEmail = "" }) {
   const [includeGroup, setIncludeGroup] = useState(false);
   const selectedSales = sale ? (includeGroup && groupSales?.length > 1 ? groupSales : [sale]) : [];
+  const [sentRecordIds, setSentRecordIds] = useState([]);
+  const emailWasSent = Boolean(sale?.emailSentAt || (sale && sentRecordIds.includes(sale.id)));
+  useEffect(() => {
+    const update = (event) => setSentRecordIds((current) => [...new Set([...current, ...(event.detail?.sales || []).filter((item) => item.emailSentAt).map((item) => item.id)])]);
+    window.addEventListener("admin:email-sent", update);
+    return () => window.removeEventListener("admin:email-sent", update);
+  }, []);
   const [open, setOpen] = useState(false);
   const [improving, setImproving] = useState(false);
   const [originalMessage, setOriginalMessage] = useState(null);
@@ -74,12 +81,14 @@ export default function QuoteEmailButton({ prepare, sale, groupSales, compact = 
       const result = await response.json();
       if (!response.ok) throw new Error(result.error || "Não foi possível enviar.");
       setSent(true);
+      window.dispatchEvent(new CustomEvent("admin:email-sent", { detail: { sales: result.sentSales || [] } }));
+      if (result.trackingWarning) setError(result.trackingWarning);
       if (result.sentCopySaved === false) setError(`O email foi enviado ao cliente. ${result.sentCopyError || "Não foi possível guardar a cópia em Enviados."} Não volte a enviar o email.`);
     } catch (failure) { setError(failure.message); }
     finally { setBusy(false); }
   }
   return <>
-    <button type="button" onClick={start} title="Enviar orçamento por email" aria-label="Enviar orçamento por email" className={inlineAction ? "inline-flex h-9 min-w-[56px] flex-1 cursor-pointer items-center justify-center whitespace-nowrap rounded-full border border-orange-200 bg-orange-50 px-2.5 text-xs font-semibold text-orange-700 transition hover:bg-orange-100" : menuItem ? "flex w-full cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-left text-xs text-[#424245] hover:bg-[#f5f5f7]" : compact ? "grid h-8 w-8 cursor-pointer place-items-center rounded-full text-[#86868b] hover:bg-orange-50 hover:text-orange-600" : "inline-flex h-12 cursor-pointer items-center justify-center gap-2 rounded-full border border-orange-200 bg-orange-50 px-5 text-sm font-semibold text-orange-700 hover:bg-orange-100"}>{!inlineAction && <IoMailOutline />}{inlineAction ? "Email" : !compact && "Enviar por email"}</button>
+    <button type="button" onClick={start} title={emailWasSent ? "Orçamento já enviado por email. Clique para enviar novamente." : "Enviar orçamento por email"} aria-label="Enviar orçamento por email" className={`${emailWasSent ? "quote-email-sent " : ""}${inlineAction ? "inline-flex h-9 min-w-[56px] flex-1 cursor-pointer items-center justify-center whitespace-nowrap rounded-full border border-orange-200 bg-orange-50 px-2.5 text-xs font-semibold text-orange-700 transition hover:bg-orange-100" : menuItem ? "flex w-full cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-left text-xs text-[#424245] hover:bg-[#f5f5f7]" : compact ? "grid h-8 w-8 cursor-pointer place-items-center rounded-full text-[#86868b] hover:bg-orange-50 hover:text-orange-600" : "inline-flex h-12 cursor-pointer items-center justify-center gap-2 rounded-full border border-orange-200 bg-orange-50 px-5 text-sm font-semibold text-orange-700 hover:bg-orange-100"}`}>{!inlineAction && <IoMailOutline />}{inlineAction ? "Email" : !compact && "Enviar por email"}</button>
     {open && createPortal(<div className="fixed inset-0 z-[1200] flex items-center justify-center overflow-y-auto bg-black/30 p-4 backdrop-blur-sm"><form onSubmit={send} role="dialog" aria-modal="true" aria-label="Enviar orçamento por email" className="site-glass my-auto w-full max-w-7xl space-y-4 rounded-[28px] bg-white p-6 shadow-xl">
       <h2 className="text-xl font-semibold">Enviar orçamento por email</h2>
       {sent ? <p role="status" className="text-sm text-emerald-700">Email enviado com o orçamento e os desenhos disponíveis.</p> : <div className="grid min-w-0 gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">

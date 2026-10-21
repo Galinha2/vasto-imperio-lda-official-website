@@ -13,9 +13,10 @@ test('group email includes grouped PDFs and drawings and excludes unrelated sale
     getSaleImage: async (id) => ({ buffer: Buffer.from(`image-${id}`) }),
     listSales: async () => records,
   };
-  const group = await quoteEmailAttachments('a', true, storage);
+  const { attachments: group, saleIds } = await quoteEmailAttachments('a', true, storage);
+  assert.deepEqual(saleIds, ['a', 'b']);
   assert.deepEqual(group.map((file) => file.content.toString()), ['pdf-a', 'image-a', 'pdf-b', 'image-b']);
   assert.equal(new Set(group.map((file) => file.filename)).size, 4);
-  assert.equal((await quoteEmailAttachments('a', false, storage)).length, 2);
-  assert.equal((await quoteEmailAttachments('c', true, storage)).length, 1);
+  assert.equal((await quoteEmailAttachments('a', false, storage)).attachments.length, 2);
+  assert.equal((await quoteEmailAttachments('c', true, storage)).attachments.length, 1);
 });

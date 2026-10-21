@@ -367,7 +367,8 @@ function RackPreview({ activeLevels, levelsForModule, hasRemovedLevels, removeLe
 
 export default function SimulatorPicking({ onQuoteDataChange, adminMode = false, adminPanel, adminDiscountPercent = null, variant = "picking" }) {
   const workbench = adminMode && variant === "workbench";
-  const eligibleFrames = frames.filter((frame) => workbench ? isWorkbenchFrame(frame) : frame.height >= 1000);
+  const usableFrames = frames.filter((frame) => workbench || !frame.workbenchOnly);
+  const eligibleFrames = usableFrames.filter((frame) => workbench ? isWorkbenchFrame(frame) : frame.height >= 1000);
   const defaultFrame = eligibleFrames.find((frame) => frame.galvanized && frame.height === (workbench ? 1000 : 2000)) || eligibleFrames[0];
   const allowedHeight = (frame) => workbench ? isWorkbenchFrame(frame) : frame.height >= 1000;
   const [orderOpen, setOrderOpen] = useState(false);
@@ -394,14 +395,14 @@ export default function SimulatorPicking({ onQuoteDataChange, adminMode = false,
   const enteredLength = Number(desiredLength);
   const isLengthUnavailable = enteredLength > 30;
   const targetLength = enteredLength > 0 ? Math.min(30, enteredLength) * 1000 : 5000;
-  const availableHeights = unique(frames.filter((frame) => frame.galvanized === galvanized && allowedHeight(frame)).map((frame) => frame.height));
-  const availableDepths = unique(frames.filter((frame) => frame.galvanized === galvanized && allowedHeight(frame)).map((frame) => frame.depth));
+  const availableHeights = unique(usableFrames.filter((frame) => frame.galvanized === galvanized && allowedHeight(frame)).map((frame) => frame.height));
+  const availableDepths = unique(usableFrames.filter((frame) => frame.galvanized === galvanized && allowedHeight(frame)).map((frame) => frame.depth));
   const baseModules = useMemo(
     () => findBestModules(targetLength, { height, depth, levels, floorType, galvanized, reinforcedBeams, sameBeamLength, desiredBeamLength }),
     [targetLength, height, depth, levels, floorType, galvanized, reinforcedBeams, sameBeamLength, desiredBeamLength],
   );
 
-  const matchingFrame = frames.find((frame) => frame.height === height && frame.depth === depth && frame.galvanized === galvanized);
+  const matchingFrame = usableFrames.find((frame) => frame.height === height && frame.depth === depth && frame.galvanized === galvanized);
   const estimateModules = (candidate) => {
     const gross = numericPrice(matchingFrame) * (candidate.length + 1) * rowCount + candidate.reduce((sum, moduleLength, moduleIndex) => {
     const beamProfile = reinforcedBeams ? "Viga Z100" : "Viga Z60";
@@ -493,7 +494,7 @@ export default function SimulatorPicking({ onQuoteDataChange, adminMode = false,
   }
 
   function handleHeightChange(nextHeight) {
-    const validDepths = unique(frames.filter((frame) => frame.height === nextHeight && frame.galvanized === galvanized).map((frame) => frame.depth));
+    const validDepths = unique(usableFrames.filter((frame) => frame.height === nextHeight && frame.galvanized === galvanized).map((frame) => frame.depth));
     const nextDepth = validDepths.find((candidate) => hasPricedShelf(candidate, floorType)) ?? validDepths.find((candidate) => hasPricedShelf(candidate, floorType === "Aglomerado" ? "Metálica" : "Aglomerado")) ?? validDepths[0];
     setHeight(nextHeight);
     setDepth(nextDepth);
@@ -501,7 +502,7 @@ export default function SimulatorPicking({ onQuoteDataChange, adminMode = false,
   }
 
   function handleDepthChange(nextDepth) {
-    const compatibleFrames = frames.filter((frame) => frame.depth === nextDepth && frame.galvanized === galvanized && allowedHeight(frame));
+    const compatibleFrames = usableFrames.filter((frame) => frame.depth === nextDepth && frame.galvanized === galvanized && allowedHeight(frame));
     const nextHeight = compatibleFrames.find((frame) => frame.height === height && hasPricedShelf(nextDepth, floorType))?.height
       ?? compatibleFrames.find((frame) => hasPricedShelf(nextDepth, floorType))?.height
       ?? compatibleFrames[0]?.height;
@@ -519,7 +520,7 @@ export default function SimulatorPicking({ onQuoteDataChange, adminMode = false,
   }
 
   function handleGalvanizedChange(nextGalvanized) {
-    const eligibleFrames = frames.filter((frame) => frame.galvanized === nextGalvanized && allowedHeight(frame));
+    const eligibleFrames = usableFrames.filter((frame) => frame.galvanized === nextGalvanized && allowedHeight(frame));
     const match = eligibleFrames.find((frame) => frame.height === height && frame.depth === depth && hasPricedShelf(frame.depth, floorType))
       ?? eligibleFrames.find((frame) => hasPricedShelf(frame.depth, floorType))
       ?? eligibleFrames[0];

@@ -533,7 +533,6 @@ export default function SalesDashboard() {
   const emailGroups = new Map(groupQuotes(sales).flatMap((group) => group.sales.map((sale) => [sale.id, group.sales])));
   const quoteGroups = groupQuotes(visibleSales);
   const groupBySale = new Map(quoteGroups.flatMap((group) => group.sales.map((sale) => [sale.id, group])));
-  const tableSales = quoteGroups.flatMap((group) => group.sales);
 
 
   const max = Math.max(...monthly.map(({ subtotal }) => subtotal), 1);
@@ -989,11 +988,19 @@ export default function SalesDashboard() {
                       <th className="w-[18%] px-3 py-4 text-right">Ações</th>
                     </tr>
                   </thead>
-                  <tbody>
-                    {tableSales.map((sale) => (
+                  {quoteGroups.map((quoteGroup) => <tbody key={quoteGroup.id} className={quoteGroup.sales.length > 1 ? styles.versionGroup : undefined}>
+                    {quoteGroup.sales.map((sale) => (
                       <Fragment key={sale.id}>
                         {(groupBySale.get(sale.id).sales[0].id === sale.id || expandedQuoteGroups[groupBySale.get(sale.id).id]) && <>
 
+                        {quoteGroup.sales.length > 1 && quoteGroup.sales[0].id === sale.id && <tr className={styles.groupHeading}><td colSpan={7}>
+                          <button type="button" aria-expanded={!!expandedQuoteGroups[quoteGroup.id]} onClick={() => setExpandedQuoteGroups((current) => ({ ...current, [quoteGroup.id]: !current[quoteGroup.id] }))} className={styles.groupToggle}>
+                            <span className={styles.groupIcon}><IoDocumentTextOutline aria-hidden="true" /></span>
+                            <span className={styles.groupTitle}><strong>{sale.customerName}</strong><span>{quoteGroup.sales.length} versões do mesmo orçamento · Compare as alternativas</span></span>
+                            <span className={styles.groupToggleLabel}>{expandedQuoteGroups[quoteGroup.id] ? "Recolher versões" : `Ver ${quoteGroup.sales.length} versões`}</span>
+                            <IoChevronDownOutline aria-hidden="true" className={`${styles.groupChevron} ${expandedQuoteGroups[quoteGroup.id] ? styles.groupChevronOpen : ""}`} />
+                          </button>
+                        </td></tr>}
                         <tr id={`sale-${sale.id}`}
                           onClick={(event) => {
                             if (!event.currentTarget.contains(event.target) || Date.now() < dragClickBlockedUntil.current || event.target.closest("button, input, select, textarea, a, [role='dialog'], [role='listbox'], [role='option']") || window.getSelection()?.toString()) return;
@@ -1027,18 +1034,13 @@ export default function SalesDashboard() {
                             setQuoteCombination({ sourceId, targetId: sale.id });
                           }}
                           style={{ "--quote-accent": sale.quoteNotSelected ? "#94a3b8" : isResolved(sale) ? "#10b981" : sale.status === "confirmada" ? "#1687f8" : "#f05252" }}
-                          className={`${styles.quoteRow} ${quoteDropTarget === sale.id ? "outline-2 -outline-offset-2 outline-[#0879c0] bg-sky-50 " : ""}cursor-pointer transition ${sale.quoteNotSelected ? "text-slate-500" : ""}`}>
+                          className={`${styles.quoteRow} ${quoteGroup.sales.length > 1 ? styles.versionMember : ""} ${quoteGroup.sales.length > 1 && expandedQuoteGroups[quoteGroup.id] ? styles.versionEntering : ""} ${quoteDropTarget === sale.id ? "outline-2 -outline-offset-2 outline-[#0879c0] bg-sky-50 " : ""}cursor-pointer transition ${sale.quoteNotSelected ? "text-slate-500" : ""}`}>
                           <td className="px-3 py-5">
                             <div className="flex items-center gap-2">
                               <button type="button" aria-expanded={imagePanel === sale.id} aria-label={`${imagePanel === sale.id ? "Fechar" : "Ver"} PDF e desenhos de ${sale.customerName}`} onClick={() => setImagePanel((current) => current === sale.id ? "" : sale.id)} className="flex min-w-0 cursor-pointer items-center gap-2 text-left text-sm font-semibold tracking-tight hover:text-[#0879c0]"><span className="truncate">{sale.customerName}</span><IoChevronDownOutline aria-hidden="true" className={`shrink-0 text-xs text-[#a1a1a6] transition-transform ${imagePanel === sale.id ? "rotate-180" : ""}`} /></button>
 
                             </div>
-                              {groupBySale.get(sale.id).sales.length > 1 && groupBySale.get(sale.id).sales[0].id === sale.id && <button type="button" aria-label={`${expandedQuoteGroups[groupBySale.get(sale.id).id] ? "Recolher" : "Expandir"} ${groupBySale.get(sale.id).sales.length} versões de ${sale.customerName}`} aria-expanded={!!expandedQuoteGroups[groupBySale.get(sale.id).id]} title="Orçamentos agrupados manualmente. Clique para ver as versões." onClick={() => setExpandedQuoteGroups((current) => ({ ...current, [groupBySale.get(sale.id).id]: !current[groupBySale.get(sale.id).id] }))} className="mt-2 inline-flex min-h-8 cursor-pointer items-center gap-2 rounded-xl border border-[#cfe1f1] bg-[#edf5fc] px-2.5 py-1.5 text-[11px] font-semibold text-[#0879c0] transition hover:border-[#0879c0] hover:bg-[#e0eefb] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0879c0]">
-                                <IoDocumentTextOutline aria-hidden="true" className="shrink-0 text-sm" />
-                                <span>{groupBySale.get(sale.id).sales.length} versões</span>
-                                <IoChevronDownOutline aria-hidden="true" className={`shrink-0 transition-transform motion-reduce:transition-none ${expandedQuoteGroups[groupBySale.get(sale.id).id] ? "rotate-180" : ""}`} />
-                              </button>}
-                            {groupBySale.get(sale.id).sales.length > 1 && expandedQuoteGroups[groupBySale.get(sale.id).id] && <p className="mt-1 text-[10px] font-medium text-[#0879c0]">{groupBySale.get(sale.id).label} · Versão {groupBySale.get(sale.id).sales.indexOf(sale) + 1}/{groupBySale.get(sale.id).sales.length}</p>}
+                            {quoteGroup.sales.length > 1 && <span className={styles.versionBadge}>Versão {quoteGroup.sales.indexOf(sale) + 1} de {quoteGroup.sales.length}{sale.quoteNumber ? ` · Orçamento ${sale.quoteNumber}` : ""}</span>}
                             {(sale.quoteDetails || sale.orderDetails?.detalhes) && <p className="mt-2 line-clamp-3 text-[10px] leading-relaxed text-[#6e6e73]" title={sale.quoteDetails || sale.orderDetails?.detalhes}>{sale.quoteDetails || sale.orderDetails?.detalhes}</p>}
 
                             <p className="mt-1 truncate text-[11px] text-[#a1a1a6]">{sale.nif ? `${sale.nif} · ` : ""}{sale.fileName}</p>
@@ -1213,10 +1215,11 @@ export default function SalesDashboard() {
                             </td>
                           </tr>
                         )}
+                        {quoteGroup.sales.length > 1 && ((!expandedQuoteGroups[quoteGroup.id] && quoteGroup.sales[0].id === sale.id) || (expandedQuoteGroups[quoteGroup.id] && quoteGroup.sales.at(-1).id === sale.id)) && <tr className={styles.groupEnd}><td colSpan={7}><span>{expandedQuoteGroups[quoteGroup.id] ? `${quoteGroup.sales.length} versões` : `Mais ${quoteGroup.sales.length - 1} ${quoteGroup.sales.length === 2 ? "versão disponível" : "versões disponíveis"}`} · {sale.customerName}</span></td></tr>}
                         </>}
                       </Fragment>
                     ))}
-                  </tbody>
+                  </tbody>)}
                 </table>
               </div>
             ) : <div className="px-6 py-14 text-center"><span className="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-[#f5f5f7] text-2xl text-[#a1a1a6]"><IoDocumentTextOutline /></span><h3 className="mt-4 text-lg font-semibold tracking-tight">{sales.length ? "Ainda sem documentos neste período." : "Tudo começa com o primeiro PDF."}</h3><p className="mx-auto mt-2 max-w-sm text-sm leading-relaxed text-[#86868b]">{sales.length ? "Escolha outro mês ou ajuste os filtros para consultar as suas encomendas." : "Importe um orçamento ou uma simulação. Os dados ficam organizados automaticamente."}</p></div>}

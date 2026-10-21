@@ -1,7 +1,8 @@
+import { sameQuoteCustomer } from "@/lib/admin/quote-groups.mjs";
 import { customerEmail } from "@/lib/admin/customer-email.mjs";
 import { NextResponse } from "next/server";
 import { assertSession, assertOrigin } from "@/lib/admin/auth.mjs";
-import { listSales, createSale, addSaleImage, deleteSale, storageMode } from "@/lib/admin/store.mjs";
+import { listSales, createSale, addSaleImage, deleteSale, getSale, getSaleImage, storageMode } from "@/lib/admin/store.mjs";
 import { parseSalePdf } from "@/lib/admin/pdf.mjs";
 
 export const runtime = "nodejs";
@@ -36,7 +37,23 @@ export async function POST(request) {
     }
     const buffer = Buffer.from(await file.arrayBuffer());
     const record = await parseSalePdf(buffer, file.name);
+    const duplicateSourceId = String(data.get("duplicateSourceId") || "");
+    const duplicateSource = duplicateSourceId ? await getSale(duplicateSourceId) : null;
+    if (duplicateSource && !sameQuoteCustomer(duplicateSource, record)) return NextResponse.json({ error: "A cópia deve manter o cliente do orçamento original." }, { status: 400 });
     const sale = await createSale({ ...record, entryOrigin: "admin", ...(email ? { orderDetails: { email } } : {}) }, buffer);
+    if (duplicateSource) {
+      try {
+        const images = [];
+        for (const original of duplicateSource.images || []) {
+          const saved = await getSaleImage(duplicateSource.id, original.id);
+          images.push(await addSaleImage(sale.id, original.fileName || "desenho.jpg", original.contentType, saved.buffer));
+        }
+        sale.images = images;
+      } catch (error) {
+        await deleteSale(sale.id);
+        throw error;
+      }
+    }
     if (!image) return NextResponse.json({ sale }, { status: 201, headers: { "Cache-Control": "no-store" } });
     try {
       const savedImage = await addSaleImage(sale.id, image.name, image.type, Buffer.from(await image.arrayBuffer()));

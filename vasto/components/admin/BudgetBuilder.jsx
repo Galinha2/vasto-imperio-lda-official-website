@@ -12,13 +12,12 @@ import QuoteEmailButton from "./QuoteEmailButton";
 import generateBudgetPdf from "@/lib/generateBudgetPdf";
 import { MdOutlineDelete } from "react-icons/md";
 
-export default function BudgetBuilder({ editSaleId = "" }) {
+export default function BudgetBuilder({ editSaleId = "", duplicateSaleId = "" }) {
   const [linhas, setLinhas] = useState([
     { produto: null, preco: 0, unidades: 0, total: 0, refCompleta: "", isPortes: false },
   ]);
   const [openProdutoIndex, setOpenProdutoIndex] = useState(null);
   const [descontoSelecionado, setDescontoSelecionado] = useState(0);
-  const [copiado, setCopiado] = useState(false);
   const [pesquisaProduto, setPesquisaProduto] = useState("");
   const [emailCliente, setEmailCliente] = useState("");
   const [nif, setNif] = useState("");
@@ -29,26 +28,29 @@ export default function BudgetBuilder({ editSaleId = "" }) {
   const [sendingToSales, setSendingToSales] = useState(false);
 
   const quoteNumberRef = useRef(null);
+  const [duplicateRecord, setDuplicateRecord] = useState(null);
+  const sourceSaleId = editSaleId || duplicateSaleId;
   const [editingRecord, setEditingRecord] = useState(null);
-  const [loadingQuote, setLoadingQuote] = useState(!!editSaleId);
+  const [loadingQuote, setLoadingQuote] = useState(!!sourceSaleId);
   const [quoteLoadError, setQuoteLoadError] = useState("");
   useEffect(() => {
-    if (!editSaleId) return;
+    if (!sourceSaleId) return;
     let active = true;
     setLoadingQuote(true); setQuoteLoadError("");
-    fetch(`/api/admin/sales/${encodeURIComponent(editSaleId)}/quote`, { cache: "no-store" })
+    fetch(`/api/admin/sales/${encodeURIComponent(sourceSaleId)}/quote`, { cache: "no-store" })
       .then(async (response) => { const result = await response.json(); if (!response.ok) throw new Error(result.error); return result; })
       .then(({ record, lines, discount }) => {
         if (!active) return;
-        quoteNumberRef.current = record.quoteNumber || quoteNumberRef.current;
-        setEditingRecord(record); setLinhas(lines); setDescontoSelecionado(discount);
+        quoteNumberRef.current = duplicateSaleId ? null : record.quoteNumber || null;
+        if (duplicateSaleId) setDuplicateRecord(record); else setEditingRecord(record);
+        setLinhas(lines); setDescontoSelecionado(discount);
         setEmailCliente(record.orderDetails?.email || "");
         setNif(record.nif || ""); setNomeClienteManual(record.customerName);
         setDadosEmpresa({ nome: record.customerName, nif: record.nif, codigoPostal: record.orderDetails?.moradaFiscal || "" });
       }).catch((error) => { if (active) setQuoteLoadError(error.message); })
       .finally(() => { if (active) setLoadingQuote(false); });
     return () => { active = false; };
-  }, [editSaleId]);
+  }, [sourceSaleId, duplicateSaleId]);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -177,32 +179,7 @@ export default function BudgetBuilder({ editSaleId = "" }) {
     );
   };
 
-  const copiarManual = async () => {
-    const linhasFormatadas = linhas
-      .filter((l) => l.produto && l.unidades > 0)
-      .map((l) => {
-        let nomeCompacto = l.produto
-          .replace(/\s+/g, " ")
-          .replace(/ x /g, "x")
-          .replace(/c\/ /g, "c/");
-        return `- ${nomeCompacto}: ${l.unidades}un x ${l.preco.toFixed(2).replace(".", ",")}€ = ${l.total.toFixed(2).replace(".", ",")}€`;
-      })
-      .join("\n");
-
-    let totaisTexto = `Total Bruto: ${totalSemDesconto.toFixed(2).replace(".", ",")}€`;
-    if (descontoSelecionado > 0)
-      totaisTexto += `\nTotal c/${descontoSelecionado}% Desc: ${totalComDesconto.toFixed(2).replace(".", ",")}€`;
-    totaisTexto += `\nTotal c/IVA: ${totalComIVA.toFixed(2).replace(".", ",")}€`;
-
-    const textoFinal = `${linhasFormatadas}\n\n${totaisTexto}`;
-    await navigator.clipboard.writeText(textoFinal);
-    setCopiado(true);
-    setTimeout(() => {
-      setCopiado(false);
-    }, 1000);
-  };
-
-  const gerarPDF = () => generateBudgetPdf({ quoteNumberRef,
+  const gerarPDF = () => generateBudgetPdf({ quoteNumberRef, quoteType: duplicateRecord?.quoteType || editingRecord?.quoteType || "",
     linhas,
     descontoSelecionado,
     dadosEmpresa,
@@ -219,7 +196,7 @@ export default function BudgetBuilder({ editSaleId = "" }) {
 
     setSendingToSales(true);
     try {
-      const pdf = await generateBudgetPdf({ quoteNumberRef,
+      const pdf = await generateBudgetPdf({ quoteNumberRef, quoteType: duplicateRecord?.quoteType || editingRecord?.quoteType || "",
         source: "orcamento",
         linhas,
         descontoSelecionado,
@@ -232,6 +209,7 @@ export default function BudgetBuilder({ editSaleId = "" }) {
 
       const form = new FormData();
       form.append("email", emailCliente.trim());
+      if (duplicateRecord) form.append("duplicateSourceId", duplicateRecord.id);
       form.append("pdf", pdf, quoteFilename({ lines: linhas, customerName: resolveCustomerName(dadosEmpresa, nomeClienteManual) }));
       if (editingRecord) {
         form.append("updatedAt", editingRecord.updatedAt);
@@ -268,7 +246,7 @@ export default function BudgetBuilder({ editSaleId = "" }) {
         <header className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.16em] text-(--orange)">Área de gestão</p>
-            <h1 className="mt-2 text-3xl font-semibold tracking-[-0.05em] text-[#1d1d1f] sm:text-4xl">{editingRecord ? "Editar orçamento" : "Criar orçamento"}</h1>
+            <h1 className="mt-2 text-3xl font-semibold tracking-[-0.05em] text-[#1d1d1f] sm:text-4xl">{editingRecord ? "Editar orçamento" : duplicateRecord ? "Duplicar orçamento" : "Criar orçamento"}</h1>
             <p className="mt-2 text-sm text-[#6e6e73]">Adicione produtos, indique os dados do cliente e gere a proposta.</p>
           </div>
           <span className="inline-flex w-fit items-center gap-2 rounded-full border border-[#e5e5e7] bg-white px-4 py-2 text-sm font-medium text-[#6e6e73]">
@@ -277,6 +255,7 @@ export default function BudgetBuilder({ editSaleId = "" }) {
           </span>
         </header>
 
+        {duplicateRecord && <p className="rounded-2xl border border-blue-100 bg-blue-50 p-4 text-sm text-blue-800">Cópia do orçamento de <strong>{duplicateRecord.customerName}</strong>. Altere os artigos e guarde para criar um novo orçamento. O original mantém-se. Os desenhos são copiados, mas não são redesenhados quando altera os artigos.</p>}
         {editingRecord && <p className="rounded-2xl border border-orange-100 bg-orange-50 p-4 text-sm text-orange-800">A editar o orçamento de <strong>{editingRecord.customerName}</strong>. Guardar atualiza este registo e o PDF. Os desenhos anexados mantêm-se; não são redesenhados ao alterar os artigos.</p>}
         <section aria-label="Linhas do orçamento" className="admin-surface rounded-[28px] border border-[#e5e5e7] bg-white p-3 shadow-[0_8px_30px_rgba(0,0,0,0.035)] sm:p-5 lg:p-6">
           <div className="mb-4 hidden grid-cols-[minmax(0,1fr)_80px_100px_100px_44px] gap-3 px-3 text-xs font-semibold uppercase tracking-[0.1em] text-[#86868b] sm:grid">
@@ -502,15 +481,6 @@ export default function BudgetBuilder({ editSaleId = "" }) {
             <div className="flex items-center justify-between gap-4"><span>Total com IVA</span><span>{totalComIVA.toFixed(2).replace(".", ",")}€</span></div>
             </div>
             <div className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-3">
-              <button
-                type="button"
-                onClick={copiarManual}
-                className={`${
-                  copiado ? "bg-emerald-600" : "bg-(--blue)"
-                } h-12 cursor-pointer rounded-full px-5 text-sm font-semibold text-white transition-all duration-200 hover:-translate-y-0.5`}
-              >
-                {copiado ? "Texto copiado" : "Copiar Texto"}
-              </button>
 
               <button
                 type="button"
@@ -538,7 +508,7 @@ export default function BudgetBuilder({ editSaleId = "" }) {
               <QuoteEmailButton initialEmail={emailCliente} prepare={async () => {
                 if (loadingNif || (dadosEmpresa?.nome === "NIF não encontrado" && !hasCustomerName(nomeClienteManual))) throw new Error("Confirme os dados do cliente antes de enviar.");
                 if (!linhas.some((line) => line.produto && line.unidades > 0)) throw new Error("Adicione artigos ao orçamento.");
-                const blob = await generateBudgetPdf({ quoteNumberRef, linhas, descontoSelecionado, dadosEmpresa, nif, nomeClienteManual, returnBlob: true });
+                const blob = await generateBudgetPdf({ quoteNumberRef, quoteType: duplicateRecord?.quoteType || editingRecord?.quoteType || "", linhas, descontoSelecionado, dadosEmpresa, nif, nomeClienteManual, returnBlob: true });
                 return [{ blob, name: quoteFilename({ lines: linhas, customerName: resolveCustomerName(dadosEmpresa, nomeClienteManual) }) }];
               }} />
             </div>

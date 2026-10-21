@@ -1,10 +1,11 @@
 import FloorLevelDimension from './FloorLevelDimension';
-export default function ModuleLevelDimensions({ label = "", labelY, activeLevels, yForLevel, thickness, x, floorY, scale, format, english }) {
+export default function ModuleLevelDimensions({ changedOnly = false, label = "", labelY, activeLevels, yForLevel, thickness, x, floorY, scale, format, english }) {
   if (!activeLevels.length) return null;
   return <g pointerEvents="none">
     {label && <text x={x} y={labelY} fill="#777" fontSize="10">{label}</text>}
-    <FloorLevelDimension x={x} floorY={floorY} firstLevelY={yForLevel(activeLevels[0])} scale={scale} format={format} english={english} />
+    {(!changedOnly || activeLevels[0] > 0) && <FloorLevelDimension x={x} floorY={floorY} firstLevelY={yForLevel(activeLevels[0])} scale={scale} format={format} english={english} />}
     {activeLevels.slice(0, -1).map((level, index) => {
+      if (changedOnly && activeLevels[index + 1] === level + 1) return null;
       const top = yForLevel(activeLevels[index + 1]);
       const bottom = yForLevel(level) - thickness;
       if (bottom <= top) return null;

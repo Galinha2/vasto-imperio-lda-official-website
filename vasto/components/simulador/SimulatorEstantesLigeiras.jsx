@@ -1,5 +1,4 @@
 "use client";
-import { levelDimensionGroups } from "@/lib/editable-levels.mjs";
 
 import useEditableLevels from "./useEditableLevels";
 import ModuleLevelDimensions from "./ModuleLevelDimensions";
@@ -141,7 +140,6 @@ function buildModules(targetLength, sameWidth, selectedWidth, { height, depth, l
 
 function ShelfPreview({ activeLevels, levelsForModule, hasRemovedLevels, removeLevel, restoreLevels, modules, height, depth, levels, rowCount, bracedIndexes, capacityLabel, solutions, selectedSolutionId, onSelectSolution, english }) {
   const formatMeters = (value) => `${(value / 1000).toLocaleString(english ? "en-IE" : "pt-PT", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} m`;
-  const dimensionGroups = levelDimensionGroups(modules, levelsForModule);
   const svgWidth = 1200;
   const bottom = 440;
   const totalLength = modules.reduce((sum, value) => sum + value, 0);
@@ -174,7 +172,7 @@ function ShelfPreview({ activeLevels, levelsForModule, hasRemovedLevels, removeL
           <p>{english ? "Click a level to remove it from that module only. Other modules remain unchanged." : "Clique num nível para o retirar apenas desse módulo. As restantes estantes mantêm-se."}</p>
           {hasRemovedLevels && <button type="button" onClick={restoreLevels} className="cursor-pointer rounded-full border border-[#e5e5e7] px-3 py-1.5 font-medium text-[#0879c0]">{english ? "Restore levels" : "Repor níveis"}</button>}
         </div>
-        <svg viewBox={`0 0 ${hasRemovedLevels ? svgWidth : Math.max(svgWidth, right + dimensionGroups.length * 90 + 30)} 545`} role="img" aria-label={english ? `Front view of light-duty shelving with ${modules.length} modules, ${formatMeters(height)} high and ${levels} levels` : `Vista frontal de estantes ligeiras com ${modules.length} módulos, ${formatMeters(height)} de altura e ${levels} níveis`} className="h-auto w-full">
+        <svg viewBox={`0 0 ${Math.max(svgWidth, right + 120)} 545`} role="img" aria-label={english ? `Front view of light-duty shelving with ${modules.length} modules, ${formatMeters(height)} high and ${levels} levels` : `Vista frontal de estantes ligeiras com ${modules.length} módulos, ${formatMeters(height)} de altura e ${levels} níveis`} className="h-auto w-full">
           <defs>
             <linearGradient id="lightFrame" x1="0" x2="1" y1="0" y2="0"><stop offset="0" stopColor="#b8bdc3"/><stop offset="0.28" stopColor="#f4f5f6"/><stop offset="0.55" stopColor="#d5d9dd"/><stop offset="1" stopColor="#aeb4ba"/></linearGradient>
             <linearGradient id="lightShelf" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stopColor="#f8f9fa"/><stop offset="0.36" stopColor="#dfe2e5"/><stop offset="1" stopColor="#c4c9ce"/></linearGradient>
@@ -244,16 +242,16 @@ function ShelfPreview({ activeLevels, levelsForModule, hasRemovedLevels, removeL
           })}
           <text x={svgWidth - 70} y="505" textAnchor="end" fill="#ff5500" fontSize="15" fontWeight="700">{capacityLabel}</text>
           <g transform="translate(70 530)" fontSize="13" fill="#777"><rect width="9" height="9" rx="1" fill="#c5cbd0"/><text x="15" y="9">{english ? "Frame" : "Bastidor"}</text><rect x="105" width="9" height="9" rx="1" fill="#e3e6e9"/><text x="120" y="9">{english ? "Shelf" : "Tabuleiro"}</text><path d="M 220 1 L 229 9 M 220 9 L 229 1" stroke="#92999f" strokeWidth="2"/><text x="236" y="9">{english ? "Brace" : "Travamento"}</text></g>
+          <ModuleLevelDimensions activeLevels={activeLevels} yForLevel={(index) => levelY(index) + shelfHeight / 2} thickness={shelfHeight} x={right + 20} floorY={bottom} scale={scale} format={formatMeters} english={english} />
           {modules.map((length, moduleIndex) => {
             const start = modules.slice(0, moduleIndex).reduce((sum, value) => sum + value, 0);
             const moduleLeft = left + start * scale + frameWidth / 2 + 1;
             const moduleRight = left + (start + length) * scale - frameWidth / 2 - 1;
             const moduleLevels = levelsForModule(moduleIndex);
-            const dimensionIndex = dimensionGroups.findIndex((group) => group.moduleIndexes.includes(moduleIndex));
-            const dimensionGroup = dimensionGroups[dimensionIndex];
+            const moduleEdited = moduleLevels.length < levels;
             const yForLevel = (index) => levelY(index) + shelfHeight / 2;
             return <g key={`module-controls-${moduleIndex}`}>
-              {(hasRemovedLevels || dimensionGroup.moduleIndexes[0] === moduleIndex) && <ModuleLevelDimensions label={!hasRemovedLevels && dimensionGroups.length > 1 ? `${english ? "Module" : "Módulo"} ${dimensionGroup.moduleIndexes.map((index) => index + 1).join(", ")}` : ""} labelY={top - 8} activeLevels={moduleLevels} yForLevel={yForLevel} thickness={shelfHeight} x={hasRemovedLevels ? moduleRight - Math.min(55, (moduleRight - moduleLeft) * 0.35) : right + 20 + dimensionIndex * 90} floorY={bottom} scale={scale} format={formatMeters} english={english} />}
+              {moduleEdited && <ModuleLevelDimensions changedOnly activeLevels={moduleLevels} yForLevel={yForLevel} thickness={shelfHeight} x={moduleRight - Math.min(55, (moduleRight - moduleLeft) * 0.35)} floorY={bottom} scale={scale} format={formatMeters} english={english} />}
               <LevelRemovalTargets activeLevels={moduleLevels} yForLevel={(index) => levelY(index)} left={moduleLeft} right={moduleRight} removeLevel={(index) => removeLevel(index, moduleIndex)} english={english} />
             </g>;
           })}

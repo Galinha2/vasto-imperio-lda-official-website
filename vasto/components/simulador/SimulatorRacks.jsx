@@ -1,5 +1,4 @@
 "use client";
-import { levelDimensionGroups } from "@/lib/editable-levels.mjs";
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useLanguage } from "@/components/header/LanguageContext";
@@ -105,7 +104,6 @@ function findBestModules(targetLength, { height, depth, levels, sameBeamLength, 
 
 function RackPreview({ activeLevels, levelsForModule, hasRemovedLevels, removeLevel, restoreLevels, modules, height, depth, levels, rowCount, capacityLabel, solutions, selectedSolutionId, onSelectSolution, english }) {
   const formatMeters = (value) => `${(value / 1000).toLocaleString(english ? "en-IE" : "pt-PT", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} m`;
-  const dimensionGroups = levelDimensionGroups(modules, levelsForModule);
   const width = 1000;
   const bottom = 410;
   const beamLengthTotal = modules.reduce((sum, moduleLength) => sum + moduleLength, 0);
@@ -135,7 +133,7 @@ function RackPreview({ activeLevels, levelsForModule, hasRemovedLevels, removeLe
           <p>{english ? "Click a level to remove it from that module only. Other modules remain unchanged." : "Clique num nível para o retirar apenas desse módulo. As restantes estantes mantêm-se."}</p>
           {hasRemovedLevels && <button type="button" onClick={restoreLevels} className="cursor-pointer rounded-full border border-[#e5e5e7] px-3 py-1.5 font-medium text-[#0879c0]">{english ? "Restore levels" : "Repor níveis"}</button>}
         </div>
-        <svg viewBox={`0 0 ${hasRemovedLevels ? width : Math.max(width, rackRight + dimensionGroups.length * 90 + 30)} 490`} role="img" aria-label={english ? `Front view of an industrial rack row with ${modules.length} modules, ${formatMeters(height)} high, ${levels} levels, repeated ${rowCount} times` : `Vista frontal de uma fila de rack industrial com ${modules.length} módulos, ${formatMeters(height)} de altura, ${levels} níveis e repetida ${rowCount} vezes`} className="h-auto w-full">
+        <svg viewBox={`0 0 ${Math.max(width, rackRight + 120)} 490`} role="img" aria-label={english ? `Front view of an industrial rack row with ${modules.length} modules, ${formatMeters(height)} high, ${levels} levels, repeated ${rowCount} times` : `Vista frontal de uma fila de rack industrial com ${modules.length} módulos, ${formatMeters(height)} de altura, ${levels} níveis e repetida ${rowCount} vezes`} className="h-auto w-full">
           <defs>
             <linearGradient id="rackUprightFinish" x1="0" x2="1" y1="0" y2="0">
               <stop offset="0" stopColor="#07518e" />
@@ -232,15 +230,15 @@ function RackPreview({ activeLevels, levelsForModule, hasRemovedLevels, removeLe
           })}
           <text x={width - 70} y="460" textAnchor="end" fill="#ff5500" fontSize="15" fontWeight="700">{capacityLabel}</text>
           <g transform="translate(70 470)" fontSize="13" fill="#777"><rect width="8" height="8" fill="#1787ff" /><text x="13" y="8">{english ? "Frame" : "Bastidor"}</text><rect x="92" width="8" height="8" fill="#FF5500" /><text x="105" y="8">{english ? "Beam" : "Viga"}</text></g>
+          <ModuleLevelDimensions activeLevels={activeLevels} yForLevel={(index) => levels === 1 ? (top + bottom + beamHeight) / 2 : Math.max(bottom - floorClearance - index * levelGap, index === levels - 1 ? top + topLevelInset : -Infinity)} thickness={beamHeight} x={rackRight + 20} floorY={bottom} scale={scale} format={formatMeters} english={english} />
           {modules.map((length, moduleIndex) => {
             const left = rackLeft + (100 + moduleIndex * 100 + modules.slice(0, moduleIndex).reduce((sum, value) => sum + value, 0)) * scale;
             const right = left + length * scale;
             const moduleLevels = levelsForModule(moduleIndex);
-            const dimensionIndex = dimensionGroups.findIndex((group) => group.moduleIndexes.includes(moduleIndex));
-            const dimensionGroup = dimensionGroups[dimensionIndex];
+            const moduleEdited = moduleLevels.length < levels;
             const yForLevel = (index) => levels === 1 ? (top + bottom + beamHeight) / 2 : Math.max(bottom - floorClearance - index * levelGap, index === levels - 1 ? top + topLevelInset : -Infinity);
             return <g key={`module-controls-${moduleIndex}`}>
-              {(hasRemovedLevels || dimensionGroup.moduleIndexes[0] === moduleIndex) && <ModuleLevelDimensions label={!hasRemovedLevels && dimensionGroups.length > 1 ? `${english ? "Module" : "Módulo"} ${dimensionGroup.moduleIndexes.map((index) => index + 1).join(", ")}` : ""} labelY={top - 8} activeLevels={moduleLevels} yForLevel={yForLevel} thickness={beamHeight} x={hasRemovedLevels ? right - Math.min(55, (right - left) * 0.35) : rackRight + 20 + dimensionIndex * 90} floorY={bottom} scale={scale} format={formatMeters} english={english} />}
+              {moduleEdited && <ModuleLevelDimensions changedOnly activeLevels={moduleLevels} yForLevel={yForLevel} thickness={beamHeight} x={right - Math.min(55, (right - left) * 0.35)} floorY={bottom} scale={scale} format={formatMeters} english={english} />}
               <LevelRemovalTargets activeLevels={moduleLevels} yForLevel={(index) => yForLevel(index) - beamHeight / 2} left={left} right={right} removeLevel={(index) => removeLevel(index, moduleIndex)} english={english} />
             </g>;
           })}

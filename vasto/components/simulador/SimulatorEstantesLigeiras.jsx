@@ -1,7 +1,7 @@
 "use client";
 
 import useEditableLevels from "./useEditableLevels";
-import FloorLevelDimension from "./FloorLevelDimension";
+import ModuleLevelDimensions from "./ModuleLevelDimensions";
 import LevelRemovalTargets from "./LevelRemovalTargets";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useLanguage } from "@/components/header/LanguageContext";
@@ -138,7 +138,7 @@ function buildModules(targetLength, sameWidth, selectedWidth, { height, depth, l
   return bestModules;
 }
 
-function ShelfPreview({ activeLevels, removeLevel, restoreLevels, modules, height, depth, levels, rowCount, bracedIndexes, capacityLabel, solutions, selectedSolutionId, onSelectSolution, english }) {
+function ShelfPreview({ activeLevels, levelsForModule, hasRemovedLevels, removeLevel, restoreLevels, modules, height, depth, levels, rowCount, bracedIndexes, capacityLabel, solutions, selectedSolutionId, onSelectSolution, english }) {
   const formatMeters = (value) => `${(value / 1000).toLocaleString(english ? "en-IE" : "pt-PT", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} m`;
   const svgWidth = 1200;
   const bottom = 440;
@@ -169,8 +169,8 @@ function ShelfPreview({ activeLevels, removeLevel, restoreLevels, modules, heigh
       </div>
       <div className="w-full overflow-hidden">
         <div className="mb-3 flex flex-wrap items-center justify-between gap-2 text-xs text-[#86868b]">
-          <p>{english ? "Click a level to remove it from the entire row. Other levels keep their height." : "Clique num nível para o retirar de toda a fila. Os restantes mantêm a altura."}</p>
-          {activeLevels.length < levels && <button type="button" onClick={restoreLevels} className="cursor-pointer rounded-full border border-[#e5e5e7] px-3 py-1.5 font-medium text-[#0879c0]">{english ? "Restore levels" : "Repor níveis"}</button>}
+          <p>{english ? "Click a level to remove it from that module only. Other modules remain unchanged." : "Clique num nível para o retirar apenas desse módulo. As restantes estantes mantêm-se."}</p>
+          {hasRemovedLevels && <button type="button" onClick={restoreLevels} className="cursor-pointer rounded-full border border-[#e5e5e7] px-3 py-1.5 font-medium text-[#0879c0]">{english ? "Restore levels" : "Repor níveis"}</button>}
         </div>
         <svg viewBox={`0 0 ${svgWidth} 545`} role="img" aria-label={english ? `Front view of light-duty shelving with ${modules.length} modules, ${formatMeters(height)} high and ${levels} levels` : `Vista frontal de estantes ligeiras com ${modules.length} módulos, ${formatMeters(height)} de altura e ${levels} níveis`} className="h-auto w-full">
           <defs>
@@ -229,7 +229,7 @@ function ShelfPreview({ activeLevels, removeLevel, restoreLevels, modules, heigh
                   </g>
                 </g>;
               })}
-              {activeLevels.map((level) => {
+              {levelsForModule(index).map((level) => {
                 const y = levelY(level);
                 return <g key={`shelf-${level}`}>
                   <rect x={x1} y={y - shelfHeight / 2} width={interiorWidth} height={shelfHeight} rx="0.5" fill="url(#lightShelf)" stroke="#c2c7cc" strokeWidth="1"/>
@@ -240,24 +240,19 @@ function ShelfPreview({ activeLevels, removeLevel, restoreLevels, modules, heigh
               <text x={(x1 + x2) / 2} y={bottom + 40} textAnchor="middle" fill="#666" fontSize="14">{formatMeters(moduleWidth)}</text>
             </g>;
           })}
-          <FloorLevelDimension x={right + 20} floorY={bottom} firstLevelY={levelY(activeLevels[0]) + shelfHeight / 2} scale={scale} format={formatMeters} english={english} />
-          {activeLevels.slice(0, -1).map((index, gapIndex) => {
-            const nextIndex = activeLevels[gapIndex + 1];
-            const lowerShelfBottom = levelY(index) - shelfHeight / 2;
-            const upperShelfTop = levelY(nextIndex) + shelfHeight / 2;
-            const dimensionX = right + 20;
-            const gapCenter = (lowerShelfBottom + upperShelfTop) / 2;
-            const clearHeight = Math.max(0, (Math.max(0, lowestShelfCenter - highestShelfCenter) / (levels - 1) * (nextIndex - index) - shelfHeight) / scale);
-            return <g key={`shelf-clearance-${index}`}>
-              <line x1={dimensionX} y1={upperShelfTop} x2={dimensionX} y2={lowerShelfBottom} stroke="#a6a6a6" strokeWidth="1.5"/>
-              <line x1={dimensionX - 4} y1={upperShelfTop} x2={dimensionX + 4} y2={upperShelfTop} stroke="#a6a6a6" strokeWidth="1.5"/>
-              <line x1={dimensionX - 4} y1={lowerShelfBottom} x2={dimensionX + 4} y2={lowerShelfBottom} stroke="#a6a6a6" strokeWidth="1.5"/>
-              <text x={dimensionX + 8} y={gapCenter + 4} fill="#666" fontSize="13">{formatMeters(clearHeight)}</text>
-            </g>;
-          })}
           <text x={svgWidth - 70} y="505" textAnchor="end" fill="#ff5500" fontSize="15" fontWeight="700">{capacityLabel}</text>
           <g transform="translate(70 530)" fontSize="13" fill="#777"><rect width="9" height="9" rx="1" fill="#c5cbd0"/><text x="15" y="9">{english ? "Frame" : "Bastidor"}</text><rect x="105" width="9" height="9" rx="1" fill="#e3e6e9"/><text x="120" y="9">{english ? "Shelf" : "Tabuleiro"}</text><path d="M 220 1 L 229 9 M 220 9 L 229 1" stroke="#92999f" strokeWidth="2"/><text x="236" y="9">{english ? "Brace" : "Travamento"}</text></g>
-          <LevelRemovalTargets activeLevels={activeLevels} yForLevel={(index) => levelY(index)} left={left} right={right} removeLevel={removeLevel} english={english} />
+          {modules.map((length, moduleIndex) => {
+            const start = modules.slice(0, moduleIndex).reduce((sum, value) => sum + value, 0);
+            const moduleLeft = left + start * scale + frameWidth / 2 + 1;
+            const moduleRight = left + (start + length) * scale - frameWidth / 2 - 1;
+            const moduleLevels = levelsForModule(moduleIndex);
+            const yForLevel = (index) => levelY(index) + shelfHeight / 2;
+            return <g key={`module-controls-${moduleIndex}`}>
+              <ModuleLevelDimensions activeLevels={moduleLevels} yForLevel={yForLevel} thickness={shelfHeight} x={moduleRight - Math.min(55, (moduleRight - moduleLeft) * 0.35)} floorY={bottom} scale={scale} format={formatMeters} english={english} />
+              <LevelRemovalTargets activeLevels={moduleLevels} yForLevel={(index) => levelY(index)} left={moduleLeft} right={moduleRight} removeLevel={(index) => removeLevel(index, moduleIndex)} english={english} />
+            </g>;
+          })}
         </svg>
       </div>
       <p className="mt-2 text-xs leading-relaxed text-[#86868b] sm:text-sm">{english ? "Each level includes one shelf. The marked braces reinforce the structure." : "Cada nível inclui um tabuleiro. Os travamentos assinalados reforçam a estrutura."}</p>
@@ -280,7 +275,7 @@ export default function SimulatorEstantesLigeiras({ onQuoteDataChange, adminMode
   const [desiredShelfLength, setDesiredShelfLength] = useState(1000);
   const [height, setHeight] = useState(2000);
   const [depth, setDepth] = useState(400);
-  const { levels, setLevels, levelSlots, activeLevels, removeLevel, restoreLevels } = useEditableLevels(4);
+  const { levels, setLevels, levelSlots, activeLevels, levelsForModule, hasRemovedLevels, removedKey, removeLevel, restoreLevels } = useEditableLevels(4);
   const [selectedSolutionId, setSelectedSolutionId] = useState("chosen");
   const enteredLength = Number(desiredLength);
   const isLengthUnavailable = enteredLength > 30;
@@ -294,7 +289,7 @@ export default function SimulatorEstantesLigeiras({ onQuoteDataChange, adminMode
     const moduleCost = candidate.reduce((sum, width, index) => {
       const shelf = productForWidth(shelves, width, depth);
       const braceCount = candidateBracedIndexes.includes(index) ? bracesInBay(index, candidate.length, height) : 0;
-      return sum + priceOf(shelf) * levels + priceOf(braces.find((item) => item.width === width)) * braceCount;
+      return sum + priceOf(shelf) * levelsForModule(index).length + priceOf(braces.find((item) => item.width === width)) * braceCount;
     }, 0);
     const gross = (frameCost + moduleCost) * rowCount;
     const rate = gross >= 2600 ? 0.15 : gross >= 1900 ? 0.10 : gross >= 1000 ? 0.05 : 0;
@@ -306,17 +301,18 @@ export default function SimulatorEstantesLigeiras({ onQuoteDataChange, adminMode
     getPrice: estimateModules,
     step: 125,
     maxSteps: 80,
-  }), [baseModules, targetLength, fixedShelfLength, desiredShelfLength, height, depth, levels, rowCount]);
+  }), [removedKey, baseModules, targetLength, fixedShelfLength, desiredShelfLength, height, depth, levels, rowCount]);
   const configKey = [desiredLength, rowCount, fixedShelfLength, desiredShelfLength, height, depth, levels].join("|");
   useEffect(() => setSelectedSolutionId("chosen"), [configKey]);
   const modules = solutions.find((solution) => solution.id === selectedSolutionId)?.modules ?? baseModules;
+  useEffect(() => restoreLevels(), [modules.join(","), height, depth, rowCount, restoreLevels]);
   const bracedIndexes = useMemo(() => bracedBayIndexes(modules.length), [modules.length]);
   const shelfProducts = modules.map((width) => productForWidth(shelves, width, depth));
   const frameCountPerRow = modules.length + 1;
   const estimatePerRow = priceOf(matchingFrame) * frameCountPerRow + modules.reduce((sum, width, index) => {
     const braceCount = bracedIndexes.includes(index) ? bracesInBay(index, modules.length, height) : 0;
     const braceProduct = braces.find((item) => item.width === width);
-    return sum + priceOf(shelfProducts[index]) * levels + priceOf(braceProduct) * braceCount;
+    return sum + priceOf(shelfProducts[index]) * levelsForModule(index).length + priceOf(braceProduct) * braceCount;
   }, 0);
   const estimate = estimatePerRow * rowCount;
   const suggestedDiscountRate = estimate >= 2600 ? 0.15 : estimate >= 1900 ? 0.10 : estimate >= 1000 ? 0.05 : 0;
@@ -327,7 +323,7 @@ export default function SimulatorEstantesLigeiras({ onQuoteDataChange, adminMode
   const discountedEstimate = estimate - discountAmount;
   const finalLength = modules.reduce((sum, value) => sum + value, 0);
   const widthDistribution = widths.map((width) => ({ width, count: modules.filter((item) => item === width).length })).filter((item) => item.count > 0);
-  const shelfDistribution = widthDistribution.map(({ width, count }) => ({ width, count: count * levels * rowCount }));
+  const shelfDistribution = widthDistribution.map(({ width, count }) => ({ width, count: modules.reduce((sum, moduleWidth, index) => sum + (moduleWidth === width ? levelsForModule(index).length : 0), 0) * rowCount }));
   const braceDistribution = widthDistribution.map(({ width }) => ({
     width,
     count: modules.reduce((sum, moduleWidth, index) => (
@@ -346,12 +342,12 @@ export default function SimulatorEstantesLigeiras({ onQuoteDataChange, adminMode
       items: createQuoteLines(entries, 1),
       discountPercent: discountRate * 100,
       total: discountedEstimate,
-      details: `Estantes de carga ligeira · Comprimento por fila: ${format(finalLength)} m · Comprimento total: ${format(finalLength * rowCount)} m · Altura: ${format(height)} m · Profundidade: ${format(depth)} m · Níveis: ${levels} (posições mantidas, de baixo para cima: ${activeLevels.map((index) => index + 1).join(", ")} de ${levelSlots}) · Linhas de estantes lado a lado: ${rowCount} · Tabuleiros: ${shelfDistribution.map(({ width, count }) => `${count} × ${format(width)} m`).join(", ")} · Travamentos: ${braceDistribution.map(({ width, count }) => `${count} × ${format(width)} m`).join(", ") || "nenhum"} · Carga máxima por nível: ${shelfCapacity.toLocaleString("pt-PT")} kg`,
+      details: `Estantes de carga ligeira · Comprimento por fila: ${format(finalLength)} m · Comprimento total: ${format(finalLength * rowCount)} m · Altura: ${format(height)} m · Profundidade: ${format(depth)} m · Níveis: ${levels} (posições de baixo para cima por módulo: ${modules.map((_, moduleIndex) => `${moduleIndex + 1}: ${levelsForModule(moduleIndex).map((index) => index + 1).join("/")}`).join("; ")} de ${levelSlots}) · Níveis por módulo: ${modules.map((_, index) => `${index + 1}: ${levelsForModule(index).length}`).join(", ")} · Linhas de estantes lado a lado: ${rowCount} · Tabuleiros: ${shelfDistribution.map(({ width, count }) => `${count} × ${format(width)} m`).join(", ")} · Travamentos: ${braceDistribution.map(({ width, count }) => `${count} × ${format(width)} m`).join(", ") || "nenhum"} · Carga máxima por nível: ${shelfCapacity.toLocaleString("pt-PT")} kg`,
       unavailable: isLengthUnavailable || !matchingFrame || modules.length === 0,
     };
     orderQuoteRef.current = quote;
     onQuoteDataChange?.(quote);
-  }, [activeLevels.join(","), levelSlots, onQuoteDataChange, matchingFrame, frameCountPerRow, rowCount, shelfDistribution, braceDistribution, discountRate, discountedEstimate, finalLength, height, depth, levels, shelfCapacity, isLengthUnavailable, modules.length]);
+  }, [removedKey, activeLevels.join(","), levelSlots, onQuoteDataChange, matchingFrame, frameCountPerRow, rowCount, shelfDistribution, braceDistribution, discountRate, discountedEstimate, finalLength, height, depth, levels, shelfCapacity, isLengthUnavailable, modules.length]);
 
   function reset() {
     setDesiredLength("1.00"); setRowCount(1); setSameShelfLength(false); setDesiredShelfLength(1000); setHeight(2000); setDepth(400); setLevels(4);
@@ -403,7 +399,7 @@ export default function SimulatorEstantesLigeiras({ onQuoteDataChange, adminMode
           </div><p className="mt-4 text-xs leading-relaxed text-[#86868b]">{english ? "VAT is added at the applicable rate. Delivery is not included. Configuration is subject to technical validation." : "Ao valor acresce IVA à taxa legal. Transporte não incluído. Configuração sujeita a validação técnica."}</p>
         </div>
         <div className="order-1 min-w-0 space-y-4 lg:order-2">
-          <ShelfPreview modules={modules} height={height} depth={depth} levels={levelSlots} activeLevels={activeLevels} removeLevel={removeLevel} restoreLevels={restoreLevels} rowCount={rowCount} bracedIndexes={bracedIndexes} capacityLabel={`${english ? "Maximum load per level" : "Carga máxima por nível"}: ${shelfCapacity.toLocaleString(english ? "en-IE" : "pt-PT")} kg`} solutions={solutions} selectedSolutionId={selectedSolutionId} onSelectSolution={setSelectedSolutionId} english={english}/>
+          <ShelfPreview modules={modules} height={height} depth={depth} levels={levelSlots} activeLevels={activeLevels} levelsForModule={levelsForModule} hasRemovedLevels={hasRemovedLevels} removeLevel={removeLevel} restoreLevels={restoreLevels} rowCount={rowCount} bracedIndexes={bracedIndexes} capacityLabel={`${english ? "Maximum load per level" : "Carga máxima por nível"}: ${shelfCapacity.toLocaleString(english ? "en-IE" : "pt-PT")} kg`} solutions={solutions} selectedSolutionId={selectedSolutionId} onSelectSolution={setSelectedSolutionId} english={english}/>
           {adminMode && adminPanel}
         </div>
       </div>

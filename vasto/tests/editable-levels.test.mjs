@@ -21,3 +21,27 @@ test("a row keeps at least one level and repeated or invalid removals are ignore
   assert.equal(editLevels(state,{type:"remove",index:0}),state);
   assert.equal(editLevels(state,{type:"remove",index:9}),state);
 });
+
+test('removing one module level preserves every other module and original level positions', async () => {
+  const { moduleLevels, removeModuleLevel } = await import('../lib/editable-levels.mjs');
+  const initial = { slots: 4, modules: {} };
+  const updated = removeModuleLevel(initial, 1, 0);
+  assert.deepEqual(moduleLevels(updated, 0), [0, 1, 2, 3]);
+  assert.deepEqual(moduleLevels(updated, 1), [1, 2, 3]);
+  assert.deepEqual(moduleLevels(updated, 2), [0, 1, 2, 3]);
+  assert.deepEqual(moduleLevels(initial, 1), [0, 1, 2, 3]);
+  const counts = [0, 1, 2].map((index) => moduleLevels(updated, index).length);
+  assert.equal(counts.reduce((sum, count) => sum + count * 2, 0), 22); // 24 original beams, only one pair removed.
+  assert.equal(counts.reduce((sum, count) => sum + count * 4, 0), 44); // Only the four matching safety brakes removed.
+});
+test('module level edits reject invalid targets and keep at least one level per module', async () => {
+  const { moduleLevels, removeModuleLevel } = await import('../lib/editable-levels.mjs');
+  const initial = { slots: 3, modules: {} };
+  let updated = removeModuleLevel(initial, 0, 1);
+  assert.equal(removeModuleLevel(updated, 0, 1), updated);
+  updated = removeModuleLevel(updated, 0, 2);
+  assert.deepEqual(moduleLevels(updated, 0), [0]);
+  assert.equal(removeModuleLevel(updated, 0, 0), updated);
+  assert.equal(removeModuleLevel(updated, -1, 0), updated);
+  assert.deepEqual(moduleLevels(updated, 1), [0, 1, 2]);
+});

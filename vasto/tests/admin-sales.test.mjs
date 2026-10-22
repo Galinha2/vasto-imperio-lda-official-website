@@ -147,7 +147,7 @@ test("actual shared PDF generator round trip, including discount and delivery", 
   function RecordingPdf(options) { generatedDocument = new jsPDF(options); return generatedDocument; }
   const generate = new Function("jsPDF", "autoTable", "window", "resolveCustomerName", "quoteFilename", `${source}; return generateBudgetPdf;`)(RecordingPdf, autoTable, { Image: LocalImage }, resolveCustomerName, quoteFilename);
   try {
-    const blob = await generate({ quoteNumber: "23123", linhas: [{ produto: "Bastidor", refCompleta: "3.1", preco: 100, unidades: 2, total: 200, isPortes: false }, { produto: "Portes", preco: 20, unidades: 1, total: 20, isPortes: true }], descontoSelecionado: 10, dadosEmpresa: { nome: "João & Companhia", nif: "123456789", codigoPostal: "2475-014 Benedita" }, nif: "123456789", nomeClienteManual: "", additionalDetails: "Configuração técnica que não deve aparecer no PDF", returnBlob: true, source: "simulador" });
+    const blob = await generate({ telefoneCliente: "+351 928348117", quoteNumber: "23123", linhas: [{ produto: "Bastidor", refCompleta: "3.1", preco: 100, unidades: 2, total: 200, isPortes: false }, { produto: "Portes", preco: 20, unidades: 1, total: 20, isPortes: true }], descontoSelecionado: 10, dadosEmpresa: { nome: "João & Companhia", nif: "123456789", codigoPostal: "2475-014 Benedita" }, nif: "123456789", nomeClienteManual: "", additionalDetails: "Configuração técnica que não deve aparecer no PDF", returnBlob: true, source: "simulador" });
     const record = await parseSalePdf(Buffer.from(await blob.arrayBuffer()), "gerador-real.pdf");
     const pdfjs = require("pdfjs-dist/legacy/build/pdf.js");
     const task = pdfjs.getDocument({ data: new Uint8Array(await blob.arrayBuffer()), useSystemFonts:true });
@@ -156,10 +156,12 @@ test("actual shared PDF generator round trip, including discount and delivery", 
       const visible = [];
       for (let page=1; page<=document.numPages; page++) visible.push(...(await (await document.getPage(page)).getTextContent()).items.map((item)=>item.str));
       assert.ok(visible.join(" ").includes("Orçamento 23123"));
+      assert.ok(visible.join(" ").includes("Contacto: +351 928348117"));
       assert.ok(!visible.join(" ").includes("Configuração técnica"));
     } finally { await task.destroy(); }
 
     assert.equal(record.quoteNumber, "23123");
+    assert.equal(record.customerPhone, "+351 928348117");
     assert.equal(record.customerName, "João & Companhia"); assert.equal(record.source, "simulador");
     assert.equal(record.subtotal, 200); assert.equal(record.vat, 46); assert.equal(record.total, 246);
     generatedDocument.setProperties({ subject: "" });
@@ -508,8 +510,9 @@ test("editing keeps the sale identity, workflow and images while updating totals
   assert.deepEqual(await editableQuote(before, pdf), { lines, discount: 10 });
   const changed = [{ ...lines[0], unidades: 3, total: 300 }];
   const revisedPdf = pdfWithMetadata({ ...metadata, customerName: "Editar teste", subtotal: 270, vat: 62.1, total: 332.1, quoteLines: changed, discountPercent: 10 });
-  const after = await reviseSaleQuote(before.id, revisedPdf, before.updatedAt, changed, 10, "cliente@example.com");
+  const after = await reviseSaleQuote(before.id, revisedPdf, before.updatedAt, changed, 10, "cliente@example.com", "+351 928348117");
   assert.equal((await getSale(before.id)).orderDetails.email, "cliente@example.com");
+  assert.equal((await getSale(before.id)).orderDetails.telefone, "+351 928348117");
   assert.equal(after.id, before.id);
   assert.equal(after.status, before.status);
   assert.equal(after.entryOrigin, "admin");

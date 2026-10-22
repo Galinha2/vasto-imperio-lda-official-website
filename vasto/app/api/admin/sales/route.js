@@ -1,4 +1,5 @@
 import { sameQuoteCustomer } from "@/lib/admin/quote-groups.mjs";
+import { customerPhone } from "@/lib/admin/customer-phone.mjs";
 import { customerEmail } from "@/lib/admin/customer-email.mjs";
 import { NextResponse } from "next/server";
 import { assertSession, assertOrigin } from "@/lib/admin/auth.mjs";
@@ -27,6 +28,7 @@ export async function POST(request) {
     storageMode();
     const data = await request.formData();
     const email = customerEmail(data.get("email"));
+    const phone = data.has("telefone") ? customerPhone(data.get("telefone")) : undefined;
     const file = data.get("pdf");
     if (!file || typeof file.arrayBuffer !== "function" || file.size > 6 * 1024 * 1024) {
       return NextResponse.json({ error: "Escolha um ficheiro PDF com até 6 MB." }, { status: 400 });
@@ -40,7 +42,7 @@ export async function POST(request) {
     const duplicateSourceId = String(data.get("duplicateSourceId") || "");
     const duplicateSource = duplicateSourceId ? await getSale(duplicateSourceId) : null;
     if (duplicateSource && !sameQuoteCustomer(duplicateSource, record)) return NextResponse.json({ error: "A cópia deve manter o cliente do orçamento original." }, { status: 400 });
-    const sale = await createSale({ ...record, entryOrigin: "admin", ...(email ? { orderDetails: { email } } : {}) }, buffer);
+    const sale = await createSale({ ...record, entryOrigin: "admin", orderDetails: { ...(email ? { email } : {}), telefone: phone ?? record.customerPhone ?? "" } }, buffer);
     if (duplicateSource) {
       try {
         const images = [];

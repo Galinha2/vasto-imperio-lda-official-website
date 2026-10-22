@@ -19,6 +19,7 @@ export default function BudgetBuilder({ editSaleId = "", duplicateSaleId = "" })
   const [openProdutoIndex, setOpenProdutoIndex] = useState(null);
   const [descontoSelecionado, setDescontoSelecionado] = useState(0);
   const [pesquisaProduto, setPesquisaProduto] = useState("");
+  const [telefoneCliente, setTelefoneCliente] = useState("");
   const [emailCliente, setEmailCliente] = useState("");
   const [nif, setNif] = useState("");
   const [nomeClienteManual, setNomeClienteManual] = useState("");
@@ -45,6 +46,7 @@ export default function BudgetBuilder({ editSaleId = "", duplicateSaleId = "" })
         if (duplicateSaleId) setDuplicateRecord(record); else setEditingRecord(record);
         setLinhas(lines); setDescontoSelecionado(discount);
         setEmailCliente(record.orderDetails?.email || "");
+        setTelefoneCliente(record.orderDetails?.telefone ?? record.customerPhone ?? "");
         setNif(record.nif || ""); setNomeClienteManual(record.customerName);
         setDadosEmpresa({ nome: record.customerName, nif: record.nif, codigoPostal: record.orderDetails?.moradaFiscal || "" });
       }).catch((error) => { if (active) setQuoteLoadError(error.message); })
@@ -64,7 +66,7 @@ export default function BudgetBuilder({ editSaleId = "", duplicateSaleId = "" })
   const nifLookupVersion = useRef(0);
   const selectCustomer = (customer) => {
     nifLookupVersion.current++;
-    setEmailCliente(customer.email || "");
+    setEmailCliente(customer.email || ""); setTelefoneCliente(customer.phone || "");
     setNif(customer.nif); setNomeClienteManual(customer.name); setLoadingNif(false);
     setDadosEmpresa({ nome: customer.name, nif: customer.nif, codigoPostal: customer.address });
   };
@@ -179,7 +181,7 @@ export default function BudgetBuilder({ editSaleId = "", duplicateSaleId = "" })
     );
   };
 
-  const gerarPDF = () => generateBudgetPdf({ quoteNumberRef, quoteType: duplicateRecord?.quoteType || editingRecord?.quoteType || "",
+  const gerarPDF = () => generateBudgetPdf({ quoteNumberRef, telefoneCliente, quoteType: duplicateRecord?.quoteType || editingRecord?.quoteType || "",
     linhas,
     descontoSelecionado,
     dadosEmpresa,
@@ -196,7 +198,7 @@ export default function BudgetBuilder({ editSaleId = "", duplicateSaleId = "" })
 
     setSendingToSales(true);
     try {
-      const pdf = await generateBudgetPdf({ quoteNumberRef, quoteType: duplicateRecord?.quoteType || editingRecord?.quoteType || "",
+      const pdf = await generateBudgetPdf({ quoteNumberRef, telefoneCliente, quoteType: duplicateRecord?.quoteType || editingRecord?.quoteType || "",
         source: "orcamento",
         linhas,
         descontoSelecionado,
@@ -209,6 +211,7 @@ export default function BudgetBuilder({ editSaleId = "", duplicateSaleId = "" })
 
       const form = new FormData();
       form.append("email", emailCliente.trim());
+      form.append("telefone", telefoneCliente.trim());
       if (duplicateRecord) form.append("duplicateSourceId", duplicateRecord.id);
       form.append("pdf", pdf, quoteFilename({ lines: linhas, customerName: resolveCustomerName(dadosEmpresa, nomeClienteManual) }));
       if (editingRecord) {
@@ -453,6 +456,7 @@ export default function BudgetBuilder({ editSaleId = "", duplicateSaleId = "" })
                 <span className="text-xs mt-1">A procurar dados...</span>
               )}
               <input type="email" value={emailCliente} onChange={(event) => setEmailCliente(event.target.value)} placeholder="Email do cliente (opcional)" aria-label="Email do cliente" className="h-12 w-full rounded-full border border-[#e5e5e7] bg-[#f5f5f7] px-4 text-sm outline-none focus:border-[#0879c0]" />
+              <input type="tel" autoComplete="tel" maxLength={80} value={telefoneCliente} onChange={(event) => setTelefoneCliente(event.target.value)} placeholder="Telemóvel do cliente (opcional)" aria-label="Telemóvel do cliente" className="h-12 w-full rounded-full border border-[#e5e5e7] bg-[#f5f5f7] px-4 text-sm outline-none focus:border-[#0879c0]" />
               {dadosEmpresa && !loadingNif && !hasCustomerName(dadosEmpresa.nome) && <p className="text-xs leading-relaxed text-[#86868b]">Não foi encontrado um nome para este NIF. Escreva o nome do cliente no campo acima; será usado no orçamento e guardado nas vendas.</p>}
               {dadosEmpresa && !loadingNif && (
                 <div className="mt-1 rounded-2xl border border-[#e5e5e7] bg-[#f5f5f7] p-4 text-sm text-[#6e6e73]">
@@ -508,7 +512,7 @@ export default function BudgetBuilder({ editSaleId = "", duplicateSaleId = "" })
               <QuoteEmailButton initialEmail={emailCliente} prepare={async () => {
                 if (loadingNif || (dadosEmpresa?.nome === "NIF não encontrado" && !hasCustomerName(nomeClienteManual))) throw new Error("Confirme os dados do cliente antes de enviar.");
                 if (!linhas.some((line) => line.produto && line.unidades > 0)) throw new Error("Adicione artigos ao orçamento.");
-                const blob = await generateBudgetPdf({ quoteNumberRef, quoteType: duplicateRecord?.quoteType || editingRecord?.quoteType || "", linhas, descontoSelecionado, dadosEmpresa, nif, nomeClienteManual, returnBlob: true });
+                const blob = await generateBudgetPdf({ quoteNumberRef, telefoneCliente, quoteType: duplicateRecord?.quoteType || editingRecord?.quoteType || "", linhas, descontoSelecionado, dadosEmpresa, nif, nomeClienteManual, returnBlob: true });
                 return [{ blob, name: quoteFilename({ lines: linhas, customerName: resolveCustomerName(dadosEmpresa, nomeClienteManual) }) }];
               }} />
             </div>

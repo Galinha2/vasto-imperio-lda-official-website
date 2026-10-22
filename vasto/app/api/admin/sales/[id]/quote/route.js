@@ -19,7 +19,7 @@ export async function PUT(request, { params }) {
     const form = await request.formData();
     const pdf = form.get("pdf");
     if (!pdf || typeof pdf.arrayBuffer !== "function" || pdf.size > 6 * 1024 * 1024) return NextResponse.json({ error: "PDF inválido ou demasiado grande." }, { status: 400 });
-    const sale = await reviseSaleQuote((await params).id, Buffer.from(await pdf.arrayBuffer()), form.get("updatedAt"), JSON.parse(String(form.get("lines"))), Number(form.get("discount")), form.has("email") ? form.get("email") : undefined);
+    const sale = await reviseSaleQuote((await params).id, Buffer.from(await pdf.arrayBuffer()), form.get("updatedAt"), JSON.parse(String(form.get("lines"))), Number(form.get("discount")), form.has("email") ? form.get("email") : undefined, form.has("telefone") ? form.get("telefone") : undefined);
     return NextResponse.json({ sale });
   } catch (error) { return failure(error); }
 }

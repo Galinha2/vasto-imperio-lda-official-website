@@ -26,6 +26,7 @@ export default function SimulatorAdmin() {
   const [mensagem, setMensagem] = useState("");
   const [mensagemSucesso, setMensagemSucesso] = useState(false);
   const [quoteData, setQuoteData] = useState(null);
+  const [telefoneCliente, setTelefoneCliente] = useState("");
   const [emailCliente, setEmailCliente] = useState("");
   const [nomeCliente, setNomeCliente] = useState("");
   const [savedCustomer, setSavedCustomer] = useState(null);
@@ -119,6 +120,7 @@ export default function SimulatorAdmin() {
     }
     return {
       quoteNumberRef,
+      telefoneCliente,
       source: "simulador",
       quoteType: simuladorAtivo,
       additionalDetails: quoteData.details || "",
@@ -187,6 +189,7 @@ export default function SimulatorAdmin() {
       const nomeBase = `simulacao-${simuladorAtivo}-${new Date().toISOString().slice(0, 10)}`;
       const form = new FormData();
       form.append("email", emailCliente.trim());
+      form.append("telefone", telefoneCliente.trim());
       form.append("pdf", pdf, quoteFilename({ quoteType: simuladorAtivo, customerName: resolveCustomerName(dadosEmpresa, nomeCliente) }));
       form.append("image", imagemBlob, quoteFilename({ quoteType: simuladorAtivo, customerName: resolveCustomerName(dadosEmpresa, nomeCliente) }, "Desenho", "jpg"));
       const response = await fetch("/api/admin/sales", { method: "POST", body: form, cache: "no-store" });
@@ -219,7 +222,8 @@ export default function SimulatorAdmin() {
       setPesquisaProdutoExtra={setPesquisaProdutoExtra}
       produtosCatalogo={produtosCatalogo}
       emailCliente={emailCliente} setEmailCliente={setEmailCliente}
-      onCustomerSelect={(customer) => { setEmailCliente(customer.email || ""); setSavedCustomer(customer); setNomeCliente(customer.name); setNifCliente(customer.nif); }}
+      telefoneCliente={telefoneCliente} setTelefoneCliente={setTelefoneCliente}
+      onCustomerSelect={(customer) => { setEmailCliente(customer.email || ""); setTelefoneCliente(customer.phone || ""); setSavedCustomer(customer); setNomeCliente(customer.name); setNifCliente(customer.nif); }}
       nomeCliente={nomeCliente}
       setNomeCliente={setNomeCliente}
       nifCliente={nifCliente}

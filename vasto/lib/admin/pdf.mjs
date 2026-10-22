@@ -1,3 +1,4 @@
+import { customerPhone } from "./customer-phone.mjs";
 import { createRequire } from "node:module";
 import { createHash } from "node:crypto";
 
@@ -17,6 +18,7 @@ function validate(data) {
     if (![data.subtotal, data.vat, data.total].every((value) => typeof value === "number" && Number.isFinite(value) && value >= 0 && value < 1e10)) throw new Error();
     if (Math.abs(round(data.subtotal + data.vat) - data.total) > 0.03) throw new Error();
     return {
+      ...(data.customerPhone && { customerPhone: customerPhone(data.customerPhone) }),
       ...(/^\d{1,20}$/.test(String(data.quoteNumber || "")) && { quoteNumber: String(data.quoteNumber) }),
       ...(typeof data.quoteCreatedAt === "string" && Number.isFinite(Date.parse(data.quoteCreatedAt)) && { quoteCreatedAt: new Date(data.quoteCreatedAt).toISOString() }),
       ...(typeof data.quoteDetails === "string" && { quoteDetails: data.quoteDetails.slice(0, 4000) }),

@@ -4,6 +4,8 @@ import { groupQuotes, sameQuoteCustomer } from "@/lib/admin/quote-groups.mjs";
 import { isSaleInactive, lastSaleActivity } from "@/lib/admin/sale-activity.mjs";
 import QuoteCombinationDialog from "./QuoteCombinationDialog";
 import SaleActions from "./SaleActions";
+import CustomerPhoneButton from "./CustomerPhoneButton";
+import CustomerNotesButton from "./CustomerNotesButton";
 import styles from "./SalesDashboard.module.css";
 import MetricCard from "./MetricCard";
 
@@ -1038,9 +1040,12 @@ export default function SalesDashboard() {
                           <td className="px-3 py-5">
                             <div className="flex items-center gap-2">
                               <button type="button" aria-expanded={imagePanel === sale.id} aria-label={`${imagePanel === sale.id ? "Fechar" : "Ver"} PDF e desenhos de ${sale.customerName}`} onClick={() => setImagePanel((current) => current === sale.id ? "" : sale.id)} className="flex min-w-0 cursor-pointer items-center gap-2 text-left text-sm font-semibold tracking-tight hover:text-[#0879c0]"><span className="truncate">{sale.customerName}</span><IoChevronDownOutline aria-hidden="true" className={`shrink-0 text-xs text-[#a1a1a6] transition-transform ${imagePanel === sale.id ? "rotate-180" : ""}`} /></button>
+                              <CustomerPhoneButton inline sale={sale} />
+                              <CustomerNotesButton inline sale={sale} onSaved={(updated) => setSales((current) => current.map((item) => item.id === updated.id ? { ...item, customerNotes: updated.customerNotes, updatedAt: updated.updatedAt } : item))} />
 
                             </div>
                             {quoteGroup.sales.length > 1 && <span className={styles.versionBadge}>Versão {quoteGroup.sales.indexOf(sale) + 1} de {quoteGroup.sales.length}{sale.quoteNumber ? ` · Orçamento ${sale.quoteNumber}` : ""}</span>}
+
                             {(sale.quoteDetails || sale.orderDetails?.detalhes) && <p className="mt-2 line-clamp-3 text-[10px] leading-relaxed text-[#6e6e73]" title={sale.quoteDetails || sale.orderDetails?.detalhes}>{sale.quoteDetails || sale.orderDetails?.detalhes}</p>}
 
                             <p className="mt-1 truncate text-[11px] text-[#a1a1a6]">{sale.nif ? `${sale.nif} · ` : ""}{sale.fileName}</p>

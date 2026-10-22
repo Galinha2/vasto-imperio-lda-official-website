@@ -9,10 +9,10 @@ export function customerSuggestions(sales, query, field = "name") {
     if (!name || ["cliente", "nif nao encontrado"].includes(normalize(name))) continue;
     const key = nif || normalize(name);
     const details = sale.orderDetails || {};
-    const customer = { name, nif, address: details.moradaFiscal || "", email: details.email || "" };
+    const customer = { name, nif, address: details.moradaFiscal || "", email: details.email || "", phone: details.telefone || sale.customerPhone || "" };
     const existing = customers.get(key);
     if (!existing) customers.set(key, customer);
-    else { existing.address ||= customer.address; existing.email ||= customer.email; }
+    else { existing.address ||= customer.address; existing.email ||= customer.email; existing.phone ||= customer.phone; }
   }
   return [...customers.values()].filter((customer) => normalize(field === "nif" ? customer.nif : customer.name).startsWith(prefix)).slice(0, 8);
 }

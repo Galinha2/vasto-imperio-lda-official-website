@@ -7,7 +7,7 @@ function formatarNumero(valor) {
   return `${inteira.replace(/\B(?=(\d{3})+(?!\d))/g, " ")},${decimal}`;
 }
 
-export default async function generateBudgetPdf({ linhas, descontoSelecionado, dadosEmpresa, nif, nomeClienteManual, additionalDetails = "", returnBlob = false, source = "orcamento", quoteType = "", quoteNumber = "", quoteNumberRef = null }) {
+export default async function generateBudgetPdf({ linhas, descontoSelecionado, dadosEmpresa, nif, nomeClienteManual, additionalDetails = "", returnBlob = false, source = "orcamento", quoteType = "", quoteNumber = "", quoteNumberRef = null, telefoneCliente = "" }) {
     let documentNumber = quoteNumber || quoteNumberRef?.current;
     if (!documentNumber) {
       const reservation = async () => {
@@ -165,6 +165,10 @@ export default async function generateBudgetPdf({ linhas, descontoSelecionado, d
       doc.text(local, offsetClienteX, yCliente, { align: "left" });
       yCliente += 5;
       doc.text(clienteMorada, offsetClienteX, yCliente, { align: "left" });
+      if (telefoneCliente.trim()) {
+        doc.setFontSize(9);
+        doc.text(doc.splitTextToSize(`Contacto: ${telefoneCliente.trim()}`, 78), offsetClienteX, yCliente + 5);
+      }
 
       const yDocumento = yDatas + boxHeight + 10;
       const textoDocumento = "V/ Documento";
@@ -490,6 +494,7 @@ export default async function generateBudgetPdf({ linhas, descontoSelecionado, d
         quoteLines: linhas.filter((line) => line.produto).map((line) => ({ produto: String(line.produto), refCompleta: String(line.refCompleta || ""), unidades: Number(line.unidades), preco: Number(line.preco), total: Number(line.total), isPortes: !!line.isPortes })),
         discountPercent: Number(descontoSelecionado || 0),
         quoteType,
+        customerPhone: telefoneCliente.trim(),
         quoteNumber: documentNumber,
         quoteCreatedAt: new Date().toISOString(),
         quoteDetails: String(additionalDetails || "").slice(0, 4000),

@@ -1,3 +1,4 @@
+import { sameNotesCustomer } from "./customer-notes.mjs";
 import { sameQuoteCustomer } from "./quote-groups.mjs";
 import { mkdir, readdir, readFile, writeFile, rename, unlink } from "node:fs/promises";
 import path from "node:path";
@@ -195,7 +196,7 @@ export async function updateMonthlyCommission(year, month, paid, commissionRate)
   });
 }
 
-export async function listSales() {
+export async function listSales({ includeArchived = false } = {}) {
   if (storageMode() === "cloud") {
     const records = [];
     for (let offset = 0; ; offset += 500) {
@@ -203,11 +204,11 @@ export async function listSales() {
       records.push(...rows.map((row) => normalizeSale(row.record)));
       if (rows.length < 500) break;
     }
-    return records.filter((record) => !record.mergedInto && !record.mergeArchived);
+    return includeArchived ? records : records.filter((record) => !record.mergedInto && !record.mergeArchived);
   }
   await mkdir(directory(), { recursive: true, mode: 0o700 });
   const files = (await readdir(directory())).filter((file) => /^[a-f0-9]{64}\.json$/.test(file));
-  return (await Promise.all(files.map(async (file) => normalizeSale(JSON.parse(await readFile(path.join(directory(), file), "utf8")))))).filter((record) => !record.mergedInto && !record.mergeArchived);
+  return (await Promise.all(files.map(async (file) => normalizeSale(JSON.parse(await readFile(path.join(directory(), file), "utf8")))))).filter((record) => includeArchived || (!record.mergedInto && !record.mergeArchived));
 }
 
 export async function getSale(id) {
@@ -448,13 +449,15 @@ export async function ungroupSaleQuote(id) {
   return listSales();
 }
 
-export async function reviseSaleQuote(id, pdf, expectedUpdatedAt, lines, discount, email) {
+export async function reviseSaleQuote(id, pdf, expectedUpdatedAt, lines, discount, email, phone) {
   const existing = await getSale(id);
   if (!existing) throw fail("Orçamento não encontrado.", 404);
   if (existing.updatedAt !== expectedUpdatedAt) throw fail("Este orçamento foi alterado entretanto. Volte a abri-lo antes de guardar.", 409);
   const { parseSalePdf } = await import("./pdf.mjs");
   const { validateQuoteLines } = await import("./editable-quote.mjs");
   const { customerEmail } = await import("./customer-email.mjs");
+  const { customerPhone } = await import("./customer-phone.mjs");
+  const contactPhone = phone === undefined ? existing.orderDetails?.telefone : customerPhone(phone);
   const contactEmail = email === undefined ? existing.orderDetails?.email : customerEmail(email);
   const parsed = await parseSalePdf(pdf, existing.fileName);
   if (!validateQuoteLines(lines, parsed.subtotal, discount)) throw fail("Os artigos não correspondem aos totais do orçamento.", 400);
@@ -463,7 +466,7 @@ export async function reviseSaleQuote(id, pdf, expectedUpdatedAt, lines, discoun
   const archive = `revisions/${id}/${revision}`;
   const { quoteRevisions: previousRevisions = [], ...snapshot } = existing;
   const quoteRevisions = [...previousRevisions, { path: archive, record: snapshot }];
-  const updated = { ...existing, ...(parsed.quoteNumber ? { quoteNumber: parsed.quoteNumber } : {}), quoteRevisions, customerName: parsed.customerName, nif: parsed.nif, subtotal: parsed.subtotal, vat: parsed.vat, total: parsed.total, updatedAt: new Date().toISOString(), quoteRevision: (existing.quoteRevision || 0) + 1, quoteLines: lines, discountPercent: discount, previousQuoteRevision: archive, orderDetails: { ...existing.orderDetails, ...(contactEmail !== undefined ? { email: contactEmail } : {}), artigos: lines } };
+  const updated = { ...existing, customerPhone: contactPhone ?? parsed.customerPhone ?? existing.customerPhone ?? "", ...(parsed.quoteNumber ? { quoteNumber: parsed.quoteNumber } : {}), quoteRevisions, customerName: parsed.customerName, nif: parsed.nif, subtotal: parsed.subtotal, vat: parsed.vat, total: parsed.total, updatedAt: new Date().toISOString(), quoteRevision: (existing.quoteRevision || 0) + 1, quoteLines: lines, discountPercent: discount, previousQuoteRevision: archive, orderDetails: { ...existing.orderDetails, ...(contactEmail !== undefined ? { email: contactEmail } : {}), ...(contactPhone !== undefined ? { telefone: contactPhone } : {}), artigos: lines } };
   const savePdf = async (bytes) => {
     if (storageMode() === "cloud") await cloud(`/storage/v1/object/${bucket()}/${id}.pdf`, { method: "POST", headers: { "Content-Type": "application/pdf", "x-upsert": "true" }, body: bytes });
     else { const temp = path.join(directory(), `${id}.${revision}.pdf.tmp`); await writeFile(temp, bytes, { mode: 0o600 }); await rename(temp, path.join(directory(), `${id}.pdf`)); }
@@ -557,4 +560,43 @@ export async function markSaleEmailSent(id, email) {
   const updated = { ...record, emailSentAt: new Date().toISOString(), emailSentTo: email };
   await saveRecord(updated);
   return updated;
+}
+
+export async function getCustomerNotes(id) {
+  const record = await getSale(id);
+  if (!record) throw fail("Orçamento não encontrado.", 404);
+  const seen = new Set();
+  const notes = (await listSales({ includeArchived: true })).filter((sale) => sameNotesCustomer(sale, record)).flatMap((sale) => (sale.customerNotes || []).filter((note) => {
+    if (seen.has(note.id)) return false;
+    seen.add(note.id); return true;
+  }).map((note) => ({ ...note, saleId: sale.id, saleUpdatedAt: sale.updatedAt })));
+  notes.sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+  return { notes, updatedAt: record.updatedAt };
+}
+
+let notesMutation = Promise.resolve();
+export function updateCustomerNotes(id, input, expectedUpdatedAt, deleteId = "") {
+  const operation = notesMutation.then(async () => {
+    const record = await getSale(id);
+    if (!record) throw fail("Orçamento não encontrado.", 404);
+    if (record.updatedAt !== expectedUpdatedAt) throw fail("Os dados foram alterados entretanto. Feche e reabra as notas antes de tentar novamente.", 409);
+    const { validateCustomerNote } = await import("./customer-notes.mjs");
+    let notes = [...(record.customerNotes || [])];
+    if (deleteId) {
+      if (!notes.some((note) => note.id === deleteId)) throw fail("Nota não encontrada.", 404);
+      notes = notes.filter((note) => note.id !== deleteId);
+    } else {
+      if (notes.length >= 300) throw fail("Este orçamento já tem 300 notas. Remova notas antigas para continuar.", 400);
+      notes.push({ ...validateCustomerNote(input), id: randomUUID(), createdAt: new Date().toISOString() });
+    }
+    const updated = { ...record, customerNotes: notes, updatedAt: new Date(Math.max(Date.now(), (Date.parse(record.updatedAt) || 0) + 1)).toISOString() };
+    if (storageMode() === "cloud") {
+      const filter = `record->>updatedAt=eq.${encodeURIComponent(record.updatedAt)}`;
+      const rows = await (await cloud(`/rest/v1/admin_sales?id=eq.${id}&${filter}`, { method: "PATCH", headers: { "Content-Type": "application/json", Prefer: "return=representation" }, body: JSON.stringify({ record: updated }) })).json();
+      if (!rows.length) throw fail("Os dados foram alterados entretanto. Feche e reabra as notas antes de tentar novamente.", 409);
+    } else await saveRecord(updated);
+    return updated;
+  });
+  notesMutation = operation.catch(() => {});
+  return operation;
 }

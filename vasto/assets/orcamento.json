@@ -2477,6 +2477,30 @@
       "workbenchOnly": true,
       "preço": 29,
       "image": "/orcamento/galvanizado.png"
+    },
+    {
+      "ref": 3,
+      "produto": "Viga em tubo 50x30 c/ 1500mm RAL 7035",
+      "preço": 27.73,
+      "peso": 3.46
+    },
+    {
+      "ref": 3,
+      "produto": "Viga em tubo 50x30 c/ 1750mm RAL 7035",
+      "preço": 30.26,
+      "peso": 4.04
+    },
+    {
+      "ref": 3,
+      "produto": "Braço de separação com 400mm RAL 7035",
+      "preço": 12.59,
+      "peso": 0.6
+    },
+    {
+      "ref": 3,
+      "produto": "Braço de separação com 500mm RAL 7035",
+      "preço": 13.87,
+      "peso": 0.75
     }
   ],
   "descontos": [

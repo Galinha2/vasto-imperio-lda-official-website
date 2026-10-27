@@ -1,3 +1,4 @@
+import ChatWidget from "@/components/chat/ChatWidget";
 import GoogleAdsConsent from "@/components/analytics/GoogleAdsConsent";
 import { Inter_Tight } from 'next/font/google';
 import "./globals.css";
@@ -107,6 +108,7 @@ export default function RootLayout({ children }) {
             {children}
           </main>
           <Footer />
+          <ChatWidget />
         </LanguageProvider>
         <GoogleAdsConsent />
         <Analytics />

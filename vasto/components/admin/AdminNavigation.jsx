@@ -4,11 +4,14 @@ import styles from "./AdminNavigation.module.css";
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { IoDocumentTextOutline, IoLogOutOutline, IoStatsChartOutline, IoConstructOutline, IoPieChartOutline, IoWalletOutline } from "react-icons/io5";
+import { IoDocumentTextOutline, IoLogOutOutline, IoStatsChartOutline, IoConstructOutline, IoPieChartOutline, IoWalletOutline, IoChatbubblesOutline } from "react-icons/io5";
+
+import AdminChatUnread, { useAdminChatUnread } from "./AdminChatUnread";
 
 import AdminSalesNotifications from "./AdminSalesNotifications";
 
 const sections = [
+  { href: "/admin/conversas", label: "Conversas", Icon: IoChatbubblesOutline },
   { href: "/admin", label: "Vendas", Icon: IoStatsChartOutline },
   { href: "/admin/estatisticas", label: "Estatísticas", Icon: IoPieChartOutline },
   { href: "/admin/comissoes", label: "Comissões", Icon: IoWalletOutline },
@@ -17,6 +20,10 @@ const sections = [
 ];
 
 export default function AdminNavigation({ children }) {
+  return <AdminChatUnread><NavigationContent>{children}</NavigationContent></AdminChatUnread>;
+}
+function NavigationContent({ children }) {
+  const { total } = useAdminChatUnread();
   const pathname = usePathname();
   const router = useRouter();
   const [error, setError] = useState("");
@@ -60,11 +67,12 @@ export default function AdminNavigation({ children }) {
                 aria-current={active ? "page" : undefined}
                 className={`flex shrink-0 items-center gap-2.5 rounded-full px-3 py-2.5 text-sm transition lg:gap-3 lg:px-4 lg:py-3 ${
                   active
-                    ? "border border-white/90 bg-white/80 font-semibold text-[#d95b24] shadow-[0_4px_16px_rgba(0,0,0,0.04)]"
+                    ? "border border-white/90 bg-white/80 font-semibold text-[#007aff] shadow-[0_4px_16px_rgba(0,0,0,0.04)]"
                     : "border border-transparent text-[#6e6e73] hover:bg-white/55"
                 }`}
               >
                 <Icon className="text-lg" />{label}
+                {href === '/admin/conversas' && total > 0 && <span className={styles.unreadBadge} role="status" aria-label={`${total} mensagens por ler`}>{total}</span>}
               </Link>
             );
           })}

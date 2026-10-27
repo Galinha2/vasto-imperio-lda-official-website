@@ -57,3 +57,19 @@ test('generic unnamed customers do not share notes by their placeholder name', a
   assert.equal(sameNotesCustomer({ id: 'a', customerName: 'Cliente' }, { id: 'a', customerName: 'Cliente' }), true);
   assert.equal(sameNotesCustomer({ id: 'a', nif: '506123456' }, { id: 'b', nif: '506123456' }), true);
 });
+
+test('marking a follow-up as handled persists completion without deleting its note', async () => {
+  const dir = await mkdtemp(path.join(tmpdir(), 'vasto-handled-'));
+  process.env.ADMIN_DATA_DIR = dir;
+  delete process.env.SUPABASE_URL; delete process.env.SUPABASE_SERVICE_ROLE_KEY;
+  try {
+    const record = { id: 'e'.repeat(64), customerName: 'Cliente seguimento', updatedAt: '2026-10-20T10:00:00Z' };
+    await createSale(record, Buffer.from('%PDF'));
+    const added = await updateCustomerNotes(record.id, { text: 'Ligar', category: 'seguimento', followUpDate: '2026-10-22' }, record.updatedAt);
+    const result = await updateCustomerNotes(record.id, null, added.updatedAt, '', added.customerNotes[0].id);
+    assert.equal(result.customerNotes[0].text, 'Ligar');
+    assert.equal(result.customerNotes[0].followUpDate, '2026-10-22');
+    assert.ok(result.customerNotes[0].followUpCompletedAt);
+    assert.ok((await getSale(record.id)).customerNotes[0].followUpCompletedAt);
+  } finally { await rm(dir, { recursive: true, force: true }); }
+});

@@ -12,8 +12,8 @@ const organizationStructuredData = {
   name: "Vasto Império, Lda.",
   url: "https://vastoimperio.pt",
   logo: "https://vastoimperio.pt/favicon-google.png",
-  email: ["geral@vastoimperio.pt", "vastoimperio@sapo.pt"],
-  telephone: ["+351 928 348 117", "+351 966 518 436"],
+  email: ["geral@vastoimperio.pt"],
+  telephone: ["+351 928 348 117"],
   areaServed: [
     { "@type": "City", name: "Viseu" },
     { "@type": "Place", name: "Benedita" },
@@ -38,8 +38,8 @@ const organizationStructuredData = {
     },
     {
       "@type": "ContactPoint",
-      telephone: "+351 966 518 436",
-      email: "vastoimperio@sapo.pt",
+      telephone: "+351 928 348 117",
+      email: "geral@vastoimperio.pt",
       contactType: "sales",
       areaServed: "Benedita",
       availableLanguage: "Portuguese",

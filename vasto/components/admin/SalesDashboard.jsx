@@ -6,6 +6,7 @@ import QuoteCombinationDialog from "./QuoteCombinationDialog";
 import SaleActions from "./SaleActions";
 import CustomerPhoneButton from "./CustomerPhoneButton";
 import CustomerNotesButton from "./CustomerNotesButton";
+import FollowUpAlerts from "./FollowUpAlerts";
 import styles from "./SalesDashboard.module.css";
 import MetricCard from "./MetricCard";
 
@@ -706,6 +707,8 @@ export default function SalesDashboard() {
 
           {error && <div role="alert" className="mt-5 flex items-start justify-between gap-3 rounded-2xl border border-red-100 bg-red-50 p-4 text-sm text-red-700"><p className="whitespace-pre-line">{error}</p><button type="button" aria-label="Fechar aviso" onClick={() => setError("")} className="grid h-9 w-9 shrink-0 cursor-pointer place-items-center rounded-full transition hover:bg-red-100"><IoCloseOutline className="text-xl" /></button></div>}
           {notice && <p role="status" className="mt-5 flex items-start gap-2 rounded-2xl bg-[#f5f5f7] p-4 text-sm text-[#424245]"><IoCheckmarkCircleOutline className="shrink-0 text-lg text-emerald-600" />{notice}</p>}
+
+          {!loading && <FollowUpAlerts onSaved={(updated) => setSales((current) => current.map((item) => item.id === updated.id ? { ...item, customerNotes: updated.customerNotes, updatedAt: updated.updatedAt } : item))} />}
 
           {!loading && unresolvedSales.length > 0 && (
             <section ref={unresolvedReminderRef} aria-labelledby="unresolved-reminder-heading" className={`relative mt-3 ${unresolvedExpanded ? "z-50" : ""}`}>

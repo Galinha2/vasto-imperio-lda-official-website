@@ -575,14 +575,17 @@ export async function getCustomerNotes(id) {
 }
 
 let notesMutation = Promise.resolve();
-export function updateCustomerNotes(id, input, expectedUpdatedAt, deleteId = "") {
+export function updateCustomerNotes(id, input, expectedUpdatedAt, deleteId = "", completeId = "") {
   const operation = notesMutation.then(async () => {
     const record = await getSale(id);
     if (!record) throw fail("Orçamento não encontrado.", 404);
     if (record.updatedAt !== expectedUpdatedAt) throw fail("Os dados foram alterados entretanto. Feche e reabra as notas antes de tentar novamente.", 409);
     const { validateCustomerNote } = await import("./customer-notes.mjs");
     let notes = [...(record.customerNotes || [])];
-    if (deleteId) {
+    if (completeId) {
+      if (!notes.some((note) => note.id === completeId)) throw fail("Nota não encontrada.", 404);
+      notes = notes.map((note) => note.id === completeId ? { ...note, followUpCompletedAt: new Date().toISOString() } : note);
+    } else if (deleteId) {
       if (!notes.some((note) => note.id === deleteId)) throw fail("Nota não encontrada.", 404);
       notes = notes.filter((note) => note.id !== deleteId);
     } else {

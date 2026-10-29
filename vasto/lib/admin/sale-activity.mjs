@@ -7,6 +7,7 @@ export function lastSaleActivity(sale) {
 }
 
 export function isSaleInactive(sale, now = Date.now()) {
+  if (sale.status !== "confirmada") return false;
   const activity = lastSaleActivity(sale);
-  return activity !== null && now - activity > 7 * 24 * 60 * 60 * 1000;
+  return activity !== null && now - activity > 14 * 24 * 60 * 60 * 1000;
 }

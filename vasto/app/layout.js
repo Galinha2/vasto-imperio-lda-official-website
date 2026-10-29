@@ -7,6 +7,9 @@ import { LanguageProvider } from "@/components/header/LanguageContext";
 import Footer from '@/components/footer/Footer';
 import { Analytics } from '@vercel/analytics/react';
 
+// Chat público temporariamente oculto. Alterar para true para reativar.
+const websiteChatEnabled = false;
+
 const organizationStructuredData = {
   "@context": "https://schema.org",
   "@type": "Organization",
@@ -108,7 +111,7 @@ export default function RootLayout({ children }) {
             {children}
           </main>
           <Footer />
-          <ChatWidget />
+          {websiteChatEnabled && <ChatWidget />}
         </LanguageProvider>
         <GoogleAdsConsent />
         <Analytics />

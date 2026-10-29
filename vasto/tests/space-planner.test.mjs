@@ -180,3 +180,16 @@ test("fixed module length uses only the chosen nominal beam size in all layouts"
     for (const plan of result.plans) for (const shelf of plan.shelves) assert.ok(Math.abs(shelf.runWidth - 2.55) < 0.001);
   }
 });
+
+test("apenas picking de 2750 mm usa três reforços centrais por nível", () => {
+  for (const material of ["Aglomerado", "Metálica"]) {
+    for (const width of [1, 1.25, 1.5, 1.75, 2, 2.25, 2.5, 2.75]) {
+      const matches = models.filter(m => m.type === "picking" && m.material === material && m.nominalWidth === width);
+      assert.ok(matches.length > 0);
+      for (const model of matches) {
+        const central = model.levelParts[3];
+        assert.equal(central.quantity, width === 2.75 ? 3 : width <= 2 ? 1 : 2);
+      }
+    }
+  }
+});

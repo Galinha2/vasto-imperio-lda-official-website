@@ -11,12 +11,12 @@ import AdminChatUnread, { useAdminChatUnread } from "./AdminChatUnread";
 import AdminSalesNotifications from "./AdminSalesNotifications";
 
 const sections = [
-  { href: "/admin/conversas", label: "Conversas", Icon: IoChatbubblesOutline },
   { href: "/admin", label: "Vendas", Icon: IoStatsChartOutline },
   { href: "/admin/estatisticas", label: "Estatísticas", Icon: IoPieChartOutline },
   { href: "/admin/comissoes", label: "Comissões", Icon: IoWalletOutline },
   { href: "/admin/orcamentos", label: "Orçamentos", Icon: IoDocumentTextOutline },
   { href: "/admin/simulador", label: "Simulador", Icon: IoConstructOutline },
+  { href: "/admin/conversas", label: "Conversas", Icon: IoChatbubblesOutline },
 ];
 
 export default function AdminNavigation({ children }) {

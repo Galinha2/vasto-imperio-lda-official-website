@@ -1,3 +1,5 @@
+import { pickingCentralCount } from "./picking-reinforcements.mjs";
+
 export function spaceModelCost(model, levels = 4) {
   return [...model.fixedParts, ...model.levelParts.map((p) => ({ ...p, quantity: p.quantity * levels }))].reduce((sum, p) => sum + Math.round(p.price * 100) * p.quantity, 0);
 }
@@ -41,7 +43,7 @@ export function spaceCatalog(products) {
               const findReinforcement = (kind) => cheapest(items.filter((p) => p.produto.startsWith(material === "Metálica" ? "Reforço para prateleiras metálicas" : `Reforço ${kind}`) && p.produto.includes(`${depth * 1000}mm`)));
               const central = findReinforcement("central"), lateral = findReinforcement("lateral");
               if (!shelf || !central || !lateral) continue;
-              levelParts.push({ name: shelf.produto, quantity: 1, price: price(shelf) }, { name: central.produto, quantity: nominalWidth <= 2 ? 1 : 2, price: price(central) }, { name: lateral.produto, quantity: 2, price: price(lateral) });
+              levelParts.push({ name: shelf.produto, quantity: 1, price: price(shelf) }, { name: central.produto, quantity: pickingCentralCount(nominalWidth * 1000), price: price(central) }, { name: lateral.produto, quantity: 2, price: price(lateral) });
             }
           }
           result.push({ type, width: nominalWidth + (type === "racks" ? 0.1 : 0.05), nominalWidth, depth, height, material, fixedParts, levelParts });

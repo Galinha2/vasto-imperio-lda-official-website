@@ -13,6 +13,7 @@ import { pickingDiscountRate } from "@/lib/picking-discount.mjs";
 import useEditableLevels from "./useEditableLevels";
 import ModuleLevelDimensions from "./ModuleLevelDimensions";
 import LevelRemovalTargets from "./LevelRemovalTargets";
+import { pickingCentralCount } from "@/lib/picking-reinforcements.mjs";
 import budget from "@/assets/orcamento.json";
 
 const products = budget.produtos.filter((product) => product.ref === 3);
@@ -65,7 +66,7 @@ function reinforcementProduct(kind, depth, floorType) {
 }
 
 function reinforcementPrice(length, depth, floorType) {
-  const centralCount = length <= 2000 ? 1 : 2;
+  const centralCount = pickingCentralCount(length);
   const lateralCount = 2;
   const central = reinforcementProduct("central", depth, floorType);
   const lateral = reinforcementProduct("lateral", depth, floorType);
@@ -467,7 +468,7 @@ export default function SimulatorPicking({ onQuoteDataChange, adminMode = false,
       { product: matchingFrame, quantity: (modules.length + 1) * rowCount },
       ...[...new Set(modules)].flatMap((length) => {
         const moduleCount = modules.reduce((sum, moduleLength, index) => sum + (moduleLength === length ? levelsForModule(index).length : 0), 0) * rowCount;
-        const centralCount = length <= 2000 ? 1 : 2;
+        const centralCount = pickingCentralCount(length);
         return [
           { product: beams.find((item) => item.length === length && item.produto.includes(profile)), quantity: moduleCount * 2 },
           { product: shelves.find((item) => item.length === length && item.depth === depth && item.material === floorType), quantity: moduleCount },

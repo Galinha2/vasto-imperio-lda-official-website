@@ -1,4 +1,5 @@
 "use client";
+import { salePeriodDate as periodDate } from "@/lib/admin/sale-period.mjs";
 
 import { groupQuotes, sameQuoteCustomer } from "@/lib/admin/quote-groups.mjs";
 import { isSaleInactive, lastSaleActivity } from "@/lib/admin/sale-activity.mjs";
@@ -29,7 +30,7 @@ const todayInLisbon = () => {
   const parts = Object.fromEntries(new Intl.DateTimeFormat("en", { timeZone: "Europe/Lisbon", year: "numeric", month: "2-digit", day: "2-digit" }).formatToParts(new Date()).map(({ type, value }) => [type, value]));
   return `${parts.year}-${parts.month}-${parts.day}`;
 };
-const periodDate = (sale) => sale.status === "em_preparacao" ? sale.issuedAt : sale.deliveryStatus === "entregue" && sale.deliveryDate ? sale.deliveryDate : sale.saleDate || sale.issuedAt;
+
 const unresolvedDate = (sale) => {
   const activity = lastSaleActivity(sale);
   if (activity === null) return "";
@@ -206,6 +207,7 @@ export default function SalesDashboard() {
   const [deletingImage, setDeletingImage] = useState("");
   const [saleToDelete, setSaleToDelete] = useState(null);
   const [deliveryPrompt, setDeliveryPrompt] = useState(null);
+  const [confirmationPeriodPrompt, setConfirmationPeriodPrompt] = useState(null);
   const [deliveryDate, setDeliveryDate] = useState("");
   const [deletingSale, setDeletingSale] = useState(false);
   const [dragging, setDragging] = useState(false);
@@ -376,16 +378,33 @@ export default function SalesDashboard() {
   }
 
   async function updateWorkflow(sale, update) {
+    if (update.status === "confirmada" && sale.status !== "confirmada" && !update.saleDate) {
+      const currentDate = todayInLisbon();
+      const existingDate = periodDate(sale)?.slice(0, 10);
+      if (existingDate && existingDate.slice(0, 7) !== currentDate.slice(0, 7)) {
+        setError("");
+        setConfirmationPeriodPrompt({ sale, update, currentDate, existingDate });
+        return;
+      }
+    }
     setChanging(sale.id); setError("");
     try {
       const result = await api(`/api/admin/sales/${sale.id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify(update) });
       setSales((current) => result.sales || current.map((item) => item.id === sale.id ? result.sale : item));
-      if (update.deliveryDate) {
-        setYear(update.deliveryDate.slice(0, 4));
-        setMonth(update.deliveryDate.slice(5, 7));
+      if (update.status === "confirmada" || update.saleDate) {
+        const date = periodDate(result.sale || sale);
+        setYear(date.slice(0, 4));
+        setMonth(date.slice(5, 7));
       }
-    } catch (failure) { setError(failure.message); }
+      return true;
+    } catch (failure) { setError(failure.message); return false; }
     finally { setChanging(""); }
+  }
+
+  async function chooseConfirmationPeriod(date) {
+    if (!confirmationPeriodPrompt || changing) return;
+    const { sale, update } = confirmationPeriodPrompt;
+    if (await updateWorkflow(sale, { ...update, saleDate: date })) setConfirmationPeriodPrompt(null);
   }
 
   async function confirmDelivery() {
@@ -399,8 +418,7 @@ export default function SalesDashboard() {
         body: JSON.stringify({ deliveryStatus: "entregue", deliveryDate }),
       });
       setSales((current) => result.sales || current.map((item) => item.id === sale.id ? result.sale : item));
-      setYear(deliveryDate.slice(0, 4));
-      setMonth(deliveryDate.slice(5, 7));
+
       setNotice(`Entrega de ${sale.customerName} registada em ${dateLabel(deliveryDate)}.`);
       setDeliveryPrompt(null);
     } catch (failure) { setError(failure.message); }
@@ -1234,7 +1252,7 @@ export default function SalesDashboard() {
           </section>
 
           <button type="button" disabled={uploading || loading} onClick={() => inputRef.current?.click()} onDragOver={(event) => { event.preventDefault(); if (!uploading && !loading) setDragging(true); }} onDragLeave={() => setDragging(false)} onDrop={(event) => { event.preventDefault(); setDragging(false); importFiles(Array.from(event.dataTransfer.files)); }} className={`mt-6 flex w-full cursor-pointer flex-col items-center justify-center gap-3 rounded-full border-2 border-dashed p-7 transition disabled:cursor-wait disabled:opacity-60 sm:flex-row sm:gap-5 ${dragging ? "border-orange-400 bg-orange-50" : "border-[#dcdce2] hover:border-orange-300 hover:bg-orange-50/50"}`}><IoCloudUploadOutline className="text-3xl text-orange-600" /><span className="text-center sm:text-left"><span className="block text-sm font-semibold">{uploading ? "A ler e registar os documentos…" : "Arraste os seus PDFs para aqui."}</span><span className="mt-1 block text-xs text-[#86868b]">Ou clique para escolher · Orçamentos e simulador · Até 6 MB por PDF</span></span></button>
-          <p className="mt-5 text-center text-[11px] leading-relaxed text-[#a1a1a6]">As vendas ainda não entregues contam no mês em que foram confirmadas; ao registar a entrega, passam a contar no mês da entrega. Os orçamentos a aguardar resposta contam no mês de emissão.</p>
+          <p className="mt-5 text-center text-[11px] leading-relaxed text-[#a1a1a6]">As vendas contam no mês em que foram confirmadas pelo cliente, mesmo quando a entrega é registada noutro mês. Os orçamentos a aguardar resposta contam no mês de emissão.</p>
         </div>
         {salesDetail && (
           <div
@@ -1313,7 +1331,21 @@ export default function SalesDashboard() {
             </section>
           </div>
         )}
-        {deliveryPrompt && (
+        {confirmationPeriodPrompt && (
+        <div className="fixed inset-0 z-[120] flex items-center justify-center bg-black/30 p-4 backdrop-blur-sm">
+          <section role="dialog" aria-modal="true" aria-labelledby="confirmation-period-title" aria-describedby="confirmation-period-description" className="admin-surface w-full max-w-md rounded-[28px] border border-white/70 bg-white p-6 shadow-[0_24px_80px_rgba(0,0,0,0.18)] sm:p-7">
+            <div className="flex items-start justify-between gap-4"><div><p className="text-[11px] font-semibold uppercase tracking-wider text-sky-700">Confirmado pelo cliente</p><h2 id="confirmation-period-title" className="mt-2 text-xl font-semibold tracking-tight">Em que mês fica a venda?</h2></div><button type="button" aria-label="Cancelar confirmação" disabled={Boolean(changing)} onClick={() => setConfirmationPeriodPrompt(null)} className="rounded-full p-2 text-[#86868b] hover:bg-[#f5f5f7]"><IoCloseOutline /></button></div>
+            <p id="confirmation-period-description" className="mt-3 text-sm leading-relaxed text-[#6e6e73]">O orçamento de {confirmationPeriodPrompt.sale.customerName} está em {new Intl.DateTimeFormat("pt-PT", { month: "long", year: "numeric" }).format(new Date(`${confirmationPeriodPrompt.existingDate}T12:00:00`))}. Quer passar para o mês atual ou manter no mês em que já está?</p>
+            {error && <p role="alert" className="mt-3 text-sm text-red-700">{error}</p>}
+            <div className="mt-6 flex flex-col gap-3">
+              <button type="button" disabled={Boolean(changing)} onClick={() => chooseConfirmationPeriod(confirmationPeriodPrompt.currentDate)} className="rounded-full bg-sky-700 px-5 py-3 text-sm font-semibold text-white disabled:opacity-50">Colocar no mês atual · {new Intl.DateTimeFormat("pt-PT", { month: "long", year: "numeric" }).format(new Date(`${confirmationPeriodPrompt.currentDate}T12:00:00`))}</button>
+              <button type="button" disabled={Boolean(changing)} onClick={() => chooseConfirmationPeriod(confirmationPeriodPrompt.existingDate)} className="rounded-full border border-[#e5e5e7] px-5 py-3 text-sm font-semibold text-[#424245] disabled:opacity-50">Manter no mês do orçamento</button>
+              <button type="button" disabled={Boolean(changing)} onClick={() => setConfirmationPeriodPrompt(null)} className="py-2 text-sm text-[#86868b]">Cancelar</button>
+            </div>
+          </section>
+        </div>
+      )}
+      {deliveryPrompt && (
           <div className="fixed inset-0 z-[60] flex items-center justify-center bg-[#1d1d1f]/35 p-4 backdrop-blur-sm" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget && !changing) setDeliveryPrompt(null); }}>
             <section role="dialog" aria-modal="true" aria-labelledby="delivery-date-title" aria-describedby="delivery-date-description" className="admin-surface w-full max-w-md rounded-[28px] border border-white/70 bg-white p-6 shadow-[0_24px_80px_rgba(0,0,0,0.18)] sm:p-7">
               <div className="flex items-start justify-between gap-4">

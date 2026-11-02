@@ -1,4 +1,5 @@
 "use client";
+import { salePeriodDate as saleDate } from "@/lib/admin/sale-period.mjs";
 
 import { IoArrowUpOutline, IoTimeOutline } from "react-icons/io5";
 import MetricCard from "./MetricCard";
@@ -10,11 +11,7 @@ import { IoCheckmarkOutline, IoCloudDoneOutline, IoWalletOutline } from "react-i
 const months = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
 const currency = new Intl.NumberFormat("pt-PT", { style: "currency", currency: "EUR" });
 const currentYear = () => new Intl.DateTimeFormat("en", { timeZone: "Europe/Lisbon", year: "numeric" }).format(new Date());
-const saleDate = (sale) => sale.status === "em_preparacao"
-  ? sale.issuedAt
-  : sale.deliveryStatus === "entregue" && sale.deliveryDate
-    ? sale.deliveryDate
-    : sale.saleDate || sale.issuedAt;
+
 const toCents = (amount) => Math.round((Number(amount) || 0) * 100);
 const sum = (items) => items.reduce((total, item) => total + toCents(item.subtotal), 0) / 100;
 const monthKey = (year, month) => `${year}-${String(month).padStart(2, "0")}`;

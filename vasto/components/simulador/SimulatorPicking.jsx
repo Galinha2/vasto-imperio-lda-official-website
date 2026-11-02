@@ -393,7 +393,7 @@ export default function SimulatorPicking({ onQuoteDataChange, adminMode = false,
   const availableBeamLengths = useMemo(() => unique(beams
     .filter((beam) => beam.produto.includes(reinforcedBeams ? "Viga Z100" : "Viga Z60"))
     .map((beam) => beam.length)), [reinforcedBeams]);
-  const enteredLength = Number(desiredLength);
+  const enteredLength = Number(desiredLength.replace(",", "."));
   const isLengthUnavailable = enteredLength > 30;
   const targetLength = enteredLength > 0 ? Math.min(30, enteredLength) * 1000 : 5000;
   const availableHeights = unique(usableFrames.filter((frame) => frame.galvanized === galvanized && allowedHeight(frame)).map((frame) => frame.height));
@@ -575,7 +575,7 @@ export default function SimulatorPicking({ onQuoteDataChange, adminMode = false,
                   onClick={(event) => event.currentTarget.select()}
                   onChange={(event) => setDesiredLength(event.target.value.slice(0, 6))}
                   onBlur={() => {
-                    const value = Number(desiredLength);
+                    const value = Number(desiredLength.replace(",", "."));
                     if (value > 0) setDesiredLength(value.toFixed(2));
                   }}
                   className="w-full bg-transparent py-3.5 text-[15px] font-medium text-[#1d1d1f] outline-none"

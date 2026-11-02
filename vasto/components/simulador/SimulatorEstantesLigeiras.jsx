@@ -279,7 +279,7 @@ export default function SimulatorEstantesLigeiras({ onQuoteDataChange, adminMode
   const [depth, setDepth] = useState(400);
   const { levels, setLevels, levelSlots, activeLevels, levelsForModule, hasRemovedLevels, removedKey, removeLevel, restoreLevels } = useEditableLevels(4);
   const [selectedSolutionId, setSelectedSolutionId] = useState("chosen");
-  const enteredLength = Number(desiredLength);
+  const enteredLength = Number(desiredLength.replace(",", "."));
   const isLengthUnavailable = enteredLength > 30;
   const targetLength = enteredLength > 0 ? Math.min(30, enteredLength) * 1000 : 1000;
   const fixedShelfLength = sameShelfLength === true;
@@ -384,7 +384,7 @@ export default function SimulatorEstantesLigeiras({ onQuoteDataChange, adminMode
               <span className="block text-sm font-semibold text-[#424245]">{english ? "Total desired length (m)" : "Comprimento total pretendido (m)"}</span>
               <span className="block text-xs leading-relaxed text-[#86868b]">{english ? "Enter the metres of shelving in a straight line for one row." : "Indique os metros de estantes em linha reta para uma fila."}</span>
               <div className="simulator-pill flex items-center rounded-full border border-[#d2d2d7] bg-[#fbfbfd] px-5 transition focus-within:border-[#0071e3] focus-within:ring-4 focus-within:ring-[#0071e3]/10">
-                <input type="text" inputMode="decimal" value={desiredLength} onClick={(event) => event.currentTarget.select()} onChange={(event) => setDesiredLength(event.target.value.slice(0, 6))} onBlur={() => { const value = Number(desiredLength); if (value > 0) setDesiredLength(value.toFixed(2)); }} className="w-full bg-transparent py-3.5 text-[15px] font-medium text-[#1d1d1f] outline-none" aria-label={english ? "Total desired length in metres" : "Comprimento total pretendido em metros"} />
+                <input type="text" inputMode="decimal" value={desiredLength} onClick={(event) => event.currentTarget.select()} onChange={(event) => setDesiredLength(event.target.value.slice(0, 6))} onBlur={() => { const value = Number(desiredLength.replace(",", ".")); if (value > 0) setDesiredLength(value.toFixed(2)); }} className="w-full bg-transparent py-3.5 text-[15px] font-medium text-[#1d1d1f] outline-none" aria-label={english ? "Total desired length in metres" : "Comprimento total pretendido em metros"} />
                 <span className="text-sm font-medium text-[#86868b]">m</span>
               </div>
               {isLengthUnavailable && <span className="mt-1 block text-sm font-medium text-red-600">{english ? "Lengths over 30.00 m are not available." : "Comprimentos superiores a 30,00 m não estão disponíveis."}</span>}

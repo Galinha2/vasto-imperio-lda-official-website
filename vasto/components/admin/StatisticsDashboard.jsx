@@ -1,4 +1,5 @@
 "use client";
+import { salePeriodDate as saleDate } from "@/lib/admin/sale-period.mjs";
 
 import MetricCard from "./MetricCard";
 
@@ -9,11 +10,7 @@ import { IoArrowUpOutline, IoCheckmarkCircleOutline, IoCloseOutline, IoDocumentT
 const months = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
 const currency = new Intl.NumberFormat("pt-PT", { style: "currency", currency: "EUR" });
 const currentYear = () => new Intl.DateTimeFormat("en", { timeZone: "Europe/Lisbon", year: "numeric" }).format(new Date());
-const saleDate = (sale) => sale.status === "em_preparacao"
-  ? sale.issuedAt
-  : sale.deliveryStatus === "entregue" && sale.deliveryDate
-    ? sale.deliveryDate
-    : sale.saleDate || sale.issuedAt;
+
 const total = (items, field = "subtotal") => items.reduce((amount, sale) => amount + Math.round((Number(sale[field]) || 0) * 100), 0) / 100;
 const percentage = (part, whole) => whole ? Math.round((part / whole) * 100) : 0;
 const validIsoDate = (value) => /^\d{4}-\d{2}-\d{2}$/.test(value || "") && Number.isFinite(Date.parse(`${value}T00:00:00Z`));

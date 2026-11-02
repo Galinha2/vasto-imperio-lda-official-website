@@ -8,6 +8,7 @@ export function usesHistoricalDeliveryPeriod(sale) {
 
 export function salePeriodDate(sale) {
   if (sale.status === 'em_preparacao') return sale.issuedAt;
+  if (sale.periodDateOverride) return sale.periodDateOverride;
   // Exceção histórica: apenas orçamentos emitidos antes de setembro de 2026.
   if (usesHistoricalDeliveryPeriod(sale) && sale.deliveryStatus === 'entregue' && sale.deliveryDate) return sale.deliveryDate;
   return sale.saleDate || sale.issuedAt;

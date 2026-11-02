@@ -1,5 +1,5 @@
 "use client";
-import { salePeriodDate as periodDate, usesHistoricalDeliveryPeriod } from "@/lib/admin/sale-period.mjs";
+import { salePeriodDate as periodDate } from "@/lib/admin/sale-period.mjs";
 
 import { groupQuotes, sameQuoteCustomer } from "@/lib/admin/quote-groups.mjs";
 import { isSaleInactive, lastSaleActivity } from "@/lib/admin/sale-activity.mjs";
@@ -209,6 +209,7 @@ export default function SalesDashboard() {
   const [deliveryPrompt, setDeliveryPrompt] = useState(null);
   const [confirmationPeriodPrompt, setConfirmationPeriodPrompt] = useState(null);
   const [deliveryDate, setDeliveryDate] = useState("");
+  const [deliveryMoveChoice, setDeliveryMoveChoice] = useState(null);
   const [deletingSale, setDeletingSale] = useState(false);
   const [dragging, setDragging] = useState(false);
   const [tableDropActive, setTableDropActive] = useState(false);
@@ -378,6 +379,12 @@ export default function SalesDashboard() {
   }
 
   async function updateWorkflow(sale, update) {
+    if (update.deliveryDate) {
+      setDeliveryDate(update.deliveryDate);
+      setDeliveryMoveChoice(null);
+      setDeliveryPrompt(sale);
+      return;
+    }
     if (update.status === "confirmada" && sale.status !== "confirmada" && !update.saleDate) {
       const currentDate = todayInLisbon();
       const existingDate = periodDate(sale)?.slice(0, 10);
@@ -410,15 +417,20 @@ export default function SalesDashboard() {
   async function confirmDelivery() {
     if (!deliveryPrompt || !deliveryDate) return;
     const sale = deliveryPrompt;
+    const differentMonth = deliveryDate.slice(0, 7) !== todayInLisbon().slice(0, 7);
+    if (differentMonth && deliveryMoveChoice === null) return;
+    const override = differentMonth ? (deliveryMoveChoice === 'move' ? deliveryDate : periodDate(sale)) : undefined;
     setChanging(sale.id); setError("");
     try {
       const result = await api(`/api/admin/sales/${sale.id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ deliveryStatus: "entregue", deliveryDate }),
+        body: JSON.stringify({ deliveryStatus: "entregue", deliveryDate, ...(override && { periodDateOverride: override }) }),
       });
       setSales((current) => result.sales || current.map((item) => item.id === sale.id ? result.sale : item));
 
+      const target = periodDate(result.sale || { ...sale, deliveryStatus: "entregue", deliveryDate, ...(override && { periodDateOverride: override }) });
+      setYear(target.slice(0, 4)); setMonth(target.slice(5, 7));
       setNotice(`Entrega de ${sale.customerName} registada em ${dateLabel(deliveryDate)}.`);
       setDeliveryPrompt(null);
     } catch (failure) { setError(failure.message); }
@@ -1116,6 +1128,7 @@ export default function SalesDashboard() {
                                 onChange={(value) => {
                                   if (value === "entregue") {
                                     setDeliveryDate(sale.deliveryDate || todayInLisbon());
+                                    setDeliveryMoveChoice(null);
                                     setDeliveryPrompt(sale);
                                   } else updateWorkflow(sale, { deliveryStatus: value });
                                 }}
@@ -1365,7 +1378,7 @@ export default function SalesDashboard() {
                 <button type="button" aria-label="Fechar" disabled={Boolean(changing)} onClick={() => setDeliveryPrompt(null)} className="grid h-9 w-9 cursor-pointer place-items-center rounded-full text-[#86868b] transition hover:bg-[#f5f5f7] disabled:opacity-50"><IoCloseOutline className="text-xl" /></button>
               </div>
               <p id="delivery-date-description" className="mt-3 text-sm leading-relaxed text-[#6e6e73]">
-                Ao registar a entrega de <strong className="font-semibold text-[#1d1d1f]">{deliveryPrompt.customerName}</strong>, {usesHistoricalDeliveryPeriod(deliveryPrompt) ? "a venda passa a contar no mês desta data, por ser um orçamento anterior a setembro de 2026." : "o mês da venda mantém-se no período escolhido na confirmação pelo cliente."}
+                Ao registar a entrega de <strong className="font-semibold text-[#1d1d1f]">{deliveryPrompt.customerName}</strong>, a data da entrega fica guardada. Se escolher outro mês, poderá decidir se o orçamento também muda de mês.
               </p>
               <label className="mt-5 flex flex-col gap-2 text-sm font-medium text-[#424245]">
                 Data de entrega
@@ -1375,13 +1388,19 @@ export default function SalesDashboard() {
                   type="date"
                   value={deliveryDate}
                   max="9999-12-31"
-                  onChange={(event) => setDeliveryDate(event.target.value)}
+                  onChange={(event) => { setDeliveryDate(event.target.value); setDeliveryMoveChoice(null); }}
                   className="h-11 cursor-pointer rounded-full border border-[#e5e5e7] bg-white px-4 text-sm outline-none transition hover:border-[#cbd5e1] hover:bg-[#f8fafc] focus:border-sky-600 focus:ring-2 focus:ring-sky-600/10"
                 />
               </label>
+              {deliveryDate && deliveryDate.slice(0, 7) !== todayInLisbon().slice(0, 7) && <fieldset className="mt-5 rounded-2xl border border-[#e5e5e7] p-4">
+                <legend className="px-1 text-sm font-semibold">Mover o orçamento para o mês da entrega?</legend>
+                <p className="mb-3 text-xs leading-relaxed text-[#86868b]">Escolheu uma entrega fora do mês atual. Indique onde deve ficar o orçamento.</p>
+                <label className="flex cursor-pointer items-center gap-3 rounded-xl p-2 text-sm transition hover:bg-[#f5f5f7]"><input type="radio" name="delivery-period" checked={deliveryMoveChoice === 'move'} onChange={() => setDeliveryMoveChoice('move')} disabled={Boolean(changing)} className="accent-sky-700" />Sim, colocar em {new Intl.DateTimeFormat('pt-PT', {month:'long', year:'numeric'}).format(new Date(`${deliveryDate}T12:00:00`))}</label>
+                <label className="mt-1 flex cursor-pointer items-center gap-3 rounded-xl p-2 text-sm transition hover:bg-[#f5f5f7]"><input type="radio" name="delivery-period" checked={deliveryMoveChoice === 'keep'} onChange={() => setDeliveryMoveChoice('keep')} disabled={Boolean(changing)} className="accent-sky-700" />Não, manter em {new Intl.DateTimeFormat('pt-PT', {month:'long', year:'numeric'}).format(new Date(`${periodDate(deliveryPrompt)}T12:00:00`))}</label>
+              </fieldset>}
               <div className="mt-6 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
                 <button type="button" disabled={Boolean(changing)} onClick={() => setDeliveryPrompt(null)} className="h-10 cursor-pointer rounded-full border border-[#e5e5e7] px-5 text-sm font-semibold text-[#424245] transition hover:bg-[#f5f5f7] disabled:opacity-50">Cancelar</button>
-                <button type="button" disabled={!deliveryDate || Boolean(changing)} onClick={confirmDelivery} className="h-10 cursor-pointer rounded-full bg-sky-700 px-5 text-sm font-semibold text-white transition hover:bg-sky-800 disabled:cursor-not-allowed disabled:opacity-50">{changing ? "A guardar…" : "Guardar entrega"}</button>
+                <button type="button" disabled={!deliveryDate || Boolean(changing) || (deliveryDate.slice(0, 7) !== todayInLisbon().slice(0, 7) && deliveryMoveChoice === null)} onClick={confirmDelivery} className="h-10 cursor-pointer rounded-full bg-sky-700 px-5 text-sm font-semibold text-white transition hover:bg-sky-800 disabled:cursor-not-allowed disabled:opacity-50">{changing ? "A guardar…" : "Guardar entrega"}</button>
               </div>
             </section>
           </div>

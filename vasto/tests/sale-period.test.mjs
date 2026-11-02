@@ -27,3 +27,11 @@ test('setembro de 2026 em diante, incluindo 2027, mantém o mês da confirmaçã
   assert.equal(salePeriodDate(sale), issuedAt);
  }
 });
+
+test('escolha explícita na entrega permite mover ou manter o mês, incluindo históricos', () => {
+ for (const issuedAt of ['2026-08-01','2026-10-01','2027-01-01']) {
+  const sale = { status:'confirmada', issuedAt, saleDate:issuedAt, deliveryStatus:'entregue', deliveryDate:'2027-03-10' };
+  assert.equal(salePeriodDate({...sale, periodDateOverride:issuedAt}), issuedAt);
+  assert.equal(salePeriodDate({...sale, periodDateOverride:sale.deliveryDate}), '2027-03-10');
+ }
+});

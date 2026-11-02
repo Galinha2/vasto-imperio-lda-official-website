@@ -354,20 +354,22 @@ export async function deleteSale(id, { allowMerged = false } = {}) {
 
 export async function updateSaleWorkflow(id, updates) {
   if (!updates || typeof updates !== "object" || Array.isArray(updates)) throw fail("Estados inválidos.", 400);
-  const { status: requestedStatus, paymentStatus, deliveryStatus, saleDate, deliveryDate, quoteProject, quoteSeparate } = updates;
+  const { status: requestedStatus, paymentStatus, deliveryStatus, saleDate, deliveryDate, periodDateOverride, quoteProject, quoteSeparate } = updates;
   const status = requestedStatus === "nao_selecionado" ? "em_preparacao" : requestedStatus;
   if (status !== undefined && !["em_preparacao", "confirmada"].includes(status)) throw fail("Estado do orçamento inválido.", 400);
   if (paymentStatus !== undefined && !paymentStatuses.includes(paymentStatus)) throw fail("Estado do pagamento inválido.", 400);
   if (deliveryStatus !== undefined && !deliveryStatuses.includes(deliveryStatus)) throw fail("Estado da entrega inválido.", 400);
   if (saleDate !== undefined && !validDate(saleDate)) throw fail("Data da venda inválida.", 400);
+  if (periodDateOverride !== undefined && !validDate(periodDateOverride)) throw fail("Mês do orçamento inválido.", 400);
   if (deliveryDate !== undefined && !validDate(deliveryDate)) throw fail("Data de entrega inválida.", 400);
   if (quoteProject !== undefined && (typeof quoteProject !== "string" || quoteProject.trim().length > 100)) throw fail("O nome do projeto deve ter até 100 caracteres.", 400);
   if (quoteSeparate !== undefined && typeof quoteSeparate !== "boolean") throw fail("Agrupamento inválido.", 400);
-  if (status === undefined && paymentStatus === undefined && deliveryStatus === undefined && saleDate === undefined && deliveryDate === undefined && quoteProject === undefined && quoteSeparate === undefined) throw fail("Indique um estado para atualizar.", 400);
+  if (status === undefined && paymentStatus === undefined && deliveryStatus === undefined && saleDate === undefined && deliveryDate === undefined && periodDateOverride === undefined && quoteProject === undefined && quoteSeparate === undefined) throw fail("Indique um estado para atualizar.", 400);
   const record = await getSale(id);
   if (!record) throw fail("Encomenda não encontrada.", 404);
   const nextStatus = status ?? record.status;
   if (saleDate !== undefined && nextStatus !== "confirmada") throw fail("Só é possível definir a data de uma venda confirmada.", 400);
+  if (periodDateOverride !== undefined && nextStatus !== "confirmada") throw fail("Só é possível escolher o mês de uma venda confirmada.", 400);
   const nextDeliveryStatus = deliveryStatus ?? record.deliveryStatus;
   if (deliveryDate !== undefined && nextDeliveryStatus !== "entregue") throw fail("Só é possível definir a data de uma entrega concluída.", 400);
   if (deliveryStatus === "entregue" && !validDate(deliveryDate ?? record.deliveryDate)) throw fail("Indique uma data válida para concluir a entrega.", 400);
@@ -379,6 +381,7 @@ export async function updateSaleWorkflow(id, updates) {
     ...(deliveryStatus !== undefined && { deliveryStatus }),
     ...(saleDate !== undefined && { saleDate }),
     ...(deliveryDate !== undefined && { deliveryDate }),
+    ...(periodDateOverride !== undefined && { periodDateOverride }),
     ...(defaultSaleDate && { saleDate: defaultSaleDate }),
     ...(quoteProject !== undefined && { quoteProject: quoteProject.trim() }),
     ...(quoteSeparate !== undefined && { quoteSeparate }),

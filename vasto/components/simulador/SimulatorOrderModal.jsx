@@ -31,13 +31,14 @@ function createEquipmentImage(image, pixelRatio, quality) {
   });
 }
 
-export default function SimulatorOrderModal({ open, onClose, total, details, items = [], discountPercent = 0, drawingRef, imageSrc, english = false }) {
+export default function SimulatorOrderModal({ open, onClose, total, details, items = [], discountPercent = 0, drawingRef, imageSrc, english = false, cartOrder = false, cartConfigurations = [], onSent }) {
   const [form, setForm] = useState(initialForm);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [sent, setSent] = useState(false);
   const currency = new Intl.NumberFormat(english ? "en-IE" : "pt-PT", { style: "currency", currency: "EUR" });
-  const equipment = Boolean(imageSrc);
+  const hasImage = Boolean(imageSrc);
+  const equipment = hasImage && !cartOrder;
 
   useEffect(() => {
     if (!open) return;
@@ -64,10 +65,10 @@ export default function SimulatorOrderModal({ open, onClose, total, details, ite
     setError("");
     try {
       const drawing = drawingRef?.current?.querySelector('svg[role="img"], svg[data-order-drawing]');
-      if (!equipment && !drawing) throw new Error(english ? "The drawing is not available to attach." : "Não foi possível preparar o desenho da estante.");
+      if (!hasImage && !drawing) throw new Error(english ? "The drawing is not available to attach." : "Não foi possível preparar o desenho da estante.");
       await document.fonts?.ready;
       let createImage;
-      if (equipment) {
+      if (hasImage) {
         const image = new window.Image();
         image.src = imageSrc;
         try {
@@ -92,7 +93,7 @@ export default function SimulatorOrderModal({ open, onClose, total, details, ite
         nomeClienteManual: form.nome,
         returnBlob: true,
       });
-      const orderData = JSON.stringify({ ...form, montagem: equipment ? undefined : form.montagem, total, detalhes: details, artigos: items, idioma: english ? "en" : "pt", tipoEncomenda: equipment ? "equipamento" : "estante" });
+      const orderData = JSON.stringify({ ...form, montagem: equipment ? undefined : form.montagem, total, detalhes: details, artigos: items, idioma: english ? "en" : "pt", tipoEncomenda: cartOrder ? "carrinho" : equipment ? "equipamento" : "estante", configuracoes: cartOrder ? cartConfigurations : undefined });
       const maxRequestBytes = 3.9 * 1024 * 1024;
       const multipartMarginBytes = 96 * 1024;
       const fixedRequestBytes = budgetPdf.size + new Blob([orderData]).size + multipartMarginBytes;
@@ -133,6 +134,7 @@ export default function SimulatorOrderModal({ open, onClose, total, details, ite
       }
       if (!response.ok) throw new Error(result.error || (english ? "Could not submit the order." : "Não foi possível enviar a encomenda."));
       setSent(true);
+      onSent?.();
       trackSimulatorOrder();
     } catch (submitError) {
       setError(submitError.message || (english ? "Could not submit the order. Try again." : "Não foi possível enviar o pedido. Tente novamente."));

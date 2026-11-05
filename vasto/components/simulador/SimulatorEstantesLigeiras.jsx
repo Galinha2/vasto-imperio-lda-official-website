@@ -9,6 +9,7 @@ import SimulatorDropdown from "@/components/simulador/SimulatorDropdown";
 import SimulatorConfigurationOptions from "@/components/simulador/SimulatorConfigurationOptions";
 import SimulatorSolutions, { buildSimilarSolutions } from "@/components/simulador/SimulatorSolutions";
 import SimulatorSectionTabs from "@/components/simulador/SimulatorSectionTabs";
+import { AddToSimulatorCart } from "./SimulatorCart";
 import SimulatorOrderModal from "@/components/simulador/SimulatorOrderModal";
 import createQuoteLines from "@/components/simulador/createQuoteLines";
 import budget from "@/assets/orcamento.json";
@@ -263,7 +264,7 @@ function ShelfPreview({ activeLevels, levelsForModule, hasRemovedLevels, removeL
   );
 }
 
-export default function SimulatorEstantesLigeiras({ onQuoteDataChange, adminMode = false, adminPanel, adminDiscountPercent = null }) {
+export default function SimulatorEstantesLigeiras({ onQuoteDataChange, adminMode = false, adminPanel, adminDiscountPercent = null, initialConfiguration = {} }) {
   const [orderOpen, setOrderOpen] = useState(false);
   const orderQuoteRef = useRef(null);
   const drawingRef = useRef(null);
@@ -271,14 +272,14 @@ export default function SimulatorEstantesLigeiras({ onQuoteDataChange, adminMode
   const english = language === "en";
   const formatMeters = (value) => `${(value / 1000).toLocaleString(english ? "en-IE" : "pt-PT", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} m`;
   const formatPrice = (value) => new Intl.NumberFormat(english ? "en-IE" : "pt-PT", { style: "currency", currency: "EUR" }).format(value);
-  const [desiredLength, setDesiredLength] = useState("1.00");
-  const [rowCount, setRowCount] = useState(1);
-  const [sameShelfLength, setSameShelfLength] = useState(false);
-  const [desiredShelfLength, setDesiredShelfLength] = useState(1000);
-  const [height, setHeight] = useState(2000);
-  const [depth, setDepth] = useState(400);
-  const { levels, setLevels, levelSlots, activeLevels, levelsForModule, hasRemovedLevels, removedKey, removeLevel, restoreLevels } = useEditableLevels(4);
-  const [selectedSolutionId, setSelectedSolutionId] = useState("chosen");
+  const [desiredLength, setDesiredLength] = useState(initialConfiguration.desiredLength ?? ("1.00"));
+  const [rowCount, setRowCount] = useState(initialConfiguration.rowCount ?? (1));
+  const [sameShelfLength, setSameShelfLength] = useState(initialConfiguration.sameShelfLength ?? (false));
+  const [desiredShelfLength, setDesiredShelfLength] = useState(initialConfiguration.desiredShelfLength ?? (1000));
+  const [height, setHeight] = useState(initialConfiguration.height ?? (2000));
+  const [depth, setDepth] = useState(initialConfiguration.depth ?? (400));
+  const { levels, setLevels, levelSlots, activeLevels, levelsForModule, hasRemovedLevels, removedKey, removeLevel, restoreLevels } = useEditableLevels(initialConfiguration.levelsState || 4);
+  const [selectedSolutionId, setSelectedSolutionId] = useState(initialConfiguration.selectedSolutionId ?? ("chosen"));
   const enteredLength = Number(desiredLength.replace(",", "."));
   const isLengthUnavailable = enteredLength > 30;
   const targetLength = enteredLength > 0 ? Math.min(30, enteredLength) * 1000 : 1000;
@@ -305,9 +306,18 @@ export default function SimulatorEstantesLigeiras({ onQuoteDataChange, adminMode
     maxSteps: 80,
   }), [removedKey, baseModules, targetLength, fixedShelfLength, desiredShelfLength, height, depth, levels, rowCount]);
   const configKey = [desiredLength, rowCount, fixedShelfLength, desiredShelfLength, height, depth, levels].join("|");
-  useEffect(() => setSelectedSolutionId("chosen"), [configKey]);
+  const previousConfigKey = useRef(configKey);
+  useEffect(() => {
+    if (previousConfigKey.current !== configKey) setSelectedSolutionId("chosen");
+    previousConfigKey.current = configKey;
+  }, [configKey]);
   const modules = solutions.find((solution) => solution.id === selectedSolutionId)?.modules ?? baseModules;
-  useEffect(() => restoreLevels(), [modules.join(","), height, depth, rowCount, restoreLevels]);
+  const structureKey = [modules.join(","), height, depth, rowCount].join("|");
+  const previousStructureKey = useRef(structureKey);
+  useEffect(() => {
+    if (previousStructureKey.current !== structureKey) restoreLevels();
+    previousStructureKey.current = structureKey;
+  }, [structureKey, restoreLevels]);
   const bracedIndexes = useMemo(() => bracedBayIndexes(modules.length), [modules.length]);
   const shelfProducts = modules.map((width) => productForWidth(shelves, width, depth));
   const frameCountPerRow = modules.length + 1;
@@ -341,6 +351,9 @@ export default function SimulatorEstantesLigeiras({ onQuoteDataChange, adminMode
     ];
     const format = (value) => (value / 1000).toLocaleString("pt-PT", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     const quote = {
+      simulatorType: "ligeiras",
+      configuration: { desiredLength, rowCount, height, depth, selectedSolutionId, sameShelfLength, desiredShelfLength, levelsState: { slots: levelSlots, modules: JSON.parse(removedKey) } },
+      rowCount,
       items: createQuoteLines(entries, 1),
       discountPercent: discountRate * 100,
       total: discountedEstimate,
@@ -349,7 +362,7 @@ export default function SimulatorEstantesLigeiras({ onQuoteDataChange, adminMode
     };
     orderQuoteRef.current = quote;
     onQuoteDataChange?.(quote);
-  }, [removedKey, activeLevels.join(","), levelSlots, onQuoteDataChange, matchingFrame, frameCountPerRow, rowCount, shelfDistribution, braceDistribution, discountRate, discountedEstimate, finalLength, height, depth, levels, shelfCapacity, isLengthUnavailable, modules.length]);
+  }, [removedKey, activeLevels.join(","), levelSlots, onQuoteDataChange, matchingFrame, frameCountPerRow, rowCount, shelfDistribution, braceDistribution, discountRate, discountedEstimate, finalLength, height, depth, levels, shelfCapacity, isLengthUnavailable, modules.length, desiredLength, selectedSolutionId, sameShelfLength, desiredShelfLength]);
 
   function reset() {
     setDesiredLength("1.00"); setRowCount(1); setSameShelfLength(false); setDesiredShelfLength(1000); setHeight(2000); setDepth(400); setLevels(4);
@@ -397,6 +410,7 @@ export default function SimulatorEstantesLigeiras({ onQuoteDataChange, adminMode
 
           <div className="mt-7 border-t border-[#e5e5e7] pt-6"><p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#86868b]">{english ? "Price estimate" : "Estimativa de preço"}</p><div className="mt-1 flex flex-wrap items-baseline gap-x-2 gap-y-1"><p className="text-4xl font-semibold tracking-[-0.04em] text-(--orange)">{isLengthUnavailable ? (english ? "Unavailable" : "Indisponível") : formatPrice(discountedEstimate)}</p>{!isLengthUnavailable && <span className="text-sm font-medium text-[#86868b]">{english ? "+ VAT" : "+ IVA"}</span>}</div><p className="mt-1 text-sm text-[#6e6e73]">{english ? `Total price for ${rowCount} shelving line${rowCount === 1 ? "" : "s"} placed side by side.` : `Preço total para ${rowCount} ${rowCount === 1 ? "linha de estantes" : "linhas de estantes"} lado a lado.`}</p>{discountRate > 0 && !isLengthUnavailable && <p className="mt-2 text-sm font-semibold text-[#0879C0]">{english ? `${discountRate * 100}% discount applied: −${formatPrice(discountAmount)}` : `Desconto de ${discountRate * 100}% aplicado: −${formatPrice(discountAmount)}`}</p>}
             {!isLengthUnavailable && <div className="mt-5 grid grid-cols-2 gap-x-4 gap-y-3 rounded-[30px] bg-[#f5f5f7] p-5 text-sm"><p className="col-span-2 flex items-baseline justify-between gap-2 border-b border-[#e5e5e7] pb-2"><span className="text-[#6e6e73]">{english ? "Total row length" : "Comprimento total das filas"}</span><strong className="font-semibold text-[#1d1d1f]">{formatMeters(finalLength * rowCount)}</strong></p><p><span className="block text-xs text-[#86868b]">{english ? "Length per row" : "Comprimento por fila"}</span><strong className="mt-0.5 block font-semibold text-[#1d1d1f]">{formatMeters(finalLength)}</strong></p><p><span className="block text-xs text-[#86868b]">{english ? "Height" : "Altura"}</span><strong className="mt-0.5 block font-semibold text-[#1d1d1f]">{formatMeters(height)}</strong></p><p><span className="block text-xs text-[#86868b]">{english ? "Depth" : "Profundidade"}</span><strong className="mt-0.5 block font-semibold text-[#1d1d1f]">{formatMeters(depth)}</strong></p><p><span className="block text-xs text-[#86868b]">{english ? "Module distribution" : "Distribuição dos módulos"}</span><strong className="mt-0.5 block font-semibold text-[#1d1d1f]">{widthDistribution.map(({ width, count }) => `${count} × ${formatMeters(width)}`).join(" · ")}</strong></p><p><span className="block text-xs text-[#86868b]">{english ? "Levels" : "Níveis"}</span><strong className="mt-0.5 block font-semibold text-[#1d1d1f]">{levels}</strong></p><p className="col-span-2"><span className="block text-xs text-[#86868b]">{english ? "Shelves by length" : "Tabuleiros por medida"}</span><strong className="mt-0.5 block font-semibold text-[#1d1d1f]">{shelfDistribution.map(({ width, count }) => `${count} × ${formatMeters(width)}`).join(" · ")}</strong></p><p className="col-span-2"><span className="block text-xs text-[#86868b]">{english ? "Braces by length" : "Travamentos por medida"}</span><strong className="mt-0.5 block font-semibold text-[#1d1d1f]">{braceDistribution.map(({ width, count }) => `${count} × ${formatMeters(width)}`).join(" · ") || (english ? "None" : "Nenhum")}</strong></p><p><span className="block text-xs text-[#86868b]">{english ? "Frames" : "Bastidores"}</span><strong className="mt-0.5 block font-semibold text-[#1d1d1f]">{frameCountPerRow * rowCount}</strong></p><p><span className="block text-xs text-[#86868b]">{english ? "Maximum load per level" : "Carga máxima por nível"}</span><strong className="mt-0.5 block font-semibold text-(--orange)">{shelfCapacity} kg</strong></p></div>}
+            <AddToSimulatorCart quoteRef={orderQuoteRef} drawingRef={drawingRef} label="Estantes ligeiras" english={english} disabled={isLengthUnavailable} />
             <div className={`mt-5 grid gap-3 ${adminMode ? "grid-cols-1" : "grid-cols-[1fr_auto]"}`}>{!adminMode && <button type="button" disabled={isLengthUnavailable} onClick={() => setOrderOpen(true)} className="simulator-pill flex cursor-pointer items-center justify-center rounded-full bg-(--orange) px-4 py-3 text-sm font-semibold text-white shadow-sm transition hover:brightness-95 disabled:cursor-not-allowed disabled:opacity-50">{english ? "Order" : "Encomendar"}</button>}<button type="button" onClick={reset} className="simulator-pill cursor-pointer rounded-full border border-[#d2d2d7] bg-white px-4 py-3 text-sm font-semibold text-[#1d1d1f] transition hover:bg-[#f5f5f7]">{adminMode ? (english ? "Reset configuration" : "Repor configuração") : (english ? "Reset" : "Recomeçar")}</button></div>
           </div><p className="mt-4 text-xs leading-relaxed text-[#86868b]">{english ? "VAT is added at the applicable rate. Delivery is not included. Configuration is subject to technical validation." : "Ao valor acresce IVA à taxa legal. Transporte não incluído. Configuração sujeita a validação técnica."}</p>
         </div>

@@ -6,6 +6,7 @@ import SimulatorDropdown from "@/components/simulador/SimulatorDropdown";
 import SimulatorConfigurationOptions from "@/components/simulador/SimulatorConfigurationOptions";
 import SimulatorSolutions, { buildSimilarSolutions } from "@/components/simulador/SimulatorSolutions";
 import SimulatorSectionTabs from "@/components/simulador/SimulatorSectionTabs";
+import { AddToSimulatorCart } from "./SimulatorCart";
 import SimulatorOrderModal from "@/components/simulador/SimulatorOrderModal";
 import createQuoteLines from "@/components/simulador/createQuoteLines";
 import { isWorkbenchFrame, workbenchLevelPosition } from "@/lib/workbench.mjs";
@@ -366,7 +367,7 @@ function RackPreview({ activeLevels, levelsForModule, hasRemovedLevels, removeLe
   );
 }
 
-export default function SimulatorPicking({ onQuoteDataChange, adminMode = false, adminPanel, adminDiscountPercent = null, variant = "picking" }) {
+export default function SimulatorPicking({ onQuoteDataChange, adminMode = false, adminPanel, adminDiscountPercent = null, initialConfiguration = {}, variant = "picking" }) {
   const workbench = adminMode && variant === "workbench";
   const usableFrames = frames.filter((frame) => workbench || !frame.workbenchOnly);
   const eligibleFrames = usableFrames.filter((frame) => workbench ? isWorkbenchFrame(frame) : frame.height >= 1000);
@@ -379,17 +380,17 @@ export default function SimulatorPicking({ onQuoteDataChange, adminMode = false,
   const english = language === "en";
   const formatMeters = (value) => `${(value / 1000).toLocaleString(english ? "en-IE" : "pt-PT", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} m`;
   const formatPrice = (value) => new Intl.NumberFormat(english ? "en-IE" : "pt-PT", { style: "currency", currency: "EUR" }).format(value);
-  const [desiredLength, setDesiredLength] = useState("1.00");
-  const [rowCount, setRowCount] = useState(1);
-  const [sameBeamLength, setSameBeamLength] = useState(false);
-  const [desiredBeamLength, setDesiredBeamLength] = useState(beamLengths[0] || 1000);
-  const [height, setHeight] = useState(workbench ? defaultFrame?.height || 1000 : 2000);
-  const [depth, setDepth] = useState(workbench ? defaultFrame?.depth || 600 : 400);
-  const { levels, setLevels, levelSlots, activeLevels, levelsForModule, hasRemovedLevels, removedKey, removeLevel, restoreLevels } = useEditableLevels(workbench ? 2 : 4);
-  const [floorType, setFloorType] = useState("Aglomerado");
-  const [galvanized, setGalvanized] = useState(true);
-  const [reinforcedBeams, setReinforcedBeams] = useState(false);
-  const [selectedSolutionId, setSelectedSolutionId] = useState("chosen");
+  const [desiredLength, setDesiredLength] = useState(initialConfiguration.desiredLength ?? ("1.00"));
+  const [rowCount, setRowCount] = useState(initialConfiguration.rowCount ?? (1));
+  const [sameBeamLength, setSameBeamLength] = useState(initialConfiguration.sameBeamLength ?? (false));
+  const [desiredBeamLength, setDesiredBeamLength] = useState(initialConfiguration.desiredBeamLength ?? (beamLengths[0] || 1000));
+  const [height, setHeight] = useState(initialConfiguration.height ?? (workbench ? defaultFrame?.height || 1000 : 2000));
+  const [depth, setDepth] = useState(initialConfiguration.depth ?? (workbench ? defaultFrame?.depth || 600 : 400));
+  const { levels, setLevels, levelSlots, activeLevels, levelsForModule, hasRemovedLevels, removedKey, removeLevel, restoreLevels } = useEditableLevels(initialConfiguration.levelsState || (workbench ? 2 : 4));
+  const [floorType, setFloorType] = useState(initialConfiguration.floorType ?? ("Aglomerado"));
+  const [galvanized, setGalvanized] = useState(initialConfiguration.galvanized ?? (true));
+  const [reinforcedBeams, setReinforcedBeams] = useState(initialConfiguration.reinforcedBeams ?? (false));
+  const [selectedSolutionId, setSelectedSolutionId] = useState(initialConfiguration.selectedSolutionId ?? ("chosen"));
   const availableBeamLengths = useMemo(() => unique(beams
     .filter((beam) => beam.produto.includes(reinforcedBeams ? "Viga Z100" : "Viga Z60"))
     .map((beam) => beam.length)), [reinforcedBeams]);
@@ -422,14 +423,23 @@ export default function SimulatorPicking({ onQuoteDataChange, adminMode = false,
     maxSteps: 8,
   }), [removedKey, baseModules, targetLength, height, depth, levels, floorType, galvanized, reinforcedBeams, sameBeamLength, desiredBeamLength, rowCount]);
   const configKey = [desiredLength, rowCount, sameBeamLength, desiredBeamLength, height, depth, levels, floorType, galvanized, reinforcedBeams].join("|");
-  useEffect(() => setSelectedSolutionId("chosen"), [configKey]);
+  const previousConfigKey = useRef(configKey);
+  useEffect(() => {
+    if (previousConfigKey.current !== configKey) setSelectedSolutionId("chosen");
+    previousConfigKey.current = configKey;
+  }, [configKey]);
   useEffect(() => {
     if (!availableBeamLengths.includes(Number(desiredBeamLength)) && availableBeamLengths.length) {
       setDesiredBeamLength(availableBeamLengths[0]);
     }
   }, [availableBeamLengths, desiredBeamLength]);
   const modules = solutions.find((solution) => solution.id === selectedSolutionId)?.modules ?? baseModules;
-  useEffect(() => restoreLevels(), [modules.join(","), height, depth, rowCount, restoreLevels]);
+  const structureKey = [modules.join(","), height, depth, rowCount].join("|");
+  const previousStructureKey = useRef(structureKey);
+  useEffect(() => {
+    if (previousStructureKey.current !== structureKey) restoreLevels();
+    previousStructureKey.current = structureKey;
+  }, [structureKey, restoreLevels]);
   const moduleSubtotal = modules.reduce((sum, moduleLength, moduleIndex) => {
     const beamProfile = reinforcedBeams ? "Viga Z100" : "Viga Z60";
     const beam = beams.find((product) => product.length === moduleLength && product.produto.includes(beamProfile));
@@ -480,6 +490,9 @@ export default function SimulatorPicking({ onQuoteDataChange, adminMode = false,
     ];
     const format = (value) => (value / 1000).toLocaleString("pt-PT", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     const quote = {
+      simulatorType: workbench ? "bancadas" : "picking",
+      configuration: { desiredLength, rowCount, sameBeamLength, desiredBeamLength, height, depth, floorType, galvanized, reinforcedBeams, selectedSolutionId, levelsState: { slots: levelSlots, modules: JSON.parse(removedKey) } },
+      rowCount,
       items: createQuoteLines(entries, 3),
       discountPercent: discountRate * 100,
       total: discountedEstimate,
@@ -488,7 +501,7 @@ export default function SimulatorPicking({ onQuoteDataChange, adminMode = false,
     };
     orderQuoteRef.current = quote;
     onQuoteDataChange?.(quote);
-  }, [removedKey, activeLevels.join(","), levelSlots, workbench, onQuoteDataChange, matchingFrame, modules, levels, rowCount, depth, floorType, safetyBrake, reinforcedBeams, galvanized, discountRate, discountedEstimate, finalLength, height, levelCapacity, isLengthUnavailable]);
+  }, [removedKey, activeLevels.join(","), levelSlots, workbench, onQuoteDataChange, matchingFrame, modules, levels, rowCount, depth, floorType, safetyBrake, reinforcedBeams, galvanized, discountRate, discountedEstimate, finalLength, height, levelCapacity, isLengthUnavailable, desiredLength, sameBeamLength, desiredBeamLength, selectedSolutionId]);
 
   function hasPricedShelf(shelfDepth, material) {
     return shelves.some((shelf) => shelf.depth === shelfDepth && shelf.material === material && typeof shelf["preço"] === "number");
@@ -637,6 +650,7 @@ export default function SimulatorPicking({ onQuoteDataChange, adminMode = false,
                 <p className="col-span-2 border-t border-[#e5e5e7] pt-2 text-[#6e6e73]">{english ? "Maximum load per beam pair" : "Carga máxima por par de vigas"} <strong className="font-semibold text-(--orange)">{levelCapacity.toLocaleString(english ? "en-IE" : "pt-PT")} kg</strong></p>
               </div>
             )}
+            <AddToSimulatorCart quoteRef={orderQuoteRef} drawingRef={drawingRef} label={workbench ? "Bancadas" : "Picking"} english={english} disabled={isLengthUnavailable} />
             <div className={`mt-5 grid gap-3 ${adminMode ? "grid-cols-1" : "grid-cols-[1fr_auto]"}`}>
               {!adminMode && <button type="button" disabled={isLengthUnavailable} onClick={() => setOrderOpen(true)} className="flex cursor-pointer items-center justify-center simulator-pill rounded-full bg-(--orange) px-4 py-3 text-sm font-semibold text-white shadow-sm transition hover:brightness-95 disabled:cursor-not-allowed disabled:opacity-50">{english ? "Order" : "Encomendar"}</button>}
               <button type="button" onClick={reset} className="cursor-pointer simulator-pill rounded-full border border-[#d2d2d7] bg-white px-4 py-3 text-sm font-semibold text-[#1d1d1f] transition hover:bg-[#f5f5f7]">{adminMode ? (english ? "Reset configuration" : "Repor configuração") : (english ? "Reset" : "Recomeçar")}</button>

@@ -11,6 +11,8 @@ import { quoteFilename } from "@/lib/quote-filenames.mjs";
 import { hasCustomerName, resolveCustomerName } from "@/lib/customer-identity.mjs";
 import QuoteEmailButton from "./QuoteEmailButton";
 import generateBudgetPdf from "@/lib/generateBudgetPdf";
+import { useSimulatorCart, CartContents } from "@/components/simulador/SimulatorCart";
+import { cartDrawing } from "@/components/simulador/cart-images";
 import orcamento from "@/assets/orcamento.json";
 
 const simuladores = [
@@ -21,6 +23,7 @@ const simuladores = [
 ];
 
 export default function SimulatorAdmin() {
+  const cart = useSimulatorCart();
   const [simuladorAtivo, setSimuladorAtivo] = useState("ligeiras");
   const [aExportar, setAExportar] = useState(false);
   const [mensagem, setMensagem] = useState("");
@@ -82,23 +85,24 @@ export default function SimulatorAdmin() {
     return () => controller.abort();
   }, [nifCliente, savedCustomer]);
 
+  const effectiveQuote = cart?.entries.length ? cart.quote : quoteData;
+  async function obterImagem() {
+    if (cart?.entries.length) return cartDrawing(cart.entries);
+    const drawing = capturaRef.current?.querySelector('svg[role="img"]');
+    if (!drawing) throw new Error("O desenho da pré-visualização não está disponível.");
+    await document.fonts?.ready;
+    const { toJpeg } = await import("html-to-image");
+    return toJpeg(drawing, { pixelRatio: 2, quality: .9, backgroundColor: "#ffffff", cacheBust: true });
+  }
   async function gerarImagem() {
     if (!capturaRef.current || aExportar) return;
     setAExportar(true);
     setMensagem("");
     setMensagemSucesso(false);
     try {
-      await document.fonts?.ready;
-      const { toPng } = await import("html-to-image");
-      const desenho = capturaRef.current.querySelector('svg[role="img"]');
-      if (!desenho) throw new Error("O desenho da pré-visualização não está disponível.");
-      const dataUrl = await toPng(desenho, {
-        pixelRatio: 3,
-        backgroundColor: "#ffffff",
-        cacheBust: true,
-      });
+      const dataUrl = await obterImagem();
       const link = document.createElement("a");
-      link.download = quoteFilename({ quoteType: simuladorAtivo, customerName: resolveCustomerName(dadosEmpresa, nomeCliente) }, "Desenho", "png");
+      link.download = quoteFilename({ quoteType: cart?.entries.length ? "Conjunto" : simuladorAtivo, customerName: resolveCustomerName(dadosEmpresa, nomeCliente) }, "Desenho", "jpg");
       link.href = dataUrl;
       link.click();
     } catch (error) {
@@ -110,7 +114,7 @@ export default function SimulatorAdmin() {
   }
 
   function obterDadosPdf() {
-    if (!quoteData || quoteData.unavailable || !quoteData.items?.length || aExportar) {
+    if (!effectiveQuote || effectiveQuote.unavailable || !effectiveQuote.items?.length || aExportar) {
       setMensagem("A configuração atual não tem dados suficientes para gerar o orçamento.");
       return null;
     }
@@ -122,10 +126,10 @@ export default function SimulatorAdmin() {
       quoteNumberRef,
       telefoneCliente,
       source: "simulador",
-      quoteType: simuladorAtivo,
-      additionalDetails: quoteData.details || "",
+      quoteType: cart?.entries.length ? "Conjunto" : simuladorAtivo,
+      additionalDetails: effectiveQuote.details || "",
       linhas: [
-        ...quoteData.items,
+        ...effectiveQuote.items,
         ...produtosExtra.filter((item) => item.produto).map((item) => {
           const quantidade = Math.max(0, Number(item.unidades) || 0);
           const preco = Number(item.preco ?? item.produto["preço"]) || 0;
@@ -139,7 +143,7 @@ export default function SimulatorAdmin() {
           };
         }),
       ],
-      descontoSelecionado: descontoManual === null ? quoteData.discountPercent : Number(descontoManual || 0),
+      descontoSelecionado: cart?.entries.length ? 0 : descontoManual === null ? effectiveQuote.discountPercent : Number(descontoManual || 0),
       dadosEmpresa,
       nif: nifCliente,
       nomeClienteManual: nomeCliente.trim(),
@@ -169,19 +173,9 @@ export default function SimulatorAdmin() {
     setMensagem("");
     setMensagemSucesso(false);
     try {
-      await document.fonts?.ready;
-      const desenho = capturaRef.current?.querySelector('svg[role="img"]');
-      if (!desenho) throw new Error("O desenho da pré-visualização não está disponível.");
-      const [{ toJpeg }, pdf] = await Promise.all([
-        import("html-to-image"),
-        generateBudgetPdf({ ...dadosPdf, returnBlob: true }),
+      const [imagemDataUrl, pdf] = await Promise.all([
+        obterImagem(), generateBudgetPdf({ ...dadosPdf, returnBlob: true }),
       ]);
-      const imagemDataUrl = await toJpeg(desenho, {
-        pixelRatio: 2,
-        backgroundColor: "#ffffff",
-        cacheBust: true,
-        quality: 0.9,
-      });
       const imagemBlob = await (await fetch(imagemDataUrl)).blob();
       if (imagemBlob.size > 4 * 1024 * 1024) throw new Error("A imagem gerada ultrapassa o limite de 4 MB.");
       if (pdf.size > 6 * 1024 * 1024) throw new Error("O PDF gerado ultrapassa o limite de 6 MB.");
@@ -190,8 +184,8 @@ export default function SimulatorAdmin() {
       const form = new FormData();
       form.append("email", emailCliente.trim());
       form.append("telefone", telefoneCliente.trim());
-      form.append("pdf", pdf, quoteFilename({ quoteType: simuladorAtivo, customerName: resolveCustomerName(dadosEmpresa, nomeCliente) }));
-      form.append("image", imagemBlob, quoteFilename({ quoteType: simuladorAtivo, customerName: resolveCustomerName(dadosEmpresa, nomeCliente) }, "Desenho", "jpg"));
+      form.append("pdf", pdf, quoteFilename({ quoteType: cart?.entries.length ? "Conjunto" : simuladorAtivo, customerName: resolveCustomerName(dadosEmpresa, nomeCliente) }));
+      form.append("image", imagemBlob, quoteFilename({ quoteType: cart?.entries.length ? "Conjunto" : simuladorAtivo, customerName: resolveCustomerName(dadosEmpresa, nomeCliente) }, "Desenho", "jpg"));
       const response = await fetch("/api/admin/sales", { method: "POST", body: form, cache: "no-store" });
       const result = await response.json();
       if (response.status === 401) throw new Error("A sessão de administração expirou. Inicie sessão novamente.");
@@ -211,9 +205,10 @@ export default function SimulatorAdmin() {
   const Simulator = ativo.Component;
   const adminPanel = (
     <SimulatorAdminQuoteTools
-      quoteData={quoteData}
-      descontoManual={descontoManual}
-      setDescontoManual={setDescontoManual}
+      quoteData={effectiveQuote}
+      cartMode={Boolean(cart?.entries.length)}
+      descontoManual={cart?.entries.length ? 0 : descontoManual}
+      setDescontoManual={cart?.entries.length ? () => setMensagem("O carrinho conserva o desconto de cada configuração. Ajuste o desconto antes de adicionar a configuração.") : setDescontoManual}
       produtosExtra={produtosExtra}
       setProdutosExtra={setProdutosExtra}
       produtoExtraAberto={produtoExtraAberto}
@@ -251,6 +246,8 @@ export default function SimulatorAdmin() {
           </div>
         </header>
 
+        {cart?.entries.length > 0 && <section className="rounded-3xl border border-[#e5e5e7] bg-white p-5"><h2 className="text-lg font-semibold">Carrinho · {cart.entries.length} configurações</h2><p className="mt-1 text-xs text-[#86868b]">O PDF, o envio por email e o envio para vendas incluem apenas as configurações adicionadas ao carrinho, com os descontos guardados em cada uma, e os artigos extra.</p><CartContents /><p className="mt-3 text-sm font-semibold">Total das configurações: {new Intl.NumberFormat('pt-PT',{style:'currency',currency:'EUR'}).format(cart.quote.total)} + IVA</p></section>}
+
         <nav aria-label="Escolher tipo de equipamento" className="grid gap-2 sm:grid-cols-2 xl:grid-cols-4">
           {simuladores.map(({ id, label, description, image }) => (
             <button
@@ -283,13 +280,8 @@ export default function SimulatorAdmin() {
         <div className="flex justify-end"><QuoteEmailButton initialEmail={emailCliente} prepare={async () => {
           const data = obterDadosPdf();
           if (!data) throw new Error("Confirme a configuração e os dados do cliente.");
-          await document.fonts?.ready;
-          const drawing = capturaRef.current?.querySelector('svg[role="img"]');
-          if (!drawing) throw new Error("O desenho não está disponível.");
-          const { toJpeg } = await import("html-to-image");
-          const blob = await generateBudgetPdf({ ...data, returnBlob: true });
-          const url = await toJpeg(drawing, { pixelRatio: 1.5, quality: 0.85, backgroundColor: "#ffffff", cacheBust: true });
-          return [{ blob, name: quoteFilename({ quoteType: simuladorAtivo, customerName: resolveCustomerName(dadosEmpresa, nomeCliente) }) }, { blob: await (await fetch(url)).blob(), name: quoteFilename({ quoteType: simuladorAtivo, customerName: resolveCustomerName(dadosEmpresa, nomeCliente) }, "Desenho", "jpg") }];
+          const [blob, url] = await Promise.all([generateBudgetPdf({ ...data, returnBlob: true }), obterImagem()]);
+          return [{ blob, name: quoteFilename({ quoteType: cart?.entries.length ? "Conjunto" : simuladorAtivo, customerName: resolveCustomerName(dadosEmpresa, nomeCliente) }) }, { blob: await (await fetch(url)).blob(), name: quoteFilename({ quoteType: cart?.entries.length ? "Conjunto" : simuladorAtivo, customerName: resolveCustomerName(dadosEmpresa, nomeCliente) }, "Desenho", "jpg") }];
         }} /></div>
 
         <section ref={capturaRef} aria-label={`Simulação de ${ativo.label}`} className="min-w-0">

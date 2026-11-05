@@ -26,7 +26,7 @@ export default async function handler(req, res) {
     temporaryFiles = Object.values(files).flat().filter(Boolean).map((file) => file.filepath);
     const rawData = Array.isArray(fields.dados) ? fields.dados[0] : fields.dados;
     const data = JSON.parse(rawData || "{}");
-    const { nome, nif, moradaFiscal, moradaEnvioIgual, moradaEnvio, montagem, telefone, email, observacoes, total, detalhes, artigos, idioma, tipoEncomenda } = data;
+    const { nome, nif, moradaFiscal, moradaEnvioIgual, moradaEnvio, montagem, telefone, email, observacoes, total, detalhes, artigos, idioma, tipoEncomenda, configuracoes } = data;
     const equipmentOrder = tipoEncomenda === "equipamento";
     if (!nome?.trim() || !/^\d{9}$/.test(String(nif || "")) || !moradaFiscal?.trim() || (!moradaEnvioIgual && !moradaEnvio?.trim()) || !telefone?.trim() || !email?.trim() || !Number.isFinite(Number(total))) {
       return res.status(400).json({ error: "Preencha os dados obrigatórios e confirme o NIF." });
@@ -138,8 +138,9 @@ export default async function handler(req, res) {
       moradaEnvio: cleanText(shippingAddress, 500),
       montagem: equipmentOrder ? null : Boolean(montagem),
       observacoes: cleanText(observacoes, 2000),
-      detalhes: cleanText(detalhes, 8000),
-      artigos: items.filter((item) => item && typeof item === "object").slice(0, 100).map((item) => ({
+      detalhes: cleanText(detalhes, 20000),
+      configuracoes: tipoEncomenda === "carrinho" && Array.isArray(configuracoes) ? configuracoes.slice(0, 10).map((entry) => ({ nome: cleanText(entry.label, 100), quantidade: Number(entry.quantity) || 1, detalhes: cleanText(entry.details, 2000) })) : undefined,
+      artigos: items.filter((item) => item && typeof item === "object").slice(0, 1000).map((item) => ({
         refCompleta: cleanText(item.refCompleta, 80),
         produto: cleanText(item.produto, 180),
         unidades: Number.isFinite(Number(item.unidades)) ? Number(item.unidades) : 0,

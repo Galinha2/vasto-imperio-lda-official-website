@@ -7,6 +7,7 @@ import { IoIosArrowDown } from "react-icons/io";
 
 export default function SimulatorAdminQuoteTools({
   quoteData,
+  cartMode = false,
   descontoManual,
   setDescontoManual,
   produtosExtra,
@@ -41,12 +42,13 @@ export default function SimulatorAdminQuoteTools({
           <div>
             <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#86868b]">Preparar proposta</p>
             <h2 className="mt-1 text-lg font-semibold text-[#1d1d1f]">Ajustes ao orçamento</h2>
-            <p className="mt-1 max-w-2xl text-sm text-[#6e6e73]">O desconto sugerido é aplicado automaticamente. Pode ajustá-lo e acrescentar artigos do catálogo.</p>
+            <p className="mt-1 max-w-2xl text-sm text-[#6e6e73]">{cartMode ? "O carrinho conserva os preços e descontos de cada configuração. Os artigos extra são acrescentados ao conjunto." : "O desconto sugerido é aplicado automaticamente. Pode ajustá-lo e acrescentar artigos do catálogo."}</p>
           </div>
           <label className="flex w-full flex-col gap-1.5 text-sm font-medium text-[#515158] sm:w-52">
-            Desconto (%)
+            {cartMode ? "Descontos já incluídos" : "Desconto (%)"}
             <input
               type="number"
+              disabled={cartMode}
               min="0"
               max="100"
               step="1"

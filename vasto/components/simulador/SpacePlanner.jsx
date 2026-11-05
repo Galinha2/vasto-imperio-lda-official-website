@@ -3,6 +3,7 @@
 import { useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { IoGridOutline, IoDownloadOutline } from "react-icons/io5";
+import { AddToSimulatorCart } from "./SimulatorCart";
 import SimulatorOrderModal from "./SimulatorOrderModal";
 import createQuoteLines from "./createQuoteLines";
 import budget from "@/assets/orcamento.json";
@@ -20,15 +21,15 @@ const meters = (n) => Number(n).toLocaleString("pt-PT", { maximumFractionDigits:
 const walls = { top: "Parede de cima", right: "Parede direita", bottom: "Parede de baixo", left: "Parede esquerda" };
 const control = "mt-2 h-11 w-full rounded-full border border-[#e5e5e7] bg-[#fbfbfd] px-4 text-sm text-[#1d1d1f] outline-none focus:border-[#ea580c] focus:ring-2 focus:ring-orange-100";
 
-export default function SpacePlanner({ models, initialType, onClose, onTypeChange, embedded = false }) {
-  const [form, setForm] = useState({ width: "3", length: "5", height: initialType === "racks" ? "6" : "3", depth: String(initialType === "racks" ? models.find((m) => m.type === "racks")?.depth || 1.1 : 0.6), aisle: initialType === "racks" ? "3.5" : "1", doorWall: "bottom", doorOffset: "1.4", doorWidth: "1.2", center: false, parallelOnly: false, sameModuleLength: false, moduleLength: "1", rowLayout: "auto", rowCount: "6", rowDirection: "length", levels: "4", optimization: "economico", material: "Aglomerado" });
-  const [type, setType] = useState(initialType || "picking");
+export default function SpacePlanner({ models, initialType, onClose, onTypeChange, embedded = false, initialConfiguration = {} }) {
+  const [form, setForm] = useState(initialConfiguration.form || { width: "3", length: "5", height: initialType === "racks" ? "6" : "3", depth: String(initialType === "racks" ? models.find((m) => m.type === "racks")?.depth || 1.1 : 0.6), aisle: initialType === "racks" ? "3.5" : "1", doorWall: "bottom", doorOffset: "1.4", doorWidth: "1.2", center: false, parallelOnly: false, sameModuleLength: false, moduleLength: "1", rowLayout: "auto", rowCount: "6", rowDirection: "length", levels: "4", optimization: "economico", material: "Aglomerado" });
+  const [type, setType] = useState(initialConfiguration.type || initialType || "picking");
   const drawingRef = useRef(null);
   const orderQuoteRef = useRef(null);
   const [orderOpen, setOrderOpen] = useState(false);
-  const [selected, setSelected] = useState(0);
-  const [excludedWalls, setExcludedWalls] = useState([]);
-  const [removedByPlan, setRemovedByPlan] = useState({});
+  const [selected, setSelected] = useState(initialConfiguration.selected || 0);
+  const [excludedWalls, setExcludedWalls] = useState(initialConfiguration.excludedWalls || []);
+  const [removedByPlan, setRemovedByPlan] = useState(initialConfiguration.removedByPlan || {});
   const [selectedShelf, setSelectedShelf] = useState(null);
   const update = (key, value) => { setForm((old) => ({ ...old, [key]: value })); setSelected(0); setRemovedByPlan({}); setSelectedShelf(null); };
   function changeType(next) {
@@ -75,18 +76,21 @@ export default function SpacePlanner({ models, initialType, onClose, onTypeChang
   const pad = 65;
   const field = (key, label, min, max, step = "0.1") => <label className="block text-sm font-semibold text-[#424245]">{label}<input type="number" min={min} max={max} step={step} value={form[key]} onChange={(e) => update(key, e.target.value)} className={control} /></label>;
 
-  function orderSpace() {
+  function prepareSpaceQuote() {
     if (!estimate || !validLevels || !plan?.shelves.length) return;
     const family = type === "ligeiras" ? 1 : type === "picking" ? 3 : 2;
     const entries = estimate.parts.filter((part) => part.quantity > 0).map((part) => ({ product: budget.produtos.find((product) => product.ref === family && product.produto === part.name && product["preço"] === part.price), quantity: part.quantity }));
     if (entries.some((entry) => !entry.product)) return;
     const items = createQuoteLines(entries, family);
     orderQuoteRef.current = {
+      simulatorType: type,
+      configuration: {kind: "space", form, type, selected, excludedWalls, removedByPlan},
       total: discountedTotal, items, discountPercent: discountRate * 100,
       details: `Planeamento de espaço · ${type} · Sala: ${meters(config.width)} × ${meters(config.length)} m · Espaço entre filas: ${meters(config.aisle)} m · Disposição: ${form.parallelOnly ? "Apenas filas paralelas" : "Livre"} · Altura disponível: ${meters(config.height)} m · Porta: ${walls[form.doorWall]}, ${meters(config.doorWidth)} m de largura, a ${meters(config.doorOffset)} m do canto · ${plan.shelves.length} módulos · ${form.levels} níveis · Tampo: ${type === "picking" ? form.material : type === "racks" ? "Sem tampo" : "Metálico"} · Altura das estantes: ${meters(plan.height)} m · Profundidade: ${meters(config.depth)} m.\n${plan.shelves.map((shelf, index) => `Módulo ${index + 1}: posição (${meters(shelf.x)}; ${meters(shelf.y)}) m, ${meters(shelf.w)} × ${meters(shelf.h)} m`).join("\n")}`,
     };
-    setOrderOpen(true);
+    return orderQuoteRef.current;
   }
+  function orderSpace() { if (prepareSpaceQuote()) setOrderOpen(true); }
 
   function download() {
     const svg = document.getElementById("space-planner-drawing");
@@ -147,6 +151,7 @@ export default function SpacePlanner({ models, initialType, onClose, onTypeChang
                 <p className="mt-3 text-xs leading-relaxed text-[#6e6e73]">{plan.shelves.length} módulos · {form.levels} níveis por módulo{type === "picking" ? ` · Tampo: ${form.material}` : ""}. Os módulos seguidos na mesma fila partilham o bastidor: uma fila de N módulos leva N + 1 bastidores. Inclui os componentes do catálogo, sem transporte ou montagem.</p>
                 {discountRate > 0 && validLevels && <p className="mt-2 text-sm font-semibold text-[#0879C0]">Desconto de {discountRate * 100}% aplicado: −{money(estimate.subtotal * discountRate)}</p>}
                 {!validLevels && <p role="alert" className="mt-3 text-xs text-amber-800">Escolha um número inteiro de níveis entre {type === "racks" ? 1 : 2} e 11 para calcular o preço.</p>}
+                <AddToSimulatorCart getQuote={prepareSpaceQuote} drawingRef={drawingRef} label={`Planeamento ${type === "ligeiras" ? "Estantes ligeiras" : type === "picking" ? "Picking" : "Racks"}`} disabled={!estimate || !validLevels || !plan.shelves.length} />
                 <button type="button" onClick={orderSpace} disabled={!estimate || !validLevels || !plan.shelves.length} className="simulator-pill mt-5 flex w-full cursor-pointer items-center justify-center rounded-full bg-(--orange) px-4 py-3 text-sm font-semibold text-white shadow-sm transition hover:brightness-95 disabled:cursor-not-allowed disabled:opacity-50">Encomendar</button>
                 <p className="mt-4 text-xs leading-relaxed text-[#86868b]">Ao valor acresce IVA à taxa legal em vigor. Transporte não incluído. Configuração sujeita a validação técnica.</p>
               </section>

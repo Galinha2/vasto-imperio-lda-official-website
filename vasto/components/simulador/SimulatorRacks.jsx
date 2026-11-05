@@ -6,6 +6,7 @@ import SimulatorDropdown from "@/components/simulador/SimulatorDropdown";
 import SimulatorConfigurationOptions from "@/components/simulador/SimulatorConfigurationOptions";
 import SimulatorSolutions, { buildSimilarSolutions } from "@/components/simulador/SimulatorSolutions";
 import SimulatorSectionTabs from "@/components/simulador/SimulatorSectionTabs";
+import { AddToSimulatorCart } from "./SimulatorCart";
 import SimulatorOrderModal from "@/components/simulador/SimulatorOrderModal";
 import createQuoteLines from "@/components/simulador/createQuoteLines";
 import useEditableLevels from "./useEditableLevels";
@@ -250,7 +251,7 @@ function RackPreview({ activeLevels, levelsForModule, hasRemovedLevels, removeLe
   );
 }
 
-export default function SimulatorRacks({ onQuoteDataChange, adminMode = false, adminPanel, adminDiscountPercent = null }) {
+export default function SimulatorRacks({ onQuoteDataChange, adminMode = false, adminPanel, adminDiscountPercent = null, initialConfiguration = {} }) {
   const [orderOpen, setOrderOpen] = useState(false);
   const orderQuoteRef = useRef(null);
   const drawingRef = useRef(null);
@@ -258,14 +259,14 @@ export default function SimulatorRacks({ onQuoteDataChange, adminMode = false, a
   const english = language === "en";
   const formatMeters = (value) => `${(value / 1000).toLocaleString(english ? "en-IE" : "pt-PT", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} m`;
   const formatPrice = (value) => new Intl.NumberFormat(english ? "en-IE" : "pt-PT", { style: "currency", currency: "EUR" }).format(value);
-  const [desiredLength, setDesiredLength] = useState("2.30");
-  const [rowCount, setRowCount] = useState(1);
-  const [sameBeamLength, setSameBeamLength] = useState(false);
-  const [desiredBeamLength, setDesiredBeamLength] = useState(beamLengths[0] || 1000);
-  const [height, setHeight] = useState(4000);
-  const [depth, setDepth] = useState(1000);
-  const { levels, setLevels, levelSlots, activeLevels, levelsForModule, hasRemovedLevels, removedKey, removeLevel, restoreLevels } = useEditableLevels(4);
-  const [selectedSolutionId, setSelectedSolutionId] = useState("chosen");
+  const [desiredLength, setDesiredLength] = useState(initialConfiguration.desiredLength ?? ("2.30"));
+  const [rowCount, setRowCount] = useState(initialConfiguration.rowCount ?? (1));
+  const [sameBeamLength, setSameBeamLength] = useState(initialConfiguration.sameBeamLength ?? (false));
+  const [desiredBeamLength, setDesiredBeamLength] = useState(initialConfiguration.desiredBeamLength ?? (beamLengths[0] || 1000));
+  const [height, setHeight] = useState(initialConfiguration.height ?? (4000));
+  const [depth, setDepth] = useState(initialConfiguration.depth ?? (1000));
+  const { levels, setLevels, levelSlots, activeLevels, levelsForModule, hasRemovedLevels, removedKey, removeLevel, restoreLevels } = useEditableLevels(initialConfiguration.levelsState || 4);
+  const [selectedSolutionId, setSelectedSolutionId] = useState(initialConfiguration.selectedSolutionId ?? ("chosen"));
   const enteredLength = Number(desiredLength.replace(",", "."));
   const isLengthUnavailable = enteredLength > 30;
   const targetLength = enteredLength > 0 ? Math.min(30, enteredLength) * 1000 : 2300;
@@ -289,9 +290,18 @@ export default function SimulatorRacks({ onQuoteDataChange, adminMode = false, a
     maxSteps: 8,
   }), [removedKey, baseModules, targetLength, height, depth, levels, sameBeamLength, desiredBeamLength, rowCount]);
   const configKey = [desiredLength, rowCount, sameBeamLength, desiredBeamLength, height, depth, levels].join("|");
-  useEffect(() => setSelectedSolutionId("chosen"), [configKey]);
+  const previousConfigKey = useRef(configKey);
+  useEffect(() => {
+    if (previousConfigKey.current !== configKey) setSelectedSolutionId("chosen");
+    previousConfigKey.current = configKey;
+  }, [configKey]);
   const modules = solutions.find((solution) => solution.id === selectedSolutionId)?.modules ?? baseModules;
-  useEffect(() => restoreLevels(), [modules.join(","), height, depth, rowCount, restoreLevels]);
+  const structureKey = [modules.join(","), height, depth, rowCount].join("|");
+  const previousStructureKey = useRef(structureKey);
+  useEffect(() => {
+    if (previousStructureKey.current !== structureKey) restoreLevels();
+    previousStructureKey.current = structureKey;
+  }, [structureKey, restoreLevels]);
   const moduleSubtotal = modules.reduce((sum, moduleLength, moduleIndex) => {
     const beam = beams.find((item) => item.length === moduleLength);
     return sum + (2 * numericPrice(beam) + 4 * numericPrice(safetyBrake)) * levelsForModule(moduleIndex).length;
@@ -322,6 +332,9 @@ export default function SimulatorRacks({ onQuoteDataChange, adminMode = false, a
     ];
     const format = (value) => (value / 1000).toLocaleString("pt-PT", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     const quote = {
+      simulatorType: "racks",
+      configuration: { desiredLength, rowCount, sameBeamLength, desiredBeamLength, height, depth, selectedSolutionId, levelsState: { slots: levelSlots, modules: JSON.parse(removedKey) } },
+      rowCount,
       items: createQuoteLines(entries, 2),
       discountPercent: discountRate * 100,
       total: discountedEstimate,
@@ -330,7 +343,7 @@ export default function SimulatorRacks({ onQuoteDataChange, adminMode = false, a
     };
     orderQuoteRef.current = quote;
     onQuoteDataChange?.(quote);
-  }, [removedKey, activeLevels.join(","), levelSlots, onQuoteDataChange, matchingFrame, modules, levels, rowCount, safetyBrake, discountRate, discountedEstimate, finalLength, height, depth, beamDistribution, capacityIsMinimum, levelCapacity, isLengthUnavailable]);
+  }, [removedKey, activeLevels.join(","), levelSlots, onQuoteDataChange, matchingFrame, modules, levels, rowCount, safetyBrake, discountRate, discountedEstimate, finalLength, height, depth, beamDistribution, capacityIsMinimum, levelCapacity, isLengthUnavailable, desiredLength, sameBeamLength, desiredBeamLength, selectedSolutionId]);
 
   function handleHeightChange(nextHeight) {
     const validDepths = unique(frames.filter((frame) => frame.height === nextHeight).map((frame) => frame.depth));
@@ -398,6 +411,7 @@ export default function SimulatorRacks({ onQuoteDataChange, adminMode = false, a
               <p className="col-span-2"><span className="block text-xs text-[#86868b]">{english ? "Beams by length" : "Vigas por medida"}</span><strong className="mt-0.5 block font-semibold text-[#1d1d1f]">{beamDistribution.map(({ length, count }) => `${count} × ${formatMeters(length)}`).join(" · ")}</strong></p>
               <p className="col-span-2 border-t border-[#e5e5e7] pt-2 text-[#6e6e73]">{english ? "Maximum load per beam pair" : "Carga máxima por par de vigas"} <strong className="font-semibold text-(--orange)">{capacityIsMinimum ? "> " : ""}{levelCapacity.toLocaleString(english ? "en-IE" : "pt-PT")} kg</strong></p>
             </div>}
+            <AddToSimulatorCart quoteRef={orderQuoteRef} drawingRef={drawingRef} label="Racks" english={english} disabled={isLengthUnavailable} />
             <div className={`mt-5 grid gap-3 ${adminMode ? "grid-cols-1" : "grid-cols-[1fr_auto]"}`}>{!adminMode && <button type="button" disabled={isLengthUnavailable} onClick={() => setOrderOpen(true)} className="flex cursor-pointer items-center justify-center simulator-pill rounded-full bg-(--orange) px-4 py-3 text-sm font-semibold text-white shadow-sm transition hover:brightness-95 disabled:cursor-not-allowed disabled:opacity-50">{english ? "Order" : "Encomendar"}</button>}<button type="button" onClick={reset} className="cursor-pointer simulator-pill rounded-full border border-[#d2d2d7] bg-white px-4 py-3 text-sm font-semibold text-[#1d1d1f] transition hover:bg-[#f5f5f7]">{adminMode ? (english ? "Reset configuration" : "Repor configuração") : (english ? "Reset" : "Recomeçar")}</button></div>
           </div>
           <p className="mt-4 text-xs leading-relaxed text-[#86868b]">{english ? "VAT is added at the applicable rate. Delivery is not included. Configuration is subject to technical validation." : "Ao valor acresce IVA à taxa legal. Transporte não incluído. Configuração sujeita a validação técnica."}</p>

@@ -1,3 +1,4 @@
+import SimulatorCartProvider from "@/components/simulador/SimulatorCart";
 import ChatWidget from "@/components/chat/ChatWidget";
 import GoogleAdsConsent from "@/components/analytics/GoogleAdsConsent";
 import { Inter_Tight } from 'next/font/google';
@@ -106,12 +107,14 @@ export default function RootLayout({ children }) {
       </head>
       <body className={`${interTight.variable} min-h-screen flex flex-col antialiased`}>
         <LanguageProvider>
+          <SimulatorCartProvider>
           <Header />
           <main className="flex-grow">
             {children}
           </main>
           <Footer />
           {websiteChatEnabled && <ChatWidget />}
+                  </SimulatorCartProvider>
         </LanguageProvider>
         <GoogleAdsConsent />
         <Analytics />

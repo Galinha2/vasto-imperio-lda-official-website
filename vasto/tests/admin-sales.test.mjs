@@ -3,7 +3,7 @@ import test from "node:test";
 import { resolveCustomerName } from "../lib/customer-identity.mjs";
 import assert from "node:assert/strict";
 import { createRequire } from "node:module";
-import { readFile, writeFile, mkdtemp } from "node:fs/promises";
+import { readFile, writeFile, mkdtemp, unlink } from "node:fs/promises";
 import { readFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
@@ -649,4 +649,15 @@ test('successful email tracking persists without changing quote amounts or workf
   assert.equal(updated.subtotal, sale.subtotal);
   assert.equal(updated.status, sale.status);
   assert.equal(updated.updatedAt, sale.updatedAt);
+});
+
+test("deleting a quote still succeeds when its PDF and an attachment are already missing", async () => {
+  const record = { ...metadata, id: "d".repeat(64), fileName: "missing-files.pdf", status: "em_preparacao" };
+  await createSale(record, pdfWithMetadata());
+  const png = Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]);
+  const image = await addSaleImage(record.id, "imagem.png", "image/png", png);
+  await unlink(path.join(process.env.ADMIN_DATA_DIR, `${record.id}.pdf`));
+  await unlink(path.join(process.env.ADMIN_DATA_DIR, `${record.id}.${image.id}.png`));
+  await deleteSale(record.id);
+  assert.equal(await getSale(record.id), null);
 });

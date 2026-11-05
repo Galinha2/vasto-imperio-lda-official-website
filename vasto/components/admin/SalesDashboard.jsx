@@ -520,6 +520,8 @@ export default function SalesDashboard() {
     resolution: (sale, value) => value === "resolved" ? isResolved(sale) : !isResolved(sale),
   };
   const visibleSales = [...filteredSales].sort((a, b) => {
+    const notSelectedOrder = Number(Boolean(a.quoteNotSelected)) - Number(Boolean(b.quoteNotSelected));
+    if (notSelectedOrder) return notSelectedOrder;
     if (headerSort.group && headerSort.value !== "all") {
       const matchesA = headerSortGroups[headerSort.group](a, headerSort.value);
       const matchesB = headerSortGroups[headerSort.group](b, headerSort.value);
@@ -1161,7 +1163,7 @@ export default function SalesDashboard() {
                               : <span className="inline-flex whitespace-nowrap rounded-full border border-[#e5e5e7] bg-white/80 px-2.5 py-1.5 text-[10px] font-medium text-[#86868b]">Não resolvido</span>}
                           </td>
                           <td className="px-3 py-4">
-                            <SaleActions groupSales={emailGroups.get(sale.id)} onSeparate={() => setQuoteCombination({ separateId: sale.id })} sale={sale} imagesOpen={imagePanel === sale.id} onImages={() => setImagePanel((current) => current === sale.id ? "" : sale.id)} onUngroup={() => changeQuoteGroup(sale.id)} grouping={groupingQuotes} onDelete={() => setSaleToDelete(sale)} />
+                            <SaleActions groupSales={emailGroups.get(sale.id)} onSeparate={() => setQuoteCombination({ separateId: sale.id })} sale={sale} imagesOpen={imagePanel === sale.id} onImages={() => setImagePanel((current) => current === sale.id ? "" : sale.id)} onUngroup={() => changeQuoteGroup(sale.id)} grouping={groupingQuotes} onDelete={() => { setError(""); setSaleToDelete(sale); }} />
                           </td>
                         </tr>
                         {imagePanel === sale.id && (
@@ -1418,6 +1420,7 @@ export default function SalesDashboard() {
               <p id="delete-sale-description" className="mt-3 text-sm leading-relaxed text-[#6e6e73]">
                 O documento de <strong className="font-semibold text-[#1d1d1f]">{saleToDelete.customerName}</strong>, o PDF original e todas as imagens anexadas serão eliminados. Esta ação não pode ser anulada.
               </p>
+              {error && <p role="alert" className="mt-4 rounded-xl bg-red-50 p-3 text-sm leading-relaxed text-red-700">{error}</p>}
               <div className="mt-6 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
                 <button type="button" disabled={deletingSale} onClick={() => setSaleToDelete(null)} className="h-10 cursor-pointer rounded-full border border-[#e5e5e7] px-5 text-sm font-semibold text-[#424245] transition hover:bg-[#f5f5f7] disabled:opacity-50">Cancelar</button>
                 <button type="button" disabled={deletingSale} onClick={removeSale} className="h-10 cursor-pointer rounded-full bg-red-600 px-5 text-sm font-semibold text-white transition hover:bg-red-700 disabled:cursor-wait disabled:opacity-60">{deletingSale ? "A eliminar…" : "Eliminar orçamento"}</button>

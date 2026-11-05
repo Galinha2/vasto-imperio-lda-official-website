@@ -344,11 +344,14 @@ export async function deleteSale(id, { allowMerged = false } = {}) {
     await removeCloudObjects([`${id}.pdf`, ...images.filter((image) => Object.hasOwn(imageTypes, image.contentType)).map((image) => imagePath(id, image))]);
     await cloud(`/rest/v1/admin_sales?id=eq.${id}`, { method: "DELETE" });
   } else {
-    await unlink(path.join(directory(), `${id}.pdf`));
+    const removeIfPresent = async (file) => {
+      try { await unlink(file); } catch (error) { if (error.code !== "ENOENT") throw error; }
+    };
+    await removeIfPresent(path.join(directory(), `${id}.pdf`));
     for (const image of images) {
-      if (Object.hasOwn(imageTypes, image.contentType)) await unlink(path.join(directory(), imagePath(id, image)));
+      if (Object.hasOwn(imageTypes, image.contentType)) await removeIfPresent(path.join(directory(), imagePath(id, image)));
     }
-    await unlink(path.join(directory(), `${id}.json`));
+    await removeIfPresent(path.join(directory(), `${id}.json`));
   }
 }
 

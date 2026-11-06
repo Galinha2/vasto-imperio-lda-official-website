@@ -1,3 +1,4 @@
+import { notifyNewSale } from "@/lib/admin/push.mjs";
 import { NextResponse } from "next/server";
 import { assertSession, assertOrigin } from "@/lib/admin/auth.mjs";
 import { createSale, deleteSaleUpload, readSaleUpload } from "@/lib/admin/store.mjs";
@@ -33,7 +34,9 @@ export async function POST(request) {
     await deleteSaleUpload(path);
     uploadRemoved = true;
     const record = await parseSalePdf(buffer, fileName);
-    return NextResponse.json({ sale: await createSale({ ...record, entryOrigin: "admin" }, buffer) }, { status: 201, headers: { "Cache-Control": "no-store" } });
+    const sale = await createSale({ ...record, entryOrigin: "admin" }, buffer);
+    await notifyNewSale(sale);
+    return NextResponse.json({ sale }, { status: 201, headers: { "Cache-Control": "no-store" } });
   } catch (error) {
     if (uploadPath && !uploadRemoved) {
       try { await deleteSaleUpload(uploadPath); }

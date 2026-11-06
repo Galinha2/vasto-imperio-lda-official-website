@@ -1,3 +1,4 @@
+import { notifyNewSale } from "@/lib/admin/push.mjs";
 import { sameQuoteCustomer } from "@/lib/admin/quote-groups.mjs";
 import { customerPhone } from "@/lib/admin/customer-phone.mjs";
 import { customerEmail } from "@/lib/admin/customer-email.mjs";
@@ -56,9 +57,10 @@ export async function POST(request) {
         throw error;
       }
     }
-    if (!image) return NextResponse.json({ sale }, { status: 201, headers: { "Cache-Control": "no-store" } });
+    if (!image) { await notifyNewSale(sale); return NextResponse.json({ sale }, { status: 201, headers: { "Cache-Control": "no-store" } }); }
     try {
       const savedImage = await addSaleImage(sale.id, image.name, image.type, Buffer.from(await image.arrayBuffer()));
+      await notifyNewSale(sale);
       return NextResponse.json({ sale: { ...sale, images: [savedImage] } }, { status: 201, headers: { "Cache-Control": "no-store" } });
     } catch (error) {
       try {

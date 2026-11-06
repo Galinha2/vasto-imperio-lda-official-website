@@ -58,3 +58,14 @@ test('muted conversation skips push only on the muted device; tests remain avail
  const testResult=await notifyAdminPush({id:'test',test:true,threadId},dependencies);
  assert.equal(testResult.sent,2);
 });
+
+test('sale push uses its own preference, privacy and sales destination',async()=>{
+ const saleId='c'.repeat(64);const payloads=[];
+ const devices=[{subscription:subscription('sales'),preferences:{chat:false,sales:true,preview:true}},{subscription:subscription('private'),preferences:{preview:false}},{subscription:subscription('disabled'),preferences:{sales:false,chat:true}}];
+ const result=await notifyAdminPush({type:'sale',id:saleId,saleId,body:'Cliente: orçamento novo'},{env:{WEB_PUSH_VAPID_PUBLIC_KEY:keys.publicKey,WEB_PUSH_VAPID_PRIVATE_KEY:keys.privateKey},list:async()=>devices,send:async(sub,payload)=>payloads.push(JSON.parse(payload))});
+ assert.equal(result.sent,2);assert.ok(payloads.every(p=>p.url===`/admin?orcamento=${saleId}`));assert.ok(payloads.every(p=>p.title.includes('orçamento')));assert.equal(payloads.filter(p=>p.body.includes('Cliente:')).length,1);
+ const handlers={};const opened=[];
+ const self={location:{origin:'https://vastoimperio.pt'},addEventListener:(name,handler)=>handlers[name]=handler,clients:{matchAll:async()=>[],openWindow:async url=>opened.push(url)}};
+ vm.runInNewContext(await readFile(new URL('../public/admin-push-sw.js',import.meta.url),'utf8'),{self,URL});
+ const waits=[];handlers.notificationclick({notification:{close(){},data:{url:`/admin?orcamento=${saleId}`}},waitUntil:p=>waits.push(p)});await Promise.all(waits);assert.equal(opened[0],`https://vastoimperio.pt/admin?orcamento=${saleId}`);
+});

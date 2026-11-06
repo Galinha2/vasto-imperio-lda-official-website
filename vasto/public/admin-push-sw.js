@@ -2,7 +2,7 @@
 self.addEventListener('install',()=>self.skipWaiting());
 self.addEventListener('activate',event=>event.waitUntil(self.clients.claim()));
 function destination(value){
-  try{const url=new URL(value,self.location.origin);if(url.origin===self.location.origin&&(url.pathname==='/admin/conversas'||url.pathname==='/admin/definicoes'))return url.href;}catch{/* Use the inbox for malformed targets. */}
+  try{const url=new URL(value,self.location.origin);if(url.origin===self.location.origin&&(url.pathname==='/admin'||url.pathname==='/admin/'||url.pathname==='/admin/conversas'||url.pathname==='/admin/definicoes'))return url.href;}catch{/* Use the inbox for malformed targets. */}
   return new URL('/admin/conversas',self.location.origin).href;
 }
 self.addEventListener('push',event=>{

@@ -74,11 +74,18 @@ export async function notifyAdminPush(event,dependencies={}){
   for(let offset=0;offset<devices.length;offset+=4){
     await Promise.all(devices.slice(offset,offset+4).map(async device=>{
       const prefs=normalizeAdminPreferences(device.preferences);
-      if(!prefs.desktop||(!event.test&&(!prefs.chat||prefs.mutedChatIds.includes(event.threadId))))return;
-      const payload={title:event.test?'Teste · Vasto Império':'Nova mensagem · Vasto Império',body:event.test?'As notificações deste dispositivo estão a funcionar.':prefs.preview?String(event.body||'').slice(0,180):'Recebeu uma nova mensagem no chat do site.',url:event.test?'/admin/definicoes':`/admin/conversas?chat=${event.threadId}`,tag:`vasto-chat-${event.id}`,silent:!prefs.sound||prefs.volume===0};
+      const saleEvent=event.type==='sale';
+      if(!prefs.desktop||(!event.test&&(saleEvent?!prefs.sales:(!prefs.chat||prefs.mutedChatIds.includes(event.threadId)))))return;
+      const payload={title:event.test?'Teste · Vasto Império':saleEvent?'Novo orçamento recebido · Vasto Império':'Nova mensagem · Vasto Império',body:event.test?'As notificações deste dispositivo estão a funcionar.':prefs.preview?String(event.body||'').slice(0,180):saleEvent?'Recebeu um novo orçamento. Abra as Vendas para consultar.':'Recebeu uma nova mensagem no chat do site.',url:event.test?'/admin/definicoes':saleEvent?`/admin?orcamento=${event.saleId}`:`/admin/conversas?chat=${event.threadId}`,tag:`vasto-${saleEvent?'sale':'chat'}-${event.id}`,silent:!prefs.sound||prefs.volume===0};
       try{await send(device.subscription,JSON.stringify(payload));sent++;}
       catch(error){failed++;if(error.statusCode===404||error.statusCode===410){try{await (dependencies.remove||removePushDevice)(device.id);}catch{/* Retry cleanup later. */}}}
     }));
   }
   return {sent,failed,configured:true};
+}
+
+// Notification failures must never undo a successfully saved quote.
+export async function notifyNewSale(sale) {
+  try { return await notifyAdminPush({type:'sale',id:sale.id,saleId:sale.id,body:`${sale.customerName || 'Cliente'}: novo orçamento recebido.`}); }
+  catch { console.error('[admin-push] Não foi possível enviar o aviso do novo orçamento.'); return {sent:0,failed:1}; }
 }

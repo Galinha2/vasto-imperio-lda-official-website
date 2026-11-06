@@ -37,7 +37,7 @@ export default function AdminSalesNotifications() {
       const text=prefs.preview?body:(type==='chat'?'Abra as conversas no painel para ler a mensagem.':'Abra o painel para consultar o novo orçamento.');
       if(prefs.inApp)setNotice({title,body:text,href,key});
       if(prefs.sound&&!(type==='chat'&&pushStatus.current))playAdminSound(audio.current,prefs.volume);
-      if(!(type==='chat'&&pushStatus.current)&&prefs.desktop&&'Notification' in window&&Notification.permission==='granted') {
+      if(!pushStatus.current&&prefs.desktop&&'Notification' in window&&Notification.permission==='granted') {
         try {
           const native=new Notification(`${title} · Vasto Império`,{body:text,icon:'/favicon-google.png',tag:`vasto-${type}-${key}`,silent:!prefs.sound||prefs.volume===0||audio.current?.state==='running'});
           notices.current.add(native);native.onclose=()=>notices.current.delete(native);

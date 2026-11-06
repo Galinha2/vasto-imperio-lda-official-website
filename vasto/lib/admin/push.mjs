@@ -31,7 +31,9 @@ export function validatePushSubscription(value){
 async function cloud(query='',options={}){
   const response=await fetch(`${process.env.SUPABASE_URL.replace(/\/$/,'')}/rest/v1/admin_push_subscriptions${query}`,{...options,cache:'no-store',headers:{apikey:process.env.SUPABASE_SERVICE_ROLE_KEY,Authorization:`Bearer ${process.env.SUPABASE_SERVICE_ROLE_KEY}`,'Content-Type':'application/json',...options.headers}});
   if(!response.ok)throw fail('Não foi possível guardar as notificações. Execute supabase/admin-push.sql no Supabase.');
-  return response.status===204?null:response.json();
+  // Inserts with return=minimal may return an empty HTTP 201 response.
+  const body=await response.text();
+  return body.trim()?JSON.parse(body):null;
 }
 export async function listPushDevices(){
   const owner=pushOwner();const now=new Date().toISOString();

@@ -30,7 +30,9 @@ export async function chatSetupStatus() {
 async function cloud(endpoint, options = {}) {
   const response = await fetch(`${process.env.SUPABASE_URL.replace(/\/$/, '')}/rest/v1/${endpoint}`, { ...options, cache: 'no-store', headers: { apikey: process.env.SUPABASE_SERVICE_ROLE_KEY, Authorization: `Bearer ${process.env.SUPABASE_SERVICE_ROLE_KEY}`, 'Content-Type': 'application/json', ...options.headers } });
   if (!response.ok) throw fail('O chat está temporariamente indisponível. Pode contactar-nos pelo telefone +351 928 348 117.', 503);
-  return response.status === 204 ? null : response.json();
+  // Supabase return=minimal can succeed with HTTP 201 and an empty body.
+  const body = await response.text();
+  return body.trim() ? JSON.parse(body) : null;
 }
 async function rows(table, query = '') {
   if (storageMode() === 'cloud') return cloud(`${table}?${query}`);

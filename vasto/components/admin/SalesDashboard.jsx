@@ -1,6 +1,7 @@
 "use client";
 import { salePeriodDate as periodDate } from "@/lib/admin/sale-period.mjs";
 
+import { isMonthComplete } from "@/lib/admin/month-completion.mjs";
 import { groupQuotes, sameQuoteCustomer } from "@/lib/admin/quote-groups.mjs";
 import { isSaleInactive, lastSaleActivity } from "@/lib/admin/sale-activity.mjs";
 import QuoteCombinationDialog from "./QuoteCombinationDialog";
@@ -533,7 +534,7 @@ export default function SalesDashboard() {
   const yearSales = sales.filter((sale) => sale.status !== "em_preparacao" && periodDate(sale).startsWith(year));
   const monthly = months.map((_, index) => {
     const monthSales = yearSales.filter((sale) => periodDate(sale).slice(5, 7) === String(index + 1).padStart(2, "0"));
-    return { subtotal: sum(monthSales), total: sum(monthSales, "total") };
+    return { subtotal: sum(monthSales), total: sum(monthSales, "total"), complete: !loading && isMonthComplete(monthSales, commissionData?.payments?.[`${year}-${String(index + 1).padStart(2, "0")}`]) };
   });
   const averageConfirmed = confirmed.length ? sum(confirmed) / confirmed.length : 0;
   const conversionRate = period.length ? Math.round((confirmed.length / period.length) * 100) : 0;
@@ -865,9 +866,9 @@ export default function SalesDashboard() {
               </div>
             </div>
             <div className="mt-7 grid grid-cols-6 gap-x-2 gap-y-4 sm:grid-cols-12 sm:gap-x-4">
-              {monthly.map(({ subtotal, total }, index) => <button type="button" key={index} aria-label={`${months[index]} ${year}: ${currency.format(subtotal)} sem IVA, ${currency.format(total)} com IVA`} title={`${months[index]}: ${currency.format(subtotal)} sem IVA · ${currency.format(total)} com IVA`} onClick={() => setMonth(String(index + 1).padStart(2, "0"))} className="group flex h-[105px] min-w-0 cursor-pointer flex-col items-center justify-end gap-1 rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-600">
+              {monthly.map(({ subtotal, total, complete }, index) => <button type="button" key={index} aria-label={`${months[index]} ${year}: ${currency.format(subtotal)} sem IVA, ${currency.format(total)} com IVA${complete ? ". Mês concluído: encomendas pagas e entregues e comissão paga." : ""}`} title={`${months[index]}: ${currency.format(subtotal)} sem IVA · ${currency.format(total)} com IVA${complete ? ". Mês concluído: encomendas pagas e entregues e comissão paga." : ""}`} onClick={() => setMonth(String(index + 1).padStart(2, "0"))} className="group flex h-[105px] min-w-0 cursor-pointer flex-col items-center justify-end gap-1 rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-600">
                 <span className={`w-full truncate text-center text-[8px] leading-tight sm:text-[9px] ${month === String(index + 1).padStart(2, "0") ? "font-semibold text-orange-700" : "text-[#86868b]"}`}>{compactCurrency(subtotal)}</span>
-                <span className={`block w-full rounded-t-md transition ${month === String(index + 1).padStart(2, "0") ? "bg-orange-600" : "bg-[#dce5ef] group-hover:bg-[#afc1d4]"}`} style={{ height: `${Math.max(4, subtotal / max * 65)}px` }} />
+                <span className={`relative flex w-full items-center justify-center rounded-t-md transition ${month === String(index + 1).padStart(2, "0") ? "bg-orange-600" : "bg-[#dce5ef] group-hover:bg-[#afc1d4]"}`} style={{ height: `${Math.max(complete ? 24 : 4, subtotal / max * 65)}px` }}>{complete && <span className={styles.monthComplete} aria-hidden="true"><IoCheckmarkCircleOutline /></span>}</span>
                 <span className={`text-center text-[9px] sm:text-[11px] ${month === String(index + 1).padStart(2, "0") ? "font-semibold text-orange-700" : "text-[#a1a1a6]"}`}>{months[index].slice(0, 3)}</span>
               </button>)}
             </div>
@@ -1028,14 +1029,14 @@ export default function SalesDashboard() {
                   {quoteGroups.map((quoteGroup) => <tbody key={quoteGroup.id} className={quoteGroup.sales.length > 1 ? styles.versionGroup : undefined}>
                     {quoteGroup.sales.map((sale) => (
                       <Fragment key={sale.id}>
-                        {(groupBySale.get(sale.id).sales[0].id === sale.id || expandedQuoteGroups[groupBySale.get(sale.id).id]) && <>
+                        {(groupBySale.get(sale.id).sales[0].id === sale.id || (expandedQuoteGroups[groupBySale.get(sale.id).id] !== false)) && <>
 
                         {quoteGroup.sales.length > 1 && quoteGroup.sales[0].id === sale.id && <tr className={styles.groupHeading}><td colSpan={7}>
-                          <button type="button" aria-expanded={!!expandedQuoteGroups[quoteGroup.id]} onClick={() => setExpandedQuoteGroups((current) => ({ ...current, [quoteGroup.id]: !current[quoteGroup.id] }))} className={styles.groupToggle}>
+                          <button type="button" aria-expanded={(expandedQuoteGroups[quoteGroup.id] !== false)} onClick={() => setExpandedQuoteGroups((current) => ({ ...current, [quoteGroup.id]: current[quoteGroup.id] === false }))} className={styles.groupToggle}>
                             <span className={styles.groupIcon}><IoDocumentTextOutline aria-hidden="true" /></span>
-                            <span className={styles.groupTitle}><strong>{sale.customerName}</strong><span>{quoteGroup.sales.length} versões do mesmo orçamento · Compare as alternativas</span></span>
-                            <span className={styles.groupToggleLabel}>{expandedQuoteGroups[quoteGroup.id] ? "Recolher versões" : `Ver ${quoteGroup.sales.length} versões`}</span>
-                            <IoChevronDownOutline aria-hidden="true" className={`${styles.groupChevron} ${expandedQuoteGroups[quoteGroup.id] ? styles.groupChevronOpen : ""}`} />
+                            <span className={styles.groupTitle}><strong>{sale.customerName}</strong><span>{quoteGroup.sales.length} orçamentos neste grupo · {(expandedQuoteGroups[quoteGroup.id] !== false) ? "Todos visíveis abaixo" : "Apenas a primeira versão visível"}</span></span>
+                            <span className={styles.groupToggleLabel}>{(expandedQuoteGroups[quoteGroup.id] !== false) ? "Mostrar apenas a primeira" : `Ver todos os ${quoteGroup.sales.length} orçamentos`}</span>
+                            <IoChevronDownOutline aria-hidden="true" className={`${styles.groupChevron} ${(expandedQuoteGroups[quoteGroup.id] !== false) ? styles.groupChevronOpen : ""}`} />
                           </button>
                         </td></tr>}
                         <tr id={`sale-${sale.id}`}
@@ -1071,7 +1072,7 @@ export default function SalesDashboard() {
                             setQuoteCombination({ sourceId, targetId: sale.id });
                           }}
                           style={{ "--quote-accent": sale.quoteNotSelected ? "#94a3b8" : isResolved(sale) ? "#10b981" : sale.status === "confirmada" ? "#1687f8" : "#f05252" }}
-                          className={`${styles.quoteRow} ${quoteGroup.sales.length > 1 ? styles.versionMember : ""} ${quoteGroup.sales.length > 1 && expandedQuoteGroups[quoteGroup.id] ? styles.versionEntering : ""} ${quoteDropTarget === sale.id ? "outline-2 -outline-offset-2 outline-[#0879c0] bg-sky-50 " : ""}cursor-pointer transition ${sale.quoteNotSelected ? "text-slate-500" : ""}`}>
+                          className={`${styles.quoteRow} ${quoteGroup.sales.length > 1 ? styles.versionMember : ""} ${quoteGroup.sales.length > 1 && (expandedQuoteGroups[quoteGroup.id] !== false) ? styles.versionEntering : ""} ${quoteDropTarget === sale.id ? "outline-2 -outline-offset-2 outline-[#0879c0] bg-sky-50 " : ""}cursor-pointer transition ${sale.quoteNotSelected ? "text-slate-500" : ""}`}>
                           <td className="px-3 py-5">
                             <div className="flex items-center gap-2">
                               <button type="button" aria-expanded={imagePanel === sale.id} aria-label={`${imagePanel === sale.id ? "Fechar" : "Ver"} PDF e desenhos de ${sale.customerName}`} onClick={() => setImagePanel((current) => current === sale.id ? "" : sale.id)} className="flex min-w-0 cursor-pointer items-center gap-2 text-left text-sm font-semibold tracking-tight hover:text-[#0879c0]"><span className="truncate">{sale.customerName}</span><IoChevronDownOutline aria-hidden="true" className={`shrink-0 text-xs text-[#a1a1a6] transition-transform ${imagePanel === sale.id ? "rotate-180" : ""}`} /></button>
@@ -1256,7 +1257,7 @@ export default function SalesDashboard() {
                             </td>
                           </tr>
                         )}
-                        {quoteGroup.sales.length > 1 && ((!expandedQuoteGroups[quoteGroup.id] && quoteGroup.sales[0].id === sale.id) || (expandedQuoteGroups[quoteGroup.id] && quoteGroup.sales.at(-1).id === sale.id)) && <tr className={styles.groupEnd}><td colSpan={7}><span>{expandedQuoteGroups[quoteGroup.id] ? `${quoteGroup.sales.length} versões` : `Mais ${quoteGroup.sales.length - 1} ${quoteGroup.sales.length === 2 ? "versão disponível" : "versões disponíveis"}`} · {sale.customerName}</span></td></tr>}
+                        {quoteGroup.sales.length > 1 && (((expandedQuoteGroups[quoteGroup.id] === false) && quoteGroup.sales[0].id === sale.id) || ((expandedQuoteGroups[quoteGroup.id] !== false) && quoteGroup.sales.at(-1).id === sale.id)) && <tr className={styles.groupEnd}><td colSpan={7}><button type="button" className={styles.groupFooterButton} aria-expanded={expandedQuoteGroups[quoteGroup.id] !== false} onClick={() => setExpandedQuoteGroups((current) => ({ ...current, [quoteGroup.id]: current[quoteGroup.id] === false }))}>{expandedQuoteGroups[quoteGroup.id] !== false ? `Todos os ${quoteGroup.sales.length} orçamentos estão visíveis · Recolher grupo` : `Ver os ${quoteGroup.sales.length - 1} orçamentos ocultos deste grupo`}<IoChevronDownOutline aria-hidden="true" className={expandedQuoteGroups[quoteGroup.id] !== false ? styles.groupChevronOpen : ""}/></button></td></tr>}
                         </>}
                       </Fragment>
                     ))}

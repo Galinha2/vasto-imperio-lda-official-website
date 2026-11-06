@@ -232,3 +232,21 @@
 .groupTitle strong{font-size:13px;font-weight:600;letter-spacing:-.2px}.groupTitle>span{line-height:1.6}.groupToggle{padding-top:18px;padding-bottom:18px}.groupIcon{border:1px solid #ffffffb3;box-shadow:0 2px 6px #23324804}.versionBadge{font-weight:500;letter-spacing:.01em}
 @media(max-width:1535px){.quoteRow{padding:20px;gap:16px;border-radius:23px;box-shadow:0 4px 18px #23324804}.quoteRow>td[data-label]::before{font-size:9px;letter-spacing:.045em;margin-bottom:7px}}
 @media(max-width:639px){.quoteRow{padding:16px;gap:14px;border-radius:20px}}
+
+/* Version groups have a visible container and an explicit show-all action. */
+.groupToggle{background:linear-gradient(115deg,#eaf3fbd9,#fff7eed9);border-color:#cddfeb;gap:14px}
+.groupIcon{background:#fff;color:#0879c0;border-color:#d5e5f2}
+.groupTitle strong{font-size:15px;color:#25384a}.groupTitle>span{color:#64788b;line-height:1.6}
+.groupToggleLabel{background:#0879c0;color:#fff;font-weight:600;padding:10px 15px;box-shadow:0 2px 6px #0879c014}
+.groupChevron{color:#0879c0}.versionBadge{background:#eaf3fb;color:#176b9f;border:1px solid #d4e5f3;padding:6px 10px}
+.groupFooterButton{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:13px 16px;border:1px solid #d4e5f3;border-radius:14px;background:#edf5fbbf;font-size:11px;line-height:1.5;font-weight:500;color:#176b9f;cursor:pointer}
+.groupFooterButton:hover{background:#e1effa}.groupFooterButton:focus-visible{outline:2px solid #0879c0;outline-offset:3px}.groupFooterButton>svg{flex-shrink:0}
+@media(max-width:1535px){.versionGroup{border-color:#cddfeb;background:linear-gradient(150deg,#eaf3fb55,#fff7ee44)}.groupToggle{border-bottom:1px solid #d4e5f399;border-radius:26px 26px 0 0}.versionMember{border-left-color:#a6cee9}}
+@media(max-width:639px){.groupToggleLabel{margin-left:0;flex:1;text-align:center;font-size:11px}.groupTitle strong{font-size:14px}.groupFooterButton{font-size:10px}.groupToggle{gap:12px}}
+:global([data-admin-theme="dark"]) .groupToggle{background:linear-gradient(115deg,#21354a,#322b25);border-color:#3b5064}
+:global([data-admin-theme="dark"]) .groupTitle strong{color:#e8f2fa}:global([data-admin-theme="dark"]) .groupTitle>span{color:#acbdcc}
+:global([data-admin-theme="dark"]) .groupFooterButton,:global([data-admin-theme="dark"]) .versionBadge{background:#20354a;color:#a6d5f5;border-color:#3b5064}
+:global([data-admin-theme="dark"]) .versionGroup{background:#1e293344;border-color:#3b5064}
+
+.monthComplete{display:grid;place-items:center;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:24px;height:24px;border:2px solid #fff;border-radius:50%;background:#e7f7ef;color:#168557;box-shadow:0 2px 6px #164d3420;font-size:20px;pointer-events:none}
+@media(max-width:639px){.monthComplete{width:20px;height:20px;font-size:17px}}

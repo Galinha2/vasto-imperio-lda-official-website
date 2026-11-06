@@ -6,5 +6,12 @@ test('overall dimensions follow the simulator envelopes for each family',()=>{
  const light=rackModel({modules:[1000,750],height:2000,depth:400,type:'ligeiras'});assert.equal(light.width,1.75);
  const racks=rackModel({modules:[1800,2700],height:3000,depth:1000,type:'racks'});assert.ok(Math.abs(racks.width-4.8)<1e-10);
  const bench=rackModel({modules:[1500],height:1000,depth:600,type:'bancadas',slots:3});assert.ok(bench.bays[0].levels[0]<bench.bays[0].levels[1]);assert.ok(bench.bays[0].levels[1]<bench.bays[0].levels[2]);
- const reinforced=rackModel({modules:[2750],height:2500,depth:800,reinforcedBeams:true});assert.equal(reinforced.beamHeight,.11);assert.equal(reinforced.bays[0].centralSupports,3);
+ const reinforced=rackModel({modules:[2750],height:2500,depth:800,reinforcedBeams:true});assert.equal(reinforced.beamHeight,.1);assert.equal(reinforced.bays[0].centralSupports,3);
+});
+
+test('Picking top deck finishes flush with the frame for wood and metal finishes',()=>{
+ for(const floorType of ['Aglomerado','Metálica'])for(const reinforcedBeams of [false,true]){
+  const model=rackModel({modules:[1500],height:2500,depth:800,slots:4,type:'picking',floorType,reinforcedBeams});
+  assert.ok(Math.abs(Math.max(...model.bays[0].levels)-model.height)<1e-9);
+ }
 });

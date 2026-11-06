@@ -57,3 +57,48 @@ test('each light-duty frame has one horizontal mid-height tie across its depth',
  try{const tie=r.group.children.find(p=>p.name==='Barra horizontal central do bastidor');assert.equal(tie.count,3);assert.equal(tie.material,r.materials.upright);assert.ok(tie.geometry.parameters.depth>.49);assert.ok(tie.geometry.parameters.width<.04);for(let i=0;i<tie.count;i++){assert.ok(Math.abs(tie.instanceMatrix.array[i*16+13]-1)<1e-6);assert.equal(tie.instanceMatrix.array[i*16+14],0);}}finally{r.dispose();}
  const picking=createRackGeometry(rackModel({...base,type:'picking'}));try{assert.ok(!picking.group.children.some(p=>p.name==='Barra horizontal central do bastidor'));}finally{picking.dispose();}
 });
+
+test('detailed metal shelves use thin sheet with folded edges and preserve instanced fittings',()=>{
+ for(const type of ['ligeiras','picking','racks']){
+  const r=createRackGeometry(rackModel({...base,type,floorType:'Metálica'}));
+  try{
+   assert.ok(r.group.children.every(mesh=>mesh.isInstancedMesh));
+   if(type!=='racks'){
+    const shelf=r.group.children.find(mesh=>mesh.name==='Tampo metálico');
+    assert.equal(shelf.geometry.parameters.height,type==='picking'?.006:.0015);
+   }
+   if(type!=='ligeiras'){
+    assert.ok(r.group.children.some(mesh=>mesh.name==='Patilha de encaixe'));
+    assert.ok(r.group.children.some(mesh=>mesh.name==='Anilha zincada'));
+   }else{
+    for(const name of ['Barra horizontal superior do bastidor','Barra horizontal central do bastidor','Barra horizontal inferior do bastidor'])assert.equal(r.group.children.find(mesh=>mesh.name===name).count,2);
+   }
+  }finally{r.dispose();}
+ }
+});
+
+test('Picking and rack beams have solid closed volumes instead of open folded faces',()=>{
+ for(const type of ['picking','racks']){
+  const r=createRackGeometry(rackModel({...base,type}));
+  try{
+   const beam=r.group.children.find(mesh=>mesh.name==='Corpo sólido da viga');
+   assert.ok(beam);assert.equal(beam.count,base.slots*2);
+   assert.equal(beam.geometry.parameters.depth,type==='picking'?.025:.04);
+   assert.ok(!r.group.children.some(mesh=>mesh.name==='Alma da viga'));
+  }finally{r.dispose();}
+ }
+});
+
+test('Picking decks sit inside slimmer beams with their top surfaces flush',()=>{
+ for(const floorType of ['Aglomerado','Metálica']){
+  const model=rackModel({...base,type:'picking',slots:1,floorType});const r=createRackGeometry(model);
+  try{
+   const beam=r.group.children.find(mesh=>mesh.name==='Corpo sólido da viga');
+   const deck=r.group.children.find(mesh=>mesh.name===(floorType==='Aglomerado'?'Painel de aglomerado':'Tampo metálico'));
+   const top=mesh=>mesh.instanceMatrix.array[13]+mesh.geometry.parameters.height/2;
+   assert.ok(Math.abs(top(beam)-top(deck))<1e-6);
+   assert.equal(beam.geometry.parameters.depth,.025);
+   assert.ok(deck.geometry.parameters.depth<=model.depth-.05+1e-9);
+  }finally{r.dispose();}
+ }
+});

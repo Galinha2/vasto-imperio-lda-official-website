@@ -1,11 +1,12 @@
 import * as THREE from 'three';
+import {RoundedBoxGeometry} from 'three/addons/geometries/RoundedBoxGeometry.js';
 import {shelfReinforcementPositions} from './rack-3d-model.mjs';
 
 // Repeated small fittings are instanced to keep rotation responsive on phones.
 export function createRackGeometry(model,{woodTexture=null,zincTexture=null}={}){
  const group=new THREE.Group();group.position.x=-model.width/2;
  const resources=new Set();const cache=new Map();const batches=new Map();
- const material=(name,color,metalness,roughness,map=null)=>{const m=new THREE.MeshStandardMaterial({name,color,metalness,roughness,map});resources.add(m);return m;};
+ const material=(name,color,metalness,roughness,map=null)=>{const m=new THREE.MeshPhysicalMaterial({name,color,metalness,roughness,map,clearcoat:metalness<.5&&roughness<.5?.22:0,clearcoatRoughness:.35});resources.add(m);return m;};
  const light=model.type==='ligeiras',rack=model.type==='racks';
  const mats={
   zinc:material('Aço galvanizado',0xbcc5cc,.68,.43,zincTexture),
@@ -20,8 +21,14 @@ export function createRackGeometry(model,{woodTexture=null,zincTexture=null}={})
  function geometry(key,make){if(!cache.has(key)){const g=make();resources.add(g);cache.set(key,g);}return cache.get(key);}
  const dummy=new THREE.Object3D();
  function put(name,geo,mat,x,y,z,rotation=null){const key=name+'|'+geo.uuid+'|'+mat.uuid;if(!batches.has(key))batches.set(key,{name,geo,mat,matrices:[]});dummy.position.set(x,y,z);dummy.rotation.set(...(rotation||[0,0,0]));dummy.scale.set(1,1,1);dummy.updateMatrix();batches.get(key).matrices.push(dummy.matrix.clone());}
- function box(name,w,h,d,x,y,z,mat,rotation){if(w<=0||h<=0||d<=0)return;const g=geometry(`box:${w}:${h}:${d}`,()=>new THREE.BoxGeometry(w,h,d));put(name,g,mat,x,y,z,rotation);}
- function bolt(x,y,z,axis='z'){const g=geometry('bolt',()=>new THREE.CylinderGeometry(.004,.004,.004,6));put('Parafuso sextavado',g,mats.bolt,x,y,z,axis==='x'?[0,0,Math.PI/2]:[Math.PI/2,0,0]);}
+ function box(name,w,h,d,x,y,z,mat,rotation){if(w<=0||h<=0||d<=0)return;const g=geometry(`box:${w}:${h}:${d}`,()=>{const g=new RoundedBoxGeometry(w,h,d,1,Math.min(.0012,w/5,h/5,d/5));g.parameters={...g.parameters,width:w,height:h,depth:d};return g;});put(name,g,mat,x,y,z,rotation);}
+ function bolt(x,y,z,axis='z'){
+  const rotation=axis==='x'?[0,0,Math.PI/2]:[Math.PI/2,0,0];
+  const g=geometry('bolt',()=>new THREE.CylinderGeometry(.004,.004,.004,6));
+  put('Parafuso sextavado',g,mats.bolt,x,y,z,rotation);
+  const washer=geometry('washer',()=>new THREE.CylinderGeometry(.006,.006,.001,16));
+  put('Anilha zincada',washer,mats.bolt,x-(axis==='x'?.0025:0),y,z-(axis==='z'?.0025:0),rotation);
+ }
  function brace(a,b){const delta=new THREE.Vector3().subVectors(b,a);const center=a.clone().add(b).multiplyScalar(.5);const g=geometry(`brace:${delta.length()}`,()=>new THREE.BoxGeometry(.017,delta.length(),.025));const rotation=new THREE.Euler().setFromQuaternion(new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0,1,0),delta.clone().normalize()));put('Diagonal galvanizada',g,mats.zinc,...center.toArray(),rotation.toArray().slice(0,3));for(const p of [a,b])bolt(p.x+.013,p.y,p.z,'x');}
  const thickness=light?.0015:.002;
  function perforatedWeb(){const w=model.upright,h=model.height;
@@ -39,7 +46,10 @@ export function createRackGeometry(model,{woodTexture=null,zincTexture=null}={})
    const inward=z>0?-1:1,profileDepth=light?.025:.04;
    put('Montante com perfuração',perforatedWeb(),mats.upright,x,0,z,[0,z>0?0:Math.PI,0]);
    for(const edge of light?[-1]:[-1,1]){box('Aba do montante',thickness,model.height,profileDepth,x+edge*(model.upright/2-thickness/2),model.height/2,z+inward*profileDepth/2,mats.upright);if(!light)box('Retorno do perfil',.009,model.height,thickness,x+edge*(model.upright/2-.0045),model.height/2,z+inward*profileDepth,mats.upright);}
-   if(light)box('Pé plástico',model.upright+.004,.018,profileDepth+.012,x,.009,z+inward*.008,mats.plastic);
+   if(light){
+    box('Pé plástico',model.upright+.004,.018,profileDepth+.012,x,.009,z+inward*.008,mats.plastic);
+    box('Rebordo do pé plástico',model.upright+.007,.003,profileDepth+.015,x,.017,z+inward*.008,mats.plastic);
+   }
    else{box('Chapa de base',model.upright+.05,.005,.105,x,.003,z,mats.zinc);box('Reforço do pé',model.upright+.008,.09,.005,x,.05,z+inward*.008,mats.zinc);bolt(x-model.upright*.3,.04,z+inward*.013);bolt(x+model.upright*.3,.04,z+inward*.013);}
   }
   if(light){
@@ -65,14 +75,23 @@ export function createRackGeometry(model,{woodTexture=null,zincTexture=null}={})
    const center=(b.left+b.right)/2,span=b.clearLength;
    for(const z of [-model.depth/2,model.depth/2]){
     const sign=z>0?1:-1;const bh=model.beamHeight;
-    // Folded beam faces, top shelf seat and bottom return are distinct surfaces.
-    box('Alma da viga',span,bh,.003,center,y-bh/2,z,mats.beam);
-    box('Aba superior da viga',span,.003,.04,center,y-.0015,z-sign*.018,mats.beam);
-    box('Retorno inferior da viga',span,.003,.035,center,y-bh+.0015,z-sign*.015,mats.beam);
+    if(model.type==='picking'||rack){
+     // Closed solid beam volume, including inner face and end caps.
+     const beamDepth=model.type==='picking'?.025:.04;
+     box('Corpo sólido da viga',span,bh,beamDepth,center,y-bh/2,z-sign*(beamDepth/2-.0015),mats.beam);
+    }else{
+     box('Alma da viga',span,bh,.003,center,y-bh/2,z,mats.beam);
+     box('Aba superior da viga',span,.003,.04,center,y-.0015,z-sign*.018,mats.beam);
+     box('Retorno inferior da viga',span,.003,.035,center,y-bh+.0015,z-sign*.015,mats.beam);
+    }
     if(!light){box('Nervura longitudinal',span,.009,.006,center,y-bh*.62,z+sign*.003,mats.beam);
      for(const end of [b.left+model.upright/2,b.right-model.upright/2]){
       box('Chapa de encaixe da viga',.038,bh*1.45,.006,end,y-bh*.55,z+sign*.004,mats.connector);
-      for(const offset of [.18,.65,1.08])bolt(end,y-bh*offset,z+sign*.009);
+      for(const offset of [.18,.65,1.08]){
+       bolt(end,y-bh*offset,z+sign*.009);
+       box('Patilha de encaixe',.008,.018,.012,end,y-bh*offset,z-sign*.006,mats.connector);
+      }
+      box('Retorno lateral do encaixe',.003,bh*1.45,.025,end+(end<center?-.018:.018),y-bh*.55,z-sign*.006,mats.connector);
       box('Freio de segurança',.009,.012,.014,end+.012,y-.006,z+sign*.014,mats.bolt);
      }
     }
@@ -81,12 +100,25 @@ export function createRackGeometry(model,{woodTexture=null,zincTexture=null}={})
     const wood=!light&&model.floorType==='Aglomerado';const shelfMat=wood?mats.wood:mats.metal;
     const overhang=model.type==='bancadas'&&y===Math.max(...b.levels)?.035:0;
     const panels=light?1:Math.max(1,Math.ceil(span/1.05));const panelWidth=(span+overhang*2)/panels;
-    const deckDepth=model.type==='bancadas'?model.depth+.025+overhang*2:model.depth-.008;
-    for(let panel=0;panel<panels;panel++)box(wood?'Painel de aglomerado':'Tampo metálico',panelWidth-.002,wood?.018:.012,deckDepth,b.left+model.upright/2-overhang+(panel+.5)*panelWidth,y+(wood?.009:.006),0,shelfMat);
+    const deckDepth=model.type==='bancadas'?model.depth+.025+overhang*2:model.type==='picking'?model.depth-.05:model.depth-.008;
+    const supportWidth=model.type==='picking'?.018:.025;
+    const supportHeight=model.type==='picking'?.03:.04;
+    const supports=!light?shelfReinforcementPositions(b,model.upright):null;
+    const supportCenters=supports?[...supports.lateral,...supports.central].sort((a,b)=>a-b):[];
+    const panelRanges=model.type==='picking'
+     ?supportCenters.slice(0,-1).map((left,index)=>({left:left+supportWidth/2+.001,right:supportCenters[index+1]-supportWidth/2-.001}))
+     :Array.from({length:panels},(_,panel)=>({left:b.left+model.upright/2-overhang+panel*panelWidth+.001,right:b.left+model.upright/2-overhang+(panel+1)*panelWidth-.001}));
+    for(const range of panelRanges){
+     const panelX=(range.left+range.right)/2;const actualPanelWidth=range.right-range.left;
+     // Picking metal decks include the solid underside of their folded profile.
+     const deckThickness=wood?.018:model.type==='picking'?.006:.0015;
+     box(wood?'Painel de aglomerado':'Tampo metálico',actualPanelWidth,deckThickness,deckDepth,panelX,y+(model.type==='picking'?-deckThickness/2:deckThickness/2),0,shelfMat);
+     if(!wood&&!light&&model.type!=='picking')for(const side of [-1,1])box('Aba lateral do tabuleiro metálico',.0015,.018,deckDepth,panelX+side*(actualPanelWidth/2-.001),y-.009,0,shelfMat);
+    }
     if(!light){
-     const supports=shelfReinforcementPositions(b,model.upright);
-     for(const x of supports.lateral)box('Reforço lateral do tampo',.025,.04,model.depth-.04,x,y-.02,0,mats.zinc);
-     for(const x of supports.central)box('Reforço central do tampo',.025,.04,model.depth-.04,x,y-.02,0,mats.zinc);
+     const supportY=y-supportHeight/2;
+     for(const x of supports.lateral)box('Reforço lateral do tampo',supportWidth,supportHeight,model.depth-.04,x,supportY,0,mats.zinc);
+     for(const x of supports.central)box('Reforço central do tampo',supportWidth,supportHeight,model.depth-.04,x,supportY,0,mats.zinc);
     }
     if(light)for(let rib=1;rib<=model.shelfRibCount;rib++){
      const z=-model.depth/2+model.depth*rib/(model.shelfRibCount+1);
@@ -95,7 +127,13 @@ export function createRackGeometry(model,{woodTexture=null,zincTexture=null}={})
      box('Reforço longitudinal integrado',span-.012,.0015,.04,center,y-.012,z,mats.metal);
      for(const side of [-1,1])box('Aba do reforço integrado',span-.012,.012,.0015,center,y-.006,z+side*.01925,mats.metal);
     }
-    if(light){for(const z of [-model.depth/2,model.depth/2])box('Borda dobrada da prateleira',span,.025,.002,center,y-.012,z,mats.metal);for(const x of [b.left+model.upright/2,b.right-model.upright/2])box('Borda lateral da prateleira',.002,.025,model.depth,x,y-.012,0,mats.metal);}
+    if(light){
+     // Solid underside fills the folded shelf rim without changing its outer height.
+     for(const side of [-1,1]){
+      box('Dobra inferior sólida da prateleira',span,.025,.008,center,y-.012,side*(deckDepth/2-.004),mats.metal);
+      box('Dobra lateral sólida da prateleira',.008,.025,deckDepth,b.left+model.upright/2+(side===1?span-.004:.004),y-.012,0,mats.metal);
+     }
+     for(const z of [-model.depth/2,model.depth/2])box('Borda dobrada da prateleira',span,.025,.002,center,y-.012,z,mats.metal);for(const x of [b.left+model.upright/2,b.right-model.upright/2])box('Borda lateral da prateleira',.002,.025,model.depth,x,y-.012,0,mats.metal);}
    }
   });
  });

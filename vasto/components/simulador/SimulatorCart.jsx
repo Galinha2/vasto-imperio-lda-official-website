@@ -1,9 +1,10 @@
 'use client';
 import { createContext, useContext, useEffect, useRef, useState } from 'react';
 import { usePathname } from 'next/navigation';
-import { IoBagOutline, IoTrashOutline } from 'react-icons/io5';
+import { IoBagOutline, IoTrashOutline, IoArrowForward, IoCloseOutline } from 'react-icons/io5';
 import { CART_LIMIT, cartQuote, validCartEntry, normalizeCartEntry, cartEntryTitle } from '@/lib/simulator-cart.mjs';
 import { captureCartDrawing, cartDrawing } from './cart-images';
+import styles from "./SimulatorCart.module.css";
 import SimulatorCartEditor from "./SimulatorCartEditor";
 import SimulatorOrderModal from './SimulatorOrderModal';
 
@@ -88,15 +89,29 @@ function CartState({ children, admin }) {
   return <CartContext.Provider value={{entries, quote, add, edit, saveEdit, remove, change, ready, show: () => setOpen(true)}}>
     {children}
     {editingEntry && <CartContext.Provider value={{entries, quote, add, edit, saveEdit, remove, change, ready, editingId:editingEntry.id}}><SimulatorCartEditor key={editingEntry.id} entry={editingEntry} admin={admin} onClose={() => { setEditingEntry(null); if (!admin) setOpen(true); }} /></CartContext.Provider>}
-    {!admin && entries.length > 0 && !pathname.startsWith('/admin') && <button type="button" onClick={() => setOpen(true)} className={`${button} fixed bottom-14 right-4 z-50 flex items-center gap-2 shadow-lg`} aria-label={`Abrir carrinho com ${entries.length} configurações`}><IoBagOutline />Carrinho <span className="rounded-full bg-[#007aff] px-2 py-0.5 text-xs text-white">{entries.length}</span></button>}
-    {open && !checkout && <div className="fixed inset-0 z-[900] flex items-center justify-center bg-black/30 p-3 backdrop-blur-sm"><section role="dialog" aria-modal="true" aria-labelledby="simulator-cart-title" className="flex max-h-[90dvh] w-full max-w-2xl flex-col rounded-3xl bg-white p-5 shadow-xl sm:p-7"><header className="mb-5 flex items-center justify-between"><h2 id="simulator-cart-title" className="text-2xl font-semibold tracking-tight">O seu carrinho</h2><button type="button" className={button} autoFocus onClick={() => setOpen(false)} aria-label="Fechar carrinho">×</button></header><div className="min-h-0 overflow-y-auto"><CartContents />{!entries.length && <p className="py-8 text-sm text-[#86868b]">Adicione uma configuração num dos simuladores.</p>}</div>{error && <p role="alert" className="mt-3 text-sm text-red-700">{error}</p>}<footer className="mt-5 flex flex-wrap items-center justify-between gap-3 border-t border-[#e5e5e7] pt-5"><p className="text-lg font-semibold">{money(quote.total)} <small className="text-xs font-normal text-[#86868b]">+ IVA · transporte não incluído</small></p><button type="button" disabled={busy || !entries.length} onClick={prepareCheckout} className={`${button} !bg-[#007aff] !text-white`}>{busy ? 'A preparar…' : 'Enviar pedido completo'}</button></footer><button type="button" onClick={() => setOpen(false)} className="mt-4 cursor-pointer text-sm text-[#007aff]">Continuar a simular</button></section></div>}
+    {!admin && entries.length > 0 && !pathname.startsWith('/admin') && <button type="button" onClick={() => setOpen(true)} className={styles.launcher} aria-label={`Abrir carrinho com ${entries.length} configurações`}><IoBagOutline size={17} />Carrinho <span className={styles.badge}>{entries.length}</span></button>}
+    {open && !checkout && <div className={styles.overlay}>
+      <section role="dialog" aria-modal="true" aria-labelledby="simulator-cart-title" className={styles.panel}>
+        <header className={styles.header}><div><p className={styles.eyebrow}>A sua seleção</p><h2 id="simulator-cart-title">O seu carrinho.</h2><p className={styles.subtitle}>{entries.length} {entries.length === 1 ? 'configuração, preparada à sua medida.' : 'configurações, preparadas à sua medida.'}</p></div><button type="button" className={styles.close} autoFocus onClick={() => setOpen(false)} aria-label="Fechar carrinho"><IoCloseOutline size={20} /></button></header>
+        <div className={styles.body}><CartContents />{!entries.length && <p className={styles.empty}>Adicione uma configuração num dos simuladores.</p>}</div>
+        {error && <p role="alert" className={styles.error}>{error}</p>}
+        <div className={styles.bottom}><footer className={styles.footer}><div><p className={styles.totalLabel}>Total estimado</p><p className={styles.total}>{money(quote.total)}</p><p className={styles.tax}>Acresce IVA à taxa legal. Transporte não incluído.</p></div><button type="button" disabled={busy || !entries.length} onClick={prepareCheckout} className={styles.checkout}>{busy ? 'A preparar…' : 'Enviar pedido completo'}<IoArrowForward size={17} /></button></footer><button type="button" onClick={() => setOpen(false)} className={styles.continue}>Continuar a simular</button></div>
+      </section>
+    </div>}
     {checkout && <SimulatorOrderModal open onClose={() => {setCheckout(null); setOpen(false);}} {...checkout} details={checkout.details} imageSrc={checkout.image} cartOrder cartConfigurations={checkout.configurations} onSent={sent} />}
   </CartContext.Provider>;
 }
 export function CartContents() {
   const cart = useSimulatorCart();
   if (!cart) return null;
-  return <ul className="divide-y divide-[#e5e5e7]">{cart.entries.map((entry,index) => <li key={entry.id} className="flex gap-3 py-4"><img src={entry.image} alt={`Desenho ${index + 1}: ${entry.label}`} className="h-20 w-24 rounded-lg border border-[#e5e5e7] object-contain" /><div className="min-w-0 flex-1"><h3 className="text-sm font-semibold">{index+1}. {cartEntryTitle(entry)}</h3><p className="mt-1 line-clamp-2 text-xs text-[#86868b]">{entry.details}</p><div className="mt-2 flex flex-wrap items-center gap-3"><label className="text-xs">Quantidade <input type="number" min="1" step="1" aria-label={`Quantidade de ${entry.label} ${index+1}`} value={entry.quantity} onChange={event => cart.change(entry.id,Number(event.target.value))} onFocus={event => event.target.select()} className="ml-2 w-20 rounded-lg border border-[#e5e5e7] p-1" /></label><span className="text-sm font-medium">{money(cartQuote([entry]).total)}</span></div><button type="button" onClick={() => cart.edit(entry)} className="cursor-pointer self-start rounded-full px-3 py-2 text-xs font-medium text-[#007aff] hover:bg-blue-50" aria-label={`Editar configuração ${index+1}`}>Editar</button></div><button type="button" onClick={() => cart.remove(entry.id)} aria-label={`Remover configuração ${index+1}`} className="cursor-pointer self-start rounded-full p-2 text-[#86868b] hover:bg-red-50 hover:text-red-600"><IoTrashOutline /></button></li>)}</ul>;
+  return <ul className={styles.list}>{cart.entries.map((entry,index) => <li key={entry.id} className={styles.item}>
+    <div className={styles.preview}><img src={entry.image} alt={`Desenho ${index + 1}: ${entry.label}`} /></div>
+    <div className={styles.content}><span className={styles.index}>Configuração {String(index+1).padStart(2,'0')}</span><h3 className={styles.title}>{cartEntryTitle(entry)}</h3>
+      <div className={styles.controls}><label className={styles.quantityLabel} htmlFor={`cart-quantity-${entry.id}`}>Quantidade</label><div className={styles.quantity}><button type="button" disabled={entry.quantity <= 1} onClick={() => cart.change(entry.id,entry.quantity-1)} aria-label={`Diminuir quantidade da configuração ${index+1}`}>−</button><input id={`cart-quantity-${entry.id}`} type="number" min="1" step="1" aria-label={`Quantidade de ${entry.label} ${index+1}`} value={entry.quantity} onChange={event => cart.change(entry.id,Number(event.target.value))} onFocus={event => event.target.select()} /><button type="button" onClick={() => cart.change(entry.id,entry.quantity+1)} aria-label={`Aumentar quantidade da configuração ${index+1}`}>+</button></div><button type="button" onClick={() => cart.edit(entry)} className={styles.edit} aria-label={`Editar configuração ${index+1}`}>Editar</button></div>
+      <details className={styles.details}><summary>Ver configuração</summary><p>{entry.details}</p></details>
+    </div>
+    <div className={styles.aside}><span className={styles.price}>{money(cartQuote([entry]).total)}</span><button type="button" onClick={() => cart.remove(entry.id)} aria-label={`Remover configuração ${index+1}`} className={styles.remove}><IoTrashOutline size={15} /></button></div>
+  </li>)}</ul>;
 }
 export function AddToSimulatorCart({ quoteRef, getQuote, drawingRef, label, english = false, disabled = false }) {
   const cart = useSimulatorCart();

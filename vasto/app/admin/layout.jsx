@@ -6,7 +6,7 @@ import AdminNavigation from "@/components/admin/AdminNavigation";
 
 export const metadata = {
   title: "Administração",
-  manifest: "/admin.webmanifest",
+  manifest: "/admin.webmanifest?v=sales-start-2",
   appleWebApp: { capable: true, title: "Vasto Admin", statusBarStyle: "default" },
   robots: { index: false, follow: false, nocache: true },
 };

@@ -74,7 +74,7 @@ export async function notifyAdminPush(event,dependencies={}){
   for(let offset=0;offset<devices.length;offset+=4){
     await Promise.all(devices.slice(offset,offset+4).map(async device=>{
       const prefs=normalizeAdminPreferences(device.preferences);
-      if(!prefs.desktop||(!event.test&&!prefs.chat))return;
+      if(!prefs.desktop||(!event.test&&(!prefs.chat||prefs.mutedChatIds.includes(event.threadId))))return;
       const payload={title:event.test?'Teste · Vasto Império':'Nova mensagem · Vasto Império',body:event.test?'As notificações deste dispositivo estão a funcionar.':prefs.preview?String(event.body||'').slice(0,180):'Recebeu uma nova mensagem no chat do site.',url:event.test?'/admin/definicoes':`/admin/conversas?chat=${event.threadId}`,tag:`vasto-chat-${event.id}`,silent:!prefs.sound||prefs.volume===0};
       try{await send(device.subscription,JSON.stringify(payload));sent++;}
       catch(error){failed++;if(error.statusCode===404||error.statusCode===410){try{await (dependencies.remove||removePushDevice)(device.id);}catch{/* Retry cleanup later. */}}}

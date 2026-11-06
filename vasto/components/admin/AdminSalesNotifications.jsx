@@ -33,6 +33,7 @@ export default function AdminSalesNotifications() {
     function notify({type,title,body,href,key,count=1}) {
       const prefs=current.current;
       if(!(type==='chat'?prefs.chat:prefs.sales))return;
+      if(type==='chat'&&prefs.mutedChatIds?.includes(new URL(href,window.location.origin).searchParams.get('chat')))return;
       const text=prefs.preview?body:(type==='chat'?'Abra as conversas no painel para ler a mensagem.':'Abra o painel para consultar o novo orçamento.');
       if(prefs.inApp)setNotice({title,body:text,href,key});
       if(prefs.sound&&!(type==='chat'&&pushStatus.current))playAdminSound(audio.current,prefs.volume);

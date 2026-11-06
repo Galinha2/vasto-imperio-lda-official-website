@@ -250,3 +250,31 @@
 
 .monthComplete{display:grid;place-items:center;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:24px;height:24px;border:2px solid #fff;border-radius:50%;background:#e7f7ef;color:#168557;box-shadow:0 2px 6px #164d3420;font-size:20px;pointer-events:none}
 @media(max-width:639px){.monthComplete{width:20px;height:20px;font-size:17px}}
+
+/* Dark mode must override the fill on each row, not just its ancestor. */
+:global([data-admin-theme="dark"]) .quoteRow{--quote-fill:#25282e;background-color:var(--quote-fill);border-color:#424852;box-shadow:none;color:#f0f3f7}
+:global([data-admin-theme="dark"]) .quoteRow:hover{--quote-fill:#2d333c;background-color:var(--quote-fill);box-shadow:none}
+:global([data-admin-theme="dark"]) .versionMember{--quote-fill:#242c35}
+:global([data-admin-theme="dark"]) .versionMember:hover{--quote-fill:#2d3844}
+:global([data-admin-theme="dark"]) .quoteRow>td{background:var(--quote-fill);border-color:#424852;box-shadow:none}
+:global([data-admin-theme="dark"]) .table>thead>tr>th{background:#252b34;border-color:#424852;box-shadow:none;color:#c5d0dd}
+:global([data-admin-theme="dark"]) .table>thead>tr>th::after{background:#424852}
+:global([data-admin-theme="dark"]) .quoteRow>td[data-label]::before{color:#b0bac7}
+:global([data-admin-theme="dark"]) .dashboard :global([class*="text-[#86868b]"]),
+:global([data-admin-theme="dark"]) .dashboard :global([class*="text-[#a1a1a6]"]),
+:global([data-admin-theme="dark"]) .dashboard :global([class*="text-[#6e6e73]"]){color:#b4becb!important}
+:global([data-admin-theme="dark"]) .dashboard :global([class*="border-[#f0f0f2]"]),
+:global([data-admin-theme="dark"]) .dashboard :global([class*="border-[#e5e5e7]"]){border-color:#424852!important}
+:global([data-admin-theme="dark"]) .dashboard :global([class~="bg-sky-50"]){background-color:#17384b!important;color:#91d3fc!important;border-color:#315a73!important}
+:global([data-admin-theme="dark"]) .dashboard :global([class~="bg-blue-50"]){background-color:#203453!important;color:#a4caff!important;border-color:#38567e!important}
+:global([data-admin-theme="dark"]) .dashboard :global([class~="bg-amber-50"]),
+:global([data-admin-theme="dark"]) .dashboard :global([class~="bg-amber-100"]){background-color:#41351c!important;color:#f3d18d!important;border-color:#6c562e!important}
+:global([data-admin-theme="dark"]) .dashboard :global([class~="bg-orange-50"]){background-color:#443020!important;color:#ffc18c!important;border-color:#755036!important}
+:global([data-admin-theme="dark"]) .dashboard :global([class~="bg-emerald-50"]){background-color:#163d32!important;color:#91dfbe!important;border-color:#2e6653!important}
+:global([data-admin-theme="dark"]) .dashboard :global([class~="bg-red-50"]){background-color:#45292d!important;color:#ffb0b3!important;border-color:#784149!important}
+:global([data-admin-theme="dark"]) .dashboard :global([class~="bg-slate-100"]){background-color:#343b46!important;color:#bcc8d7!important}
+:global([data-admin-theme="dark"]) .dashboard :global([class*="text-sky-700"]){color:#91d3fc}
+:global([data-admin-theme="dark"]) .dashboard :global([class*="text-emerald-700"]){color:#91dfbe}
+:global([data-admin-theme="dark"]) .dashboard :global([class*="text-orange-700"]){color:#ffc18c}
+:global([data-admin-theme="dark"]) .dashboard .deleteDialog:global(.admin-surface){background-color:#25282e!important;border-color:#424852!important}
+@media(min-width:1536px){:global([data-admin-theme="dark"]) .quoteRow,:global([data-admin-theme="dark"]) .quoteRow:hover{background:transparent}}

@@ -47,3 +47,14 @@ test('service worker mostra notificações e impede redirecionamentos externos',
  assert.equal(opened[0],'https://vastoimperio.pt/admin/conversas?chat=abc');
  assert.equal(handlers.fetch,undefined,'não deve guardar páginas privadas em cache');
 });
+
+test('muted conversation skips push only on the muted device; tests remain available',async()=>{
+ const threadId='b'.repeat(64);const sent=[];
+ const devices=[{id:'muted',subscription:subscription('muted'),preferences:{mutedChatIds:[threadId]}},{id:'normal',subscription:subscription('normal'),preferences:{}}];
+ const dependencies={env:{WEB_PUSH_VAPID_PUBLIC_KEY:keys.publicKey,WEB_PUSH_VAPID_PRIVATE_KEY:keys.privateKey},list:async()=>devices,send:async(sub)=>sent.push(sub.endpoint)};
+ const result=await notifyAdminPush({id:'message',threadId,body:'Olá'},dependencies);
+ assert.equal(result.sent,1);assert.equal(sent.length,1);assert.match(sent[0],/normal$/);
+ sent.length=0;
+ const testResult=await notifyAdminPush({id:'test',test:true,threadId},dependencies);
+ assert.equal(testResult.sent,2);
+});

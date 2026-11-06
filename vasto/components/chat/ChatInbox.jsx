@@ -3,6 +3,9 @@ import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import styles from './Chat.module.css';
+import SwipeChatThread from './SwipeChatThread';
+import {useAdminPreferences} from '@/components/admin/AdminPreferences';
+import {IoNotificationsOffOutline} from 'react-icons/io5';
 import ChatMessages from './ChatMessages';
 import {prepareChatImage} from '@/lib/prepare-chat-image.mjs';
 import {IoImageOutline} from 'react-icons/io5';
@@ -10,6 +13,10 @@ import { useAdminChatUnread } from '@/components/admin/AdminChatUnread';
 import { IoChatbubbleOutline, IoArrowUp, IoChevronBack, IoTrashOutline } from 'react-icons/io5';
 export default function ChatInbox() {
   const router = useRouter();
+  const {preferences,update} = useAdminPreferences();
+  const [swipe,setSwipe] = useState(null);
+  const [deleteTarget,setDeleteTarget] = useState(null);
+  function toggleMute(thread){const ids=preferences.mutedChatIds||[];update({mutedChatIds:ids.includes(thread.id)?ids.filter(id=>id!==thread.id):[...ids,thread.id]});setSwipe(null);}
   const screen = useRef(null);
   const searchParams = useSearchParams();
   const requestedChat = searchParams.get("chat");
@@ -134,15 +141,14 @@ export default function ChatInbox() {
     finally { setBusy(false); setPendingMessage(''); }
   }
   async function removeConversation() {
-    if (busy || !selected) return;
-    const id = selected.id;
-    if (!window.confirm(`Apagar a conversa com ${selected.name}? Todas as mensagens serão eliminadas definitivamente.`)) return;
+    if (busy || !deleteTarget) return;
+    const id = deleteTarget.id;
     setBusy(true); setError('');
     try {
       const response = await fetch(`/api/admin/chat?id=${encodeURIComponent(id)}`, { method: 'DELETE' });
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || 'Não foi possível apagar a conversa.');
-      deletedIds.current.add(id);
+      deletedIds.current.add(id); setDeleteTarget(null); setSwipe(null);
       void refreshUnread();
       setThreads(current => current.filter(thread => thread.id !== id));
       if (selection.current === id) {
@@ -155,14 +161,15 @@ export default function ChatInbox() {
   return <div ref={screen} className={`${styles.inbox} ${selected ? styles.inboxSelected : ''}`}>
     <header className={styles.pageHeader}><Link href="/admin" className={styles.mobileExit} aria-label="Voltar ao painel"><IoChevronBack size={22}/></Link><div><h1>Conversas</h1><p role="status">{total ? `${total} ${total === 1 ? 'mensagem recebida por ler' : 'mensagens recebidas por ler'}` : 'Um espaço para estar mais perto dos seus clientes.'}</p></div><span className={styles.count}>{threads.length} {threads.length === 1 ? 'conversa' : 'conversas'}</span></header>
     {error && !selected && <p role="alert" className={styles.error}>{error}</p>}
+    {deleteTarget && <div className={styles.chatDeleteOverlay}><section role="alertdialog" aria-modal="true" aria-labelledby="delete-chat-heading" className={styles.chatDeleteDialog}><h2 id="delete-chat-heading">Apagar a conversa com {deleteTarget.name}?</h2><p>Todas as mensagens serão eliminadas definitivamente.</p>{error&&<p role="alert">{error}</p>}<div className={styles.endActions}><button type="button" autoFocus disabled={busy} onClick={()=>setDeleteTarget(null)}>Cancelar</button><button type="button" disabled={busy} className={styles.confirmEndButton} onClick={removeConversation}>{busy?'A apagar…':'Apagar conversa'}</button></div></section></div>}
     <div className={`${styles.workspace} ${selected ? styles.workspaceSelected : ''}`}>
       <aside className={styles.threadList} aria-label="Conversas">
         <h2 className={styles.listHeading}>Mensagens do site</h2>
         {!threads.length && <p className={styles.emptyList}>{loading ? 'A carregar conversas…' : 'As novas conversas aparecem aqui.'}</p>}
-        {threads.map(thread => <button key={thread.id} aria-pressed={selected?.id === thread.id} onClick={() => { followMessages.current = true; setPendingMessage(''); selection.current = thread.id; setSelected(thread); setMessages([]); setMessage(''); setError(''); setDelivery(''); }} className={`${styles.thread} ${selected?.id === thread.id ? styles.threadActive : ''}`}><span className={styles.avatar} aria-hidden="true">{thread.name.slice(0, 1).toUpperCase()}</span><span className={styles.threadCopy}><span className={styles.threadTop}><strong>{thread.name}</strong><time>{new Date(thread.created_at).toLocaleDateString('pt-PT', {day:'2-digit', month:'2-digit'})}</time></span><span className={styles.threadContact}>{thread.contact || 'Visitante do site'}</span></span>{counts[thread.id] > 0 && <span className={styles.threadUnread} aria-label={`${counts[thread.id]} mensagens por ler`}>{counts[thread.id]}</span>}</button>)}
+        {threads.map(thread => <SwipeChatThread key={thread.id} name={thread.name} disabled={busy} muted={preferences.mutedChatIds?.includes(thread.id)} open={swipe?.id===thread.id?swipe.action:null} onOpen={action=>setSwipe(action?{id:thread.id,action}:null)} onMute={()=>toggleMute(thread)} onDelete={()=>setDeleteTarget(thread)}><button aria-pressed={selected?.id === thread.id} onClick={() => { followMessages.current = true; setPendingMessage(''); selection.current = thread.id; setSelected(thread); setMessages([]); setMessage(''); setError(''); setDelivery(''); }} className={`${styles.thread} ${selected?.id === thread.id ? styles.threadActive : ''}`}><span className={styles.avatar} aria-hidden="true">{thread.name.slice(0, 1).toUpperCase()}</span><span className={styles.threadCopy}><span className={styles.threadTop}><strong>{thread.name}</strong><time>{new Date(thread.created_at).toLocaleDateString('pt-PT', {day:'2-digit', month:'2-digit'})}</time></span><span className={styles.threadContact}>{preferences.mutedChatIds?.includes(thread.id)&&<IoNotificationsOffOutline aria-label="Silenciada neste dispositivo"/>}{thread.contact || 'Visitante do site'}</span></span>{counts[thread.id] > 0 && <span className={styles.threadUnread} aria-label={`${counts[thread.id]} mensagens por ler`}>{counts[thread.id]}</span>}</button></SwipeChatThread>)}
       </aside>
       {selected ? <section className={styles.conversation}>
-        <header className={styles.conversationHeader}><button className={styles.back} aria-label="Voltar às conversas" onClick={backToList}><IoChevronBack size={20} /></button><span className={styles.avatar} aria-hidden="true">{selected.name.slice(0,1).toUpperCase()}</span><div><h2>{selected.name}</h2><p>{selected.contact || 'Visitante do site'}</p></div><button type="button" className={styles.deleteChat} onClick={removeConversation} disabled={busy} aria-label="Apagar conversa" title="Apagar conversa"><IoTrashOutline size={18} /><span>Apagar</span></button></header>
+        <header className={styles.conversationHeader}><button className={styles.back} aria-label="Voltar às conversas" onClick={backToList}><IoChevronBack size={20} /></button><span className={styles.avatar} aria-hidden="true">{selected.name.slice(0,1).toUpperCase()}</span><div><h2>{selected.name}</h2><p>{selected.contact || 'Visitante do site'}</p></div><button type="button" className={styles.deleteChat} onClick={()=>setDeleteTarget(selected)} disabled={busy} aria-label="Apagar conversa" title="Apagar conversa"><IoTrashOutline size={18} /><span>Apagar</span></button></header>
         <div onScroll={event => { const node = event.currentTarget; followMessages.current = node.scrollHeight - node.scrollTop - node.clientHeight < 90; }} role="log" aria-live="polite" aria-label="Mensagens" className={styles.messages}><ChatMessages messages={messages} sender="staff" threadId={selected.id} pending={pendingMessage}/><div ref={end} /></div>
         <form className={styles.form} onSubmit={send}>{error && <p role="alert" className={styles.error}>{error}</p>}<label htmlFor="staff-message" className={styles.messageLabel}>Responder a {selected.name}</label><div className={styles.compose}><label className={`${styles.attachImage} ${busy ? styles.attachBusy : ''}`} title="Enviar imagem" aria-label="Enviar imagem"><IoImageOutline size={23}/><input id="staff-chat-image" type="file" accept="image/jpeg,image/png,image/webp" disabled={busy} onChange={sendImage}/><span className={styles.srOnly}>Enviar imagem</span></label><textarea disabled={busy} onKeyDown={event => { if (event.key === 'Enter' && !event.shiftKey && !event.nativeEvent.isComposing && window.matchMedia('(pointer: fine)').matches) { event.preventDefault(); event.currentTarget.form?.requestSubmit(); } }} id="staff-message" required maxLength={2000} rows={1} value={message} onChange={e => { setMessage(e.target.value); e.target.style.height = 'auto'; e.target.style.height = `${Math.min(e.target.scrollHeight, 100)}px`; }} placeholder="Escreva uma mensagem…" /><button disabled={busy || !message.trim()} aria-label={busy ? 'A enviar mensagem' : 'Enviar mensagem'}><IoArrowUp size={20} /></button></div>{delivery && <p role="status" className={styles.delivery}>{delivery}</p>}</form>
       </section> : <div className={styles.empty}><span className={styles.emptyIcon}><IoChatbubbleOutline size={28} /></span><h2>Uma boa conversa começa aqui.</h2><p>Selecione uma conversa para acompanhar o pedido e responder ao cliente.</p></div>}

@@ -1,5 +1,6 @@
 "use client";
 
+import AdminRack3D from "@/components/admin/AdminRack3D";
 import SimulatorProductPhoto from "./SimulatorProductPhoto";
 import photoStyles from "./SimulatorProductPhoto.module.css";
 
@@ -421,7 +422,9 @@ export default function SimulatorEstantesLigeiras({ onQuoteDataChange, adminMode
           </div><p className="mt-4 text-xs leading-relaxed text-[#86868b]">{english ? "VAT is added at the applicable rate. Delivery is not included. Configuration is subject to technical validation." : "Ao valor acresce IVA à taxa legal. Transporte não incluído. Configuração sujeita a validação técnica."}</p>
         </div>
         <div className="order-1 min-w-0 space-y-4 lg:order-2">
+          <AdminRack3D english={english} type="ligeiras" modules={modules} height={height} depth={depth} slots={levelSlots} levelsByModule={modules.map((_,index)=>levelsForModule(index))} finalLength={finalLength} bracedIndexes={bracedIndexes} braceCounts={modules.map((_,index)=>bracedIndexes.includes(index)?bracesInBay(index,modules.length,height):0)}>
           <ShelfPreview modules={modules} height={height} depth={depth} levels={levelSlots} activeLevels={activeLevels} levelsForModule={levelsForModule} hasRemovedLevels={hasRemovedLevels} removeLevel={removeLevel} restoreLevels={restoreLevels} rowCount={rowCount} bracedIndexes={bracedIndexes} capacityLabel={`${english ? "Maximum load per level" : "Carga máxima por nível"}: ${shelfCapacity.toLocaleString(english ? "en-IE" : "pt-PT")} kg`} solutions={solutions} selectedSolutionId={selectedSolutionId} onSelectSolution={setSelectedSolutionId} english={english}/>
+          </AdminRack3D>
           {adminMode && <SimulatorProductPhoto type="light" english={english}/>}
           {adminMode && adminPanel}
         </div>

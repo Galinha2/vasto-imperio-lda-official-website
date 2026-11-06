@@ -1,5 +1,6 @@
 "use client";
 
+import AdminRack3D from "@/components/admin/AdminRack3D";
 import SimulatorProductPhoto from "./SimulatorProductPhoto";
 import photoStyles from "./SimulatorProductPhoto.module.css";
 
@@ -602,7 +603,7 @@ export default function SimulatorPicking({ onQuoteDataChange, adminMode = false,
                 />
                 <span className="text-sm font-medium text-[#86868b]">m</span>
               </div>
-              {isLengthUnavailable ? (
+        {isLengthUnavailable ? (
                 <span className="mt-1 block text-sm font-medium text-red-600">{english ? "Lengths over 30.00 m are not available." : "Comprimentos superiores a 30,00 m não estão disponíveis."}</span>
               ) : null}
             </label>
@@ -666,6 +667,7 @@ export default function SimulatorPicking({ onQuoteDataChange, adminMode = false,
           {!matchingFrame && <p className="mt-3 rounded-[30px] bg-amber-50 p-3 text-sm text-amber-800">{english ? "No frame with this height, depth and finish combination is available in catalogue ref. 3." : "Não existe um bastidor com esta combinação de altura, profundidade e acabamento no catálogo ref. 3."}</p>}
         </div>
         <div className="order-1 min-w-0 space-y-4 lg:order-2">
+                <AdminRack3D english={english} unavailable={isLengthUnavailable} type={workbench ? "bancadas" : "picking"} galvanized={galvanized} floorType={floorType} modules={modules} height={height} depth={depth} slots={levelSlots} levelsByModule={modules.map((_,index)=>levelsForModule(index))} finalLength={finalLength} reinforcedBeams={reinforcedBeams}>
         {isLengthUnavailable ? (
           <div className="site-glass flex-1 rounded-[30px] border border-[#e5e5e7] bg-white p-7 shadow-[0_12px_40px_rgba(0,0,0,0.05)]">
             <h2 className="text-xl font-semibold tracking-tight text-[#1d1d1f]">{workbench ? (english ? "Workbench" : "Bancada") : (english ? "Picking shelving" : "Estante de picking")}</h2><p className="mt-1 text-xs text-[#86868b]">{english ? "Your configuration · 2D preview" : "A sua configuração · Pré-visualização 2D"}</p>
@@ -676,6 +678,7 @@ export default function SimulatorPicking({ onQuoteDataChange, adminMode = false,
             <RackPreview workbench={workbench} modules={modules} height={height} depth={depth} levels={levelSlots} activeLevels={activeLevels} levelsForModule={levelsForModule} hasRemovedLevels={hasRemovedLevels} removeLevel={removeLevel} restoreLevels={restoreLevels} floorType={floorType} galvanized={galvanized} reinforcedBeams={reinforcedBeams} rowCount={rowCount} capacityLabel={`${english ? "Maximum load per beam pair" : "Carga máxima por par de vigas"}: ${levelCapacity.toLocaleString(english ? "en-IE" : "pt-PT")} kg`} solutions={solutions} selectedSolutionId={selectedSolutionId} onSelectSolution={setSelectedSolutionId} english={english} />
           </div>
         )}
+          </AdminRack3D>
           {adminMode && !workbench && <SimulatorProductPhoto type="picking" galvanized={galvanized} english={english}/>}
           {adminMode && adminPanel}
         </div>

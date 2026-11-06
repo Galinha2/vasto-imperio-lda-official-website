@@ -1,3 +1,4 @@
+import "@/components/admin/AdminTheme.css";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { verifySession, SESSION_COOKIE } from "@/lib/admin/auth.mjs";

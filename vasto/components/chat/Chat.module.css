@@ -33,3 +33,16 @@
 .deleteChat{display:flex;align-items:center;gap:7px;flex-shrink:0;margin-left:auto;padding:8px 10px;border:0;border-radius:9px;background:transparent;color:#86868b;font-size:12px;cursor:pointer}.deleteChat:hover{background:#fff1f0;color:#d93025}.deleteChat:disabled{opacity:.4;cursor:default}@media(max-width:480px){.deleteChat span{display:none}}
 
 .threadUnread{display:grid;place-items:center;flex-shrink:0;min-width:21px;height:21px;padding:0 6px;border-radius:999px;background:#007aff;color:#fff;font-size:11px;font-weight:600;font-variant-numeric:tabular-nums}
+
+:global([data-admin-theme="dark"]) .inbox{color:#f5f5f7}
+:global([data-admin-theme="dark"]) .workspace,
+:global([data-admin-theme="dark"]) .messages,
+:global([data-admin-theme="dark"]) .form{background:#1c1c1e;border-color:#38383a}
+:global([data-admin-theme="dark"]) .threadList,
+:global([data-admin-theme="dark"]) .emptyIcon,
+:global([data-admin-theme="dark"]) .count{background:#242426;border-color:#38383a;color:#a1a1a6}
+:global([data-admin-theme="dark"]) .threadActive,
+:global([data-admin-theme="dark"]) .thread:hover{background:#38383a}
+:global([data-admin-theme="dark"]) .avatar,
+:global([data-admin-theme="dark"]) .theirs{background:#38383a;color:#f5f5f7}
+:global([data-admin-theme="dark"]) .conversationHeader{border-color:#38383a}

@@ -8,6 +8,7 @@ import { IoIosArrowDown } from "react-icons/io";
 export default function SimulatorAdminQuoteTools({
   quoteData,
   cartMode = false,
+  cartPanel,
   descontoManual,
   setDescontoManual,
   produtosExtra,
@@ -157,6 +158,8 @@ export default function SimulatorAdminQuoteTools({
           + Adicionar produto
         </button>
       </section>
+
+      {cartPanel}
 
       <section aria-label="Exportar simulação" className="admin-surface flex flex-col justify-between gap-4 rounded-[24px] border border-[#e5e5e7] bg-white p-5 shadow-[0_8px_30px_rgba(0,0,0,0.035)] sm:px-6">
         <div>

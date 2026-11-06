@@ -213,3 +213,17 @@
   .versionEntering { animation: none; }
   .groupChevron { transition: none; }
 }
+
+:global([data-admin-theme="dark"]) .dashboard{--sales-glass-shadow:0 8px 28px #0002;--quote-fill:#242426;color:#f5f5f7}
+:global([data-admin-theme="dark"]) .documents,
+:global([data-admin-theme="dark"]) .dashboard :global(.admin-surface){background-color:#1c1c1e!important;border-color:#38383a!important;box-shadow:0 8px 24px #0002}
+:global([data-admin-theme="dark"]) .quoteRow{background-color:#242426;border-color:#38383a;box-shadow:none}
+:global([data-admin-theme="dark"]) .quoteRow:hover{background-color:#2c2c2e;box-shadow:none}
+:global([data-admin-theme="dark"]) .dashboard input:not([type="checkbox"]):not([type="file"]),
+:global([data-admin-theme="dark"]) .dashboard select{background-color:#242426!important;border-color:#48484a!important;box-shadow:none;color:#f5f5f7}
+:global([data-admin-theme="dark"]) .groupToggle{background:#242426;border-color:#38383a}
+:global([data-admin-theme="dark"]) .groupTitle strong{color:#f5f5f7}
+:global([data-admin-theme="dark"]) .groupIcon,
+:global([data-admin-theme="dark"]) .groupToggleLabel,
+:global([data-admin-theme="dark"]) .versionBadge{background:#38383a;color:#c7c7cc}
+:global([data-admin-theme="dark"]) .groupEnd span{background:#242426;border-color:#38383a;color:#a1a1a6}

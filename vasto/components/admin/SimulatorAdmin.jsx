@@ -207,6 +207,7 @@ export default function SimulatorAdmin() {
     <SimulatorAdminQuoteTools
       quoteData={effectiveQuote}
       cartMode={Boolean(cart?.entries.length)}
+      cartPanel={cart?.entries.length > 0 && <section className="rounded-3xl border border-[#e5e5e7] bg-white p-5"><h2 className="text-lg font-semibold">Carrinho · {cart.entries.length} configurações</h2><p className="mt-1 text-xs text-[#86868b]">O PDF, o envio por email e o envio para vendas incluem apenas as configurações adicionadas ao carrinho, com os descontos guardados em cada uma, e os artigos extra.</p><CartContents /><p className="mt-3 text-sm font-semibold">Total das configurações: {new Intl.NumberFormat('pt-PT',{style:'currency',currency:'EUR'}).format(cart.quote.total)} + IVA</p></section>}
       descontoManual={cart?.entries.length ? 0 : descontoManual}
       setDescontoManual={cart?.entries.length ? () => setMensagem("O carrinho conserva o desconto de cada configuração. Ajuste o desconto antes de adicionar a configuração.") : setDescontoManual}
       produtosExtra={produtosExtra}
@@ -246,7 +247,7 @@ export default function SimulatorAdmin() {
           </div>
         </header>
 
-        {cart?.entries.length > 0 && <section className="rounded-3xl border border-[#e5e5e7] bg-white p-5"><h2 className="text-lg font-semibold">Carrinho · {cart.entries.length} configurações</h2><p className="mt-1 text-xs text-[#86868b]">O PDF, o envio por email e o envio para vendas incluem apenas as configurações adicionadas ao carrinho, com os descontos guardados em cada uma, e os artigos extra.</p><CartContents /><p className="mt-3 text-sm font-semibold">Total das configurações: {new Intl.NumberFormat('pt-PT',{style:'currency',currency:'EUR'}).format(cart.quote.total)} + IVA</p></section>}
+
 
         <nav aria-label="Escolher tipo de equipamento" className="grid gap-2 sm:grid-cols-2 xl:grid-cols-4">
           {simuladores.map(({ id, label, description, image }) => (

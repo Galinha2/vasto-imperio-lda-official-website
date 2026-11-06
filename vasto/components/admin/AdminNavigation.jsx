@@ -1,10 +1,11 @@
 "use client";
 
 import styles from "./AdminNavigation.module.css";
-import { useState } from "react";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
-import { IoDocumentTextOutline, IoLogOutOutline, IoStatsChartOutline, IoConstructOutline, IoPieChartOutline, IoWalletOutline, IoChatbubblesOutline } from "react-icons/io5";
+import { usePathname } from "next/navigation";
+import { IoDocumentTextOutline, IoStatsChartOutline, IoConstructOutline, IoPieChartOutline, IoWalletOutline, IoChatbubblesOutline, IoSettingsOutline } from "react-icons/io5";
+
+import AdminPreferences, { useAdminPreferences } from "./AdminPreferences";
 
 import AdminChatUnread, { useAdminChatUnread } from "./AdminChatUnread";
 
@@ -17,32 +18,20 @@ const sections = [
   { href: "/admin/orcamentos", label: "Orçamentos", Icon: IoDocumentTextOutline },
   { href: "/admin/simulador", label: "Simulador", Icon: IoConstructOutline },
   { href: "/admin/conversas", label: "Conversas", Icon: IoChatbubblesOutline },
+  { href: "/admin/definicoes", label: "Definições", Icon: IoSettingsOutline },
 ];
 
 export default function AdminNavigation({ children }) {
-  return <AdminChatUnread><NavigationContent>{children}</NavigationContent></AdminChatUnread>;
+  return <AdminPreferences><AdminChatUnread><NavigationContent>{children}</NavigationContent></AdminChatUnread></AdminPreferences>;
 }
 function NavigationContent({ children }) {
   const { total } = useAdminChatUnread();
   const pathname = usePathname();
-  const router = useRouter();
-  const [error, setError] = useState("");
-
-  async function logout() {
-    setError("");
-    try {
-      const response = await fetch("/api/admin/session", { method: "DELETE", cache: "no-store" });
-      const result = await response.json();
-      if (!response.ok) throw new Error(result.error || "Não foi possível terminar a sessão.");
-      router.replace("/admin/login");
-      router.refresh();
-    } catch (failure) {
-      setError(failure.message || "Não foi possível terminar a sessão.");
-    }
-  }
+  const { theme } = useAdminPreferences();
 
   return (
-    <div className={`${styles.shell} lg:grid`}>
+    <div className={`${styles.shell} lg:grid`} data-admin-theme={theme}>
+      <AdminSalesNotifications />
       <aside className={`${styles.sidebar} sticky top-0 z-40 border-b px-4 py-3 lg:flex lg:flex-col`}>
         <div className={`${styles.brandHeader} flex items-center justify-between gap-3`}>
           <Link href="/" aria-label="Ir para a página inicial da Vasto Império" className={`${styles.brand} flex min-w-0 items-center gap-3 rounded-2xl outline-none focus-visible:ring-2 focus-visible:ring-orange-300`}>
@@ -52,10 +41,6 @@ function NavigationContent({ children }) {
               <p className="mt-0.5 text-[11px] text-[#86868b]">Área de administração</p>
             </div>
           </Link>
-          <AdminSalesNotifications />
-          <button type="button" onClick={logout} className="flex shrink-0 cursor-pointer items-center gap-2 rounded-xl px-2 py-2 text-xs text-[#6e6e73] transition hover:bg-[#f5f5f7] hover:text-[#1d1d1f] lg:hidden">
-            <IoLogOutOutline className="text-base" /> Sair
-          </button>
         </div>
         <nav aria-label="Administração" className="mt-3 flex gap-2 overflow-x-auto pb-0.5 lg:mt-10 lg:flex-col lg:overflow-visible">
           {sections.map(({ href, label, Icon }) => {
@@ -77,13 +62,7 @@ function NavigationContent({ children }) {
             );
           })}
         </nav>
-        {error && <p role="alert" className="mt-3 text-xs text-red-700">{error}</p>}
-        <div className="mt-auto hidden lg:block">
-          <p className="text-[11px] leading-relaxed text-[#a1a1a6]">Os seus documentos.<br />A sua visão do negócio.</p>
-          <button type="button" onClick={logout} className="mt-6 flex w-full cursor-pointer items-center gap-3 rounded-xl px-4 py-2 text-sm text-[#86868b] transition hover:bg-[#f5f5f7] hover:text-[#1d1d1f]">
-            <IoLogOutOutline className="text-lg" />Terminar sessão
-          </button>
-        </div>
+        <div className="mt-auto hidden pt-8 lg:block"><p className="px-4 text-[11px] leading-relaxed text-[#a1a1a6]">Vasto Império<br />Área de administração</p></div>
       </aside>
       <div className={styles.content}>{children}</div>
     </div>

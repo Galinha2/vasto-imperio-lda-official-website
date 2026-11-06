@@ -44,23 +44,32 @@ export default function ChatWidget({ preview = false }) {
     return () => { clearTimeout(timer); document.removeEventListener('visibilitychange', update); };
   }, [waitingSince, open, hidden]);
   useEffect(() => {
-    if (!open || hidden) return;
+    if (hidden) return;
     const media = window.matchMedia('(max-width: 1023px) and (pointer: coarse), (max-width: 767px)');
     const viewport = window.visualViewport;
     const previousOverflow = document.body.style.overflow;
     const resize = () => {
       if (viewport && viewport.scale > 1.05) return;
-      document.body.style.overflow = media.matches ? 'hidden' : previousOverflow;
-      screen.current?.style.setProperty('--visitor-chat-height', `${viewport?.height || window.innerHeight}px`);
-      screen.current?.style.setProperty('--visitor-chat-top', `${viewport?.offsetTop || 0}px`);
+      document.body.style.overflow = open && media.matches ? 'hidden' : previousOverflow;
+      const viewportTop = viewport?.offsetTop || 0;
+      const viewportHeight = viewport?.height || window.innerHeight;
+      screen.current?.style.setProperty('--visitor-chat-height', `${viewportHeight}px`);
+      screen.current?.style.setProperty('--visitor-chat-top', `${viewportTop}px`);
+      if (media.matches && !open) {
+        const bottomOffset = Math.max(20, window.innerHeight - viewportTop - viewportHeight + 20);
+        screen.current?.style.setProperty('--visitor-chat-bottom', `${bottomOffset}px`);
+      } else {
+        screen.current?.style.removeProperty('--visitor-chat-bottom');
+      }
     };
     resize(); media.addEventListener('change', resize);
     viewport?.addEventListener('resize', resize); viewport?.addEventListener('scroll', resize);
-    window.addEventListener('resize', resize);
+    window.addEventListener('resize', resize); window.addEventListener('scroll', resize, { passive: true });
     return () => {
       document.body.style.overflow = previousOverflow;
       media.removeEventListener('change', resize); viewport?.removeEventListener('resize', resize);
       viewport?.removeEventListener('scroll', resize); window.removeEventListener('resize', resize);
+      window.removeEventListener('scroll', resize);
     };
   }, [open, hidden]);
   useEffect(() => {

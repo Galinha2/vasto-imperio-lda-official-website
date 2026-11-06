@@ -42,10 +42,10 @@ export default function AdminPushProvider({children}){
   return()=>{canceled=true;clearTimeout(timer);};
  },[subscription,configuration,preferencesReady,save,preferences.desktop]);
  async function enable(){
-  if(busy)return;setError('');setMessage('');
-  if(ios&&!installed){setError('No iPhone, adicione primeiro esta aplicação ao ecrã principal e abra-a pelo ícone.');return;}
-  if(!supported||!registration){setError('Este navegador ainda não está pronto para receber notificações push. Instale ou recarregue a aplicação.');return;}
-  if(!configuration?.configured){setError('Falta configurar as chaves Web Push no servidor. Consulte o guia de instalação.');return;}
+  if(busy)return false;setError('');setMessage('');
+  if(ios&&!installed){setError('No iPhone, adicione primeiro esta aplicação ao ecrã principal e abra-a pelo ícone.');return false;}
+  if(!supported||!registration){setError('Este navegador ainda não está pronto para receber notificações push. Instale ou recarregue a aplicação. No iPhone, abra pelo ícone no ecrã principal.');return false;}
+  if(!configuration?.configured){setError('Falta configurar WEB_PUSH_VAPID_PUBLIC_KEY e WEB_PUSH_VAPID_PRIVATE_KEY no servidor e publicar novamente. Consulte o guia de instalação.');return false;}
   setBusy(true);
   try{
    const permission=await requestPermission();if(permission!=='granted')throw new Error('Permita notificações nas definições deste site ou aplicação.');
@@ -54,19 +54,20 @@ export default function AdminPushProvider({children}){
    sub ||= await registration.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:fromBase64(configuration.publicKey)});
    // Enabling is an explicit opt-in, even if alerts were previously disabled.
    await post({subscription:sub.toJSON(),preferences:{...preferences,desktop:true}});
-   setSubscription(sub);setActive(true);setMessage('Dispositivo registado. Pode receber mensagens mesmo com a aplicação fechada. Use “Testar neste dispositivo” para confirmar.');
-  }catch(failure){setActive(false);setError(failure.message||'Não foi possível ativar as notificações.');}finally{setBusy(false);}
+   setSubscription(sub);setActive(true);setMessage('Dispositivo registado. Pode receber mensagens mesmo com a aplicação fechada. Use “Testar neste dispositivo” para confirmar.');return true;
+  }catch(failure){setActive(false);setError(failure.message||'Não foi possível ativar as notificações.');return false;}finally{setBusy(false);}
  }
  async function disable(){if(busy)return;setBusy(true);setError('');try{await api({method:'DELETE'});await subscription?.unsubscribe();setSubscription(null);setActive(false);setMessage('Notificações push desativadas neste dispositivo.');}catch(failure){setError(failure.message);}finally{setBusy(false);}}
- async function test(){if(busy)return;setBusy(true);setMessage('');setError('');try{await post({action:'test'});setMessage('O serviço push aceitou o teste. Confirme a notificação no telemóvel.');}catch(failure){setError(failure.message);}finally{setBusy(false);}}
+ async function test(){if(busy)return;if(!active&&!(await enable()))return;setBusy(true);setMessage('');setError('');try{await post({action:'test'});setMessage('O serviço push aceitou o teste. Confirme a notificação no telemóvel.');}catch(failure){setError(failure.message);}finally{setBusy(false);}}
  async function install(){if(!installPrompt)return;await installPrompt.prompt();await installPrompt.userChoice;setInstallPrompt(null);}
  return <Context.Provider value={{active,busy,error,message,supported,ios,installed,configuration,registration,subscription,enable,disable,test,install,installPrompt}}>{children}</Context.Provider>;
 }
 export function AdminPushPanel(){
  const push=useAdminPush();
  return <section className={styles.card} aria-labelledby="settings-mobile"><div className={styles.sectionTitle}><IoPhonePortraitOutline/><div><h2 id="settings-mobile">Aplicação no telemóvel</h2><p>Receba mensagens do chat no Android e no iPhone, mesmo fora do computador.</p></div><span className={styles.status}>{push.active?'Ativas neste dispositivo':'Por ativar'}</span></div>
+ <p className={styles.hint}>{push.ios&&!push.installed?'No iPhone, abra esta página no Safari e use Partilhar → Adicionar ao ecrã principal. Depois abra pelo novo ícone.':!push.supported?'Este navegador não disponibiliza notificações push. Utilize a aplicação instalada e uma ligação HTTPS.':!push.configuration?'A verificar a configuração do servidor…':!push.configuration.configured?'Faltam as chaves Web Push no servidor. É necessário configurá-las antes de receber avisos.':!push.active?'Toque em Ativar neste dispositivo ou em Testar neste dispositivo para pedir permissão e registar o telemóvel.':'Este dispositivo está registado para receber notificações.'}</p>
  <ol className={styles.installSteps}><li>Instale a aplicação neste telemóvel.</li><li>Abra pelo ícone e inicie sessão. Se quiser manter o acesso, escolha “Manter sessão iniciada” no início de sessão.</li><li>Ative as notificações abaixo e permita os avisos do sistema.</li></ol>
- <div className={styles.actions}>{push.installPrompt&&<button type="button" onClick={push.install} className={styles.secondary}>Instalar aplicação</button>}<button type="button" disabled={push.busy||!push.configuration?.configured||(!push.supported&&!push.ios)} onClick={push.enable} className={styles.button}>{push.busy?'A preparar…':push.subscription?'Renovar notificações':'Ativar neste dispositivo'}</button><button type="button" disabled={push.busy||!push.active} onClick={push.test} className={styles.secondary}>Testar neste dispositivo</button>{push.subscription&&<button type="button" disabled={push.busy} onClick={push.disable} className={styles.secondary}>Desativar neste dispositivo</button>}</div>
+ <div className={styles.actions}>{push.installPrompt&&<button type="button" onClick={push.install} className={styles.secondary}>Instalar aplicação</button>}<button type="button" disabled={push.busy} onClick={push.enable} className={styles.button}>{push.busy?'A preparar…':push.subscription?'Renovar notificações':'Ativar neste dispositivo'}</button><button type="button" disabled={push.busy} onClick={push.test} className={styles.secondary}>Testar neste dispositivo</button>{push.subscription&&<button type="button" disabled={push.busy} onClick={push.disable} className={styles.secondary}>Desativar neste dispositivo</button>}</div>
  {push.configuration&&!push.configuration.configured&&<p className={styles.hint}>As notificações push ainda precisam de configuração no servidor. O guia de instalação está em docs/admin-push.md.</p>}
  {push.error&&<p role="alert" className={styles.error}>{push.error}</p>}{push.message&&<p role="status" className={styles.message}>{push.message}</p>}
  <details className={styles.installHelp}><summary>Como instalar no Android e no iPhone</summary><p><strong>iPhone / iPad (iOS 16.4 ou posterior):</strong> abra esta página no Safari, toque em Partilhar → Adicionar ao ecrã principal. Abra o novo ícone para ativar as notificações.</p><p><strong>Android:</strong> abra esta página no Chrome e escolha Instalar aplicação ou Adicionar ao ecrã principal no menu do navegador.</p><p>Quando chegar uma notificação, toque para abrir a conversa e responder. É necessária ligação à internet. As permissões, a sessão e o modo Não incomodar do telemóvel podem afetar os avisos.</p></details>

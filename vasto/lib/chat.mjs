@@ -6,6 +6,27 @@ export const CHAT_COOKIE = 'vasto_chat';
 const fail = (message, status) => Object.assign(new Error(message), { status });
 const hash = value => createHash('sha256').update(value).digest('hex');
 const dir = () => path.resolve(process.env.ADMIN_DATA_DIR || '.admin-data', 'chat');
+// Only expose this diagnostic inside the authenticated administration.
+export async function chatSetupStatus() {
+  try {
+    if (storageMode() !== 'cloud') return { ready: true, local: true };
+    for (const [table, fields] of [['site_chat_threads', 'id'], ['site_chat_messages', 'id,admin_read_at'], ['site_chat_presence', 'id']]) {
+      const response = await fetch(`${process.env.SUPABASE_URL.replace(/\/$/, '')}/rest/v1/${table}?select=${fields}&limit=0`, {
+        cache: 'no-store', signal: AbortSignal.timeout(8000),
+        headers: { apikey: process.env.SUPABASE_SERVICE_ROLE_KEY, Authorization: `Bearer ${process.env.SUPABASE_SERVICE_ROLE_KEY}` },
+      });
+      if (!response.ok) {
+        const detail = await response.json().catch(() => ({}));
+        if (response.status === 401 || response.status === 403) return { ready: false, message: 'O Supabase recusou o acesso ao chat. Confirme a chave SUPABASE_SERVICE_ROLE_KEY do projeto e execute supabase/site-chat.sql para aplicar as permissões.' };
+        if (response.status === 404 || ['PGRST205', 'PGRST204', '42P01', '42703'].includes(detail.code)) return { ready: false, message: `A estrutura do chat está incompleta (${table}). Execute o ficheiro supabase/site-chat.sql completo no SQL Editor do mesmo projeto Supabase usado pelo site.` };
+        return { ready: false, message: 'O Supabase não conseguiu disponibilizar o chat. Confirme o estado do projeto e execute supabase/site-chat.sql.' };
+      }
+    }
+    return { ready: true, local: false };
+  } catch {
+    return { ready: false, message: 'Não foi possível ligar ao armazenamento do chat. Confirme SUPABASE_URL e SUPABASE_SERVICE_ROLE_KEY no ambiente onde está a testar.' };
+  }
+}
 async function cloud(endpoint, options = {}) {
   const response = await fetch(`${process.env.SUPABASE_URL.replace(/\/$/, '')}/rest/v1/${endpoint}`, { ...options, cache: 'no-store', headers: { apikey: process.env.SUPABASE_SERVICE_ROLE_KEY, Authorization: `Bearer ${process.env.SUPABASE_SERVICE_ROLE_KEY}`, 'Content-Type': 'application/json', ...options.headers } });
   if (!response.ok) throw fail('O chat está temporariamente indisponível. Pode contactar-nos pelo telefone +351 928 348 117.', 503);

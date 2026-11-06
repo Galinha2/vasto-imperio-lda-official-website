@@ -4,7 +4,7 @@ A administração pode ser instalada no Android e no iPhone. Cada mensagem receb
 
 ## Preparar o servidor
 
-1. Executar `supabase/admin-push.sql` no SQL Editor do projeto Supabase utilizado pelo site.
+1. Executar `supabase/site-chat.sql` e depois `supabase/admin-push.sql` no SQL Editor do projeto Supabase utilizado pelo site. O primeiro cria as conversas, mensagens e presença; o segundo cria os dispositivos para notificações. A página privada `/admin/testar-chat` verifica a ligação às tabelas e indica problemas de configuração.
 2. Em `vasto/`, executar `node scripts/setup-web-push.mjs`. Este comando cria o par de chaves apenas se ainda não existir em `.env.local`, sem o exibir.
 3. Configurar na Vercel os mesmos valores de `WEB_PUSH_VAPID_PUBLIC_KEY`, `WEB_PUSH_VAPID_PRIVATE_KEY` e `WEB_PUSH_VAPID_SUBJECT` (por exemplo `mailto:geral@vastoimperio.pt`). A chave privada é secreta e nunca deve ser enviada para o frontend, incluída num commit ou publicada. A chave pública é disponibilizada apenas pela API autenticada.
 4. Publicar as alterações. A aplicação exige HTTPS, exceto em localhost durante desenvolvimento.

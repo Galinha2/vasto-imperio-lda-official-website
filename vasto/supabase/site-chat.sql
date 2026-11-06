@@ -1,4 +1,5 @@
 -- Executar no SQL Editor do mesmo projeto Supabase usado pela administração.
+grant usage on schema public to service_role;
 create table if not exists public.site_chat_threads (
   id text primary key,
   name text not null,
@@ -38,3 +39,6 @@ grant delete on public.site_chat_threads to service_role;
 alter table public.site_chat_messages add column if not exists admin_read_at timestamptz;
 create index if not exists site_chat_messages_unread on public.site_chat_messages (thread_id) where sender = 'visitor' and admin_read_at is null;
 grant update on public.site_chat_messages to service_role;
+
+-- Atualizar a estrutura exposta pela API após criar as tabelas ou colunas.
+notify pgrst, 'reload schema';

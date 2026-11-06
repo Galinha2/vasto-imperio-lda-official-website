@@ -10,6 +10,7 @@ import CustomerPhoneButton from "./CustomerPhoneButton";
 import CustomerNotesButton from "./CustomerNotesButton";
 import FollowUpAlerts from "./FollowUpAlerts";
 import styles from "./SalesDashboard.module.css";
+import DashboardPriorities from "./DashboardPriorities";
 import MetricCard from "./MetricCard";
 
 import { Fragment, useEffect, useId, useRef, useState } from "react";
@@ -874,28 +875,7 @@ export default function SalesDashboard() {
             </div>
           </section>
 
-          <section aria-labelledby="sales-insights-heading" className="mt-6">
-            <div className="mb-3 flex items-end justify-between gap-3">
-              <div><h2 id="sales-insights-heading" className="text-base font-semibold tracking-tight">Indicadores do período</h2><p className="mt-1 text-xs text-[#86868b]">Um resumo do desempenho em {periodLabel.toLocaleLowerCase("pt-PT")}.</p></div>
-            </div>
-            <div className="grid gap-3 sm:grid-cols-3">
-              <button type="button" aria-haspopup="dialog" onClick={() => setSalesDetail("average")} className="w-full cursor-pointer rounded-2xl border border-[#e8e8ed] bg-white p-4 text-left transition hover:border-sky-200 hover:bg-sky-50/40 hover:shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-600/30">
-                <p className="text-xs font-medium text-[#86868b]">Valor médio por encomenda</p>
-                <p className="mt-2 text-xl font-semibold tracking-tight text-[#1d1d1f]">{loading ? "—" : currency.format(averageConfirmed)}</p>
-                <p className="mt-1 text-[11px] text-[#a1a1a6]">Encomendas confirmadas · sem IVA</p>
-              </button>
-              <button type="button" aria-haspopup="dialog" onClick={() => setSalesDetail("conversion")} className="w-full cursor-pointer rounded-2xl border border-[#e8e8ed] bg-white p-4 text-left transition hover:border-sky-200 hover:bg-sky-50/40 hover:shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-600/30">
-                <p className="text-xs font-medium text-[#86868b]">Taxa de conversão</p>
-                <p className="mt-2 text-xl font-semibold tracking-tight text-sky-700">{loading ? "—" : `${conversionRate}%`}</p>
-                <p className="mt-1 text-[11px] text-[#a1a1a6]">{confirmed.length} confirmadas de {period.length} documentos</p>
-              </button>
-              <button type="button" aria-haspopup="dialog" onClick={() => setSalesDetail("resolved")} className="w-full cursor-pointer rounded-2xl border border-[#e8e8ed] bg-white p-4 text-left transition hover:border-emerald-200 hover:bg-emerald-50/40 hover:shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600/30">
-                <p className="text-xs font-medium text-[#86868b]">Encomendas resolvidas</p>
-                <p className="mt-2 text-xl font-semibold tracking-tight text-emerald-700">{loading ? "—" : `${resolvedRate}%`}</p>
-                <p className="mt-1 text-[11px] text-[#a1a1a6]">{resolvedCount} pagas e entregues de {period.length} documentos</p>
-              </button>
-            </div>
-          </section>
+          <DashboardPriorities sales={sales} loading={loading} importing={uploading} onImport={()=>inputRef.current?.click()} onOpen={sale=>router.push(`/admin?orcamento=${sale.id}`,{scroll:false})}/>
 
           <section
             id="sales-documents"
@@ -1074,19 +1054,20 @@ export default function SalesDashboard() {
                           style={{ "--quote-accent": sale.quoteNotSelected ? "#94a3b8" : isResolved(sale) ? "#10b981" : sale.status === "confirmada" ? "#1687f8" : "#f05252" }}
                           className={`${styles.quoteRow} ${quoteGroup.sales.length > 1 ? styles.versionMember : ""} ${quoteGroup.sales.length > 1 && (expandedQuoteGroups[quoteGroup.id] !== false) ? styles.versionEntering : ""} ${quoteDropTarget === sale.id ? "outline-2 -outline-offset-2 outline-[#0879c0] bg-sky-50 " : ""}cursor-pointer transition ${sale.quoteNotSelected ? "text-slate-500" : ""}`}>
                           <td className="px-3 py-5">
-                            <div className="flex items-center gap-2">
-                              <button type="button" aria-expanded={imagePanel === sale.id} aria-label={`${imagePanel === sale.id ? "Fechar" : "Ver"} PDF e desenhos de ${sale.customerName}`} onClick={() => setImagePanel((current) => current === sale.id ? "" : sale.id)} className="flex min-w-0 cursor-pointer items-center gap-2 text-left text-sm font-semibold tracking-tight hover:text-[#0879c0]"><span className="truncate">{sale.customerName}</span><IoChevronDownOutline aria-hidden="true" className={`shrink-0 text-xs text-[#a1a1a6] transition-transform ${imagePanel === sale.id ? "rotate-180" : ""}`} /></button>
+                            <div className={styles.quoteIdentity}><IoDocumentTextOutline aria-hidden="true"/><span>{sale.quoteNumber ? `Orçamento #${sale.quoteNumber}` : "Orçamento"}</span><time>{dateLabel(sale.issuedAt)}</time></div>
+                            <div className={styles.customerHeading}>
+                              <button type="button" aria-expanded={imagePanel === sale.id} aria-label={`${imagePanel === sale.id ? "Fechar" : "Ver"} PDF e desenhos de ${sale.customerName}`} onClick={() => setImagePanel((current) => current === sale.id ? "" : sale.id)} className={styles.customerName}><span>{sale.customerName}</span><IoChevronDownOutline aria-hidden="true" className={`shrink-0 text-xs text-[#a1a1a6] transition-transform ${imagePanel === sale.id ? "rotate-180" : ""}`} /></button>
                               <CustomerPhoneButton inline sale={sale} />
                               <CustomerNotesButton inline sale={sale} onSaved={(updated) => setSales((current) => current.map((item) => item.id === updated.id ? { ...item, customerNotes: updated.customerNotes, updatedAt: updated.updatedAt } : item))} />
 
                             </div>
                             {quoteGroup.sales.length > 1 && <span className={styles.versionBadge}>Versão {quoteGroup.sales.indexOf(sale) + 1} de {quoteGroup.sales.length}{sale.quoteNumber ? ` · Orçamento ${sale.quoteNumber}` : ""}</span>}
 
-                            {(sale.quoteDetails || sale.orderDetails?.detalhes) && <p className="mt-2 line-clamp-3 text-[10px] leading-relaxed text-[#6e6e73]" title={sale.quoteDetails || sale.orderDetails?.detalhes}>{sale.quoteDetails || sale.orderDetails?.detalhes}</p>}
+                            {(sale.quoteDetails || sale.orderDetails?.detalhes) && <p className={styles.quoteDescription} title={sale.quoteDetails || sale.orderDetails?.detalhes}>{sale.quoteDetails || sale.orderDetails?.detalhes}</p>}
 
-                            <p className="mt-1 truncate text-[11px] text-[#a1a1a6]">{sale.nif ? `${sale.nif} · ` : ""}{sale.fileName}</p>
+                            <p className={styles.quoteReference} title={sale.fileName}>{sale.nif ? `NIF ${sale.nif}` : "Sem NIF indicado"}{sale.emailSentAt ? " · Email enviado" : ""}</p>
                             <div className="mt-1 flex items-center gap-2">
-                              <p className="min-w-0 truncate text-[10px] text-[#86868b]">{sale.source === "simulador" ? "Simulador" : "Orçamento"} · {dateLabel(sale.issuedAt)}</p>
+                              <p className="min-w-0 truncate text-[10px] text-[#86868b]">{sale.source === "simulador" ? "Criado no simulador" : "Documento PDF"}</p>
                             <span title={sale.entryOrigin === "cliente" || (!sale.entryOrigin && sale.orderDetails) ? "Pedido enviado pelo cliente através do site, com envio por email." : "Orçamento introduzido através do painel de administração."} className={`shrink-0 inline-flex rounded-full px-2 py-0.5 text-[10px] font-medium ${sale.entryOrigin === "cliente" || (!sale.entryOrigin && sale.orderDetails) ? "border border-orange-200 bg-orange-50 text-orange-700" : "border border-blue-200 bg-blue-50 text-blue-700"}`}>
                               {sale.entryOrigin === "cliente" || (!sale.entryOrigin && sale.orderDetails) ? "Cliente · Site" : "Admin"}
                             </span>
@@ -1094,7 +1075,7 @@ export default function SalesDashboard() {
                             {sale.uploadedAt && <p className="mt-0.5 truncate text-[9px] text-[#a1a1a6]" title={`Pedido recebido em ${dateLabel(sale.uploadedAt.slice(0, 10))}`}>Recebido · {dateLabel(sale.uploadedAt.slice(0, 10))}</p>}
                           </td>
                           <td data-label="Valores" className="whitespace-nowrap px-2 py-5 text-right">
-                            <p className="text-sm font-medium">{currency.format(sale.subtotal)}</p>
+                            <p className={styles.quoteAmount}>{currency.format(sale.subtotal)}</p><span className={styles.amountLabel}>Sem IVA</span>
                             <p className="mt-1 text-[10px] text-[#86868b]">c/ IVA {currency.format(sale.total)}</p>
                           </td>
                           <td data-label="Orçamento" className="px-2 py-5">
@@ -1103,7 +1084,7 @@ export default function SalesDashboard() {
                               options={quoteStatuses}
                               value={quoteStatus(sale)}
                               onChange={(value) => updateWorkflow(sale, { status: value })}
-                              className="w-full max-w-[140px] text-[11px]"
+                              className={styles.workflowDropdown}
                               disabled={changing === sale.id}
                               tone
                             />
@@ -1115,15 +1096,15 @@ export default function SalesDashboard() {
                               options={paymentStatuses}
                               value={sale.paymentStatus}
                               onChange={(value) => updateWorkflow(sale, { paymentStatus: value })}
-                              className="w-full max-w-[112px] text-[11px]"
+                              className={styles.workflowDropdown}
                               disabled={changing === sale.id}
                               tone
                             />
-                            ) : <span className="text-xs text-[#a1a1a6]">—</span>}
+                            ) : <span className={styles.notConfirmed}>Após confirmação</span>}
                           </td>
                           <td data-label="Entrega" className="px-2 py-5">
                             {sale.status === "confirmada" ? (
-                            <div className="flex items-center gap-1">
+                            <div className={styles.deliveryFields}>
                               <DashboardDropdown
                                 label={`Estado da entrega de ${sale.customerName}`}
                                 options={deliveryStatuses}
@@ -1135,7 +1116,7 @@ export default function SalesDashboard() {
                                     setDeliveryPrompt(sale);
                                   } else updateWorkflow(sale, { deliveryStatus: value });
                                 }}
-                                className="w-[98px] shrink-0 text-[11px]"
+                                className={styles.workflowDropdown}
                                 disabled={changing === sale.id}
                                 tone
                               />
@@ -1156,12 +1137,12 @@ export default function SalesDashboard() {
                                 </label>
                               )}
                             </div>
-                            ) : <span className="text-xs text-[#a1a1a6]">—</span>}
+                            ) : <span className={styles.notConfirmed}>Após confirmação</span>}
                           </td>
                           <td data-label="Estado" className="px-2 py-5">
                             {isResolved(sale)
-                              ? <span className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-full border border-[#e5e5e7] bg-[#f5f5f7] px-2.5 py-1.5 text-[10px] font-semibold text-[#424245]"><IoCheckmarkCircleOutline className="text-sm text-emerald-600" />Resolvido</span>
-                              : <span className="inline-flex whitespace-nowrap rounded-full border border-[#e5e5e7] bg-white/80 px-2.5 py-1.5 text-[10px] font-medium text-[#86868b]">Não resolvido</span>}
+                              ? <span className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-full border border-[#e5e5e7] bg-[#f5f5f7] px-2.5 py-1.5 text-[10px] font-semibold text-[#424245]"><IoCheckmarkCircleOutline className="text-sm text-emerald-600" />Pago e entregue</span>
+                              : <span className="inline-flex whitespace-nowrap rounded-full border border-[#e5e5e7] bg-white/80 px-2.5 py-1.5 text-[10px] font-medium text-[#86868b]">{sale.quoteNotSelected ? "Não selecionado" : sale.status === "em_preparacao" ? "Por confirmar" : "Em curso"}</span>}
                           </td>
                           <td className="px-3 py-4">
                             <SaleActions groupSales={emailGroups.get(sale.id)} onSeparate={() => setQuoteCombination({ separateId: sale.id })} sale={sale} imagesOpen={imagePanel === sale.id} onImages={() => setImagePanel((current) => current === sale.id ? "" : sale.id)} onUngroup={() => changeQuoteGroup(sale.id)} grouping={groupingQuotes} onDelete={() => { setError(""); setSaleToDelete(sale); }} />

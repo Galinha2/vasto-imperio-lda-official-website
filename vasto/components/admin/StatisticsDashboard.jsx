@@ -58,6 +58,7 @@ export default function StatisticsDashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [expandedInsight, setExpandedInsight] = useState("");
+  const [indicatorMonth, setIndicatorMonth] = useState(() => new Intl.DateTimeFormat("en", {timeZone:"Europe/Lisbon",month:"2-digit"}).format(new Date()));
 
   useEffect(() => {
     let active = true;
@@ -91,6 +92,11 @@ export default function StatisticsDashboard() {
 
   const years = useMemo(() => [...new Set([currentYear(), ...sales.map((sale) => saleDate(sale).slice(0, 4))])].sort().reverse(), [sales]);
   const yearSales = sales.filter((sale) => !sale.quoteNotSelected && saleDate(sale).startsWith(year));
+  const indicatorSales = yearSales.filter(sale => indicatorMonth === "all" || saleDate(sale).slice(5,7) === indicatorMonth);
+  const indicatorConfirmed = indicatorSales.filter(sale => sale.status === "confirmada");
+  const indicatorResolved = indicatorConfirmed.filter(sale => sale.paymentStatus === "pago" && sale.deliveryStatus === "entregue");
+  const indicatorLabel = indicatorMonth === "all" ? `Ano ${year}` : `${months[Number(indicatorMonth)-1]} ${year}`;
+  const indicatorAverage = indicatorConfirmed.length ? total(indicatorConfirmed) / indicatorConfirmed.length : 0;
   const confirmed = yearSales.filter((sale) => sale.status !== "em_preparacao");
   const awaiting = yearSales.filter((sale) => sale.status === "em_preparacao");
   const paid = confirmed.filter((sale) => sale.paymentStatus === "pago");
@@ -271,6 +277,9 @@ export default function StatisticsDashboard() {
     { id: "status-delivered", label: "Entregues", records: delivered },
   ].map((item) => ({ ...item, count: item.records.length, value: total(item.records) }));
   const detailContent = {
+    "period-average": {title:"Valor médio por encomenda",description:`${indicatorLabel} · ${currency.format(indicatorAverage)} sem IVA por encomenda confirmada.`,entries:saleEntries(indicatorConfirmed),empty:"Não há encomendas confirmadas neste período."},
+    "period-conversion": {title:"Taxa de conversão",description:`${indicatorLabel} · ${indicatorConfirmed.length} confirmadas de ${indicatorSales.length} documentos.`,entries:saleEntries(indicatorSales),empty:"Não há documentos neste período."},
+    "period-resolved": {title:"Encomendas resolvidas",description:`${indicatorLabel} · ${indicatorResolved.length} pagas e entregues de ${indicatorSales.length} documentos.`,entries:saleEntries(indicatorSales),empty:"Não há documentos neste período."},
     ...insightDetails,
     "summary-confirmed": {
       title: "Vendas confirmadas",
@@ -353,6 +362,30 @@ export default function StatisticsDashboard() {
               onClick={() => setExpandedInsight(["summary-confirmed", "summary-gross", "summary-awaiting", "summary-average"][index])} />
           ))}
         </section>
+
+          <section aria-labelledby="statistics-period-heading" className="mt-6">
+            <div className="mb-3 flex flex-wrap items-end justify-between gap-3">
+              <div><h2 id="statistics-period-heading" className="text-base font-semibold tracking-tight">Indicadores do período</h2><p className="mt-1 text-xs text-[#86868b]">Um resumo do desempenho em {indicatorLabel.toLocaleLowerCase("pt-PT")}.</p></div>
+              <label className="flex shrink-0 items-center gap-2 rounded-full border border-[#e5e5e7] bg-white px-3 py-2 text-xs text-[#424245]">Mês<select aria-label="Mês dos indicadores" value={indicatorMonth} onChange={event=>setIndicatorMonth(event.target.value)} className="min-w-0 cursor-pointer bg-transparent outline-none"><option value="all">Todos os meses</option>{months.map((label,index)=><option key={label} value={String(index+1).padStart(2,"0")}>{label}</option>)}</select></label>
+            </div>
+            <div className="grid gap-3 sm:grid-cols-3">
+              <button type="button" aria-haspopup="dialog" onClick={() => setExpandedInsight("period-average")} className="w-full cursor-pointer rounded-2xl border border-[#e8e8ed] bg-white p-4 text-left transition hover:border-sky-200 hover:bg-sky-50/40 hover:shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-600/30">
+                <p className="text-xs font-medium text-[#86868b]">Valor médio por encomenda</p>
+                <p className="mt-2 text-xl font-semibold tracking-tight text-[#1d1d1f]">{loading ? "—" : currency.format(indicatorAverage)}</p>
+                <p className="mt-1 text-[11px] text-[#a1a1a6]">Encomendas confirmadas · sem IVA</p>
+              </button>
+              <button type="button" aria-haspopup="dialog" onClick={() => setExpandedInsight("period-conversion")} className="w-full cursor-pointer rounded-2xl border border-[#e8e8ed] bg-white p-4 text-left transition hover:border-sky-200 hover:bg-sky-50/40 hover:shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-600/30">
+                <p className="text-xs font-medium text-[#86868b]">Taxa de conversão</p>
+                <p className="mt-2 text-xl font-semibold tracking-tight text-sky-700">{loading ? "—" : `${percentage(indicatorConfirmed.length, indicatorSales.length)}%`}</p>
+                <p className="mt-1 text-[11px] text-[#a1a1a6]">{indicatorConfirmed.length} confirmadas de {indicatorSales.length} documentos</p>
+              </button>
+              <button type="button" aria-haspopup="dialog" onClick={() => setExpandedInsight("period-resolved")} className="w-full cursor-pointer rounded-2xl border border-[#e8e8ed] bg-white p-4 text-left transition hover:border-emerald-200 hover:bg-emerald-50/40 hover:shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600/30">
+                <p className="text-xs font-medium text-[#86868b]">Encomendas resolvidas</p>
+                <p className="mt-2 text-xl font-semibold tracking-tight text-emerald-700">{loading ? "—" : `${percentage(indicatorResolved.length, indicatorSales.length)}%`}</p>
+                <p className="mt-1 text-[11px] text-[#a1a1a6]">{indicatorResolved.length} pagas e entregues de {indicatorSales.length} documentos</p>
+              </button>
+            </div>
+          </section>
 
         <section className="mt-6 grid gap-4 lg:grid-cols-2">
           <ProgressRing

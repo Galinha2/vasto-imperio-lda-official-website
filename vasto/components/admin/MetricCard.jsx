@@ -4,6 +4,7 @@ export default function MetricCard({ label, value, detail, icon, tone = "orange"
   const Tag = onClick ? "button" : "article";
   return (
     <Tag
+      data-admin-card="true"
       className={`${styles.card} ${dark ? styles.dark : styles.light}`}
       style={{ "--metric-ink": tone === "blue" ? "#155c87" : tone === "green" ? "#14664f" : "#a84619", "--metric-accent": tone === "blue" ? "#39b7ff" : tone === "green" ? "#40d9a0" : "#ff773d" }}
       {...(onClick ? { type: "button", onClick, "aria-haspopup": "dialog" } : {})}

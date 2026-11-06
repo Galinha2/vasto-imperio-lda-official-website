@@ -29,6 +29,7 @@ function PromotionalPage({ produto }) {
   const displayProduct = localizedProduct || (english && isPickingProduct ? {
     ...produto,
     title: "Picking Shelving with Shelves",
+    galleryTitle: "Our customers",
     subtitle: "A modular solution for organising products and keeping stock within easy reach. Choose the dimensions and configure your shelving to suit the available space.",
     description: "<span class='label'>Material:</span> High-strength metal structure.<br/><span class='label'>Load capacity:</span> Up to 1,000 kg per beam pair.<br/><span class='label'>Frame height:</span> 2,000 to 5,500 mm.<br/><span class='label'>Frame depth:</span> 400 to 1,100 mm.<br/><span class='label'>Beam length:</span> 1,000 to 2,750 mm.<br/><span class='label'>Beam profiles:</span> Z60 or Z100.<br/><span class='label'>Description:</span> A robust metal shelving system for warehouses, workshops and storage areas. Its modular structure and quick-fit beams support a range of height, depth and length configurations to suit your load and organisation needs.",
   } : produto);

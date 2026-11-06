@@ -1,6 +1,6 @@
 "use client";
 
-import Image from "@/components/loadings/LoadingImage";
+import Image from "next/image";
 import Link from "next/link";
 import contentpt from "@/assets/contentpt.json";
 import contenten from "@/assets/contenten.json";

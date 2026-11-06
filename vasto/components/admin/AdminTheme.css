@@ -106,6 +106,3 @@ html[data-admin-theme="dark"] [data-admin-dialog] [role="tablist"]{background:#1
 html[data-admin-theme="dark"] [data-admin-dialog] [role="tab"][aria-selected="true"]{background:#35475c!important;color:#c6e6ff!important}
 html[data-admin-theme="dark"] [role="listbox"] [role="option"]{color:#e1e8f1!important}
 html[data-admin-theme="dark"] [role="listbox"] [role="option"][aria-selected="true"]{background:#2e4863!important;color:#c6e6ff!important}
-
-/* Keep admin actions consistently pill-shaped, including portalled menus. */
-:is(div[data-admin-theme],[data-admin-dialog],[data-admin-popover],.admin-surface[role="listbox"]) button{border-radius:9999px!important}

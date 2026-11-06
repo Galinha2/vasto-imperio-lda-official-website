@@ -201,7 +201,9 @@
         "/produtos/prateleiras-ligeiras/a3.jpeg",
         "/produtos/prateleiras-ligeiras/a4.jpg",
         "/produtos/prateleiras-ligeiras/a5.jpg",
-        "/produtos/prateleiras-ligeiras/a6.jpg"
+        "/produtos/prateleiras-ligeiras/a6.jpg",
+        "/produtos/prateleiras-ligeiras/cliente-ligeiras-1.webp",
+        "/produtos/prateleiras-ligeiras/cliente-ligeiras-2.webp"
       ],
       "faq": [
         {
@@ -337,13 +339,15 @@
         ],
         "galeriaTitle": "Os nossos clientes",
         "galeria": [
-          "/produtos/prateleiras-ligeiras/a2.jpeg",
-          "/produtos/prateleiras-ligeiras/a1.jpeg",
-          "/produtos/prateleiras-ligeiras/a4.jpg",
-          "/produtos/prateleiras-ligeiras/a5.jpg",
-          "/produtos/prateleiras-ligeiras/a3.jpeg",
-          "/produtos/prateleiras-ligeiras/a6.jpg"
-        ],
+        "/produtos/prateleiras-ligeiras/a2.jpeg",
+        "/produtos/prateleiras-ligeiras/a1.jpeg",
+        "/produtos/prateleiras-ligeiras/a4.jpg",
+        "/produtos/prateleiras-ligeiras/a5.jpg",
+        "/produtos/prateleiras-ligeiras/a3.jpeg",
+        "/produtos/prateleiras-ligeiras/a6.jpg",
+        "/produtos/prateleiras-ligeiras/cliente-ligeiras-1.webp",
+        "/produtos/prateleiras-ligeiras/cliente-ligeiras-2.webp"
+      ],
         "tabela": [
           {
             "nome": "Prateleira",
@@ -410,6 +414,8 @@
       },
       {
         "id": "estantes-picking",
+        "galeriaTitle": "Os nossos clientes",
+        "galeria": ["/produtos/estantes-picking/clientes/picking-galvanizada-aglomerado.webp", "/produtos/estantes-picking/clientes/picking-pintada-perspetiva.webp", "/produtos/estantes-picking/clientes/picking-pintada-frente.webp", "/produtos/estantes-picking/clientes/picking-pintada-detalhe.webp", "/produtos/estantes-picking/clientes/picking-galvanizada-lateral.webp"],
         "image": "/produtos/9-Porteco Z60/i1.png",
         "width": 160,
         "text": "Estantes de Picking com Tampos",

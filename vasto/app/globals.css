@@ -453,3 +453,50 @@ html body {
   border-color: rgb(110 231 183 / 80%) !important;
 }
 .quote-email-sent:hover { background-color: #a7f3d0 !important; }
+
+/* Single-line text entry uses the same pill shape across the site and admin. */
+input:not([type]),
+input:is([type="text"], [type="email"], [type="tel"], [type="url"], [type="search"], [type="password"], [type="number"]) {
+  border-radius: 9999px !important;
+}
+
+/* Give the original home hero equipment composition more presence. */
+.home-hero-product-image {
+  transform: scale(1.05);
+  transform-origin: center bottom;
+}
+@media (min-width: 1024px) {
+  .home-hero-product-image {
+    transform: scale(1.08);
+    transform-origin: right bottom;
+  }
+}
+
+/* Align the hero artwork with the shared content edge below. */
+.home-hero-art {
+  margin-right: 0;
+  margin-left: auto;
+  justify-self: end;
+  justify-content: flex-end;
+}
+.home-hero-product-image { transform-origin: right bottom; }
+@media (min-width: 1024px) {
+  .home-hero-art { margin-right: 16px; }
+}
+
+@media (max-width: 1023px) {
+  .home-hero-art {
+    margin-inline: auto;
+    justify-self: center;
+    justify-content: center;
+  }
+  .home-hero-product-image {
+    transform-origin: center bottom;
+  }
+}
+
+/* Centre the actual home hero image, independently of desktop alignment. */
+@media (max-width: 1023px) {
+  .home-hero-art { display: flex; width: 100%; margin-inline: auto; align-self: center; justify-content: center; }
+  .home-hero-art > img.home-hero-product-image { display: block; margin-inline: auto; flex: 0 1 auto; object-position: center bottom !important; transform: none; }
+}

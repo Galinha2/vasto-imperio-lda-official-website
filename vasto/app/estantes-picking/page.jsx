@@ -23,6 +23,8 @@ export default function EstantesPickingPage() {
         subtitle:
           "Uma solução modular para organizar artigos e facilitar o acesso diário ao stock. Escolha as dimensões e configure a sua estante de acordo com o espaço disponível.",
         mainImage: product.image,
+        galleryTitle: product.galeriaTitle,
+        gallery: product.galeria,
         features: product.images.slice(1, 3).map((image) => ({ image })),
         description: product.description,
         tabela: product.tabela,

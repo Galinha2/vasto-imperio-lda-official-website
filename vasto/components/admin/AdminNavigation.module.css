@@ -70,3 +70,35 @@
 .shell[data-admin-theme="dark"] .content :is(h1,h2,h3){color:var(--admin-text)}
 .shell[data-admin-theme="dark"] .content :is(input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),textarea,select){background-color:#242426;color:#f5f5f7;border-color:#48484a}
 .shell[data-admin-theme="dark"] :global(svg[role="img"]){background:#fff;color-scheme:light;border-radius:12px}
+
+/* Restore the blue and orange background behind the glass surfaces. */
+.shell{background-image:radial-gradient(ellipse at 8% 4%,rgb(255 173 117 / 15%),transparent 44%),radial-gradient(ellipse at 95% 35%,rgb(123 183 225 / 15%),transparent 48%);background-attachment:fixed}
+.shell[data-admin-theme="dark"]{background-image:none}
+@media(min-width:360px) and (max-width:639px){.content :global(.admin-metrics){grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}}
+@media(max-width:1023px) and (pointer:coarse){
+ .shell{min-height:100dvh;padding-left:env(safe-area-inset-left);padding-right:env(safe-area-inset-right);padding-bottom:env(safe-area-inset-bottom)}
+ .sidebar{padding-top:max(14px,env(safe-area-inset-top))}
+ .sidebar nav a{min-height:44px}
+ .content :is(input,textarea,select){font-size:16px}
+}
+
+/* Refined spacing and glass edges; preserve the original coloured backdrop. */
+.shell{font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue",sans-serif}
+.sidebar{border-color:#ffffffb8;box-shadow:0 8px 32px #23324805,inset 0 1px 0 #ffffffc9;backdrop-filter:blur(26px) saturate(140%);-webkit-backdrop-filter:blur(26px) saturate(140%)}
+.brand{padding:6px 4px}.sidebar nav a{font-size:12px;min-height:44px;transition:background .18s,box-shadow .18s;color:var(--admin-muted)}
+.sidebar nav a[aria-current="page"]{color:#0879c0;background:#ffffffb8;border-color:#ffffffc9;box-shadow:0 3px 12px #23324807}
+.content :global(.admin-surface){border-radius:24px;border-color:#ffffffbd;box-shadow:0 8px 32px #23324806,inset 0 1px 0 #ffffffab}
+.content :is(input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]),textarea,select){border-radius:13px;min-height:40px}
+.content :is(input,textarea,select):focus-visible{outline:2px solid #0879c055;outline-offset:2px}
+.content :is(button,a){touch-action:manipulation}
+.content h1{letter-spacing:-.045em;line-height:1.16}.content :is(h2,h3){letter-spacing:-.025em}
+@media(min-width:1024px){.sidebar{border-radius:26px;padding:24px 16px}.sidebar nav a{padding:12px 16px}.brandHeader{padding-bottom:5px}}
+@media(max-width:639px){.content :global(.admin-surface){border-radius:20px}.sidebar nav a{font-size:11px}}
+.shell[data-admin-theme="dark"] .sidebar nav a[aria-current="page"]{background:#293b50;border-color:#3a4f66;color:#8ec9f5}
+.shell[data-admin-theme="dark"] .content :global(.admin-surface){border-color:#38383a;box-shadow:0 8px 28px #0002}
+@media(prefers-reduced-motion:reduce){.sidebar nav a{transition:none}}
+
+/* Conversations use the available workspace rather than a centred card. */
+.conversationsShell{height:100dvh;min-height:0;overflow:hidden}
+.conversationsContent{height:100%;min-height:0;padding:0;overflow:hidden}
+@media(max-width:1023px){.conversationsShell{display:flex;flex-direction:column}.conversationsShell>.sidebar{flex-shrink:0}.conversationsContent{flex:1;height:auto}}

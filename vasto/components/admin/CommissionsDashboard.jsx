@@ -186,7 +186,7 @@ export default function CommissionsDashboard() {
         <header className="flex flex-col justify-between gap-5 sm:flex-row sm:items-end">
           <div>
             <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[#86868b]">Gestão financeira <span className="px-1.5 text-[#c7c7cc]">/</span> Comissões</p>
-            <h1 className="mt-2 text-4xl font-semibold tracking-[-0.055em] text-[#1d1d1f] sm:text-[44px]">Comissões, com clareza.</h1>
+            <h1 className="mt-2 text-4xl font-semibold tracking-[-0.055em] text-[#1d1d1f] sm:text-[44px]">Comissões</h1>
             <p className="mt-2 text-sm text-[#86868b]">Acompanhe os valores mensais e assinale o que já foi recebido.</p>
           </div>
           <label className="flex h-11 items-center gap-2 rounded-full border border-[#e5e5e7] bg-white px-4 text-sm text-[#424245] shadow-sm">
@@ -214,7 +214,7 @@ export default function CommissionsDashboard() {
               <h2 id="commission-chart-heading" className="mt-1 text-lg font-semibold tracking-tight text-[#1d1d1f]">Comissão estimada por mês</h2>
               <p className="mt-1 text-xs text-[#86868b]">Calculada por mês, sobre as vendas confirmadas sem IVA.</p>
             </div>
-            <label className="flex w-fit items-center gap-3 rounded-full border border-[#e5e5e7] bg-[#fbfbfd] px-4 py-2.5 text-xs text-[#6e6e73] transition focus-within:border-sky-500 focus-within:ring-4 focus-within:ring-sky-500/10">
+            <label className="flex w-full max-w-full flex-wrap items-center gap-3 rounded-xl border border-[#e5e5e7] bg-[#fbfbfd] sm:w-fit px-4 py-2.5 text-xs text-[#6e6e73] transition focus-within:border-sky-500 focus-within:ring-4 focus-within:ring-sky-500/10">
               Taxa predefinida
               <input
                 type="number"
@@ -276,7 +276,7 @@ export default function CommissionsDashboard() {
                     <th scope="row" className="px-5 py-3.5 font-medium text-[#343438] sm:px-7">{item.label}</th>
                     <td className="px-5 py-3.5 text-right tabular-nums text-[#6e6e73]">{loading ? "—" : currency.format(item.subtotal)}</td>
                     <td className="px-5 py-3.5 text-right">
-                      <label className="inline-flex flex-col items-end gap-1">
+                      <label className="relative inline-flex flex-col items-end gap-1">
                         <span className="sr-only">Percentagem de comissão de {item.label}</span>
                         <span className="flex h-9 w-24 items-center rounded-full border border-[#e5e5e7] bg-white px-3 transition focus-within:border-sky-500 focus-within:ring-4 focus-within:ring-sky-500/10">
                           <input

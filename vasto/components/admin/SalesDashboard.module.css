@@ -227,3 +227,8 @@
 :global([data-admin-theme="dark"]) .groupToggleLabel,
 :global([data-admin-theme="dark"]) .versionBadge{background:#38383a;color:#c7c7cc}
 :global([data-admin-theme="dark"]) .groupEnd span{background:#242426;border-color:#38383a;color:#a1a1a6}
+
+/* Quieter typography and spacing without flattening status colours. */
+.groupTitle strong{font-size:13px;font-weight:600;letter-spacing:-.2px}.groupTitle>span{line-height:1.6}.groupToggle{padding-top:18px;padding-bottom:18px}.groupIcon{border:1px solid #ffffffb3;box-shadow:0 2px 6px #23324804}.versionBadge{font-weight:500;letter-spacing:.01em}
+@media(max-width:1535px){.quoteRow{padding:20px;gap:16px;border-radius:23px;box-shadow:0 4px 18px #23324804}.quoteRow>td[data-label]::before{font-size:9px;letter-spacing:.045em;margin-bottom:7px}}
+@media(max-width:639px){.quoteRow{padding:16px;gap:14px;border-radius:20px}}

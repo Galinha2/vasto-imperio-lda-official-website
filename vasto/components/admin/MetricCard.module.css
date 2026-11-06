@@ -47,3 +47,7 @@ button.card:focus-visible { outline: 3px solid #0879c0; outline-offset: 4px; }
 :global([data-admin-theme="dark"]) .detail{color:#a1a1a6}
 :global([data-admin-theme="dark"]) .value{color:#f5f5f7}
 :global([data-admin-theme="dark"]) .icon{background:color-mix(in srgb,var(--metric-accent) 18%,#1c1c1e);color:var(--metric-accent);border-color:#38383a;box-shadow:none}
+
+.card{gap:16px;padding:23px 22px;border-radius:25px;transition:transform .2s,box-shadow .2s}.icon{width:48px;height:48px;font-size:22px}.label{font-size:11px;line-height:1.5}.value{margin-top:6px;font-size:clamp(22px,2vw,29px);letter-spacing:-.045em}.detail{line-height:1.65;margin-top:7px}
+@media(max-width:639px){.card{padding:18px 15px;gap:12px;border-radius:21px;align-items:flex-start}.icon{width:36px;height:36px;font-size:18px}.value{font-size:21px}.label{font-size:10px}.detail{font-size:9px}}
+@media(prefers-reduced-motion:reduce){.card{transition:none}}

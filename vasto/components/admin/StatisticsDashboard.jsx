@@ -332,7 +332,7 @@ export default function StatisticsDashboard() {
         <header className="flex flex-col justify-between gap-5 sm:flex-row sm:items-end">
           <div>
             <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[#86868b]">Visão geral <span className="px-1.5 text-[#c7c7cc]">/</span> Estatísticas</p>
-            <h1 className="mt-2 text-4xl font-semibold tracking-[-0.055em] sm:text-[44px]">O negócio em números.</h1>
+            <h1 className="mt-2 text-4xl font-semibold tracking-[-0.055em] sm:text-[44px]">Estatísticas</h1>
             <p className="mt-2 text-sm text-[#86868b]">Vendas, encomendas e evolução ao longo do ano.</p>
           </div>
           <label className="flex h-10 items-center gap-2 rounded-full border border-[#e5e5e7] bg-white px-4 text-sm text-[#424245]">
@@ -345,7 +345,7 @@ export default function StatisticsDashboard() {
 
         {error && <p role="alert" className="mt-6 rounded-2xl border border-red-100 bg-red-50 p-4 text-sm text-red-700">{error}</p>}
 
-        <section aria-label="Resumo financeiro" className="mt-7 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <section aria-label="Resumo financeiro" className="admin-metrics mt-7 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
           {summary.map((card, index) => (
             <MetricCard key={card.label} label={card.label} value={loading ? "—" : card.value}
               detail={card.detail} icon={card.icon} dark={index === 0 || index === 3}
@@ -400,7 +400,7 @@ export default function StatisticsDashboard() {
               onMouseDown={(event) => { if (event.target === event.currentTarget) setExpandedInsight(""); }}
             >
               <section
-                role="dialog"
+                data-admin-dialog="true" role="dialog"
                 aria-modal="true"
                 aria-labelledby="insight-dialog-title"
                 className="admin-surface max-h-[min(85vh,48rem)] w-full max-w-3xl overflow-y-auto rounded-[26px] border border-[#e8e8ed] bg-white shadow-[0_24px_80px_rgba(0,0,0,0.22)]"

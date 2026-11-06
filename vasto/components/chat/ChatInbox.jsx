@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import styles from './Chat.module.css';
-import ChatImage from './ChatImage';
+import ChatMessages from './ChatMessages';
 import {prepareChatImage} from '@/lib/prepare-chat-image.mjs';
 import {IoImageOutline} from 'react-icons/io5';
 import { useAdminChatUnread } from '@/components/admin/AdminChatUnread';
@@ -20,16 +20,19 @@ export default function ChatInbox() {
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
+  const [pendingMessage, setPendingMessage] = useState('');
   const [delivery, setDelivery] = useState('');
   const [loading, setLoading] = useState(true);
   const end = useRef(null);
+  const followMessages = useRef(true);
   const selection = useRef(null);
   const deletedIds = useRef(new Set());
   useEffect(() => {
-    const media = window.matchMedia('(max-width: 767px)');
+    const media = window.matchMedia('(max-width: 1023px) and (pointer: coarse), (max-width: 767px)');
     const viewport = window.visualViewport;
     const previousOverflow = document.body.style.overflow;
     const resize = () => {
+      if (viewport && viewport.scale > 1.05) return;
       document.body.style.overflow = media.matches ? 'hidden' : previousOverflow;
       screen.current?.style.setProperty('--chat-height', `${viewport?.height || window.innerHeight}px`);
       screen.current?.style.setProperty('--chat-top', `${viewport?.offsetTop || 0}px`);
@@ -42,7 +45,7 @@ export default function ChatInbox() {
     return () => { document.body.style.overflow = previousOverflow; media.removeEventListener('change', resize); viewport?.removeEventListener('resize', resize); viewport?.removeEventListener('scroll', resize); window.removeEventListener('resize', resize); };
   }, []);
   function backToList() {
-    selection.current = null; setSelected(null); setMessage(''); setDelivery(''); setError('');
+    selection.current = null; setPendingMessage(''); setSelected(null); setMessage(''); setDelivery(''); setError('');
     if (requestedChat) router.replace('/admin/conversas');
   }
   useEffect(() => {
@@ -100,7 +103,7 @@ export default function ChatInbox() {
     document.addEventListener('visibilitychange', read);
     return () => document.removeEventListener('visibilitychange', read);
   }, [selected, messages, markRead]);
-  useEffect(() => { end.current?.scrollIntoView({ block: 'nearest' }); }, [messages.length]);
+  useEffect(() => { if (followMessages.current || pendingMessage) end.current?.scrollIntoView({ block: 'nearest' }); }, [messages.length, pendingMessage]);
   async function sendImage(event) {
     const file = event.target.files?.[0]; event.target.value = '';
     if (!file || busy) return;
@@ -113,14 +116,14 @@ export default function ChatInbox() {
       form.append('threadId', id);
       const response = await fetch('/api/chat/images', {method:'POST', body:form});
       const data = await response.json(); if (!response.ok) throw new Error(data.error);
-      if (selection.current === id) { setMessages(data.messages); setDelivery('Imagem enviada. Disponível durante 7 dias.'); }
+      if (selection.current === id) { setMessages(data.messages); setDelivery('Imagem enviada.'); }
     } catch (error) { setError(error.message || 'Não foi possível enviar a imagem.'); }
     finally { setBusy(false); }
   }
   async function send(event) {
     event.preventDefault(); if (busy || !selected) return;
     const id = selected.id;
-    setBusy(true); setError('');
+    setBusy(true); setError(''); setPendingMessage(message.trim());
     try {
       const response = await fetch('/api/admin/chat', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id, message }) });
       const data = await response.json();
@@ -128,7 +131,7 @@ export default function ChatInbox() {
       if (selection.current === id) { setMessages(data.messages); setMessage('');
         setDelivery(data.email?.status === 'sent' ? 'Resposta enviada no chat e aceite pelo servidor de email.' : data.email?.status === 'failed' ? 'Resposta guardada no chat, mas não foi possível enviar o email. Contacte o cliente através do contacto indicado.' : data.email?.status === 'no_email' ? 'Resposta enviada no chat. Este visitante não indicou um email válido.' : 'Resposta enviada no chat. O visitante tem a conversa aberta.'); }
     } catch (error) { setError(error.message); }
-    finally { setBusy(false); }
+    finally { setBusy(false); setPendingMessage(''); }
   }
   async function removeConversation() {
     if (busy || !selected) return;
@@ -156,12 +159,12 @@ export default function ChatInbox() {
       <aside className={styles.threadList} aria-label="Conversas">
         <h2 className={styles.listHeading}>Mensagens do site</h2>
         {!threads.length && <p className={styles.emptyList}>{loading ? 'A carregar conversas…' : 'As novas conversas aparecem aqui.'}</p>}
-        {threads.map(thread => <button key={thread.id} aria-pressed={selected?.id === thread.id} onClick={() => { selection.current = thread.id; setSelected(thread); setMessages([]); setMessage(''); setError(''); setDelivery(''); }} className={`${styles.thread} ${selected?.id === thread.id ? styles.threadActive : ''}`}><span className={styles.avatar} aria-hidden="true">{thread.name.slice(0, 1).toUpperCase()}</span><span className={styles.threadCopy}><span className={styles.threadTop}><strong>{thread.name}</strong><time>{new Date(thread.created_at).toLocaleDateString('pt-PT', {day:'2-digit', month:'2-digit'})}</time></span><span className={styles.threadContact}>{thread.contact || 'Visitante do site'}</span></span>{counts[thread.id] > 0 && <span className={styles.threadUnread} aria-label={`${counts[thread.id]} mensagens por ler`}>{counts[thread.id]}</span>}</button>)}
+        {threads.map(thread => <button key={thread.id} aria-pressed={selected?.id === thread.id} onClick={() => { followMessages.current = true; setPendingMessage(''); selection.current = thread.id; setSelected(thread); setMessages([]); setMessage(''); setError(''); setDelivery(''); }} className={`${styles.thread} ${selected?.id === thread.id ? styles.threadActive : ''}`}><span className={styles.avatar} aria-hidden="true">{thread.name.slice(0, 1).toUpperCase()}</span><span className={styles.threadCopy}><span className={styles.threadTop}><strong>{thread.name}</strong><time>{new Date(thread.created_at).toLocaleDateString('pt-PT', {day:'2-digit', month:'2-digit'})}</time></span><span className={styles.threadContact}>{thread.contact || 'Visitante do site'}</span></span>{counts[thread.id] > 0 && <span className={styles.threadUnread} aria-label={`${counts[thread.id]} mensagens por ler`}>{counts[thread.id]}</span>}</button>)}
       </aside>
       {selected ? <section className={styles.conversation}>
         <header className={styles.conversationHeader}><button className={styles.back} aria-label="Voltar às conversas" onClick={backToList}><IoChevronBack size={20} /></button><span className={styles.avatar} aria-hidden="true">{selected.name.slice(0,1).toUpperCase()}</span><div><h2>{selected.name}</h2><p>{selected.contact || 'Visitante do site'}</p></div><button type="button" className={styles.deleteChat} onClick={removeConversation} disabled={busy} aria-label="Apagar conversa" title="Apagar conversa"><IoTrashOutline size={18} /><span>Apagar</span></button></header>
-        <div role="log" aria-live="polite" aria-label="Mensagens" className={styles.messages}>{messages.map(item => <div key={item.id} className={`${styles.bubble} ${item.sender === 'staff' ? styles.mine : styles.theirs}`}><small>{item.sender === 'staff' ? 'Equipa Vasto Império' : selected.name}</small>{item.image ? <ChatImage image={item.image} threadId={selected.id} messageId={item.id}/> : <p>{item.body}</p>}<time>{new Date(item.created_at).toLocaleString('pt-PT')}</time></div>)}<div ref={end} /></div>
-        <form className={styles.form} onSubmit={send}>{error && <p role="alert" className={styles.error}>{error}</p>}<label htmlFor="staff-message" className={styles.messageLabel}>Responder a {selected.name}</label><div className={styles.compose}><label className={`${styles.attachImage} ${busy ? styles.attachBusy : ''}`} title="Enviar imagem" aria-label="Enviar imagem"><IoImageOutline size={23}/><input id="staff-chat-image" type="file" accept="image/jpeg,image/png,image/webp" disabled={busy} onChange={sendImage}/><span className={styles.srOnly}>Enviar imagem</span></label><textarea id="staff-message" required maxLength={2000} rows={1} value={message} onChange={e => { setMessage(e.target.value); e.target.style.height = 'auto'; e.target.style.height = `${Math.min(e.target.scrollHeight, 100)}px`; }} placeholder="Escreva uma mensagem…" /><button disabled={busy || !message.trim()} aria-label={busy ? 'A enviar mensagem' : 'Enviar mensagem'}><IoArrowUp size={20} /></button></div>{delivery && <p role="status" className={styles.delivery}>{delivery}</p>}</form>
+        <div onScroll={event => { const node = event.currentTarget; followMessages.current = node.scrollHeight - node.scrollTop - node.clientHeight < 90; }} role="log" aria-live="polite" aria-label="Mensagens" className={styles.messages}><ChatMessages messages={messages} sender="staff" threadId={selected.id} pending={pendingMessage}/><div ref={end} /></div>
+        <form className={styles.form} onSubmit={send}>{error && <p role="alert" className={styles.error}>{error}</p>}<label htmlFor="staff-message" className={styles.messageLabel}>Responder a {selected.name}</label><div className={styles.compose}><label className={`${styles.attachImage} ${busy ? styles.attachBusy : ''}`} title="Enviar imagem" aria-label="Enviar imagem"><IoImageOutline size={23}/><input id="staff-chat-image" type="file" accept="image/jpeg,image/png,image/webp" disabled={busy} onChange={sendImage}/><span className={styles.srOnly}>Enviar imagem</span></label><textarea disabled={busy} onKeyDown={event => { if (event.key === 'Enter' && !event.shiftKey && !event.nativeEvent.isComposing && window.matchMedia('(pointer: fine)').matches) { event.preventDefault(); event.currentTarget.form?.requestSubmit(); } }} id="staff-message" required maxLength={2000} rows={1} value={message} onChange={e => { setMessage(e.target.value); e.target.style.height = 'auto'; e.target.style.height = `${Math.min(e.target.scrollHeight, 100)}px`; }} placeholder="Escreva uma mensagem…" /><button disabled={busy || !message.trim()} aria-label={busy ? 'A enviar mensagem' : 'Enviar mensagem'}><IoArrowUp size={20} /></button></div>{delivery && <p role="status" className={styles.delivery}>{delivery}</p>}</form>
       </section> : <div className={styles.empty}><span className={styles.emptyIcon}><IoChatbubbleOutline size={28} /></span><h2>Uma boa conversa começa aqui.</h2><p>Selecione uma conversa para acompanhar o pedido e responder ao cliente.</p></div>}
     </div>
   </div>;

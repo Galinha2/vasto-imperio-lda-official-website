@@ -714,7 +714,7 @@ export default function SalesDashboard() {
     <main className={`${styles.dashboard} min-w-0 px-4 py-8 sm:px-6 lg:px-6 lg:py-10 xl:px-8`}>
         <div className="mx-auto w-full max-w-[1500px]">
           <header className="flex flex-col justify-between gap-5 sm:flex-row sm:items-center">
-            <div><p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[#86868b]">Visão geral</p><h1 className="mt-2 text-4xl font-semibold tracking-[-0.055em] sm:text-[44px]">As suas vendas.</h1><p className="mt-2 text-sm text-[#86868b]">Uma visão clara de cada documento e de cada mês.</p></div>
+            <div><p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[#86868b]">Visão geral</p><h1 className="mt-2 text-4xl font-semibold tracking-[-0.055em] sm:text-[44px]">Vendas</h1><p className="mt-2 text-sm text-[#86868b]">Orçamentos, pagamentos e entregas, organizados por mês.</p></div>
           </header>
 
           {quoteCombination && <QuoteCombinationDialog {...quoteCombination} onClose={() => setQuoteCombination(null)} onVersions={changeQuoteGroup} onSaved={(updated, separated) => { setSales(updated); setNotice(separated ? "Orçamentos separados. Os documentos originais foram recuperados." : "Orçamento conjunto criado com o PDF e os desenhos. Pode separar em Ações."); }} />}
@@ -842,7 +842,7 @@ export default function SalesDashboard() {
             </section>
           )}
 
-          <div className="mt-5 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          <div className="admin-metrics mt-5 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
             {[
               { id: "confirmed", label: "Encomendas confirmadas", value: currency.format(sum(confirmed)), detail: "Valor confirmado · sem IVA", icon: <IoArrowUpOutline />, color: "bg-teal-50 text-teal-700 ring-teal-100" },
               { id: "commissions", label: "Comissões por receber", value: commissionData ? currency.format(outstandingCommission) : "—", detail: commissionData ? `Já recebidas: ${currency.format(paidCommission)} · ${periodLabel}` : "Resumo de comissões indisponível", icon: <IoWalletOutline />, color: "bg-amber-50 text-amber-700 ring-amber-100" },
@@ -1275,7 +1275,7 @@ export default function SalesDashboard() {
             onMouseDown={(event) => { if (event.target === event.currentTarget) setSalesDetail(""); }}
           >
             <section
-              role="dialog"
+              data-admin-dialog="true" role="dialog"
               aria-modal="true"
               aria-labelledby="sales-detail-title"
               className="admin-surface max-h-[min(85vh,48rem)] w-full max-w-3xl overflow-y-auto rounded-[26px] border border-[#e8e8ed] bg-white shadow-[0_24px_80px_rgba(0,0,0,0.22)]"
@@ -1348,7 +1348,7 @@ export default function SalesDashboard() {
         )}
         {confirmationPeriodPrompt && (
         <div className="fixed inset-0 z-[120] flex items-center justify-center bg-black/30 p-4 backdrop-blur-sm">
-          <section role="dialog" aria-modal="true" aria-labelledby="confirmation-period-title" aria-describedby="confirmation-period-description" className="admin-surface w-full max-w-md rounded-[28px] border border-white/70 bg-white p-6 shadow-[0_24px_80px_rgba(0,0,0,0.18)] sm:p-7">
+          <section data-admin-dialog="true" role="dialog" aria-modal="true" aria-labelledby="confirmation-period-title" aria-describedby="confirmation-period-description" className="admin-surface w-full max-w-md rounded-[28px] border border-white/70 bg-white p-6 shadow-[0_24px_80px_rgba(0,0,0,0.18)] sm:p-7">
             <div className="flex items-start justify-between gap-4"><div><p className="text-[11px] font-semibold uppercase tracking-wider text-sky-700">Confirmado pelo cliente</p><h2 id="confirmation-period-title" className="mt-2 text-xl font-semibold tracking-tight">Em que mês fica a venda?</h2></div><button type="button" aria-label="Cancelar confirmação" disabled={Boolean(changing)} onClick={() => setConfirmationPeriodPrompt(null)} className="cursor-pointer transition-colors duration-150 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-700 disabled:cursor-not-allowed rounded-full p-2 text-[#86868b] hover:bg-[#f5f5f7]"><IoCloseOutline /></button></div>
             <p id="confirmation-period-description" className="mt-3 text-sm leading-relaxed text-[#6e6e73]">O orçamento de {confirmationPeriodPrompt.sale.customerName} está em {new Intl.DateTimeFormat("pt-PT", { month: "long", year: "numeric" }).format(new Date(`${confirmationPeriodPrompt.existingDate}T12:00:00`))}. Pode colocar no mês atual, manter no mês do orçamento ou escolher outro mês.</p>
             {error && <p role="alert" className="mt-3 text-sm text-red-700">{error}</p>}
@@ -1371,7 +1371,7 @@ export default function SalesDashboard() {
       )}
       {deliveryPrompt && (
           <div className="fixed inset-0 z-[60] flex items-center justify-center bg-[#1d1d1f]/35 p-4 backdrop-blur-sm" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget && !changing) setDeliveryPrompt(null); }}>
-            <section role="dialog" aria-modal="true" aria-labelledby="delivery-date-title" aria-describedby="delivery-date-description" className="admin-surface w-full max-w-md rounded-[28px] border border-white/70 bg-white p-6 shadow-[0_24px_80px_rgba(0,0,0,0.18)] sm:p-7">
+            <section data-admin-dialog="true" role="dialog" aria-modal="true" aria-labelledby="delivery-date-title" aria-describedby="delivery-date-description" className="admin-surface w-full max-w-md rounded-[28px] border border-white/70 bg-white p-6 shadow-[0_24px_80px_rgba(0,0,0,0.18)] sm:p-7">
               <div className="flex items-start justify-between gap-4">
                 <div>
                   <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-sky-700">Concluir entrega</p>

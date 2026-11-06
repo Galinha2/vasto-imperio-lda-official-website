@@ -45,7 +45,7 @@ export default function QuoteCombinationDialog({ sourceId, targetId, separateId,
       onSaved(result.sales,!!separateId);onClose();window.dispatchEvent(new Event("admin:sales-changed"));
     }catch(failure){setError(failure.message);}finally{setBusy(false);}
   }
-  return createPortal(<div className="fixed inset-0 z-[1200] flex items-center justify-center bg-black/30 p-4 backdrop-blur-sm"><section role="dialog" aria-modal="true" aria-label="Organizar orçamentos" className="w-full max-w-lg rounded-[28px] bg-white p-6 shadow-xl">
+  return createPortal(<div className="fixed inset-0 z-[1200] flex items-center justify-center bg-black/30 p-4 backdrop-blur-sm"><section data-admin-dialog="true" role="dialog" aria-modal="true" aria-label="Organizar orçamentos" className="w-full max-w-lg rounded-[28px] bg-white p-6 shadow-xl">
     <h2 className="text-xl font-semibold tracking-tight">{separateId?"Separar orçamento conjunto?":"Como quer juntar estes orçamentos?"}</h2>
     {separateId?<p className="mt-3 text-sm leading-relaxed text-[#6e6e73]">Os dois documentos originais voltam às vendas, com os respetivos desenhos e valores. As alterações feitas apenas no orçamento conjunto não passam para os originais.</p>:<div className="mt-5 space-y-3">
       <button type="button" disabled={busy} onClick={()=>{onVersions(sourceId,targetId);onClose();}} className="w-full cursor-pointer rounded-2xl border border-[#e5e5e7] p-4 text-left hover:bg-[#f5f5f7] disabled:opacity-50"><span className="block text-sm font-semibold">Agrupar como versões</span><span className="mt-1 block text-xs leading-relaxed text-[#86868b]">Alternativas do mesmo pedido. Mantém os PDFs separados e mostra o número de versões.</span></button>

@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from 'react';
 import { usePathname } from 'next/navigation';
 import { IoChatbubblesOutline, IoCloseOutline, IoArrowUp } from 'react-icons/io5';
 import styles from './Chat.module.css';
-import ChatImage from './ChatImage';
+import ChatMessages from './ChatMessages';
 import {prepareChatImage} from '@/lib/prepare-chat-image.mjs';
 import {CHAT_REPLY_WAIT_MS, unansweredSince} from '@/lib/chat-waiting.mjs';
 import {IoCallOutline} from 'react-icons/io5';
@@ -21,12 +21,14 @@ export default function ChatWidget({ preview = false }) {
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
+  const [pendingMessage, setPendingMessage] = useState('');
   const [loading, setLoading] = useState(true);
   const [ended, setEnded] = useState(false);
   const [confirmEnd, setConfirmEnd] = useState(false);
   const endButton = useRef(null);
   const generation = useRef(0);
   const end = useRef(null);
+  const followMessages = useRef(true);
   const launcher = useRef(null);
   const screen = useRef(null);
   const hidden = pathname.startsWith('/admin') && !preview;
@@ -43,10 +45,11 @@ export default function ChatWidget({ preview = false }) {
   }, [waitingSince, open, hidden]);
   useEffect(() => {
     if (!open || hidden) return;
-    const media = window.matchMedia('(max-width: 767px)');
+    const media = window.matchMedia('(max-width: 1023px) and (pointer: coarse), (max-width: 767px)');
     const viewport = window.visualViewport;
     const previousOverflow = document.body.style.overflow;
     const resize = () => {
+      if (viewport && viewport.scale > 1.05) return;
       document.body.style.overflow = media.matches ? 'hidden' : previousOverflow;
       screen.current?.style.setProperty('--visitor-chat-height', `${viewport?.height || window.innerHeight}px`);
       screen.current?.style.setProperty('--visitor-chat-top', `${viewport?.offsetTop || 0}px`);
@@ -128,8 +131,8 @@ export default function ChatWidget({ preview = false }) {
       leave();
     };
   }, [open, hidden, !!thread]);
-  useEffect(() => { end.current?.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); }, [messages.length, open, delayed]);
-  function close() { setConfirmEnd(false); setOpen(false); launcher.current?.focus(); }
+  useEffect(() => { if (followMessages.current || pendingMessage) end.current?.scrollIntoView({ block: 'nearest', behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth' }); }, [messages.length, open, delayed, pendingMessage]);
+  function close() { followMessages.current = true; setConfirmEnd(false); setOpen(false); launcher.current?.focus(); }
   function cancelEnd() {
     setConfirmEnd(false);
     requestAnimationFrame(() => endButton.current?.focus());
@@ -165,25 +168,25 @@ export default function ChatWidget({ preview = false }) {
   }
   async function send(event) {
     event.preventDefault(); if (busy) return;
-    setBusy(true); setError('');
+    setBusy(true); setError(''); setPendingMessage(message.trim());
     try {
       const response = await fetch('/api/chat', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name, contact, message }) });
       const data = await response.json();
       if (!response.ok) throw new Error(data.error);
       setThread(data.thread); setMessages(data.messages); setMessage(''); setEnded(false);
     } catch (error) { setError(error.message || 'Não foi possível enviar. Tente novamente.'); }
-    finally { setBusy(false); }
+    finally { setBusy(false); setPendingMessage(''); }
   }
   if (hidden) return null;
   return <div ref={screen} className={`${styles.widget} ${open ? styles.widgetOpen : ''}`}>
     {open && <section className={styles.panel} role="dialog" aria-labelledby="chat-title" onKeyDown={e => { if (e.key === 'Escape') { if (confirmEnd) { e.stopPropagation(); cancelEnd(); } else close(); } }}>
-      <header className={styles.header}><div><p className={styles.eyebrow}>VASTO IMPÉRIO</p><h2 id="chat-title">Como podemos ajudar?</h2><p>Apoio da nossa equipa, aqui no site.</p></div><button type="button" onClick={close} aria-label="Fechar conversa"><IoCloseOutline size={25} /></button></header>
-      <div className={styles.messages} role="log" aria-label="Mensagens da conversa" aria-live="polite">
-        <div className={styles.welcome}>Vamos conversar.<br /><span>Conte-nos o que procura. A nossa equipa responde assim que possível.</span></div>
+      <header className={styles.header}><div><p className={styles.eyebrow}>APOIO AO CLIENTE</p><h2 id="chat-title">Vasto Império<span className={styles.brandDot} aria-hidden="true" /></h2><p>Estamos aqui para ajudar.</p></div><button type="button" onClick={close} aria-label="Fechar conversa"><IoCloseOutline size={25} /></button></header>
+      <div className={styles.messages} onScroll={event => { const node = event.currentTarget; followMessages.current = node.scrollHeight - node.scrollTop - node.clientHeight < 90; }} role="log" aria-label="Mensagens da conversa" aria-live="polite">
+        {!messages.length && <div className={styles.welcome}>Vamos conversar.<span>Conte-nos o que procura. A nossa equipa responde assim que possível.</span></div>}
         {!thread && <div className={styles.identity}><label>O seu nome<input form="visitor-chat-form" required maxLength={100} autoComplete="name" value={name} onChange={e => setName(e.target.value)} /></label><label>Email (opcional)<input form="visitor-chat-form" type="email" maxLength={160} autoComplete="email" value={contact} onChange={e => setContact(e.target.value)} /></label></div>}
         {ended && <p role="status" className={styles.waiting}>Conversa terminada. Se precisar de mais ajuda, pode iniciar uma nova abaixo.</p>}
         {loading && <p>A ligar à conversa…</p>}
-        {messages.map(item => <div key={item.id} className={`${styles.bubble} ${item.sender === 'visitor' ? styles.mine : styles.theirs}`}><small>{item.sender === 'staff' ? 'Equipa Vasto Império' : 'Você'}</small>{item.image ? <ChatImage image={item.image} threadId={thread?.id} messageId={item.id}/> : <p>{item.body}</p>}<time>{new Date(item.created_at).toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' })}</time></div>)}
+        <ChatMessages messages={messages} sender="visitor" threadId={thread?.id} pending={pendingMessage}/>
         {waitingSince !== null && (delayed ? <div role="status" className={styles.delayNotice}>
           <strong>Pedimos desculpa pela demora.</strong>
           <p>Em períodos de maior procura, a resposta pode demorar um pouco mais. Iremos responder o mais breve possível. Se preferir, fale connosco por telefone.</p>
@@ -199,7 +202,7 @@ export default function ChatWidget({ preview = false }) {
           <div className={styles.endActions}><button type="button" autoFocus disabled={busy} onClick={cancelEnd}>Continuar conversa</button><button type="button" disabled={busy} onClick={endConversation} className={styles.confirmEndButton}>{busy ? 'A terminar…' : 'Terminar conversa'}</button></div>
         </div> : <>
         <label htmlFor="site-chat-message" className={styles.messageLabel}>A sua mensagem</label>
-        <div className={styles.compose}><label className={`${styles.attachImage} ${busy ? styles.attachBusy : ''}`} title="Enviar imagem" aria-label="Enviar imagem"><IoImageOutline size={23}/><input id="visitor-chat-image" type="file" accept="image/jpeg,image/png,image/webp" disabled={busy} onChange={sendImage}/><span className={styles.srOnly}>Enviar imagem</span></label><textarea id="site-chat-message" required maxLength={2000} rows={1} placeholder="Escreva a sua mensagem…" value={message} onChange={e => { setMessage(e.target.value); e.target.style.height = 'auto'; e.target.style.height = `${Math.min(e.target.scrollHeight, 100)}px`; }} /><button type="submit" disabled={busy || loading || !message.trim()} aria-label="Enviar mensagem"><IoArrowUp size={20} /></button></div>
+        <div className={styles.compose}><label className={`${styles.attachImage} ${busy ? styles.attachBusy : ''}`} title="Enviar imagem" aria-label="Enviar imagem"><IoImageOutline size={23}/><input id="visitor-chat-image" type="file" accept="image/jpeg,image/png,image/webp" disabled={busy} onChange={sendImage}/><span className={styles.srOnly}>Enviar imagem</span></label><textarea disabled={busy} onKeyDown={event => { if (event.key === 'Enter' && !event.shiftKey && !event.nativeEvent.isComposing && window.matchMedia('(pointer: fine)').matches) { event.preventDefault(); event.currentTarget.form?.requestSubmit(); } }} id="site-chat-message" required maxLength={2000} rows={1} placeholder="Escreva a sua mensagem…" value={message} onChange={e => { setMessage(e.target.value); e.target.style.height = 'auto'; e.target.style.height = `${Math.min(e.target.scrollHeight, 100)}px`; }} /><button type="submit" disabled={busy || loading || !message.trim()} aria-label="Enviar mensagem"><IoArrowUp size={20} /></button></div>
         {thread && <button ref={endButton} type="button" disabled={busy} onClick={() => setConfirmEnd(true)} className={styles.endConversation}>Terminar conversa</button>}
         </>}
         <p className={styles.privacy}>Se deixar um email e fechar o chat, enviamos a resposta por email. <a href="/politica-de-privacidade-e-cookies" target="_blank" rel="noopener noreferrer">Privacidade</a> · <a href="tel:+351928348117">Ligar agora</a></p>

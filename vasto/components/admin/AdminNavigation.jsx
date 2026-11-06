@@ -32,7 +32,7 @@ function NavigationContent({ children }) {
   const { theme } = useAdminPreferences();
 
   return (
-    <div className={`${styles.shell} lg:grid`} data-admin-theme={theme}>
+    <div className={`${styles.shell} ${pathname.startsWith("/admin/conversas") ? styles.conversationsShell : ""} lg:grid`} data-admin-theme={theme}>
       <AdminSalesNotifications />
       <aside className={`${styles.sidebar} sticky top-0 z-40 border-b px-4 py-3 lg:flex lg:flex-col`}>
         <div className={`${styles.brandHeader} flex items-center justify-between gap-3`}>
@@ -66,7 +66,7 @@ function NavigationContent({ children }) {
         </nav>
         <div className="mt-auto hidden pt-8 lg:block"><p className="px-4 text-[11px] leading-relaxed text-[#a1a1a6]">Vasto Império<br />Área de administração</p></div>
       </aside>
-      <div className={styles.content}>{children}</div>
+      <div className={`${styles.content} ${pathname.startsWith("/admin/conversas") ? styles.conversationsContent : ""}`}>{children}</div>
     </div>
   );
 }

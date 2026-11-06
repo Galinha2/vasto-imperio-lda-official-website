@@ -1,3 +1,4 @@
+import { lineDiscount } from "../quote-discounts.mjs";
 import { sameQuoteCustomer } from "./quote-groups.mjs";
 export function assertMergeable(source, target) {
   if (!source || !target || source.id === target.id || source.mergedInto || target.mergedInto || source.mergeArchived || target.mergeArchived) throw Object.assign(new Error("Escolha dois orçamentos disponíveis diferentes."), { status:400 });
@@ -10,7 +11,7 @@ export function combinedQuoteLines(quotes) {
   const normalize = (value) => String(value || "").normalize("NFC").trim().replace(/\s+/g, " ").toLocaleLowerCase("pt-PT");
   for (const { lines, discount } of quotes) {
     for (const line of lines) {
-      const factor = line.isPortes ? 1 : 1 - Number(discount || 0) / 100;
+      const factor = 1 - lineDiscount(line, discount) / 100;
       const price = Number(line.preco) * factor;
       const reference = normalize(line.refCompleta);
       const identity = reference ? `ref:${reference}` : `name:${normalize(line.produto)}`;
@@ -23,7 +24,7 @@ export function combinedQuoteLines(quotes) {
         existing.total += total;
         existing.preco = existing.total / existing.unidades;
       } else {
-        grouped.set(key, { ...line, unidades: quantity, preco: price, total });
+        grouped.set(key, { ...line, unidades: quantity, preco: price, total, discountPercent: 0 });
       }
     }
   }

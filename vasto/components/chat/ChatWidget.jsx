@@ -4,9 +4,9 @@ import { usePathname } from 'next/navigation';
 import { IoChatbubblesOutline, IoCloseOutline, IoArrowUp } from 'react-icons/io5';
 import styles from './Chat.module.css';
 
-export default function ChatWidget() {
+export default function ChatWidget({ preview = false }) {
   const pathname = usePathname();
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(preview);
   const [readIds, setReadIds] = useState([]);
   const [pageVisible, setPageVisible] = useState(true);
   const [thread, setThread] = useState(null);
@@ -19,7 +19,7 @@ export default function ChatWidget() {
   const [loading, setLoading] = useState(true);
   const end = useRef(null);
   const launcher = useRef(null);
-  const hidden = pathname.startsWith('/admin');
+  const hidden = pathname.startsWith('/admin') && !preview;
   useEffect(() => {
     if (hidden) return;
     let active = true;

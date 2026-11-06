@@ -1,3 +1,4 @@
+import { notifyAdminPush } from '@/lib/admin/push.mjs';
 import { deliverChatEmail } from '@/lib/chat-email.mjs';
 import { NextResponse } from 'next/server';
 import { assertOrigin } from '@/lib/admin/auth.mjs';
@@ -27,7 +28,7 @@ export async function POST(request) {
     if (!thread) ({ thread, token } = await createThread({ name: body.name, contact: body.contact || '', address: request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown' }));
     const message = await sendMessage(thread.id, body.message, 'visitor');
     await setPresence(thread.id, true);
-    if (token) await deliverChatEmail({ thread, message, kind: 'started' });
+    await Promise.allSettled([notifyAdminPush({ threadId: thread.id, id: message.id, body: `${thread.name}: ${message.body}` }), ...(token ? [deliverChatEmail({ thread, message, kind: 'started' })] : [])]);
     const response = NextResponse.json({ thread: { name: thread.name }, messages: await messages(thread.id) }, { headers: { 'Cache-Control': 'no-store' } });
     if (token) response.cookies.set(CHAT_COOKIE, token, { httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: 'strict', path: '/api/chat', maxAge: 30 * 86400 });
     return response;

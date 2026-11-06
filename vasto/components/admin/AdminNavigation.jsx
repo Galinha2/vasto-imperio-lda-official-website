@@ -7,6 +7,8 @@ import { IoDocumentTextOutline, IoStatsChartOutline, IoConstructOutline, IoPieCh
 
 import AdminPreferences, { useAdminPreferences } from "./AdminPreferences";
 
+import AdminPushProvider from "./AdminPushNotifications";
+
 import AdminChatUnread, { useAdminChatUnread } from "./AdminChatUnread";
 
 import AdminSalesNotifications from "./AdminSalesNotifications";
@@ -22,7 +24,7 @@ const sections = [
 ];
 
 export default function AdminNavigation({ children }) {
-  return <AdminPreferences><AdminChatUnread><NavigationContent>{children}</NavigationContent></AdminChatUnread></AdminPreferences>;
+  return <AdminPreferences><AdminPushProvider><AdminChatUnread><NavigationContent>{children}</NavigationContent></AdminChatUnread></AdminPushProvider></AdminPreferences>;
 }
 function NavigationContent({ children }) {
   const { total } = useAdminChatUnread();

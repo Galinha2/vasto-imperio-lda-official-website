@@ -9,6 +9,7 @@ import { hasCustomerName, resolveCustomerName } from "@/lib/customer-identity.mj
 import { quoteFilename } from "@/lib/quote-filenames.mjs";
 import CustomerSuggestionInput from "./CustomerSuggestionInput";
 import QuoteEmailButton from "./QuoteEmailButton";
+import { lineDiscount, lineNet } from "@/lib/quote-discounts.mjs";
 import generateBudgetPdf from "@/lib/generateBudgetPdf";
 import { MdOutlineDelete } from "react-icons/md";
 
@@ -148,11 +149,11 @@ export default function BudgetBuilder({ editSaleId = "", duplicateSaleId = "" })
   const totalComDesconto =
     linhas.reduce((acc, l) => {
       if (l.isPortes) return acc + l.total;
-      return acc + l.total * (1 - descontoSelecionado / 100);
+      return acc + lineNet(l, descontoSelecionado);
     }, 0);
 
   const totalComIVA = linhas.reduce((acc, l) => {
-    const valorDesc = l.isPortes ? 0 : descontoSelecionado > 0 ? (l.total * descontoSelecionado) / 100 : 0;
+    const valorDesc = l.isPortes ? 0 : l.total * lineDiscount(l, descontoSelecionado) / 100;
     const valorLiquido = l.total - valorDesc;
     return acc + valorLiquido * 1.23;
   }, 0);
@@ -166,13 +167,13 @@ export default function BudgetBuilder({ editSaleId = "", duplicateSaleId = "" })
           .replace(/\s+/g, " ")
           .replace(/ x /g, "x")
           .replace(/c\/ /g, "c/");
-        return `- ${nomeCompacto}: ${l.unidades}un x ${l.preco.toFixed(2).replace(".", ",")}€ = ${l.total.toFixed(2).replace(".", ",")}€`;
+        return `- ${nomeCompacto}: ${l.unidades}un x ${l.preco.toFixed(2).replace(".", ",")}€ = ${lineNet(l, descontoSelecionado).toFixed(2).replace(".", ",")}€ (desc. ${lineDiscount(l, descontoSelecionado)}%)`;
       })
       .join("\n");
 
     let totaisTexto = `Total Bruto: ${totalSemDesconto.toFixed(2).replace(".", ",")}€`;
-    if (descontoSelecionado > 0)
-      totaisTexto += `\nTotal c/${descontoSelecionado}% Desc: ${totalComDesconto.toFixed(2).replace(".", ",")}€`;
+    if (totalSemDesconto > totalComDesconto)
+      totaisTexto += `\nTotal com descontos: ${totalComDesconto.toFixed(2).replace(".", ",")}€`;
     totaisTexto += `\nTotal c/IVA: ${totalComIVA.toFixed(2).replace(".", ",")}€`;
 
     e.clipboardData.setData(
@@ -261,14 +262,14 @@ export default function BudgetBuilder({ editSaleId = "", duplicateSaleId = "" })
         {duplicateRecord && <p className="rounded-2xl border border-blue-100 bg-blue-50 p-4 text-sm text-blue-800">Cópia do orçamento de <strong>{duplicateRecord.customerName}</strong>. Altere os artigos e guarde para criar um novo orçamento. O original mantém-se. Os desenhos são copiados, mas não são redesenhados quando altera os artigos.</p>}
         {editingRecord && <p className="rounded-2xl border border-orange-100 bg-orange-50 p-4 text-sm text-orange-800">A editar o orçamento de <strong>{editingRecord.customerName}</strong>. Guardar atualiza este registo e o PDF. Os desenhos anexados mantêm-se; não são redesenhados ao alterar os artigos.</p>}
         <section aria-label="Linhas do orçamento" className="admin-surface rounded-[28px] border border-[#e5e5e7] bg-white p-3 shadow-[0_8px_30px_rgba(0,0,0,0.035)] sm:p-5 lg:p-6">
-          <div className="mb-4 hidden grid-cols-[minmax(0,1fr)_80px_100px_100px_44px] gap-3 px-3 text-xs font-semibold uppercase tracking-[0.1em] text-[#86868b] sm:grid">
-            <span>Produto</span><span className="text-center">Qtd.</span><span className="text-center">Preço unit.</span><span className="text-center">Total</span><span />
+          <div className="mb-4 hidden grid-cols-[minmax(0,1fr)_70px_90px_100px_90px_44px] gap-3 px-3 text-xs font-semibold uppercase tracking-[0.1em] text-[#86868b] sm:grid">
+            <span>Produto</span><span className="text-center">Qtd.</span><span className="text-center">Preço unit.</span><span className="text-center">Total líquido</span><span className="text-center">Desc. %</span><span />
           </div>
         <div className="flex flex-col gap-3 items-start">
           {linhas.map((linha, index) => (
             <div
               key={index}
-              className="relative grid w-full grid-cols-[repeat(3,minmax(0,1fr))_40px] items-center gap-2 rounded-[22px] border border-[#e8e8eb] bg-[#fbfbfd] p-3 sm:grid-cols-[minmax(0,1fr)_80px_100px_100px_44px] sm:gap-3 sm:rounded-full sm:bg-white sm:px-3 sm:py-2"
+              className="relative grid w-full grid-cols-[repeat(3,minmax(0,1fr))_40px] items-center gap-2 rounded-[22px] border border-[#e8e8eb] bg-[#fbfbfd] p-3 sm:grid-cols-[minmax(0,1fr)_70px_90px_100px_90px_44px] sm:gap-3 sm:rounded-full sm:bg-white sm:px-3 sm:py-2"
             >
               <div data-produto-dropdown className="relative col-span-4 min-w-0 sm:col-span-1">
                 <div className="flex h-12 items-center rounded-full border border-[#e5e5e7] bg-white px-4 transition focus-within:border-(--blue) focus-within:ring-4 focus-within:ring-[#0879c0]/10 sm:border-transparent sm:bg-[#f5f5f7]">
@@ -385,9 +386,16 @@ export default function BudgetBuilder({ editSaleId = "", duplicateSaleId = "" })
 
               <div className="flex h-11 w-full items-center justify-center rounded-full border border-[#e5e5e7] bg-white px-3 text-sm font-semibold text-[#1d1d1f] sm:bg-[#f5f5f7]">
                 <p className="text-center whitespace-nowrap">
-                  {linha.total.toFixed(2).replace(".", ",")}€
+                  {lineNet(linha, descontoSelecionado).toFixed(2).replace(".", ",")}€
                 </p>
               </div>
+
+              <label className="flex h-11 items-center gap-1 rounded-full border border-[#e5e5e7] bg-[#f5f5f7] px-3 text-xs">
+                <span className="sr-only">Desconto da linha {index + 1} em percentagem (vazio usa o desconto base)</span>
+                <input type="text" inputMode="decimal" disabled={linha.isPortes} value={linha.discountPercent ?? ""} placeholder={String(linha.isPortes ? 0 : descontoSelecionado || 0)}
+                  onChange={event => { const value = event.target.value.replace(",", "."); if (value !== "" && !/^\d{0,3}(\.\d{0,2})?$/.test(value)) return; setLinhas(current => current.map((line, i) => i === index ? {...line, discountPercent: value === "" ? null : Math.min(100, Number(value) || 0)} : line)); }}
+                  className="min-w-0 w-full bg-transparent text-center outline-none disabled:opacity-40" /><span>%</span>
+              </label>
 
               <button
                 type="button"
@@ -410,6 +418,7 @@ export default function BudgetBuilder({ editSaleId = "", duplicateSaleId = "" })
           </button>
         </div>
 
+        <p className="mt-4 text-xs leading-relaxed text-[#6e6e73]">Defina o desconto em % em cada linha. Um campo vazio usa o desconto base; 0% retira o desconto dessa linha. O desconto da linha substitui o desconto base. Os portes não têm desconto.</p>
         </section>
 
         <section aria-label="Dados do cliente e totais" className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(360px,0.8fr)]">
@@ -418,7 +427,7 @@ export default function BudgetBuilder({ editSaleId = "", duplicateSaleId = "" })
             <p className="mt-1 text-sm text-[#6e6e73]">Opcional · o NIF preenche os dados da empresa.</p>
           <div data-desc-dropdown className="relative mt-5 flex flex-col gap-4 sm:flex-row sm:items-start">
             <label className="block shrink-0 text-xs font-medium text-[#6e6e73]">
-              Desconto
+              Desconto base
               <span className="mt-1 flex h-12 w-32 items-center gap-1 rounded-full border border-[#e5e5e7] bg-[#f5f5f7] px-4 focus-within:border-[#0879c0] focus-within:ring-4 focus-within:ring-[#0879c0]/10">
                 <input type="number" min="0" max="100" step="0.01" inputMode="decimal" aria-label="Percentagem de desconto" value={descontoSelecionado}
                   onChange={(event) => { const value = event.target.value; setDescontoSelecionado(value === "" ? "" : Math.min(100, Math.max(0, Number(value) || 0))); }}
@@ -475,8 +484,8 @@ export default function BudgetBuilder({ editSaleId = "", duplicateSaleId = "" })
             <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#86868b]">Resumo do orçamento</p>
             <div className="mt-4 flex flex-col gap-2 text-sm text-[#6e6e73]">
             <div className="flex items-center justify-between gap-4"><span>Total bruto</span><span className="font-medium text-[#1d1d1f]">{totalSemDesconto.toFixed(2).replace(".", ",")}€</span></div>
-            {descontoSelecionado > 0 && (
-              <div className="flex items-center justify-between gap-4 text-(--orange)"><span>Desconto · {descontoSelecionado}%</span><span className="font-semibold">−{(totalSemDesconto - totalComDesconto).toFixed(2).replace(".", ",")}€</span></div>
+            {totalSemDesconto > totalComDesconto && (
+              <div className="flex items-center justify-between gap-4 text-(--orange)"><span>Descontos aplicados</span><span className="font-semibold">−{(totalSemDesconto - totalComDesconto).toFixed(2).replace(".", ",")}€</span></div>
             )}
             <div className="mt-2 flex items-baseline justify-between gap-4 border-t border-[#e8e8eb] pt-4">
               <span className="font-semibold text-[#1d1d1f]">Valor líquido sem IVA</span>

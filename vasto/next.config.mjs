@@ -4,10 +4,10 @@ const nextConfig = {
     return [{ source: "/home", destination: "/", permanent: true }];
   },
   async headers() {
-    return ["/admin/:path*", "/orcamento/admin/:path*", "/simulador/admin/:path*", "/api/:path*"].map((source) => ({
+    return [{ source: "/admin-push-sw.js", headers: [{ key: "Cache-Control", value: "no-cache, no-store, must-revalidate" }, { key: "Service-Worker-Allowed", value: "/admin/" }] }, ...["/admin/:path*", "/orcamento/admin/:path*", "/simulador/admin/:path*", "/api/:path*"].map((source) => ({
       source,
       headers: [{ key: "X-Robots-Tag", value: "noindex, nofollow, noarchive" }],
-    }));
+    }))];
   },
   serverExternalPackages: ["pdfjs-dist"],
   images: {

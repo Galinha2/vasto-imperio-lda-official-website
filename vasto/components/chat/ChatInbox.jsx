@@ -1,9 +1,12 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 import styles from './Chat.module.css';
 import { useAdminChatUnread } from '@/components/admin/AdminChatUnread';
 import { IoChatbubbleOutline, IoArrowUp, IoChevronBack, IoTrashOutline } from 'react-icons/io5';
 export default function ChatInbox() {
+  const searchParams = useSearchParams();
+  const requestedChat = searchParams.get("chat");
   const { counts, total, markRead, refresh: refreshUnread } = useAdminChatUnread();
   const [threads, setThreads] = useState([]);
   const [selected, setSelected] = useState(null);
@@ -16,6 +19,19 @@ export default function ChatInbox() {
   const end = useRef(null);
   const selection = useRef(null);
   const deletedIds = useRef(new Set());
+  useEffect(() => {
+    if (!/^[a-f0-9]{64}$/.test(requestedChat || '')) return;
+    let active = true;
+    (async () => {
+      try {
+        const response = await fetch(`/api/admin/chat?id=${requestedChat}`, {cache:'no-store'});
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || 'Não foi possível abrir a conversa.');
+        if (active && data.thread) { selection.current=data.thread.id; setSelected(data.thread); setMessages(data.messages); }
+      } catch (failure) { if (active) setError(failure.message); }
+    })();
+    return () => { active=false; };
+  }, [requestedChat]);
   useEffect(() => {
     let active = true;
     let pending = false;

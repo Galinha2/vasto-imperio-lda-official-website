@@ -13,8 +13,8 @@ export async function GET(request) {
     if (params.has('unread')) return NextResponse.json({ counts: await unreadChatCounts() }, { headers: { 'Cache-Control': 'no-store' } });
     if (params.has('notifications')) return NextResponse.json(await incomingMessages(params.get('since')), { headers: { 'Cache-Control': 'no-store' } });
     const id = params.get('id');
-    if (id) await threadExists(id);
-    return NextResponse.json(id ? { messages: await messages(id) } : { threads: await listThreads() }, { headers: { 'Cache-Control': 'no-store' } });
+    const thread = id ? await threadExists(id) : null;
+    return NextResponse.json(id ? { messages: await messages(id), thread: {id:thread.id,name:thread.name,contact:thread.contact,created_at:thread.created_at} } : { threads: await listThreads() }, { headers: { 'Cache-Control': 'no-store' } });
   } catch (error) { return failure(error); }
 }
 export async function POST(request) {

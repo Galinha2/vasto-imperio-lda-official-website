@@ -1,3 +1,4 @@
+import { lineNet } from "../quote-discounts.mjs";
 import { createRequire } from "node:module";
 const require = createRequire(import.meta.url);
 const number = (value) => Number(String(value).replace(/[€%\s]/g, "").replace(/\.(?=\d{3}(?:\D|$))/g, "").replace(",", "."));
@@ -5,7 +6,8 @@ const number = (value) => Number(String(value).replace(/[€%\s]/g, "").replace(
 export function validateQuoteLines(lines, subtotal, discount) {
   if (!Array.isArray(lines) || !lines.length || lines.length > 1000 || !Number.isFinite(discount) || discount < 0 || discount > 100) return false;
   if (lines.some((line) => !line.produto || !Number.isFinite(line.preco) || line.preco < 0 || !Number.isFinite(line.unidades) || line.unidades <= 0 || Math.abs(line.total - line.preco * line.unidades) > 0.03)) return false;
-  const calculated = lines.reduce((sum, line) => sum + line.total * (line.isPortes ? 1 : 1 - discount / 100), 0);
+  if (lines.some(line => line.discountPercent != null && (!Number.isFinite(line.discountPercent) || line.discountPercent < 0 || line.discountPercent > 100))) return false;
+  const calculated = lines.reduce((sum, line) => sum + lineNet(line, discount), 0);
   return Math.abs(calculated - subtotal) <= Math.max(0.05, lines.length * 0.011);
 }
 
@@ -57,11 +59,11 @@ export async function editableQuote(record, buffer) {
         const unidades = number(qty.str), preco = number(prices[0].str);
         const isPortes = ref.startsWith("0.") || /^(Portes|Montagem)/i.test(productName);
         if (!isPortes) discounts.add(discount);
-        lines.push({ produto: productName, refCompleta: ref, unidades, preco, total: unidades * preco, isPortes });
+        lines.push({ produto: productName, refCompleta: ref, unidades, preco, total: unidades * preco, isPortes, discountPercent: discount });
       }
     }
     const discount = [...discounts][0] || 0;
-    if (discounts.size <= 1 && validateQuoteLines(lines, record.subtotal, discount)) return { lines, discount };
+    if (validateQuoteLines(lines, record.subtotal, discount)) return { lines, discount };
     throw Object.assign(new Error("Não foi possível recuperar todos os artigos deste PDF com segurança. Utilize um PDF exportado pelo orçamento ou simulador Vasto Império."), { status: 422 });
   } finally { await task.destroy(); }
 }

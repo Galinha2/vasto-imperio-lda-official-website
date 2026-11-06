@@ -1,3 +1,4 @@
+import { lineDiscount, lineNet } from "./quote-discounts.mjs";
 import { quoteFilename } from "./quote-filenames.mjs";
 import { resolveCustomerName } from "./customer-identity.mjs";
 import jsPDF from "jspdf";
@@ -232,8 +233,8 @@ export default async function generateBudgetPdf({ linhas, descontoSelecionado, d
         .filter((l) => l.produto)
         .map((l) => {
           const unidade = "un";
-          const descLinha = l.isPortes ? "" : (descontoSelecionado > 0 ? descontoSelecionado : 0);
-          const valorDesc = l.isPortes ? 0 : (descontoSelecionado > 0 ? (l.total * descontoSelecionado) / 100 : 0);
+          const descLinha = l.isPortes ? "" : lineDiscount(l, descontoSelecionado);
+          const valorDesc = l.isPortes ? 0 : (l.total * lineDiscount(l, descontoSelecionado) / 100);
           const valorLiquido = l.total - valorDesc;
           return {
             referencia: l.refCompleta || "",
@@ -309,19 +310,19 @@ export default async function generateBudgetPdf({ linhas, descontoSelecionado, d
         (acc, l) =>
           acc +
           (l.isPortes ? 0 :
-            (descontoSelecionado > 0 ? (l.total * descontoSelecionado) / 100 : 0)
+            (l.total * lineDiscount(l, descontoSelecionado) / 100)
           ),
         0,
       );
       const totalLiquido = linhas.reduce(
         (acc, l) =>
           acc +
-          (l.total - (l.isPortes ? 0 : (descontoSelecionado > 0 ? (l.total * descontoSelecionado) / 100 : 0))),
+          (l.total - (l.isPortes ? 0 : (l.total * lineDiscount(l, descontoSelecionado) / 100))),
         0,
       );
       const totalIVA = linhas.reduce(
         (acc, l) => {
-          const valorDesc = l.isPortes ? 0 : (descontoSelecionado > 0 ? (l.total * descontoSelecionado) / 100 : 0);
+          const valorDesc = l.isPortes ? 0 : (l.total * lineDiscount(l, descontoSelecionado) / 100);
           const valorLiquido = l.total - valorDesc;
           return acc + valorLiquido * 0.23;
         },
@@ -423,9 +424,9 @@ export default async function generateBudgetPdf({ linhas, descontoSelecionado, d
       yTot += 6;
       doc.setFont("helvetica", "normal");
       doc.setTextColor(...corPretaFooter);
-      doc.text("Desconto Global:", xTotais, yTot, { align: "left" });
+      doc.text("Desconto aplicado:", xTotais, yTot, { align: "left" });
       doc.setTextColor(...corOrange);
-      doc.text(`${descontoSelecionado}%`, 200, yTot, { align: "right" });
+      doc.text(linhas.some(l => !l.isPortes && l.discountPercent != null) ? "Por artigo" : `${descontoSelecionado}%`, 200, yTot, { align: "right" });
       yTot += 6;
       doc.setFont("helvetica", "normal");
       doc.setTextColor(...corPretaFooter);
@@ -487,11 +488,11 @@ export default async function generateBudgetPdf({ linhas, descontoSelecionado, d
         customerName: resolvedCustomerName,
         nif: String(dadosEmpresa?.nif || nif || ""),
         issuedAt,
-        subtotal: Number(linhas.reduce((sum, line) => sum + line.total * (line.isPortes ? 1 : 1 - Number(descontoSelecionado || 0) / 100), 0).toFixed(2)),
-        vat: Number(linhas.reduce((sum, line) => sum + line.total * (line.isPortes ? 1 : 1 - Number(descontoSelecionado || 0) / 100) * 0.23, 0).toFixed(2)),
-        total: Number(linhas.reduce((sum, line) => sum + line.total * (line.isPortes ? 1 : 1 - Number(descontoSelecionado || 0) / 100) * 1.23, 0).toFixed(2)),
+        subtotal: Number(linhas.reduce((sum, line) => sum + lineNet(line, descontoSelecionado), 0).toFixed(2)),
+        vat: Number(linhas.reduce((sum, line) => sum + lineNet(line, descontoSelecionado) * 0.23, 0).toFixed(2)),
+        total: Number(linhas.reduce((sum, line) => sum + lineNet(line, descontoSelecionado) * 1.23, 0).toFixed(2)),
         source,
-        quoteLines: linhas.filter((line) => line.produto).map((line) => ({ produto: String(line.produto), refCompleta: String(line.refCompleta || ""), unidades: Number(line.unidades), preco: Number(line.preco), total: Number(line.total), isPortes: !!line.isPortes })),
+        quoteLines: linhas.filter((line) => line.produto).map((line) => ({ produto: String(line.produto), refCompleta: String(line.refCompleta || ""), unidades: Number(line.unidades), preco: Number(line.preco), total: Number(line.total), discountPercent: line.discountPercent == null ? null : Number(line.discountPercent), isPortes: !!line.isPortes })),
         discountPercent: Number(descontoSelecionado || 0),
         quoteType,
         customerPhone: telefoneCliente.trim(),

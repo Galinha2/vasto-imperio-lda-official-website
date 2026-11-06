@@ -2,6 +2,7 @@
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { useAdminPush } from './AdminPushNotifications';
 import { useAdminPreferences } from './AdminPreferences';
 import { playAdminSound } from './admin-notification-audio';
 import styles from './AdminSalesNotifications.module.css';
@@ -9,6 +10,8 @@ import styles from './AdminSalesNotifications.module.css';
 // This listener stays mounted across all admin pages, including Settings.
 export default function AdminSalesNotifications() {
   const router=useRouter();
+  const {active:pushActive}=useAdminPush();
+  const pushStatus=useRef(pushActive);pushStatus.current=pushActive;
   const {preferences,ready}=useAdminPreferences();
   const current=useRef(preferences);current.current=preferences;
   const seen=useRef(null);const cursor=useRef(null);const chatSeen=useRef(new Set());
@@ -32,8 +35,8 @@ export default function AdminSalesNotifications() {
       if(!(type==='chat'?prefs.chat:prefs.sales))return;
       const text=prefs.preview?body:(type==='chat'?'Abra as conversas no painel para ler a mensagem.':'Abra o painel para consultar o novo orçamento.');
       if(prefs.inApp)setNotice({title,body:text,href,key});
-      if(prefs.sound)playAdminSound(audio.current,prefs.volume);
-      if(prefs.desktop&&'Notification' in window&&Notification.permission==='granted') {
+      if(prefs.sound&&!(type==='chat'&&pushStatus.current))playAdminSound(audio.current,prefs.volume);
+      if(!(type==='chat'&&pushStatus.current)&&prefs.desktop&&'Notification' in window&&Notification.permission==='granted') {
         try {
           const native=new Notification(`${title} · Vasto Império`,{body:text,icon:'/favicon-google.png',tag:`vasto-${type}-${key}`,silent:!prefs.sound||prefs.volume===0||audio.current?.state==='running'});
           notices.current.add(native);native.onclose=()=>notices.current.delete(native);
@@ -62,7 +65,7 @@ export default function AdminSalesNotifications() {
         const data=await response.json();if(stopped||!Array.isArray(data.messages))return;
         const incoming=data.messages.filter(m=>!chatSeen.current.has(m.id));data.messages.forEach(m=>chatSeen.current.add(m.id));cursor.current=data.cursor;
         if(chatSeen.current.size>3000)chatSeen.current=new Set([...chatSeen.current].slice(-2000));
-        if(incoming.length){window.dispatchEvent(new CustomEvent('admin:new-chat',{detail:incoming}));incoming.forEach(m=>notify({type:'chat',title:'Nova mensagem recebida',body:m.body,href:'/admin/conversas',key:m.id}));}
+        if(incoming.length){window.dispatchEvent(new CustomEvent('admin:new-chat',{detail:incoming}));incoming.forEach(m=>notify({type:'chat',title:'Nova mensagem recebida',body:m.body,href:`/admin/conversas?chat=${m.thread_id}`,key:m.id}));}
       }catch{/* Retry transient failures, including while minimized. */}finally{chatPending=false;schedule(chat);}
     }
     // Do not pause on document.hidden: alerts must still arrive when another app is active.

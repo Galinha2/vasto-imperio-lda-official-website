@@ -1,3 +1,4 @@
+import { PUSH_DEVICE_COOKIE, removePushDevice } from '@/lib/admin/push.mjs';
 import { NextResponse } from "next/server";
 import { signIn, verifySession, sessionCookie, assertOrigin, SESSION_COOKIE } from "@/lib/admin/auth.mjs";
 
@@ -29,7 +30,10 @@ export async function POST(request) {
 export async function DELETE(request) {
   try {
     assertOrigin(request);
+    const deviceId = request.cookies.get(PUSH_DEVICE_COOKIE)?.value;
+    if (deviceId && verifySession(request.cookies.get(SESSION_COOKIE)?.value)) await removePushDevice(deviceId);
     const response = NextResponse.json({ authenticated: false });
+    response.cookies.set(PUSH_DEVICE_COOKIE, "", { httpOnly: true, secure: process.env.NODE_ENV === "production", sameSite: "strict", path: "/", maxAge: 0 });
     response.cookies.set(sessionCookie("", true));
     return response;
   } catch (error) { return NextResponse.json({ error: error.message }, { status: error.status || 403 }); }

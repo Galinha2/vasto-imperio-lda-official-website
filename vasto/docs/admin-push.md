@@ -28,7 +28,7 @@ As preferências de som, conteúdo das notificações e avisos do chat são sinc
 4. Responder e verificar a chegada da resposta no site.
 5. Terminar sessão nesse telemóvel e confirmar que deixa de receber avisos; o outro dispositivo deve continuar ativo.
 
-O chat público mantém-se oculto pelo sinalizador `websiteChatEnabled = false` em `app/layout.js`, até ser reativado pelo utilizador.
+O chat público está ativo (`websiteChatEnabled = true` em `app/layout.js`). “Terminar conversa” remove o acesso do visitante à conversa neste navegador e desativa a presença, conservando o histórico no admin. Uma mensagem posterior inicia uma nova conversa. Fechar o popup apenas minimiza o chat.
 
 ## Funcionamento e limites
 

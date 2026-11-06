@@ -19,6 +19,13 @@ export async function POST(request) {
     if (raw.length > 5000) return NextResponse.json({ error: 'Mensagem demasiado longa.' }, { status: 413 });
     let body; try { body = JSON.parse(raw); } catch { return NextResponse.json({ error: 'Pedido inválido.' }, { status: 400 }); }
     let thread = await visitorThread(request.cookies.get(CHAT_COOKIE)?.value);
+    if (body.action === 'end') {
+      if (thread) await setPresence(thread.id, false);
+      const response = NextResponse.json({ ok: true }, { headers: { 'Cache-Control': 'no-store' } });
+      // End visitor access without deleting the team's conversation history.
+      response.cookies.set(CHAT_COOKIE, '', { httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: 'strict', path: '/api/chat', maxAge: 0 });
+      return response;
+    }
     if (body.action === 'presence') {
       if (thread) await setPresence(thread.id, body.open === true);
       return NextResponse.json({ ok: true });

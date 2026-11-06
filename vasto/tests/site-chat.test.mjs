@@ -95,7 +95,7 @@ test('contadores por conversa, leitura limitada às mensagens vistas e exclusão
     assert.equal((await unreadChatCounts())[b.id], 1);
     await markChatRead(a.id, [first.id]);
     assert.deepEqual(await unreadChatCounts(), { [b.id]:1 });
-    assert.ok((await messages(a.id))[0].admin_read_at);
+    assert.ok((await messages(a.id)).find(message => message.id === first.id).admin_read_at);
     await markChatRead(a.id, [first.id]);
     assert.deepEqual(await unreadChatCounts(), { [b.id]:1 });
     await assert.rejects(markChatRead(a.id, ['../secret']), { status:400 });

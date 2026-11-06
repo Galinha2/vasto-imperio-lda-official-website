@@ -17,6 +17,8 @@ export default function ChatWidget({ preview = false }) {
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [ended, setEnded] = useState(false);
+  const generation = useRef(0);
   const end = useRef(null);
   const launcher = useRef(null);
   const hidden = pathname.startsWith('/admin') && !preview;
@@ -27,12 +29,13 @@ export default function ChatWidget({ preview = false }) {
     async function refresh() {
       if (pending || document.hidden) return;
       pending = true;
+      const version = generation.current;
       try {
         const response = await fetch('/api/chat', { cache: 'no-store' });
         const data = await response.json();
         if (!response.ok) throw new Error(data.error);
-        if (active) { setThread(data.thread); setMessages(data.messages); setError(''); }
-      } catch (error) { if (active) setError(error.message || 'Não foi possível ligar ao chat.'); }
+        if (active && version === generation.current) { setThread(data.thread); setMessages(data.messages); setError(''); }
+      } catch (error) { if (active && version === generation.current) setError(error.message || 'Não foi possível ligar ao chat.'); }
       finally { pending = false; if (active) setLoading(false); }
     }
     refresh();
@@ -89,6 +92,19 @@ export default function ChatWidget({ preview = false }) {
   }, [open, hidden, !!thread]);
   useEffect(() => { end.current?.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); }, [messages.length, open]);
   function close() { setOpen(false); launcher.current?.focus(); }
+  async function endConversation() {
+    if (busy || !window.confirm('Terminar esta conversa? Pode iniciar uma nova quando quiser.')) return;
+    setBusy(true); setError(''); generation.current++;
+    try {
+      const response = await fetch('/api/chat', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'end' }) });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error);
+      generation.current++;
+      setThread(null); setMessages([]); setName(''); setContact(''); setMessage(''); setEnded(true);
+      close();
+    } catch (error) { setError(error.message || 'Não foi possível terminar a conversa. Tente novamente.'); }
+    finally { setBusy(false); }
+  }
   async function send(event) {
     event.preventDefault(); if (busy) return;
     setBusy(true); setError('');
@@ -96,7 +112,7 @@ export default function ChatWidget({ preview = false }) {
       const response = await fetch('/api/chat', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name, contact, message }) });
       const data = await response.json();
       if (!response.ok) throw new Error(data.error);
-      setThread(data.thread); setMessages(data.messages); setMessage('');
+      setThread(data.thread); setMessages(data.messages); setMessage(''); setEnded(false);
     } catch (error) { setError(error.message || 'Não foi possível enviar. Tente novamente.'); }
     finally { setBusy(false); }
   }
@@ -106,6 +122,7 @@ export default function ChatWidget({ preview = false }) {
       <header className={styles.header}><div><p className={styles.eyebrow}>VASTO IMPÉRIO</p><h2 id="chat-title">Como podemos ajudar?</h2><p>Apoio da nossa equipa, aqui no site.</p></div><button type="button" onClick={close} aria-label="Fechar conversa"><IoCloseOutline size={25} /></button></header>
       <div className={styles.messages} role="log" aria-label="Mensagens da conversa" aria-live="polite">
         <div className={styles.welcome}>Vamos conversar.<br /><span>Conte-nos o que procura. A nossa equipa responde assim que possível.</span></div>
+        {ended && <p role="status" className={styles.waiting}>Conversa terminada. Se precisar de mais ajuda, pode iniciar uma nova abaixo.</p>}
         {loading && <p>A ligar à conversa…</p>}
         {messages.map(item => <div key={item.id} className={`${styles.bubble} ${item.sender === 'visitor' ? styles.mine : styles.theirs}`}><small>{item.sender === 'staff' ? 'Equipa Vasto Império' : 'Você'}</small><p>{item.body}</p><time>{new Date(item.created_at).toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' })}</time></div>)}
         {messages.at(-1)?.sender === 'visitor' && <p role="status" className={styles.waiting}>Obrigado pela sua mensagem. Aguarde um pouco, por favor. A nossa equipa irá responder brevemente.</p>}
@@ -116,6 +133,7 @@ export default function ChatWidget({ preview = false }) {
         {error && <p className={styles.error} role="alert">{error}</p>}
         <label htmlFor="site-chat-message" className={styles.messageLabel}>A sua mensagem</label>
         <div className={styles.compose}><textarea id="site-chat-message" required maxLength={2000} rows={2} placeholder="Escreva a sua mensagem…" value={message} onChange={e => setMessage(e.target.value)} /><button type="submit" disabled={busy || loading || !message.trim()} aria-label="Enviar mensagem"><IoArrowUp size={20} /></button></div>
+        {thread && <button type="button" disabled={busy} onClick={endConversation} className={styles.endConversation}>Terminar conversa</button>}
         <p className={styles.privacy}>Se deixar um email e fechar o chat, enviamos a resposta por email. <a href="tel:+351928348117">Ligar agora</a></p>
       </form>
     </section>}

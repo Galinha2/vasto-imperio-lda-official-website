@@ -9,7 +9,7 @@ import Footer from '@/components/footer/Footer';
 import { Analytics } from '@vercel/analytics/react';
 
 // Chat público temporariamente oculto. Alterar para true para reativar.
-const websiteChatEnabled = false;
+const websiteChatEnabled = true;
 
 const organizationStructuredData = {
   "@context": "https://schema.org",

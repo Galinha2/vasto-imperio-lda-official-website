@@ -1,10 +1,13 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
-import { useSearchParams } from 'next/navigation';
+import Link from 'next/link';
+import { useRouter, useSearchParams } from 'next/navigation';
 import styles from './Chat.module.css';
 import { useAdminChatUnread } from '@/components/admin/AdminChatUnread';
 import { IoChatbubbleOutline, IoArrowUp, IoChevronBack, IoTrashOutline } from 'react-icons/io5';
 export default function ChatInbox() {
+  const router = useRouter();
+  const screen = useRef(null);
   const searchParams = useSearchParams();
   const requestedChat = searchParams.get("chat");
   const { counts, total, markRead, refresh: refreshUnread } = useAdminChatUnread();
@@ -19,6 +22,26 @@ export default function ChatInbox() {
   const end = useRef(null);
   const selection = useRef(null);
   const deletedIds = useRef(new Set());
+  useEffect(() => {
+    const media = window.matchMedia('(max-width: 767px)');
+    const viewport = window.visualViewport;
+    const previousOverflow = document.body.style.overflow;
+    const resize = () => {
+      document.body.style.overflow = media.matches ? 'hidden' : previousOverflow;
+      screen.current?.style.setProperty('--chat-height', `${viewport?.height || window.innerHeight}px`);
+      screen.current?.style.setProperty('--chat-top', `${viewport?.offsetTop || 0}px`);
+    };
+    resize();
+    media.addEventListener('change', resize);
+    viewport?.addEventListener('resize', resize);
+    viewport?.addEventListener('scroll', resize);
+    window.addEventListener('resize', resize);
+    return () => { document.body.style.overflow = previousOverflow; media.removeEventListener('change', resize); viewport?.removeEventListener('resize', resize); viewport?.removeEventListener('scroll', resize); window.removeEventListener('resize', resize); };
+  }, []);
+  function backToList() {
+    selection.current = null; setSelected(null); setMessage(''); setDelivery(''); setError('');
+    if (requestedChat) router.replace('/admin/conversas');
+  }
   useEffect(() => {
     if (!/^[a-f0-9]{64}$/.test(requestedChat || '')) return;
     let active = true;
@@ -107,9 +130,9 @@ export default function ChatInbox() {
     } catch (error) { setError(error.message); }
     finally { setBusy(false); }
   }
-  return <div className={styles.inbox}>
-    <header className={styles.pageHeader}><div><h1>Conversas</h1><p role="status">{total ? `${total} ${total === 1 ? 'mensagem recebida por ler' : 'mensagens recebidas por ler'}` : 'Um espaço para estar mais perto dos seus clientes.'}</p></div><span className={styles.count}>{threads.length} {threads.length === 1 ? 'conversa' : 'conversas'}</span></header>
-    {error && <p role="alert" className={styles.error}>{error}</p>}
+  return <div ref={screen} className={`${styles.inbox} ${selected ? styles.inboxSelected : ''}`}>
+    <header className={styles.pageHeader}><Link href="/admin" className={styles.mobileExit} aria-label="Voltar ao painel"><IoChevronBack size={22}/></Link><div><h1>Conversas</h1><p role="status">{total ? `${total} ${total === 1 ? 'mensagem recebida por ler' : 'mensagens recebidas por ler'}` : 'Um espaço para estar mais perto dos seus clientes.'}</p></div><span className={styles.count}>{threads.length} {threads.length === 1 ? 'conversa' : 'conversas'}</span></header>
+    {error && !selected && <p role="alert" className={styles.error}>{error}</p>}
     <div className={`${styles.workspace} ${selected ? styles.workspaceSelected : ''}`}>
       <aside className={styles.threadList} aria-label="Conversas">
         <h2 className={styles.listHeading}>Mensagens do site</h2>
@@ -117,9 +140,9 @@ export default function ChatInbox() {
         {threads.map(thread => <button key={thread.id} aria-pressed={selected?.id === thread.id} onClick={() => { selection.current = thread.id; setSelected(thread); setMessages([]); setMessage(''); setError(''); setDelivery(''); }} className={`${styles.thread} ${selected?.id === thread.id ? styles.threadActive : ''}`}><span className={styles.avatar} aria-hidden="true">{thread.name.slice(0, 1).toUpperCase()}</span><span className={styles.threadCopy}><span className={styles.threadTop}><strong>{thread.name}</strong><time>{new Date(thread.created_at).toLocaleDateString('pt-PT', {day:'2-digit', month:'2-digit'})}</time></span><span className={styles.threadContact}>{thread.contact || 'Visitante do site'}</span></span>{counts[thread.id] > 0 && <span className={styles.threadUnread} aria-label={`${counts[thread.id]} mensagens por ler`}>{counts[thread.id]}</span>}</button>)}
       </aside>
       {selected ? <section className={styles.conversation}>
-        <header className={styles.conversationHeader}><button className={styles.back} aria-label="Voltar às conversas" onClick={() => { selection.current = null; setSelected(null); }}><IoChevronBack size={20} /></button><span className={styles.avatar} aria-hidden="true">{selected.name.slice(0,1).toUpperCase()}</span><div><h2>{selected.name}</h2><p>{selected.contact || 'Visitante do site'}</p></div><button type="button" className={styles.deleteChat} onClick={removeConversation} disabled={busy} aria-label="Apagar conversa" title="Apagar conversa"><IoTrashOutline size={18} /><span>Apagar</span></button></header>
+        <header className={styles.conversationHeader}><button className={styles.back} aria-label="Voltar às conversas" onClick={backToList}><IoChevronBack size={20} /></button><span className={styles.avatar} aria-hidden="true">{selected.name.slice(0,1).toUpperCase()}</span><div><h2>{selected.name}</h2><p>{selected.contact || 'Visitante do site'}</p></div><button type="button" className={styles.deleteChat} onClick={removeConversation} disabled={busy} aria-label="Apagar conversa" title="Apagar conversa"><IoTrashOutline size={18} /><span>Apagar</span></button></header>
         <div role="log" aria-live="polite" aria-label="Mensagens" className={styles.messages}>{messages.map(item => <div key={item.id} className={`${styles.bubble} ${item.sender === 'staff' ? styles.mine : styles.theirs}`}><small>{item.sender === 'staff' ? 'Equipa Vasto Império' : selected.name}</small><p>{item.body}</p><time>{new Date(item.created_at).toLocaleString('pt-PT')}</time></div>)}<div ref={end} /></div>
-        <form className={styles.form} onSubmit={send}><label htmlFor="staff-message" className={styles.messageLabel}>Responder a {selected.name}</label><div className={styles.compose}><textarea id="staff-message" required maxLength={2000} rows={2} value={message} onChange={e => setMessage(e.target.value)} placeholder="Escreva uma mensagem…" /><button disabled={busy || !message.trim()} aria-label={busy ? 'A enviar mensagem' : 'Enviar mensagem'}><IoArrowUp size={20} /></button></div>{delivery && <p role="status" className={styles.delivery}>{delivery}</p>}</form>
+        <form className={styles.form} onSubmit={send}>{error && <p role="alert" className={styles.error}>{error}</p>}<label htmlFor="staff-message" className={styles.messageLabel}>Responder a {selected.name}</label><div className={styles.compose}><textarea id="staff-message" required maxLength={2000} rows={1} value={message} onChange={e => { setMessage(e.target.value); e.target.style.height = 'auto'; e.target.style.height = `${Math.min(e.target.scrollHeight, 100)}px`; }} placeholder="Escreva uma mensagem…" /><button disabled={busy || !message.trim()} aria-label={busy ? 'A enviar mensagem' : 'Enviar mensagem'}><IoArrowUp size={20} /></button></div>{delivery && <p role="status" className={styles.delivery}>{delivery}</p>}</form>
       </section> : <div className={styles.empty}><span className={styles.emptyIcon}><IoChatbubbleOutline size={28} /></span><h2>Uma boa conversa começa aqui.</h2><p>Selecione uma conversa para acompanhar o pedido e responder ao cliente.</p></div>}
     </div>
   </div>;

@@ -1,3 +1,4 @@
+import {optimizeImage} from "../optimize-image.mjs";
 import { sameNotesCustomer } from "./customer-notes.mjs";
 import { sameQuoteCustomer } from "./quote-groups.mjs";
 import { mkdir, readdir, readFile, writeFile, rename, unlink } from "node:fs/promises";
@@ -279,6 +280,9 @@ export async function addSaleImage(id, fileName, contentType, buffer) {
   const images = Array.isArray(record.images) ? record.images : [];
   if (images.length >= maxImagesPerSale) throw fail(`Cada orçamento pode ter até ${maxImagesPerSale} imagens.`, 400);
 
+  const optimized = await optimizeImage(buffer);
+  buffer = optimized.buffer; contentType = optimized.contentType;
+  fileName = String(fileName || "imagem").replace(/\.[^.]+$/, "") + (contentType === "image/webp" ? ".webp" : contentType === "image/png" ? ".png" : ".jpg");
   const image = {
     id: randomUUID(),
     name: path.basename(fileName || "imagem").replace(/[\u0000-\u001f\u007f]/g, "").slice(0, 120) || "imagem",

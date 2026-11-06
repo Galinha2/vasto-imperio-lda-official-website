@@ -38,3 +38,11 @@ O chat público está ativo (`websiteChatEnabled = true` em `app/layout.js`). �
 - Endereços de subscrição só podem apontar para serviços push conhecidos; a API não permite pedidos para URLs arbitrários.
 - Subscrições expiradas ou removidas pelo serviço (HTTP 404/410) são eliminadas. Falhas temporárias não apagam o dispositivo nem bloqueiam a mensagem do visitante.
 - Receção depende da ligação, das permissões do sistema, das opções de poupança de energia e do modo Não incomodar. O teste do servidor comprova aceitação pelo serviço push; entrega real requer um teste no Android e no iPhone.
+
+## Imagens nas conversas
+
+- Executar novamente `supabase/site-chat.sql` completo para acrescentar a coluna `image` e criar o bucket privado `chat-images`. Não elimina conversas.
+- Visitante e admin podem tocar no ícone de imagem e escolher JPG, PNG ou WebP. O navegador reduz o ficheiro antes de enviar; o servidor valida, remove metadados e converte para WebP até 1600 px. HEIC não é suportado: exportar como JPG.
+- O acesso à imagem exige a sessão do admin ou o cookie da própria conversa. Os ficheiros deixam de ser servidos aos 7 dias. A mensagem permanece com indicação de imagem expirada.
+- Configurar `CRON_SECRET` na Vercel e publicar `vercel.json`: `/api/cron/chat-images` corre diariamente. A eliminação física acontece na execução seguinte à expiração (até cerca de 24 horas depois). Para limpeza mais frequente, um agendador pode chamar o mesmo endpoint com `Authorization: Bearer <CRON_SECRET>`. Sem agendador, o acesso expira mas o ficheiro ocupa espaço até à limpeza. Nunca publicar o segredo.
+- A tarefa toca exclusivamente no bucket `chat-images`. Imagens dos orçamentos e PDFs não são apagados pela retenção do chat. As novas imagens dos orçamentos são otimizadas no servidor até 2560 px, com qualidade superior para conservar desenhos e cotas. Quando o original já é mais pequeno, é conservado. Imagens já guardadas não são alteradas retroativamente.

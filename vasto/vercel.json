@@ -3,6 +3,10 @@
     {
       "path": "/api/cron/supabase-keepalive",
       "schedule": "35 6 * * *"
+    },
+    {
+      "path": "/api/cron/chat-images",
+      "schedule": "15 4 * * *"
     }
   ]
 }

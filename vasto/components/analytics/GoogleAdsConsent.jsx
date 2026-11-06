@@ -48,6 +48,12 @@ export default function GoogleAdsConsent() {
     setReady(true);
   }, []);
 
+  useEffect(() => {
+    const showPreferences = () => setOpen(true);
+    window.addEventListener('vasto:cookie-preferences', showPreferences);
+    return () => window.removeEventListener('vasto:cookie-preferences', showPreferences);
+  }, []);
+
   function choose(accepted) {
     updateConsent(accepted);
     try { localStorage.setItem(STORAGE_KEY, JSON.stringify({ accepted, expires: Date.now() + 180 * 86400000 })); } catch { /* Keep the choice in memory. */ }
@@ -68,6 +74,7 @@ export default function GoogleAdsConsent() {
           <h2 id="cookie-consent-title" className="mt-2 text-xl font-semibold tracking-[-0.03em] text-[#1d1d1f]">Preferências de cookies</h2>
           <p className="mt-3 text-sm leading-relaxed text-[#6e6e73]">Utilizamos cookies essenciais para o funcionamento do site. Com a sua autorização, usamos também cookies para avaliar os resultados dos nossos anúncios.</p>
           <p className="mt-2 text-xs leading-relaxed text-[#86868b]">Pode aceitar ou continuar apenas com os essenciais. A sua escolha pode ser alterada a qualquer momento.</p>
+          <p className="mt-3 text-xs"><a href="/politica-de-privacidade-e-cookies" className="text-[#0879c0] underline underline-offset-4">Ler a Política de Privacidade e Cookies</a></p>
           <details className="mt-4 border-t border-[#efeff1] pt-3 text-xs leading-relaxed text-[#6e6e73]">
             <summary className="w-fit cursor-pointer rounded-sm py-1 font-medium text-[#1d1d1f] outline-offset-4 focus-visible:outline-2">Como utilizamos os cookies</summary>
             <p className="mt-3"><strong className="font-medium text-[#1d1d1f]">Essenciais.</strong> Permitem funcionalidades como guardar o carrinho e manter a sessão iniciada.</p>

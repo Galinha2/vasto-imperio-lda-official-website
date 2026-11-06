@@ -1,5 +1,8 @@
 "use client";
 
+import SimulatorProductPhoto from "./SimulatorProductPhoto";
+import photoStyles from "./SimulatorProductPhoto.module.css";
+
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useLanguage } from "@/components/header/LanguageContext";
 import SimulatorDropdown from "@/components/simulador/SimulatorDropdown";
@@ -560,10 +563,13 @@ export default function SimulatorPicking({ onQuoteDataChange, adminMode = false,
 
   return (
     <section ref={drawingRef} className={adminMode ? "min-h-0 bg-transparent p-0" : "min-h-screen bg-[#f8f8fa] px-4 py-12 sm:px-6 lg:px-10 lg:py-16"}>
-      {!adminMode && <header className="mx-auto mb-9 max-w-[1800px] sm:mb-12">
-        <p className="mt-[35px] mb-3 text-xs font-semibold uppercase tracking-[0.16em] text-[#6e6e73] lg:mt-5">{english ? "Configurator · Picking shelving" : "Configurador · Estantes picking"}</p>
+      {!adminMode && <header className={photoStyles.heroHeader}>
+        <div className={photoStyles.heroCopy}>
+        <p className="mt-0 mb-3 text-xs font-semibold uppercase tracking-[0.16em] text-[#6e6e73]">{english ? "Configurator · Picking shelving" : "Configurador · Estantes picking"}</p>
         <h1 className="max-w-4xl text-4xl font-semibold leading-[1.05] tracking-[-0.045em] text-[#1d1d1f] sm:text-5xl lg:text-6xl">{english ? "Shelving made for your space." : "A sua estante, à medida do seu espaço."}</h1>
-        <p className="mt-4 max-w-2xl text-base leading-relaxed text-[#6e6e73] sm:text-lg">{english ? "Choose the dimensions and materials. See the configuration, load capacity and price estimate update in real time." : "Defina as medidas e os materiais. Veja a configuração, a capacidade e uma estimativa de preço atualizadas em tempo real."}</p>
+        <p className="order-2 pb-6 md:order-none md:pb-8 mt-0 max-w-2xl text-base leading-relaxed text-[#6e6e73] sm:text-lg">{english ? "Choose the dimensions and materials. See the configuration, load capacity and price estimate update in real time." : "Defina as medidas e os materiais. Veja a configuração, a capacidade e uma estimativa de preço atualizadas em tempo real."}</p>
+        </div>
+        <div className="self-end overflow-hidden"><SimulatorProductPhoto type={workbench ? "bancadas" : "picking"} galvanized={galvanized} english={english} hero/></div>
       </header>}
       {!adminMode && <div className="mx-auto grid max-w-[1800px] gap-5 lg:grid-cols-[minmax(360px,0.78fr)_minmax(0,1.75fr)] xl:gap-7">
         <div className="flex justify-start"><SimulatorSectionTabs group="storage" active="picking" /></div>
@@ -650,9 +656,9 @@ export default function SimulatorPicking({ onQuoteDataChange, adminMode = false,
                 <p className="col-span-2 border-t border-[#e5e5e7] pt-2 text-[#6e6e73]">{english ? "Maximum load per beam pair" : "Carga máxima por par de vigas"} <strong className="font-semibold text-(--orange)">{levelCapacity.toLocaleString(english ? "en-IE" : "pt-PT")} kg</strong></p>
               </div>
             )}
-            <AddToSimulatorCart quoteRef={orderQuoteRef} drawingRef={drawingRef} label={workbench ? "Bancadas" : "Picking"} english={english} disabled={isLengthUnavailable} />
+            <AddToSimulatorCart quoteRef={orderQuoteRef} drawingRef={drawingRef} label={workbench ? "Bancadas" : "Picking"} english={english} onOrder={!adminMode ? () => setOrderOpen(true) : undefined} disabled={isLengthUnavailable} />
             <div className={`mt-5 grid gap-3 ${adminMode ? "grid-cols-1" : "grid-cols-[1fr_auto]"}`}>
-              {!adminMode && <button type="button" disabled={isLengthUnavailable} onClick={() => setOrderOpen(true)} className="flex cursor-pointer items-center justify-center simulator-pill rounded-full bg-(--orange) px-4 py-3 text-sm font-semibold text-white shadow-sm transition hover:brightness-95 disabled:cursor-not-allowed disabled:opacity-50">{english ? "Order" : "Encomendar"}</button>}
+
               <button type="button" onClick={reset} className="cursor-pointer simulator-pill rounded-full border border-[#d2d2d7] bg-white px-4 py-3 text-sm font-semibold text-[#1d1d1f] transition hover:bg-[#f5f5f7]">{adminMode ? (english ? "Reset configuration" : "Repor configuração") : (english ? "Reset" : "Recomeçar")}</button>
             </div>
           </div>
@@ -670,6 +676,7 @@ export default function SimulatorPicking({ onQuoteDataChange, adminMode = false,
             <RackPreview workbench={workbench} modules={modules} height={height} depth={depth} levels={levelSlots} activeLevels={activeLevels} levelsForModule={levelsForModule} hasRemovedLevels={hasRemovedLevels} removeLevel={removeLevel} restoreLevels={restoreLevels} floorType={floorType} galvanized={galvanized} reinforcedBeams={reinforcedBeams} rowCount={rowCount} capacityLabel={`${english ? "Maximum load per beam pair" : "Carga máxima por par de vigas"}: ${levelCapacity.toLocaleString(english ? "en-IE" : "pt-PT")} kg`} solutions={solutions} selectedSolutionId={selectedSolutionId} onSelectSolution={setSelectedSolutionId} english={english} />
           </div>
         )}
+          {adminMode && !workbench && <SimulatorProductPhoto type="picking" galvanized={galvanized} english={english}/>}
           {adminMode && adminPanel}
         </div>
       </div>

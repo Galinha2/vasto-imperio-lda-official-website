@@ -43,3 +43,10 @@ export function cartEntryTitle(entry) {
   const label = entry.label === 'Picking' ? 'Estante picking' : entry.label;
   return `${label} - ${height}x${length}x${depth} mm`;
 }
+
+export function cartWithCurrentConfiguration(entries, current) {
+  const identity = entry => JSON.stringify([entry.simulatorType, entry.configuration, entry.items, entry.discountPercent]);
+  if (entries.some(entry => identity(entry) === identity(current))) return {entries, added:false};
+  if (entries.length >= CART_LIMIT) throw new Error(`Pode juntar até ${CART_LIMIT} configurações por pedido.`);
+  return {entries:[...entries,current],added:true};
+}

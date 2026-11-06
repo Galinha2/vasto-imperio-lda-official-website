@@ -6,6 +6,7 @@ import contenten from "@/assets/contenten.json";
 import PageSelection from "./PageSelection";
 import PageSelectionMobile from "./PageSelectionMobile";
 import { useLanguage } from "./LanguageContext";
+import { SimulatorHeaderCart } from "@/components/simulador/SimulatorCart";
 import LanguageSelection from "./LanguageSelection";
 import HamburgerMenu from "./HamburgerMenu";
 import { useState, useEffect, useRef } from "react";
@@ -23,7 +24,10 @@ export default function Header() {
   useEffect(() => {
     lastScrollY.current = window.scrollY;
 
+    let revealUntil = 0;
+    const revealCart = () => { revealUntil = Date.now() + 6500; setShowHeader(true); };
     const controlHeader = () => {
+      if (Date.now() < revealUntil) { setShowHeader(true); lastScrollY.current = window.scrollY; return; }
       const isMobile = window.innerWidth < 768;
       if (!isMobile) {
         setShowHeader(true);
@@ -39,9 +43,11 @@ export default function Header() {
       lastScrollY.current = window.scrollY;
     };
 
+    window.addEventListener("vasto:cart-added", revealCart);
     window.addEventListener("scroll", controlHeader);
     window.addEventListener("resize", controlHeader);
     return () => {
+      window.removeEventListener("vasto:cart-added", revealCart);
       window.removeEventListener("scroll", controlHeader);
       window.removeEventListener("resize", controlHeader);
     };
@@ -71,7 +77,8 @@ export default function Header() {
             className="h-12 w-12 object-contain sm:h-[52px] sm:w-[52px]"
           />
         </Link>
-        <div className="flex items-center">
+        <div className="ml-auto flex items-center justify-end gap-2">
+          <div className="flex items-center">
           {/* Menu Desktop */}
           <div className="hidden md:flex">
             <PageSelection />
@@ -81,9 +88,10 @@ export default function Header() {
             <PageSelectionMobile isOpen={isOpen} setIsOpen={setIsOpen} />
           </div>
         </div>
-        <div className="flex gap-2 md:hidden">
-          <LanguageSelection />
-          <HamburgerMenu isOpen={isOpen} setIsOpen={setIsOpen} />
+        <div className="flex shrink-0 items-center gap-2">
+          <SimulatorHeaderCart english={language === "en"}/>
+          <div className="flex items-center gap-2 md:hidden"><LanguageSelection /><HamburgerMenu isOpen={isOpen} setIsOpen={setIsOpen} /></div>
+        </div>
         </div>
       </div>
     </div>

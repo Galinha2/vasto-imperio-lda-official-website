@@ -1,3 +1,4 @@
+import {saveChatImage,removeChatImages} from "./chat-images.mjs";
 import { createHash, randomBytes, randomUUID } from 'node:crypto';
 import { mkdir, readFile, writeFile, readdir, rename, unlink } from 'node:fs/promises';
 import path from 'node:path';
@@ -10,7 +11,7 @@ const dir = () => path.resolve(process.env.ADMIN_DATA_DIR || '.admin-data', 'cha
 export async function chatSetupStatus() {
   try {
     if (storageMode() !== 'cloud') return { ready: true, local: true };
-    for (const [table, fields] of [['site_chat_threads', 'id'], ['site_chat_messages', 'id,admin_read_at'], ['site_chat_presence', 'id']]) {
+    for (const [table, fields] of [['site_chat_threads', 'id'], ['site_chat_messages', 'id,admin_read_at,image'], ['site_chat_presence', 'id']]) {
       const response = await fetch(`${process.env.SUPABASE_URL.replace(/\/$/, '')}/rest/v1/${table}?select=${fields}&limit=0`, {
         cache: 'no-store', signal: AbortSignal.timeout(8000),
         headers: { apikey: process.env.SUPABASE_SERVICE_ROLE_KEY, Authorization: `Bearer ${process.env.SUPABASE_SERVICE_ROLE_KEY}` },
@@ -73,14 +74,16 @@ export async function messages(id) {
   if (!/^[a-f0-9]{64}$/.test(id || '')) throw fail('Conversa inválida.', 400);
   return (await rows('site_chat_messages', `thread_id=eq.${id}&order=created_at.asc&limit=500`)).filter(m => m.thread_id === id).sort((a,b) => a.created_at.localeCompare(b.created_at));
 }
-export async function sendMessage(id, text, sender) {
+export async function sendMessage(id, text, sender, imageBytes = null) {
   const body = cleanMessage(text);
   const previous = await messages(id);
   if (previous.length >= 500) throw fail('Esta conversa atingiu o limite de mensagens. Contacte-nos por telefone.', 429);
   const last = previous.filter(m => m.sender === sender).at(-1);
   if (last && Date.now() - Date.parse(last.created_at) < 1500) throw fail('Aguarde um momento antes de enviar outra mensagem.', 429);
   const message = { id: randomUUID(), thread_id: id, body, sender, created_at: new Date().toISOString() };
-  await insert('site_chat_messages', message);
+  if (imageBytes) message.image = await saveChatImage(imageBytes);
+  try { await insert('site_chat_messages', message); }
+  catch (error) { if (message.image) await removeChatImages([message.image.path]).catch(() => {}); throw error; }
   return message;
 }
 export async function listThreads() {
@@ -120,6 +123,8 @@ export async function incomingMessages(since) {
 
 export async function deleteThread(id) {
   if (!/^[a-f0-9]{64}$/.test(id || '')) throw fail('Conversa inválida.', 400);
+  const attachments = (await messages(id)).filter(message => message.image).map(message => message.image.path);
+  await removeChatImages(attachments);
   if (storageMode() === 'cloud') {
     // Foreign keys remove messages and presence atomically with the conversation.
     await cloud(`site_chat_threads?id=eq.${id}`, { method: 'DELETE', headers: { Prefer: 'return=minimal' } });

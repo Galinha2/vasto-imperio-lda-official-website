@@ -42,3 +42,10 @@ grant update on public.site_chat_messages to service_role;
 
 -- Atualizar a estrutura exposta pela API após criar as tabelas ou colunas.
 notify pgrst, 'reload schema';
+
+-- Imagens privadas: apenas metadados na conversa; ficheiros no Storage.
+alter table public.site_chat_messages add column if not exists image jsonb;
+insert into storage.buckets (id,name,public,file_size_limit,allowed_mime_types)
+values ('chat-images','chat-images',false,4194304,array['image/webp'])
+on conflict (id) do update set public=false,file_size_limit=4194304,allowed_mime_types=array['image/webp'];
+notify pgrst, 'reload schema';

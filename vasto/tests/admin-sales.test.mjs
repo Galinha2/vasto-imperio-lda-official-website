@@ -1,3 +1,6 @@
+import sharp from "sharp";
+import {optimizeImage} from "../lib/optimize-image.mjs";
+import {lineDiscount,lineNet} from "../lib/quote-discounts.mjs";
 import { quoteFilename } from "../lib/quote-filenames.mjs";
 import test from "node:test";
 import { resolveCustomerName } from "../lib/customer-identity.mjs";
@@ -138,6 +141,7 @@ test("actual shared PDF generator round trip, including discount and delivery", 
     getAttribute() { return this._src; }
   }
   const source = (await readFile(path.join(root, "lib/generateBudgetPdf.js"), "utf8"))
+    .replace('import { lineDiscount, lineNet } from "./quote-discounts.mjs";', "")
     .replace('import jsPDF from "jspdf";', "")
     .replace('import { quoteFilename } from "./quote-filenames.mjs";', "")
     .replace('import { resolveCustomerName } from "./customer-identity.mjs";', "")
@@ -145,7 +149,7 @@ test("actual shared PDF generator round trip, including discount and delivery", 
     .replace("export default async function", "async function");
   let generatedDocument;
   function RecordingPdf(options) { generatedDocument = new jsPDF(options); return generatedDocument; }
-  const generate = new Function("jsPDF", "autoTable", "window", "resolveCustomerName", "quoteFilename", `${source}; return generateBudgetPdf;`)(RecordingPdf, autoTable, { Image: LocalImage }, resolveCustomerName, quoteFilename);
+  const generate = new Function("jsPDF", "autoTable", "window", "resolveCustomerName", "quoteFilename", "lineDiscount", "lineNet", `${source}; return generateBudgetPdf;`)(RecordingPdf, autoTable, { Image: LocalImage }, resolveCustomerName, quoteFilename, lineDiscount, lineNet);
   try {
     const blob = await generate({ telefoneCliente: "+351 928348117", quoteNumber: "23123", linhas: [{ produto: "Bastidor", refCompleta: "3.1", preco: 100, unidades: 2, total: 200, isPortes: false }, { produto: "Portes", preco: 20, unidades: 1, total: 20, isPortes: true }], descontoSelecionado: 10, dadosEmpresa: { nome: "João & Companhia", nif: "123456789", codigoPostal: "2475-014 Benedita" }, nif: "123456789", nomeClienteManual: "", additionalDetails: "Configuração técnica que não deve aparecer no PDF", returnBlob: true, source: "simulador" });
     const record = await parseSalePdf(Buffer.from(await blob.arrayBuffer()), "gerador-real.pdf");
@@ -233,9 +237,9 @@ test("records and original PDFs persist, identical content cannot be registered 
   assert.equal(migrated.deliveryStatus, "entregue");
   await assert.rejects(getPdf("../outside"), { status: 400 });
 
-  const png = Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]);
+  const png = await sharp({create:{width:16,height:16,channels:3,background:"white"}}).png().toBuffer();
   const image = await addSaleImage(record.id, "estante.png", "image/png", png);
-  assert.deepEqual((await getSaleImage(record.id, image.id)).buffer, png);
+  assert.deepEqual((await getSaleImage(record.id, image.id)).buffer, (await optimizeImage(png)).buffer);
   await assert.rejects(addSaleImage(record.id, "imagem.png", "image/png", Buffer.from("not an image")), { status: 400 });
   await assert.rejects(addSaleImage(record.id, "imagem.png", "__proto__", png), { status: 400 });
   await deleteSaleImage(record.id, image.id);
@@ -372,9 +376,9 @@ test("Supabase adapter stores private PDFs, lists records, changes status and re
     assert.equal((await updateSaleWorkflow(record.id, { status: "confirmada" })).paymentStatus, "entrada_paga");
     assert.deepEqual((await getPdf(record.id)).buffer, buffer);
     await assert.rejects(createSale(record, buffer), { status: 409 });
-    const png = Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]);
+    const png = await sharp({create:{width:16,height:16,channels:3,background:"white"}}).png().toBuffer();
     const image = await addSaleImage(record.id, "rack.png", "image/png", png);
-    assert.deepEqual((await getSaleImage(record.id, image.id)).buffer, png);
+    assert.deepEqual((await getSaleImage(record.id, image.id)).buffer, (await optimizeImage(png)).buffer);
     await deleteSale(record.id);
     assert.equal((await listSales()).length, 0);
     assert.equal(objects.size, 0);
@@ -407,7 +411,7 @@ test("Supabase failures report actionable setup guidance without logging credent
 
 test("public simulator orders are saved as confirmed sales with their image and order details", async () => {
   const pdf = pdfWithMetadata({ ...metadata, customerName: "Encomenda pública", issuedAt: "2026-10-13" });
-  const image = Buffer.from([0xff, 0xd8, 0xff]);
+  const image = await sharp({create:{width:16,height:16,channels:3,background:"white"}}).jpeg().toBuffer();
   const orderDetails = { email: "cliente@example.com", artigos: [{ produto: "Rack", unidades: 1, total: 180 }] };
   assert.equal(await saveSimulatorOrderToSales({
     pdfBuffer: pdf,
@@ -424,7 +428,7 @@ test("public simulator orders are saved as confirmed sales with their image and 
   assert.deepEqual(sale.orderDetails, orderDetails);
   assert.equal(sale.entryOrigin, "cliente");
   assert.equal(sale.images.length, 1);
-  assert.deepEqual((await getSaleImage(sale.id, sale.images[0].id)).buffer, image);
+  assert.deepEqual((await getSaleImage(sale.id, sale.images[0].id)).buffer, (await optimizeImage(image)).buffer);
   await deleteSale(sale.id);
 });
 
@@ -574,7 +578,7 @@ test("joining estimates preserves discounted totals and originals, and undo rest
   const lines=combinedQuoteLines([{lines:targetLines,discount:20},{lines:sourceLines,discount:10}]);
   assert.equal(lines.reduce((sum,line)=>sum+line.total,0),420);
   const combinedPdf=pdfWithMetadata({...metadata,customerName:"Junção Teste",subtotal:420,vat:96.6,total:516.6,quoteLines:lines,discountPercent:0});
-  const image=Buffer.from([255,216,255]);
+  const image=await sharp({create:{width:16,height:16,channels:3,background:"white"}}).jpeg().toBuffer();
   const sales=await mergeSaleQuotes(source.id,target.id,{source:source.updatedAt,target:target.updatedAt},combinedPdf,image);
   const merged=sales.find((sale)=>sale.mergedQuoteIds?.includes(source.id));
   assert.ok(merged);
@@ -654,10 +658,10 @@ test('successful email tracking persists without changing quote amounts or workf
 test("deleting a quote still succeeds when its PDF and an attachment are already missing", async () => {
   const record = { ...metadata, id: "d".repeat(64), fileName: "missing-files.pdf", status: "em_preparacao" };
   await createSale(record, pdfWithMetadata());
-  const png = Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]);
+  const png = await sharp({create:{width:16,height:16,channels:3,background:"white"}}).png().toBuffer();
   const image = await addSaleImage(record.id, "imagem.png", "image/png", png);
   await unlink(path.join(process.env.ADMIN_DATA_DIR, `${record.id}.pdf`));
-  await unlink(path.join(process.env.ADMIN_DATA_DIR, `${record.id}.${image.id}.png`));
+  await unlink(path.join(process.env.ADMIN_DATA_DIR, `${record.id}.${image.id}.${image.contentType === "image/webp" ? "webp" : "png"}`));
   await deleteSale(record.id);
   assert.equal(await getSale(record.id), null);
 });

@@ -9,7 +9,7 @@ const errorResponse = error => NextResponse.json({ error: error.status ? error.m
 export async function GET(request) {
   try {
     const thread = await visitorThread(request.cookies.get(CHAT_COOKIE)?.value);
-    return NextResponse.json({ thread: thread ? { name: thread.name } : null, messages: thread ? await messages(thread.id) : [] }, { headers: { 'Cache-Control': 'no-store' } });
+    return NextResponse.json({ thread: thread ? { id: thread.id, name: thread.name } : null, messages: thread ? await messages(thread.id) : [] }, { headers: { 'Cache-Control': 'no-store' } });
   } catch (error) { return errorResponse(error); }
 }
 export async function POST(request) {
@@ -36,7 +36,7 @@ export async function POST(request) {
     const message = await sendMessage(thread.id, body.message, 'visitor');
     await setPresence(thread.id, true);
     await Promise.allSettled([notifyAdminPush({ threadId: thread.id, id: message.id, body: `${thread.name}: ${message.body}` }), ...(token ? [deliverChatEmail({ thread, message, kind: 'started' })] : [])]);
-    const response = NextResponse.json({ thread: { name: thread.name }, messages: await messages(thread.id) }, { headers: { 'Cache-Control': 'no-store' } });
+    const response = NextResponse.json({ thread: { id: thread.id, name: thread.name }, messages: await messages(thread.id) }, { headers: { 'Cache-Control': 'no-store' } });
     if (token) response.cookies.set(CHAT_COOKIE, token, { httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: 'strict', path: '/api/chat', maxAge: 30 * 86400 });
     return response;
   } catch (error) { return errorResponse(error); }

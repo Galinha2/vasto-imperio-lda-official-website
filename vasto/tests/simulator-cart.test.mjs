@@ -54,3 +54,15 @@ test('título apresenta altura, comprimento real da fila e profundidade em milí
  assert.equal(cartEntryTitle({...example,label:'Planeamento Picking'}),'Planeamento Picking');
  assert.equal(cartEntryTitle({...entry,details:''}),'Picking');
 });
+
+test('ordering includes the saved cart and current configuration exactly once',async()=>{
+ const {cartWithCurrentConfiguration,cartQuote}=await import('../lib/simulator-cart.mjs');
+ const first={id:'rack',label:'Racks',simulatorType:'racks',configuration:{height:4000},details:'Rack',quantity:2,discountPercent:25,items:[{produto:'Viga',preco:100,unidades:1,total:100}]};
+ const current={...first,id:'picking',label:'Picking',simulatorType:'picking',configuration:{height:2000},quantity:1,discountPercent:15};
+ const merged=cartWithCurrentConfiguration([first],current);
+ assert.equal(merged.added,true);assert.equal(merged.entries.length,2);assert.equal(cartQuote(merged.entries).total,235);assert.equal(first.quantity,2);
+ const repeated=cartWithCurrentConfiguration(merged.entries,{...current,id:'retry',quantity:9});
+ assert.equal(repeated.added,false);assert.equal(repeated.entries.length,2);assert.equal(repeated.entries[1].quantity,1);
+ const full=Array.from({length:10},(_,i)=>({...first,id:String(i),configuration:{height:4000+i}}));
+ assert.throws(()=>cartWithCurrentConfiguration(full,current));assert.equal(cartWithCurrentConfiguration(full,{...full[0],id:'retry'}).added,false);
+});

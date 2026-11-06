@@ -3,6 +3,9 @@ import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import styles from './Chat.module.css';
+import ChatImage from './ChatImage';
+import {prepareChatImage} from '@/lib/prepare-chat-image.mjs';
+import {IoImageOutline} from 'react-icons/io5';
 import { useAdminChatUnread } from '@/components/admin/AdminChatUnread';
 import { IoChatbubbleOutline, IoArrowUp, IoChevronBack, IoTrashOutline } from 'react-icons/io5';
 export default function ChatInbox() {
@@ -98,6 +101,22 @@ export default function ChatInbox() {
     return () => document.removeEventListener('visibilitychange', read);
   }, [selected, messages, markRead]);
   useEffect(() => { end.current?.scrollIntoView({ block: 'nearest' }); }, [messages.length]);
+  async function sendImage(event) {
+    const file = event.target.files?.[0]; event.target.value = '';
+    if (!file || busy) return;
+    if (!selected) return;
+    const id = selected.id;
+    setBusy(true); setError('');
+    try {
+      const image = await prepareChatImage(file);
+      const form = new FormData(); form.append('image', image, 'imagem.webp');
+      form.append('threadId', id);
+      const response = await fetch('/api/chat/images', {method:'POST', body:form});
+      const data = await response.json(); if (!response.ok) throw new Error(data.error);
+      if (selection.current === id) { setMessages(data.messages); setDelivery('Imagem enviada. Disponível durante 7 dias.'); }
+    } catch (error) { setError(error.message || 'Não foi possível enviar a imagem.'); }
+    finally { setBusy(false); }
+  }
   async function send(event) {
     event.preventDefault(); if (busy || !selected) return;
     const id = selected.id;
@@ -141,8 +160,8 @@ export default function ChatInbox() {
       </aside>
       {selected ? <section className={styles.conversation}>
         <header className={styles.conversationHeader}><button className={styles.back} aria-label="Voltar às conversas" onClick={backToList}><IoChevronBack size={20} /></button><span className={styles.avatar} aria-hidden="true">{selected.name.slice(0,1).toUpperCase()}</span><div><h2>{selected.name}</h2><p>{selected.contact || 'Visitante do site'}</p></div><button type="button" className={styles.deleteChat} onClick={removeConversation} disabled={busy} aria-label="Apagar conversa" title="Apagar conversa"><IoTrashOutline size={18} /><span>Apagar</span></button></header>
-        <div role="log" aria-live="polite" aria-label="Mensagens" className={styles.messages}>{messages.map(item => <div key={item.id} className={`${styles.bubble} ${item.sender === 'staff' ? styles.mine : styles.theirs}`}><small>{item.sender === 'staff' ? 'Equipa Vasto Império' : selected.name}</small><p>{item.body}</p><time>{new Date(item.created_at).toLocaleString('pt-PT')}</time></div>)}<div ref={end} /></div>
-        <form className={styles.form} onSubmit={send}>{error && <p role="alert" className={styles.error}>{error}</p>}<label htmlFor="staff-message" className={styles.messageLabel}>Responder a {selected.name}</label><div className={styles.compose}><textarea id="staff-message" required maxLength={2000} rows={1} value={message} onChange={e => { setMessage(e.target.value); e.target.style.height = 'auto'; e.target.style.height = `${Math.min(e.target.scrollHeight, 100)}px`; }} placeholder="Escreva uma mensagem…" /><button disabled={busy || !message.trim()} aria-label={busy ? 'A enviar mensagem' : 'Enviar mensagem'}><IoArrowUp size={20} /></button></div>{delivery && <p role="status" className={styles.delivery}>{delivery}</p>}</form>
+        <div role="log" aria-live="polite" aria-label="Mensagens" className={styles.messages}>{messages.map(item => <div key={item.id} className={`${styles.bubble} ${item.sender === 'staff' ? styles.mine : styles.theirs}`}><small>{item.sender === 'staff' ? 'Equipa Vasto Império' : selected.name}</small>{item.image ? <ChatImage image={item.image} threadId={selected.id} messageId={item.id}/> : <p>{item.body}</p>}<time>{new Date(item.created_at).toLocaleString('pt-PT')}</time></div>)}<div ref={end} /></div>
+        <form className={styles.form} onSubmit={send}>{error && <p role="alert" className={styles.error}>{error}</p>}<label htmlFor="staff-message" className={styles.messageLabel}>Responder a {selected.name}</label><div className={styles.compose}><label className={`${styles.attachImage} ${busy ? styles.attachBusy : ''}`} title="Enviar imagem" aria-label="Enviar imagem"><IoImageOutline size={23}/><input id="staff-chat-image" type="file" accept="image/jpeg,image/png,image/webp" disabled={busy} onChange={sendImage}/><span className={styles.srOnly}>Enviar imagem</span></label><textarea id="staff-message" required maxLength={2000} rows={1} value={message} onChange={e => { setMessage(e.target.value); e.target.style.height = 'auto'; e.target.style.height = `${Math.min(e.target.scrollHeight, 100)}px`; }} placeholder="Escreva uma mensagem…" /><button disabled={busy || !message.trim()} aria-label={busy ? 'A enviar mensagem' : 'Enviar mensagem'}><IoArrowUp size={20} /></button></div>{delivery && <p role="status" className={styles.delivery}>{delivery}</p>}</form>
       </section> : <div className={styles.empty}><span className={styles.emptyIcon}><IoChatbubbleOutline size={28} /></span><h2>Uma boa conversa começa aqui.</h2><p>Selecione uma conversa para acompanhar o pedido e responder ao cliente.</p></div>}
     </div>
   </div>;

@@ -1,5 +1,6 @@
 "use client";
 
+import styles from "./SimulatorOrderModal.module.css";
 import { useEffect, useState } from "react";
 import { trackSimulatorOrder } from "@/lib/google-ads.mjs";
 import { quoteFilename } from "@/lib/quote-filenames.mjs";
@@ -150,10 +151,10 @@ export default function SimulatorOrderModal({ open, onClose, total, details, ite
   };
 
   return (
-    <div className="fixed inset-0 z-[1000] flex items-stretch justify-center overflow-y-auto bg-[#1d1d1f]/45 p-0 backdrop-blur-sm sm:items-center sm:p-6">
-      <section role="dialog" aria-modal="true" aria-labelledby="simulator-order-title" className="site-section site-glass min-h-[100dvh] w-full max-w-none overflow-y-auto rounded-none border-0 bg-white p-5 shadow-none sm:my-auto sm:min-h-0 sm:max-h-[min(92vh,900px)] sm:max-w-4xl sm:rounded-[30px] sm:border sm:border-white/70 sm:p-8 sm:shadow-[0_24px_90px_rgba(0,0,0,0.2)] lg:flex lg:max-h-[96dvh] lg:flex-col lg:overflow-hidden">
+    <div className={styles.overlay}>
+      <section role="dialog" aria-modal="true" aria-labelledby="simulator-order-title" className={styles.panel}>
         {sent ? (
-          <div className="py-8 text-center sm:py-12">
+          <div className={styles.success}>
             <span className="mx-auto grid h-14 w-14 place-items-center rounded-full bg-emerald-50 text-2xl text-emerald-600" aria-hidden="true">✓</span>
             <h2 id="simulator-order-title" className="mt-5 text-2xl font-semibold tracking-[-0.04em] text-[#1d1d1f]">{text.success}</h2>
             <p className="mt-2 text-sm text-[#6e6e73]">{text.successText}</p>
@@ -161,7 +162,7 @@ export default function SimulatorOrderModal({ open, onClose, total, details, ite
           </div>
         ) : (
           <>
-            <div className="mb-6 flex shrink-0 items-start justify-between gap-4 lg:mb-4">
+            <div className={styles.header}>
               <div>
                 <p className="text-xs font-semibold uppercase tracking-[0.14em] text-(--orange)">{english ? "Vasto Império" : "Vasto Império"}</p>
                 <h2 id="simulator-order-title" className="mt-2 text-2xl font-semibold tracking-[-0.045em] text-[#1d1d1f] sm:text-3xl">{text.title}</h2>
@@ -169,60 +170,64 @@ export default function SimulatorOrderModal({ open, onClose, total, details, ite
               </div>
               <button type="button" aria-label={text.cancel} onClick={onClose} className="grid h-10 w-10 shrink-0 cursor-pointer place-items-center rounded-full bg-[#f5f5f7] text-lg text-[#6e6e73] transition hover:bg-[#e9e9ed]">×</button>
             </div>
-            <form onSubmit={submit} className="lg:flex lg:min-h-0 lg:flex-1 lg:flex-col">
-              <div className="grid gap-5 lg:min-h-0 lg:flex-1 lg:grid-cols-[1.45fr_0.8fr] lg:items-start lg:gap-4">
-                <div className="space-y-5 lg:space-y-3">
-                  <section className="site-section site-glass rounded-[24px] border border-[#e8e8ed] bg-white p-4 sm:p-5 lg:p-4">
+            <form onSubmit={submit} className={styles.form}>
+              <div className={styles.layout}>
+                <div className={styles.fields}>
+                  <section className={styles.card}>
                     <div className="mb-4 lg:mb-2">
                       <h3 className="text-base font-semibold tracking-[-0.02em] text-[#1d1d1f]">{english ? "Customer details" : "Dados do cliente"}</h3>
                       <p className="mt-1 text-xs text-[#86868b]">{english ? "Your details for the order and invoice." : "Dados para o pedido e para a faturação."}</p>
                     </div>
                     <div className="grid gap-3 sm:grid-cols-2 lg:gap-x-3 lg:gap-y-2">
-                      <label className="space-y-1 text-sm font-medium text-[#424245]">{text.name}<input required autoComplete="name" value={form.nome} onChange={(event) => setField("nome", event.target.value)} className="h-12 w-full rounded-full border border-[#d2d2d7] bg-[#fbfbfd] px-4 text-[#1d1d1f] outline-none transition focus:border-(--blue) focus:ring-4 focus:ring-[#0879c0]/10 lg:h-10" /></label>
-                      <label className="space-y-1 text-sm font-medium text-[#424245]">{text.nif}<input required inputMode="numeric" maxLength={9} value={form.nif} onChange={(event) => setField("nif", event.target.value.replace(/\D/g, "").slice(0, 9))} className="h-12 w-full rounded-full border border-[#d2d2d7] bg-[#fbfbfd] px-4 text-[#1d1d1f] outline-none transition focus:border-(--blue) focus:ring-4 focus:ring-[#0879c0]/10 lg:h-10" /></label>
-                      <label className="space-y-1 text-sm font-medium text-[#424245]">{text.phone}<input required type="tel" autoComplete="tel" value={form.telefone} onChange={(event) => setField("telefone", event.target.value)} className="h-12 w-full rounded-full border border-[#d2d2d7] bg-[#fbfbfd] px-4 text-[#1d1d1f] outline-none transition focus:border-(--blue) focus:ring-4 focus:ring-[#0879c0]/10 lg:h-10" /></label>
-                      <label className="space-y-1 text-sm font-medium text-[#424245]">{text.email}<input required type="email" autoComplete="email" value={form.email} onChange={(event) => setField("email", event.target.value)} className="h-12 w-full rounded-full border border-[#d2d2d7] bg-[#fbfbfd] px-4 text-[#1d1d1f] outline-none transition focus:border-(--blue) focus:ring-4 focus:ring-[#0879c0]/10 lg:h-10" /></label>
+                      <label className="space-y-1 text-sm font-medium text-[#424245]">{text.name}<input required autoComplete="name" value={form.nome} onChange={(event) => setField("nome", event.target.value)} className={styles.input} /></label>
+                      <label className="space-y-1 text-sm font-medium text-[#424245]">{text.nif}<input required inputMode="numeric" maxLength={9} value={form.nif} onChange={(event) => setField("nif", event.target.value.replace(/\D/g, "").slice(0, 9))} className={styles.input} /></label>
+                      <label className="space-y-1 text-sm font-medium text-[#424245]">{text.phone}<input required type="tel" autoComplete="tel" value={form.telefone} onChange={(event) => setField("telefone", event.target.value)} className={styles.input} /></label>
+                      <label className="space-y-1 text-sm font-medium text-[#424245]">{text.email}<input required type="email" autoComplete="email" value={form.email} onChange={(event) => setField("email", event.target.value)} className={styles.input} /></label>
                     </div>
                   </section>
 
-                  <section className="site-section site-glass rounded-[24px] border border-[#e8e8ed] bg-white p-4 sm:p-5 lg:p-4">
+                  <section className={styles.card}>
                     <div className="mb-4 lg:mb-2">
                       <h3 className="text-base font-semibold tracking-[-0.02em] text-[#1d1d1f]">{english ? "Addresses" : "Moradas"}</h3>
                       <p className="mt-1 text-xs text-[#86868b]">{english ? "Tell us where to invoice and deliver the order." : "Indica onde faturar e entregar a encomenda."}</p>
                     </div>
                     <div className="space-y-4 lg:space-y-2">
-                      <label className="block space-y-1 text-sm font-medium text-[#424245]">{text.fiscal}<input required autoComplete="billing street-address" value={form.moradaFiscal} onChange={(event) => setField("moradaFiscal", event.target.value)} className="h-12 w-full rounded-full border border-[#d2d2d7] bg-[#fbfbfd] px-4 text-[#1d1d1f] outline-none transition focus:border-(--blue) focus:ring-4 focus:ring-[#0879c0]/10 lg:h-10" /></label>
+                      <label className="block space-y-1 text-sm font-medium text-[#424245]">{text.fiscal}<input required autoComplete="billing street-address" value={form.moradaFiscal} onChange={(event) => setField("moradaFiscal", event.target.value)} className={styles.input} /></label>
                       <label className="flex cursor-pointer items-center gap-3 rounded-2xl bg-[#f5f5f7] px-4 py-3 text-sm text-[#424245]"><input type="checkbox" checked={form.moradaEnvioIgual} onChange={(event) => setField("moradaEnvioIgual", event.target.checked)} className="h-4 w-4 accent-[#0879c0]" />{text.same}</label>
-                      {!form.moradaEnvioIgual && <label className="block space-y-1 text-sm font-medium text-[#424245]">{text.shipping}<input required autoComplete="shipping street-address" value={form.moradaEnvio} onChange={(event) => setField("moradaEnvio", event.target.value)} className="h-12 w-full rounded-full border border-[#d2d2d7] bg-[#fbfbfd] px-4 text-[#1d1d1f] outline-none transition focus:border-(--blue) focus:ring-4 focus:ring-[#0879c0]/10 lg:h-10" /></label>}
+                      {!form.moradaEnvioIgual && <label className="block space-y-1 text-sm font-medium text-[#424245]">{text.shipping}<input required autoComplete="shipping street-address" value={form.moradaEnvio} onChange={(event) => setField("moradaEnvio", event.target.value)} className={styles.input} /></label>}
                     </div>
                   </section>
 
                   <section className={`grid gap-4 ${equipment ? "" : "sm:grid-cols-2"}`}>
-                    {!equipment && <fieldset className="site-glass rounded-[24px] border border-[#e8e8ed] bg-white p-4 lg:p-3">
+                    {!equipment && <fieldset className={styles.assembly}>
                       <legend className="px-1 text-sm font-semibold text-[#424245]">{text.assembly}</legend>
                       <div className="mt-2 flex rounded-full bg-[#f5f5f7] p-1">
                         {[false, true].map((value) => <button key={String(value)} type="button" aria-pressed={form.montagem === value} onClick={() => setField("montagem", value)} className={`h-10 flex-1 cursor-pointer rounded-full px-4 text-sm font-semibold transition ${form.montagem === value ? "bg-white text-[#1d1d1f] shadow-sm" : "text-[#6e6e73] hover:text-[#1d1d1f]"}`}>{value ? text.yes : text.no}</button>)}
                       </div>
                     </fieldset>}
-                    <label className="block space-y-1 text-sm font-medium text-[#424245]">{text.notes}<textarea rows={2} value={form.observacoes} onChange={(event) => setField("observacoes", event.target.value)} placeholder={text.notesPlaceholder} className="site-glass min-h-[72px] w-full resize-y rounded-[20px] border border-[#d2d2d7] bg-[#fbfbfd] px-4 py-3 text-[#1d1d1f] outline-none transition placeholder:text-[#86868b] focus:border-(--blue) focus:ring-4 focus:ring-[#0879c0]/10 lg:min-h-[64px] lg:py-2" /></label>
+                    <label className="block space-y-1 text-sm font-medium text-[#424245]">{text.notes}<textarea rows={2} value={form.observacoes} onChange={(event) => setField("observacoes", event.target.value)} placeholder={text.notesPlaceholder} className={styles.notes} /></label>
                   </section>
                 </div>
 
-                <aside className="rounded-[24px] bg-[#f5f5f7] p-5 sm:p-6 lg:sticky lg:top-0">
+                <aside className={styles.summary}>
                   <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[#6e6e73]">{english ? "Order summary" : "Resumo da encomenda"}</p>
+                  <div className={styles.summaryBadge}>{english?'Prepared for you':'Preparado à sua medida'}</div>
+                  {cartOrder && <p className={styles.summaryCount}>{cartConfigurations?.length || 0} {english?'configurations in your request':'configurações no seu pedido'}</p>}
                   {equipment && <p className="mt-3 text-sm leading-relaxed text-[#424245]">{details}</p>}
                   <div className="mt-5 border-y border-[#dedee3] py-5">
                     <p className="text-sm font-medium text-[#424245]">{text.final}</p>
                     <p className="mt-2 text-3xl font-semibold tracking-[-0.05em] text-(--orange)">{currency.format(total || 0)}</p>
                     <p className="mt-2 text-xs leading-relaxed text-[#6e6e73]">{text.vat}</p>
                   </div>
+                  <div className={styles.vatRow}><span>{english?'Total including VAT (23%)':'Total com IVA (23%)'}</span><strong>{currency.format((total || 0) * 1.23)}</strong></div>
                   <p className="mt-4 text-xs leading-relaxed text-[#6e6e73]">{equipment
                     ? (english ? "The item list, equipment image and quotation will be sent to Vasto Império with your request." : "A lista de artigos, a imagem do equipamento e o orçamento seguem para a Vasto Império juntamente com o pedido.")
                     : (english ? "The technical specification and drawing will be sent to Vasto Império with your request." : "A lista técnica e o desenho seguem para a Vasto Império juntamente com o pedido.")}</p>
                 </aside>
               </div>
-              {error && <p role="alert" className="mt-5 rounded-2xl bg-red-50 px-4 py-3 text-sm text-red-700">{error}</p>}
-              <div className="mt-6 flex shrink-0 flex-col-reverse gap-3 border-t border-[#e8e8ed] pt-5 sm:flex-row sm:justify-end lg:mt-4 lg:pt-3">
+              {error && <p role="alert" className={styles.error}>{error}</p>}
+              <div className={styles.actions}>
+                <p className={styles.privacy}>{english?'Your details are used to handle this request.':'Os seus dados são utilizados para acompanhar este pedido.'} <a href="/politica-de-privacidade-e-cookies" target="_blank" rel="noopener noreferrer">{english?'Privacy policy':'Política de Privacidade'}</a></p>
                 <button type="button" disabled={submitting} onClick={onClose} className="h-12 cursor-pointer rounded-full border border-[#d2d2d7] bg-white px-6 text-sm font-semibold text-[#424245] transition hover:bg-[#f5f5f7] disabled:opacity-50">{text.cancel}</button>
                 <button type="submit" disabled={submitting} className="h-12 cursor-pointer rounded-full bg-(--orange) px-7 text-sm font-semibold text-white shadow-sm transition hover:-translate-y-0.5 hover:brightness-95 disabled:cursor-wait disabled:opacity-60">{submitting ? text.sending : text.submit}</button>
               </div>

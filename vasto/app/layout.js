@@ -81,7 +81,7 @@ export const metadata = {
     icon: [
       { url: "/icon.png", type: "image/png", sizes: "512x512" },
     ],
-    apple: "/apple-touch-icon.png",
+    apple: [{ url: "/apple-touch-icon.png?v=white-2", sizes: "180x180", type: "image/png" }],
   },
   openGraph: {
     title: "Estantes Metálicas e Racks em Viseu e Portugal | Vasto Império",

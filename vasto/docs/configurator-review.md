@@ -9,7 +9,7 @@
 - Local PDF export for each configuration and the combined cart. Contains drawing, requested/effective dimensions, components/quantities, net and gross estimate, conditions and an informational configuration fingerprint. Does not reserve an official quote number or make a network request to create an order.
 - Actions now use add-to-request and proposal wording, including the final submission disclaimer. Existing cart/current-configuration merge behavior is preserved.
 - General quote form has installation location and assembly choice, sent in the message. Existing photo/PDF attachments remain; client and server agree on 3 files and a 3 MB aggregate limit, below the existing hosting request limit.
-- Removed unsupported NP 1116 certification wording from lockers in both languages. No assertion of noncompliance is made.
+- NP 1116 certification wording is retained for lockers in both languages, as explicitly confirmed by the company representative.
 - Permanent redirects from the three Portuguese product duplicates to their existing landing pages. Canonicals and reciprocal PT/EN alternates use those destinations. Sitemap regenerated without redirected duplicates.
 - Product JSON-LD uses actual page descriptions and images, without fabricated prices, ratings or availability.
 

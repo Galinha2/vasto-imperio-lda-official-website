@@ -1,5 +1,5 @@
 "use client";
-import ConfigurationReview from "./ConfigurationReview";
+import ConfigurationReview, { ConfigurationPdfDownload } from "./ConfigurationReview";
 import { configurationReference } from "@/lib/configuration-summary.mjs";
 
 import AdminRack3D from "@/components/admin/AdminRack3D";
@@ -664,6 +664,7 @@ export default function SimulatorPicking({ onQuoteDataChange, adminMode = false,
             )}
             {!isLengthUnavailable && <ConfigurationReview requested={desiredLength} effective={finalLength} rows={rowCount} total={discountedEstimate} quoteRef={orderQuoteRef} drawingRef={drawingRef} english={english} />}
             <AddToSimulatorCart quoteRef={orderQuoteRef} drawingRef={drawingRef} label={workbench ? "Bancadas" : "Picking"} english={english} onOrder={!adminMode ? () => setOrderOpen(true) : undefined} disabled={isLengthUnavailable} />
+            {!isLengthUnavailable && <ConfigurationPdfDownload quoteRef={orderQuoteRef} drawingRef={drawingRef} english={english} />}
             <div className={`mt-5 grid gap-3 ${adminMode ? "grid-cols-1" : "grid-cols-[1fr_auto]"}`}>
 
               <button type="button" onClick={reset} className="cursor-pointer simulator-pill rounded-full border border-[#d2d2d7] bg-white px-4 py-3 text-sm font-semibold text-[#1d1d1f] transition hover:bg-[#f5f5f7]">{adminMode ? (english ? "Reset configuration" : "Repor configuração") : (english ? "Reset" : "Recomeçar")}</button>

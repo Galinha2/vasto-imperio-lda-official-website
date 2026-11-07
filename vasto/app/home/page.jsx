@@ -1,3 +1,4 @@
+import surfaces from "@/components/home/HomeSurfaces.module.css";
 import { createPageMetadata } from "@/lib/seo";
 
 export const metadata = createPageMetadata({
@@ -15,16 +16,16 @@ import SimulatorCard from "@/components/home/SimulatorCard";
 
 export default function Page() {
     return (
-        <div className="overflow-hidden bg-white">
+        <div className={`${surfaces.page} overflow-hidden`}>
             <Banner />
-            <section className="bg-white px-5 py-14 sm:px-8 sm:py-16 lg:py-20">
-                <div className="mx-auto grid max-w-[1480px] items-stretch gap-8 lg:grid-cols-[minmax(0,1.8fr)_minmax(320px,0.9fr)] lg:gap-10">
+            <section className={`${surfaces.configurators} px-5 py-14 sm:px-8 sm:py-16 lg:py-20`}>
+                <div className="mx-auto max-w-[1480px]">
                     <SimulatorCard />
                     <InfoIconsCards />
                 </div>
             </section>
             <Cards />
-            <ContactCard wide />
+            <div className={surfaces.contacts}><ContactCard wide /></div>
         </div>
     );
 }

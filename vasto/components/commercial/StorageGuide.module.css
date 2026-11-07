@@ -1,0 +1,22 @@
+.section{padding:80px 32px;background:#f5f5f7;color:#1d1d1f}.inner{max-width:1480px;margin:auto}.eyebrow{font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:#d84c0a;font-weight:600}.section h2{max-width:800px;font-size:clamp(32px,3.5vw,48px);letter-spacing:-.045em;line-height:1.1;font-weight:600;margin:15px 0 20px}.lead{max-width:650px;color:#6e6e73;line-height:1.75;font-size:15px}
+.choiceGrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:26px;margin-top:38px}
+.choiceCard{min-width:0;display:flex;flex-direction:column;overflow:hidden;border:1px solid #e1e3e8;border-radius:28px;background:#fff;transition:border-color .25s}
+.choiceCard:hover,.choiceCard:focus-within{border-color:#e3ad91}
+.choicePhoto{position:relative;display:block;aspect-ratio:1.26;overflow:hidden;background:#eceef0}
+.choicePhoto img{object-fit:cover;transition:transform .6s cubic-bezier(.2,.65,.25,1)}
+.choiceCard:hover .choicePhoto img{transform:scale(1.025)}
+.photoLabel{position:absolute;top:18px;left:18px;max-width:calc(100% - 36px);padding:8px 12px;border-radius:999px;background:#fffffff2;color:#424245;font-size:10px;font-weight:500;letter-spacing:.015em;z-index:1;box-shadow:0 2px 8px #0000000a}
+.choiceBody{position:relative;z-index:1;flex:1;margin:-30px 14px 0;padding:25px 18px 22px;border-radius:22px 22px 0 0;background:#fff}
+.choiceKicker{display:block;color:#d84c0a;font-size:10px;letter-spacing:.09em;font-weight:600;text-transform:uppercase;margin-bottom:10px}
+.choiceBody h3{font-size:clamp(24px,2vw,29px);line-height:1.15;font-weight:600;letter-spacing:-.04em}
+.choiceBody p{font-size:14px;line-height:1.75;color:#6e6e73;margin-top:12px;max-width:330px}
+.choiceActions{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:14px;margin:0 32px 25px;padding-top:18px;border-top:1px solid #ececf0}
+.choicePrimary{display:inline-flex;align-items:center;justify-content:center;gap:20px;border-radius:999px;background:var(--orange,#ff5500);color:#fff;min-height:44px;padding:11px 19px;font-size:13px;font-weight:600;transition:background .2s}
+.choicePrimary:hover{background:var(--orange-hover,#e64c00)}
+.choiceSecondary{display:inline-flex;align-items:center;gap:6px;color:#0879c0;font-size:12px;font-weight:500;text-underline-offset:4px}
+.choiceSecondary:hover{text-decoration:underline}
+.choiceCard a:focus-visible,.helpLink:focus-visible{outline:2px solid #0879c0;outline-offset:4px}
+.help{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:24px;margin-top:28px;padding:32px;border-radius:28px;background:#fff;border:1px solid #e8e8ed}.helpIcon{display:grid;place-items:center;width:52px;height:52px;border-radius:18px;background:#fff3eb;color:#e85212}.helpIcon svg{width:27px;height:27px}.helpCopy h3{font-size:21px;font-weight:600;letter-spacing:-.03em;line-height:1.25}.helpCopy p{max-width:670px;font-size:14px;color:#626268;line-height:1.7;margin-top:8px}.helpCopy>span{display:block;max-width:670px;font-size:11px;color:#86868b;line-height:1.7;margin-top:8px}.helpLink{display:flex;align-items:center;gap:18px;max-width:250px;font-size:13px;line-height:1.5;font-weight:600;color:#424245}.helpLink>span{display:grid;place-items:center;width:40px;height:40px;flex-shrink:0;border-radius:50%;background:#fff2e9;color:#ed510c;font-size:18px;transition:background .2s}.helpLink:hover>span{background:#ffe2cf}
+@media(max-width:1100px){.choiceGrid{gap:16px}.choiceBody{margin:-26px 10px 0;padding:22px 14px}.choiceActions{margin:0 24px 23px;gap:12px}.help{grid-template-columns:auto minmax(0,1fr)}.helpLink{grid-column:2;max-width:none;justify-content:space-between}}
+@media(max-width:850px){.section{padding:56px 20px}.choiceGrid{grid-template-columns:1fr;gap:22px;margin-top:28px}.choicePhoto{aspect-ratio:1.55}.choiceBody{margin:-28px 12px 0;padding:24px 16px 22px}.choiceBody p{max-width:none}.choiceBody h3{font-size:28px}.choiceActions{margin:0 28px 24px;padding-top:18px}.help{padding:25px;gap:18px;align-items:start}.helpIcon{width:40px;height:40px;border-radius:14px}.helpIcon svg{width:23px;height:23px}.helpCopy h3{font-size:21px}.helpLink{grid-column:1/-1;border-top:1px solid #ececf0;padding-top:20px}.helpCopy>span{margin-top:12px}}
+@media(prefers-reduced-motion:reduce){.choiceCard,.choicePhoto img,.choicePrimary,.helpLink>span{transition:none}}

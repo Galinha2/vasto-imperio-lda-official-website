@@ -1,0 +1,12 @@
+/* Near-white home background with restrained catalogue colour accents. */
+.page{--glass-surface:#fff;--glass-border:#e5e5e7;--home-card-shadow:0 8px 26px rgb(25 35 50 / 5%),0 1px 4px rgb(25 35 50 / 3%);--glass-shadow:var(--home-card-shadow);background-color:#fff;background-image:radial-gradient(ellipse at 8% 4%,rgb(255 173 117 / 4%),transparent 44%),radial-gradient(ellipse at 95% 35%,rgb(123 183 225 / 4%),transparent 48%);background-attachment:fixed}
+.page :global(.home-hero){background:#fff!important;border-bottom-color:#e5e5e7}
+.page :global(.home-hero-background){display:none!important}
+.page :global(.home-hero-overlay){background:#fff!important}
+.page .configurators{background:transparent;border-bottom:1px solid #e5e5e7}
+.page [data-home-projects]{background:transparent!important;border-bottom:1px solid #e5e5e7}
+.page :global(#escolher-estantes){background:transparent}
+.page .contacts>section{background:transparent;border-top:1px solid #e5e5e7}
+.page :global(.site-glass){backdrop-filter:none;-webkit-backdrop-filter:none;box-shadow:var(--glass-shadow)}
+
+.page [data-surface-card]{box-shadow:var(--home-card-shadow)}

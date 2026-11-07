@@ -14,9 +14,10 @@ function loadModelViewer(){
  return modelViewerPromise;
 }
 export default function RackARPreview({model,english=false,onClose}){
- const dialog=useRef(null),viewer=useRef(null);const [src,setSrc]=useState(''),[ready,setReady]=useState(false),[supported,setSupported]=useState(false),[error,setError]=useState('');
+ const dialog=useRef(null),viewer=useRef(null);const [src,setSrc]=useState(''),[ready,setReady]=useState(false),[supported,setSupported]=useState(false),[launching,setLaunching]=useState(false),[error,setError]=useState('');
  useEffect(()=>{const node=dialog.current;node.showModal();return()=>node.close();},[]);
  useEffect(()=>{
+  setReady(false);setSupported(false);setError('');
   let cancelled=false,url;const key=JSON.stringify(model);
   async function prepare(){
    let asset;
@@ -35,19 +36,34 @@ export default function RackARPreview({model,english=false,onClose}){
  },[model,english]);
  useEffect(()=>{
   const node=viewer.current;if(!src||!node)return;
-  const loaded=()=>{setReady(true);setSupported(Boolean(node.canActivateAR));};
-  const failed=()=>setError(english?'Unable to open this model on your device.':'Não foi possível abrir este modelo neste dispositivo.');
-  const status=event=>{if(event.detail.status==='failed')failed();};
+  let cancelled=false,poll;
+  const sync=()=>{
+   if(cancelled)return;
+   setReady(Boolean(node.loaded));setSupported(Boolean(node.canActivateAR));
+   if(node.loaded&&node.canActivateAR)clearInterval(poll);
+  };
+  const loaded=()=>{sync();Promise.resolve(node.updateComplete).then(()=>{if(!cancelled)requestAnimationFrame(sync);});};
+  const failed=()=>{if(!cancelled){setLaunching(false);setError(english?'Unable to open this model on your device.':'Não foi possível abrir este modelo neste dispositivo.');}};
+  const status=event=>{sync();if(event.detail.status==='failed')failed();};
   node.addEventListener('load',loaded);node.addEventListener('error',failed);node.addEventListener('ar-status',status);
-  if(node.loaded)loaded();
-  return()=>{node.removeEventListener('load',loaded);node.removeEventListener('error',failed);node.removeEventListener('ar-status',status);};
+  // AR mode selection may finish after the model's load event (e.g. WebXR detection).
+  poll=setInterval(sync,250);const stop=setTimeout(()=>clearInterval(poll),10000);
+  loaded();
+  return()=>{cancelled=true;clearInterval(poll);clearTimeout(stop);node.removeEventListener('load',loaded);node.removeEventListener('error',failed);node.removeEventListener('ar-status',status);};
  },[src,english]);
  return createPortal(<dialog ref={dialog} className={styles.arDialog} onCancel={onClose} aria-labelledby="rack-ar-title">
   <header><h2 id="rack-ar-title">{english?'View in your space':'Ver no meu espaço'}</h2><button type="button" onClick={onClose} aria-label={english?'Close':'Fechar'}>×</button></header>
   <p>{english?'Place one row of your current configuration on the floor, at its actual size.':'Coloque uma fila da configuração atual no chão do seu espaço, à escala real.'}</p>
-  {src&&<model-viewer ref={viewer} src={src} ar="" ar-modes="webxr quick-look" ar-scale="fixed" ar-placement="floor" camera-controls="" shadow-intensity="1" alt={english?'Your shelving configuration':'A sua configuração de estantes'}><span slot="ar-button"/></model-viewer>}
+  {src&&<model-viewer ref={viewer} src={src} ar={true} ar-modes="quick-look webxr" ar-scale="fixed" ar-placement="floor" camera-controls="" shadow-intensity="1" alt={english?'Your shelving configuration':'A sua configuração de estantes'}><span slot="ar-button"/></model-viewer>}
   {!ready&&!error&&<p role="status">{english?'Preparing your model…':'A preparar o seu modelo…'}</p>}
   {error&&<p role="alert">{error}</p>}
-  {ready&&<><button className={styles.arLaunch} type="button" disabled={!supported} onClick={()=>{setError('');viewer.current?.activateAR().catch(()=>setError(english?'Could not start the camera. Check your browser permissions.':'Não foi possível iniciar a câmara. Verifique as permissões do navegador.'));}}>{english?'Open camera':'Abrir câmara'}</button><p>{supported?(english?'Point the camera at the floor and move your phone slowly to detect a surface.':'Aponte a câmara para o chão e mova o telemóvel devagar para detetar a superfície.'):(english?'Open this configurator in Safari on an iPhone or Chrome on an AR-compatible Android phone, using HTTPS.':'Abra este configurador no Safari do iPhone ou no Chrome de um Android compatível com realidade aumentada, através de HTTPS.')}</p></>}
+  {ready&&<><button className={styles.arLaunch} type="button" disabled={!supported||launching} aria-busy={launching} onClick={()=>{
+    const node=viewer.current;
+    if(!node?.canActivateAR){setSupported(false);return;}
+    setError('');setLaunching(true);
+    // Invoke directly in the tap handler so iOS retains the user activation.
+    try{Promise.resolve(node.activateAR()).catch(()=>setError(english?'Could not open augmented reality. Please try again in Safari on your iPhone.':'Não foi possível abrir a realidade aumentada. Tente novamente no Safari do iPhone.')).finally(()=>setLaunching(false));}
+    catch{setLaunching(false);setError(english?'Could not open augmented reality. Please try again.':'Não foi possível abrir a realidade aumentada. Tente novamente.');}
+   }}>{launching?(english?'Opening AR…':'A abrir realidade aumentada…'):(english?'View in my space':'Ver no meu espaço')}</button><p>{supported?(english?'On iPhone, Apple’s viewer opens. Select AR and point the camera at the floor. On compatible Android devices, allow camera access when prompted.':'No iPhone, abre o visualizador da Apple: selecione RA e aponte a câmara para o chão. Num Android compatível, permita o acesso à câmara quando solicitado.'):(english?'AR is not available in this browser. Use Safari on an iPhone or Chrome on an AR-compatible Android device. Android requires HTTPS.':'A realidade aumentada não está disponível neste navegador. Use o Safari do iPhone ou o Chrome de um Android compatível. No Android é necessário HTTPS.')}</p></>}
  </dialog>,document.body);
 }

@@ -14,3 +14,12 @@
 .arDialog header{display:flex;align-items:center;justify-content:space-between;gap:12px}.arDialog h2{font-size:22px;font-weight:600}.arDialog header button{width:40px;height:40px;border:0;border-radius:50%;background:#f2f3f5;font-size:26px;cursor:pointer}
 .arDialog p{font-size:13px;line-height:1.6;color:#687381;margin:12px 0}.arDialog model-viewer{display:block;width:100%;height:min(380px,46dvh);border-radius:18px;background:#f5f7fa;touch-action:pan-y}
 .arLaunch{width:100%;padding:14px;border:0;border-radius:999px;background:var(--orange,#ff5500);color:#fff;font-weight:600;cursor:pointer;margin-top:16px}.arLaunch:disabled{background:#e9edf1;color:#77818d;cursor:default}
+
+.viewerPanel{position:relative;min-height:420px}
+.loadingOverlay{position:absolute;inset:0;z-index:5;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:14px;min-height:420px;padding:48px 24px;text-align:center;background:var(--admin-surface,#f8f9fb);color:var(--admin-text,#1d1d1f)}
+.loadingOverlay strong{font-size:15px;font-weight:600}.loadingOverlay p{max-width:290px;font-size:12px;line-height:1.7;color:var(--admin-muted,#6e6e73)}
+.loadingSpinner{width:30px;height:30px;border:2px solid #ff550025;border-top-color:var(--orange,#ff5500);border-radius:50%;animation:rackLoadingSpin .8s linear infinite}
+.modeSwitch button[aria-busy=true]{color:var(--orange,#ff5500);cursor:progress}.toolbar button:disabled{opacity:.45;cursor:wait}
+.retryButton{margin-top:10px;padding:9px 18px;border:1px solid currentColor;border-radius:999px;font-size:12px;font-weight:600;cursor:pointer}
+@keyframes rackLoadingSpin{to{transform:rotate(360deg)}}
+@media(prefers-reduced-motion:reduce){.loadingSpinner{animation:none;border-color:var(--orange,#ff5500);opacity:.65}}

@@ -15,8 +15,10 @@ export function createRackGeometry(model,{woodTexture=null,zincTexture=null}={})
   connector:material('Chapa de encaixe',rack?0xe87820:0xcbd0ce,.48,.35),
   wood:material('Tampo aglomerado',0xbda47e,.03,.86,woodTexture),
   metal:material('Tampo metálico',0xd3d7d3,.4,.38),
+  shelfRib:material('Reforço integrado cinzento claro',0xe1e4e0,.4,.38),
+  tie:material('Travamento cinzento',0xaeb8b2,.3,.48),
   bolt:material('Parafusos zincados',0xd5dce0,.75,.28),
-  plastic:material('Pés de proteção',0x252b30,.02,.82),
+  plastic:material('Pés de proteção branco suave',0xeeefe9,.02,.82),
  };
  function geometry(key,make){if(!cache.has(key)){const g=make();resources.add(g);cache.set(key,g);}return cache.get(key);}
  const dummy=new THREE.Object3D();
@@ -43,9 +45,29 @@ export function createRackGeometry(model,{woodTexture=null,zincTexture=null}={})
  const positions=[model.bays[0].left,...model.bays.map(b=>b.right)];
  positions.forEach(x=>{
   for(const z of [-model.depth/2,model.depth/2]){
-   const inward=z>0?-1:1,profileDepth=light?.025:.04;
-   put('Montante com perfuração',perforatedWeb(),mats.upright,x,0,z,[0,z>0?0:Math.PI,0]);
-   for(const edge of light?[-1]:[-1,1]){box('Aba do montante',thickness,model.height,profileDepth,x+edge*(model.upright/2-thickness/2),model.height/2,z+inward*profileDepth/2,mats.upright);if(!light)box('Retorno do perfil',.009,model.height,thickness,x+edge*(model.upright/2-.0045),model.height/2,z+inward*profileDepth,mats.upright);}
+   const inward=z>0?-1:1,profileDepth=light?model.upright:.04;
+   if(light){
+    // Stamped outward-facing tongues, as in the light-duty frame photograph.
+    const sideX=x-model.upright/2;
+    // Open C-section: continuous inward-facing channel, with small return lips.
+    box('Parede traseira do montante ligeiro',thickness,model.height,model.upright,sideX+profileDepth,model.height/2,z+inward*model.upright/2,mats.upright);
+    for(const edge of [sideX+.003,sideX+profileDepth-.003])box('Rebordo do canal aberto do montante',.006,model.height,thickness,edge,model.height/2,z+inward*model.upright,mats.upright);
+    box('Montante com encaixes salientes',thickness,model.height,model.upright,sideX,model.height/2,z+inward*model.upright/2,mats.upright);
+    const tongue=geometry('light-stamped-tongue',()=>{
+     const section=new THREE.Shape();
+     section.moveTo(0,0);section.lineTo(-.004,.004);section.lineTo(-.004,.014);section.lineTo(0,.018);
+     section.lineTo(.001,.018);section.lineTo(-.0025,.0135);section.lineTo(-.0025,.0045);section.lineTo(.001,0);section.closePath();
+     return new THREE.ExtrudeGeometry(section,{depth:.008,bevelEnabled:false,curveSegments:1});
+    });
+    for(let tabY=.05;tabY<model.height-.025;tabY+=.05){
+     put('Patilha saliente do bastidor',tongue,mats.upright,sideX-.00075,tabY,z+inward*model.upright/2-.004);
+     put('Patilha saliente traseira do bastidor',tongue,mats.upright,sideX+profileDepth+.00075,tabY,z+inward*model.upright/2+.004,[0,Math.PI,0]);
+    }
+    box('Aba do montante',profileDepth,model.height,thickness,x-model.upright/2+profileDepth/2,model.height/2,z,mats.upright);
+   }else{
+    put('Montante com perfuração',perforatedWeb(),mats.upright,x,0,z,[0,z>0?0:Math.PI,0]);
+    for(const edge of [-1,1]){box('Aba do montante',thickness,model.height,profileDepth,x+edge*(model.upright/2-thickness/2),model.height/2,z+inward*profileDepth/2,mats.upright);box('Retorno do perfil',.009,model.height,thickness,x+edge*(model.upright/2-.0045),model.height/2,z+inward*profileDepth,mats.upright);}
+   }
    if(light){
     box('Pé plástico',model.upright+.004,.018,profileDepth+.012,x,.009,z+inward*.008,mats.plastic);
     box('Rebordo do pé plástico',model.upright+.007,.003,profileDepth+.015,x,.017,z+inward*.008,mats.plastic);
@@ -54,9 +76,9 @@ export function createRackGeometry(model,{woodTexture=null,zincTexture=null}={})
   }
   if(light){
    // Frame ties join the front and rear posts at the top, middle and above the rubber feet.
-   box('Barra horizontal superior do bastidor',.018,.03,model.depth-.004,x,model.height-.025,0,mats.upright);
-   box('Barra horizontal central do bastidor',.018,.03,model.depth-.004,x,model.height/2,0,mats.upright);
-   box('Barra horizontal inferior do bastidor',.018,.03,model.depth-.004,x,.065,0,mats.upright);
+   box('Barra horizontal superior do bastidor',.03,.03,model.depth-.004,x,model.height-.015,0,mats.upright);
+   box('Barra horizontal central do bastidor',.03,.03,model.depth-.004,x,model.height/2,0,mats.upright);
+   box('Barra horizontal inferior do bastidor',.03,.03,model.depth-.004,x,.065,0,mats.upright);
   }
   if(!light){
    const lo=.12,hi=model.height-.08,segments=Math.max(1,Math.ceil((hi-lo)/.7));const step=(hi-lo)/segments;
@@ -66,10 +88,26 @@ export function createRackGeometry(model,{woodTexture=null,zincTexture=null}={})
  });
  model.bays.forEach(b=>{
   if(light)for(const y of b.horizontalBraces){
-   const z=-model.depth/2-.004,center=(b.left+b.right)/2;
-   box('Travamento horizontal traseiro',b.clearLength,.15,.002,center,y,z,mats.metal);
-   for(const side of [-1,1])box('Aba do travamento horizontal',b.clearLength,.002,.012,center,y+side*.074,z+.005,mats.metal);
-   for(const end of [b.left+model.upright/2+.012,b.right-model.upright/2-.012]){bolt(end,y-.05,z-.004);bolt(end,y+.05,z-.004);}
+   const z=-model.depth/2-.002,center=(b.left+b.right)/2;
+   // Four subtly creased facets meet at a slightly recessed centre: stamped X in one sheet.
+   const tieGeometry=geometry(`embossed-tie:${b.clearLength}`,()=>{
+    const w=b.clearLength/2,h=.075;
+    const vertices=[[-w,-h,-.0015],[w,-h,-.0015],[w,h,-.0015],[-w,h,-.0015],[0,0,-.008],[-w,-h,.0015],[w,-h,.0015],[w,h,.0015],[-w,h,.0015],[0,0,-.005]];
+    const faces=[[0,4,1],[1,4,2],[2,4,3],[3,4,0],[5,6,9],[6,7,9],[7,8,9],[8,5,9],[0,1,6],[0,6,5],[1,2,7],[1,7,6],[2,3,8],[2,8,7],[3,0,5],[3,5,8]];
+    const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(faces.flatMap(face=>face.flatMap(i=>vertices[i])),3));g.computeVertexNormals();return g;
+   });
+   put('Travamento horizontal traseiro',tieGeometry,mats.tie,center,y,z);
+   for(const side of [-1,1]){
+    const hook=geometry(`tie-end-hook:${side}`,()=>{
+     // Curved end return wraps towards the frame's stamped mounting tongue.
+     const shape=new THREE.Shape();shape.moveTo(0,0);
+     shape.lineTo(side*.006,0);shape.quadraticCurveTo(side*.012,0,side*.012,.006);
+     shape.lineTo(side*.012,.019);shape.lineTo(side*.009,.019);shape.lineTo(side*.009,.006);
+     shape.quadraticCurveTo(side*.009,.003,side*.006,.003);shape.lineTo(0,.003);shape.closePath();
+     return new THREE.ExtrudeGeometry(shape,{depth:.13,bevelEnabled:false,curveSegments:6});
+    });
+    put('Aba curva lateral do travamento',hook,mats.tie,center+side*b.clearLength/2,y+.065,z,[Math.PI/2,0,0]);
+   }
   }
   b.levels.forEach(y=>{
    const center=(b.left+b.right)/2,span=b.clearLength;
@@ -81,8 +119,8 @@ export function createRackGeometry(model,{woodTexture=null,zincTexture=null}={})
      box('Corpo sólido da viga',span,bh,beamDepth,center,y-bh/2,z-sign*(beamDepth/2-.0015),mats.beam);
     }else{
      box('Alma da viga',span,bh,.003,center,y-bh/2,z,mats.beam);
-     box('Aba superior da viga',span,.003,.04,center,y-.0015,z-sign*.018,mats.beam);
-     box('Retorno inferior da viga',span,.003,.035,center,y-bh+.0015,z-sign*.015,mats.beam);
+     box('Aba superior da viga',span,light?.0015:.003,light?.008:.04,center,y-.0015,z-sign*(light?.003:.018),mats.beam);
+     box('Retorno inferior da viga',span,light?.0015:.003,light?.008:.035,center,y-bh+.0015,z-sign*(light?.003:.015),mats.beam);
     }
     if(!light){box('Nervura longitudinal',span,.009,.006,center,y-bh*.62,z+sign*.003,mats.beam);
      for(const end of [b.left+model.upright/2,b.right-model.upright/2]){
@@ -122,12 +160,47 @@ export function createRackGeometry(model,{woodTexture=null,zincTexture=null}={})
     }
     if(light)for(let rib=1;rib<=model.shelfRibCount;rib++){
      const z=-model.depth/2+model.depth*rib/(model.shelfRibCount+1);
-     // Folded underside stiffener: runs along X (shelf length), not across its depth.
-     // It is part of the metal deck, using its exact material and finish.
-     box('Reforço longitudinal integrado',span-.012,.0015,.04,center,y-.012,z,mats.metal);
-     for(const side of [-1,1])box('Aba do reforço integrado',span-.012,.012,.0015,center,y-.006,z+side*.01925,mats.metal);
+     // One continuous pressed hat section with rounded shoulders and folded attachment lips.
+     const ribGeometry=geometry(`formed-shelf-rib:${span}`,()=>{
+      const shape=new THREE.Shape();
+      shape.moveTo(-.0445,0);shape.lineTo(-.0395,0);
+      shape.quadraticCurveTo(-.03675,0,-.03675,-.00275);
+      shape.lineTo(-.03675,-.00525);shape.quadraticCurveTo(-.03675,-.008,-.034,-.008);
+      shape.lineTo(.034,-.008);shape.quadraticCurveTo(.03675,-.008,.03675,-.00525);
+      shape.lineTo(.03675,-.00275);shape.quadraticCurveTo(.03675,0,.0395,0);
+      shape.lineTo(.0445,0);shape.lineTo(.0445,-.0015);shape.lineTo(.0395,-.0015);
+      shape.quadraticCurveTo(.03825,-.0015,.03825,-.00275);
+      shape.lineTo(.03825,-.00525);shape.quadraticCurveTo(.03825,-.0095,.034,-.0095);
+      shape.lineTo(-.034,-.0095);shape.quadraticCurveTo(-.03825,-.0095,-.03825,-.00525);
+      shape.lineTo(-.03825,-.00275);shape.quadraticCurveTo(-.03825,-.0015,-.0395,-.0015);
+      shape.lineTo(-.0445,-.0015);shape.closePath();
+      return new THREE.ExtrudeGeometry(shape,{depth:span-.012,bevelEnabled:false,curveSegments:6});
+     });
+     put('Reforço longitudinal integrado',ribGeometry,mats.shelfRib,b.left+model.upright/2+.006,y,z,[0,Math.PI/2,0]);
+
     }
     if(light){
+     const rimProfile=geometry(`curved-shelf-rim:${span}`,()=>{
+      const shape=new THREE.Shape();shape.moveTo(0,.0015);
+      shape.quadraticCurveTo(-.004,.0015,-.004,-.0025);
+      shape.lineTo(-.004,-.021);shape.quadraticCurveTo(-.004,-.024,-.001,-.024);
+      shape.lineTo(.004,-.024);shape.lineTo(.004,-.0225);shape.lineTo(-.001,-.0225);
+      shape.quadraticCurveTo(-.0025,-.0225,-.0025,-.021);
+      shape.lineTo(-.0025,-.0025);shape.quadraticCurveTo(-.0025,0,0,0);shape.closePath();
+      return new THREE.ExtrudeGeometry(shape,{depth:span-.004,bevelEnabled:false,curveSegments:6});
+     });
+     for(const side of [-1,1])put('Curva contínua do rebordo do tampo',rimProfile,mats.metal,side<0?b.right-model.upright/2-.002:b.left+model.upright/2+.002,y,side*(deckDepth/2-.004),[0,side*Math.PI/2,0]);
+     // Small folded returns and perforated corner clips visible in the underside reference.
+     const cornerClip=geometry('light-shelf-corner-clip',()=>{
+      const shape=new THREE.Shape();shape.moveTo(0,0);shape.lineTo(.016,0);shape.quadraticCurveTo(.018,0,.018,.002);shape.lineTo(.018,.022);shape.quadraticCurveTo(.018,.024,.016,.024);shape.lineTo(.01,.024);shape.lineTo(.01,.015);shape.quadraticCurveTo(.008,.012,.006,.015);shape.lineTo(.006,.024);shape.lineTo(.002,.024);shape.quadraticCurveTo(0,.024,0,.022);shape.closePath();
+      const hole=new THREE.Path();hole.absarc(.009,.006,.0025,0,Math.PI*2,true);shape.holes.push(hole);
+      return new THREE.ExtrudeGeometry(shape,{depth:.0015,bevelEnabled:false});
+     });
+     for(const end of [-1,1])for(const side of [-1,1]){
+      const clipX=end<0?b.left+model.upright/2+.002:b.right-model.upright/2-.02;
+      put('Encaixe perfurado do canto do tampo',cornerClip,mats.metal,clipX,y-.024,side*(deckDepth/2-.01));
+      box('Retorno inferior do rebordo',.018,.0015,.009,clipX+.009,y-.024,side*(deckDepth/2-.006),mats.metal);
+     }
      // Solid underside fills the folded shelf rim without changing its outer height.
      for(const side of [-1,1]){
       box('Dobra inferior sólida da prateleira',span,.025,.008,center,y-.012,side*(deckDepth/2-.004),mats.metal);

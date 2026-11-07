@@ -1,5 +1,6 @@
 "use client";
 
+import {lightShelfPositions,lightBracePositions} from '@/lib/light-shelf-layout.mjs';
 import AdminRack3D from "@/components/admin/AdminRack3D";
 import SimulatorProductPhoto from "./SimulatorProductPhoto";
 import photoStyles from "./SimulatorProductPhoto.module.css";
@@ -159,12 +160,11 @@ function ShelfPreview({ activeLevels, levelsForModule, hasRemovedLevels, removeL
   // Keep uprights visually consistent as the row grows; do not scale their
   // thickness with the total rack width.
   const frameWidth = 5;
-  const shelfHeight = Math.max(5, Math.min(12, rackHeight * 0.025)) / 1.5;
+  const shelfHeight = 25 * scale;
   const footHeight = Math.max(4, Math.min(8, shelfHeight * 0.75));
   const braceBaySet = new Set(bracedIndexes);
-  const lowestShelfCenter = bottom - footHeight - shelfHeight / 2;
-  const highestShelfCenter = top + shelfHeight / 2;
-  const levelY = (level) => lowestShelfCenter - level * (lowestShelfCenter - highestShelfCenter) / (levels - 1);
+  const physicalLevels=lightShelfPositions(height/1000,levels,modules.map((_,index)=>braceBaySet.has(index)?bracesInBay(index,modules.length,height):0));
+  const levelY = (level) => bottom-physicalLevels[level]*1000*scale+shelfHeight/2;
 
   return (
     <div className="site-glass min-w-0 rounded-[30px] border border-[#e5e5e7] bg-white p-5 shadow-[0_12px_40px_rgba(0,0,0,0.05)] sm:p-7 md:p-9">
@@ -211,8 +211,8 @@ function ShelfPreview({ activeLevels, levelsForModule, hasRemovedLevels, removeL
             const braceQuantity = hasBrace ? bracesInBay(index, modules.length, height) : 0;
             // The brace profile has the same physical thickness in 0.75 m and
             // 1 m bays. Scale it with the overall drawing so long rows stay tidy.
-            const braceHeight = Math.max(4, Math.min(25, 150 * scale));
-            const bracePositions = Array.from({ length: braceQuantity }, (_, braceIndex) => top + rackHeight * (0.2 + (0.6 * braceIndex) / Math.max(1, braceQuantity - 1)));
+            const braceHeight = 150 * scale;
+            const bracePositions = lightBracePositions(height/1000,braceQuantity).map(y=>bottom-y*1000*scale);
             return <g key={`bay-${index}`}>
               {bracePositions.map((braceY, braceIndex) => {
                 const braceX1 = x1 - 0.5;

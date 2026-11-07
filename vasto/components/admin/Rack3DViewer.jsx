@@ -6,9 +6,12 @@ import {createRackGeometry} from '@/lib/admin/rack-3d-geometry.mjs';
 import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
 import {rackModel} from '@/lib/admin/rack-3d-model.mjs';
 import styles from './Rack3DViewer.module.css';
+import dynamic from 'next/dynamic';
+const ARPreview=dynamic(()=>import('./RackARPreview'),{ssr:false});
 export default function Rack3DViewer(props){
  const english=Boolean(props.english);
  const host=useRef(null),actions=useRef({});const [error,setError]=useState('');
+ const [arOpen,setAROpen]=useState(false);
  const key=JSON.stringify(props);
  const summary=rackModel(props);
  const meters=value=>`${value.toLocaleString(english?'en-IE':'pt-PT',{minimumFractionDigits:2,maximumFractionDigits:2})} m`;
@@ -85,7 +88,8 @@ export default function Rack3DViewer(props){
    [english?'Levels per module':'Níveis por módulo',summary.bays.map(b=>b.levels.length).join(' / ')],
   ].map(([label,value])=><div key={label}><dt>{label}</dt><dd>{value}</dd></div>)}</dl>{props.capacityLabel&&<strong>{props.capacityLabel}</strong>}</div>}
 
-  <div className={styles.toolbar} aria-label="Controlos da vista 3D">{[['perspective',english?'Reset view':'Repor vista'],['front',english?'Front':'Frente'],['side',english?'Side':'Lado'],['top',english?'Top':'Topo']].map(([view,label])=><button type="button" key={view} onClick={()=>actions.current.view?.(view)}>{label}</button>)}<button type="button" aria-label="Aproximar modelo" onClick={()=>actions.current.zoom?.(.8)}>+</button><button type="button" aria-label="Afastar modelo" onClick={()=>actions.current.zoom?.(1.25)}>−</button></div>
+  {arOpen&&summary&&<ARPreview model={summary} english={english} onClose={()=>setAROpen(false)}/>}
+  <div className={styles.toolbar} aria-label="Controlos da vista 3D">{[['perspective',english?'Reset view':'Repor vista'],['front',english?'Front':'Frente'],['side',english?'Side':'Lado'],['top',english?'Top':'Topo']].map(([view,label])=><button type="button" key={view} onClick={()=>actions.current.view?.(view)}>{label}</button>)}<button type="button" aria-label="Aproximar modelo" onClick={()=>actions.current.zoom?.(.8)}>+</button><button type="button" aria-label="Afastar modelo" onClick={()=>actions.current.zoom?.(1.25)}>−</button><button type="button" className={styles.arButton} disabled={!summary} onClick={()=>setAROpen(true)}>{english?"View in your space":"Ver no meu espaço"}</button></div>
   {error&&<p className={styles.error} role="alert">{error}</p>}<div ref={host} className={styles.canvas}/>
   <p className={styles.help}>{english?'Drag to rotate · Scroll or pinch to zoom · Right-click or use two fingers to pan.':'Arraste para rodar · Roda do rato ou pinça para zoom · Botão direito ou dois dedos para deslocar.'}</p>
   <p className={styles.note}>{english?'One row of your current configuration. Finishes and details are inspired by product photographs. Illustrative model; refer to the technical drawing for dimensions. Removed shelves match the 2D drawing.':'Vista de uma fila da configuração atual. Acabamentos e pormenores inspirados nas fotografias dos produtos. Modelo ilustrativo, sem substituir o desenho técnico. Os níveis removidos acompanham o desenho 2D.'}</p>

@@ -37,7 +37,7 @@ test('light shelves at 500/600 mm have one/two integrated longitudinal ribs per 
   try{
    const rib=r.group.children.find(p=>p.name==='Reforço longitudinal integrado');
    if(!count){assert.equal(rib,undefined);continue;}
-   assert.equal(rib.count,count*2);assert.equal(rib.material,r.materials.metal);assert.ok(rib.geometry.parameters.width>1);assert.equal(rib.geometry.parameters.depth,.04);const flange=r.group.children.find(p=>p.name==='Aba do reforço integrado');assert.equal(flange.geometry.parameters.height,.012);
+   assert.equal(rib.count,count*2);assert.equal(rib.material,r.materials.shelfRib);rib.geometry.computeBoundingBox();const bounds=rib.geometry.boundingBox;assert.ok(bounds.max.z-bounds.min.z>1);assert.ok(Math.abs(bounds.max.x-bounds.min.x-.089)<1e-6);assert.ok(Math.abs(bounds.min.y+.0095)<1e-6);assert.ok(rib.geometry.parameters.shapes.curves.some(curve=>curve.isQuadraticBezierCurve));
    const xs=Array.from({length:rib.count},(_,i)=>rib.instanceMatrix.array[i*16+12]);assert.ok(xs.every(x=>Math.abs(x-xs[0])<1e-6));
    const zs=Array.from({length:count},(_,i)=>rib.instanceMatrix.array[i*16+14]);
    if(count===1)assert.ok(Math.abs(zs[0])<1e-6);else{assert.ok(zs[0]<0&&zs[1]>0);assert.ok(Math.abs(zs[0]+zs[1])<1e-6);}
@@ -101,4 +101,59 @@ test('Picking decks sit inside slimmer beams with their top surfaces flush',()=>
    assert.ok(deck.geometry.parameters.depth<=model.depth-.05+1e-9);
   }finally{r.dispose();}
  }
+});
+
+test('the highest light-duty shelf is flush with the top of the frame',()=>{
+ for(const slots of [1,3]){
+  const model=rackModel({...base,type:'ligeiras',slots});const r=createRackGeometry(model);
+  try{
+   const deck=r.group.children.find(mesh=>mesh.name==='Tampo metálico');
+   const top=Math.max(...Array.from({length:deck.count},(_,i)=>deck.instanceMatrix.array[i*16+13]+deck.geometry.parameters.height/2));
+   assert.ok(Math.abs(top-model.height)<1e-6);
+  }finally{r.dispose();}
+ }
+});
+
+test('light-duty frames use outward stamped tongues instead of rectangular slots',()=>{
+ const r=createRackGeometry(rackModel({...base,type:'ligeiras'}));
+ try{
+  assert.ok(!r.group.children.some(mesh=>mesh.name==='Montante com perfuração'));
+  const tabs=r.group.children.find(mesh=>mesh.name==='Patilha saliente do bastidor');
+  assert.ok(tabs&&tabs.count>4);
+  tabs.geometry.computeBoundingBox();
+  assert.ok(tabs.geometry.boundingBox.min.x<-.003);
+  assert.equal(tabs.material,r.materials.upright);
+ }finally{r.dispose();}
+});
+
+test('light-duty uprights have a continuous open inner channel while keeping both tongue rows',()=>{
+ const r=createRackGeometry(rackModel({...base,type:'ligeiras'}));
+ try{
+  assert.ok(!r.group.children.some(mesh=>mesh.name==='Parede interior do montante ligeiro'));
+  const lips=r.group.children.find(mesh=>mesh.name==='Rebordo do canal aberto do montante');
+  assert.ok(lips);assert.equal(lips.geometry.parameters.width,.006);
+  for(const name of ['Patilha saliente do bastidor','Patilha saliente traseira do bastidor'])assert.ok(r.group.children.some(mesh=>mesh.name===name));
+ }finally{r.dispose();}
+});
+
+test('horizontal ties have a subtle recessed centre with four corner-to-centre creases',()=>{
+ const r=createRackGeometry(rackModel({...base,type:'ligeiras',bracedIndexes:[0]}));
+ try{
+  const tie=r.group.children.find(mesh=>mesh.name==='Travamento horizontal traseiro');
+  const positions=tie.geometry.getAttribute('position');let centre=false,corner=false;
+  for(let i=0;i<positions.count;i++){
+   if(Math.abs(positions.getX(i))<1e-6&&Math.abs(positions.getY(i))<1e-6&&Math.abs(positions.getZ(i)+.005)<1e-6)centre=true;
+   if(Math.abs(positions.getY(i)-.075)<1e-6&&Math.abs(positions.getZ(i)+.0015)<1e-6)corner=true;
+  }
+  assert.ok(centre&&corner);
+ }finally{r.dispose();}
+});
+
+test('light-duty rear ties mount with curved end returns and no rear bolts',()=>{
+ const r=createRackGeometry(rackModel({...base,type:'ligeiras',bracedIndexes:[0],braceCounts:[2]}));
+ try{
+  const hooks=r.group.children.filter(mesh=>mesh.name==='Aba curva lateral do travamento');
+  assert.equal(hooks.reduce((sum,mesh)=>sum+mesh.count,0),4);
+  assert.ok(!r.group.children.some(mesh=>mesh.name==='Parafuso sextavado'||mesh.name==='Anilha zincada'||mesh.name==='Aba do travamento horizontal'));
+ }finally{r.dispose();}
 });

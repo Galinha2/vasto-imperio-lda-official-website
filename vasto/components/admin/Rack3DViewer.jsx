@@ -13,12 +13,15 @@ export default function Rack3DViewer(props){
  const english=Boolean(props.english);
  const host=useRef(null),actions=useRef({});const [error,setError]=useState('');
  const [arOpen,setAROpen]=useState(false);
+ const [ready,setReady]=useState(false),[retry,setRetry]=useState(0);
  const key=JSON.stringify(props);
  const summary=rackModel(props);
  const meters=value=>`${value.toLocaleString(english?'en-IE':'pt-PT',{minimumFractionDigits:2,maximumFractionDigits:2})} m`;
  const title=({picking:english?'Picking shelving':'Estante de picking',racks:english?'Industrial pallet racking':'Rack industrial para paletes',ligeiras:english?'Light-duty shelving':'Estante de carga ligeira',bancadas:english?'Workbench':'Bancada'})[props.type];
  useEffect(()=>{
-  const node=host.current;const model=rackModel(JSON.parse(key));if(!node||!model){setError((english?'Choose a valid configuration to preview the model.':'Escolha uma configuração válida para ver o modelo.'));return;}
+  setReady(false);setError('');props.onStatusChange?.('loading');
+  let cancelled=false,initialFrame,initialTimer,readyFrame;
+  const node=host.current;const model=rackModel(JSON.parse(key));if(!node||!model){setError((english?'Choose a valid configuration to preview the model.':'Escolha uma configuração válida para ver o modelo.'));props.onStatusChange?.('error');return;}
   setError('');let renderer,controls,observer;const disposables=[];let contextLost;let rack;
   function surfaceTexture(kind){
    const canvas=document.createElement('canvas');canvas.width=256;canvas.height=256;const ctx=canvas.getContext('2d');if(!ctx)return null;
@@ -32,6 +35,8 @@ export default function Rack3DViewer(props){
    }
    const texture=new THREE.CanvasTexture(canvas);texture.colorSpace=THREE.SRGBColorSpace;texture.wrapS=texture.wrapT=THREE.RepeatWrapping;texture.repeat.set(kind==='wood'?3:2,2);texture.anisotropy=Math.min(8,renderer.capabilities.getMaxAnisotropy());disposables.push(texture);return texture;
   }
+  function initialize(){
+  if(cancelled)return;
   try{
    renderer=new THREE.WebGLRenderer({antialias:true,alpha:true});renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,2));renderer.setClearColor(0xf5f7fa,1);renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1;renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;
    node.appendChild(renderer.domElement);renderer.domElement.setAttribute('aria-label',(english?'Interactive 3D shelving model':'Modelo 3D interativo da estante'));renderer.domElement.tabIndex=0;
@@ -76,10 +81,14 @@ export default function Rack3DViewer(props){
    }
    const resize=()=>{const width=node.clientWidth,height=node.clientHeight;if(!width||!height)return;renderer.setSize(width,height);camera.aspect=width/height;camera.updateProjectionMatrix();render();};resize();fit();observer=new ResizeObserver(resize);observer.observe(node);controls.addEventListener('change',render);
    actions.current={view:fit,zoom:factor=>{camera.position.sub(controls.target).multiplyScalar(factor).add(controls.target);controls.update();render();}};
-   contextLost=event=>{event.preventDefault();setError((english?'The 3D preview was interrupted. Switch to 2D and reopen 3D.':'A vista 3D foi interrompida. Feche e volte a abrir o 3D.'));};renderer.domElement.addEventListener('webglcontextlost',contextLost);
-  }catch{setError((english?'This device could not open 3D. The 2D drawing remains available.':'Este dispositivo não conseguiu abrir o 3D. O desenho 2D continua disponível.'));}
-  return()=>{actions.current={};observer?.disconnect();controls?.dispose();rack?.dispose();disposables.forEach(item=>item.dispose?.());if(renderer){renderer.domElement.removeEventListener('webglcontextlost',contextLost);renderer.dispose();renderer.domElement.remove();}};
- },[key]);
+   contextLost=event=>{event.preventDefault();cancelAnimationFrame(readyFrame);setReady(false);props.onStatusChange?.('error');setError((english?'The 3D preview was interrupted. Try loading it again.':'A vista 3D foi interrompida. Tente carregar novamente.'));};renderer.domElement.addEventListener('webglcontextlost',contextLost);
+   readyFrame=requestAnimationFrame(()=>{if(!cancelled){setReady(true);props.onStatusChange?.('ready');}});
+  }catch{setReady(false);props.onStatusChange?.('error');setError((english?'This device could not open 3D. The 2D drawing remains available.':'Este dispositivo não conseguiu abrir o 3D. O desenho 2D continua disponível.'));}
+  }
+  // Paint the loading state before building geometry and compiling WebGL shaders.
+  initialFrame=requestAnimationFrame(()=>{initialTimer=setTimeout(initialize,0);});
+  return()=>{cancelled=true;cancelAnimationFrame(initialFrame);cancelAnimationFrame(readyFrame);clearTimeout(initialTimer);actions.current={};observer?.disconnect();controls?.dispose();rack?.dispose();disposables.forEach(item=>item.dispose?.());if(renderer){renderer.domElement.removeEventListener('webglcontextlost',contextLost);renderer.dispose();renderer.forceContextLoss();renderer.domElement.remove();}};
+ },[key,retry]);
  return <div className={styles.root}>
   {summary&&<div className={styles.summary}><h3>{title}</h3><p>{english?'Your configuration · 3D preview':'A sua configuração · Pré-visualização 3D'}</p><dl>{[
    [english?'Length per row':'Comprimento por fila',meters(summary.width)],
@@ -91,8 +100,8 @@ export default function Rack3DViewer(props){
   ].map(([label,value])=><div key={label}><dt>{label}</dt><dd>{value}</dd></div>)}</dl>{props.capacityLabel&&<strong>{props.capacityLabel}</strong>}</div>}
 
   {arOpen&&summary&&<ARPreview model={summary} english={english} onClose={()=>setAROpen(false)}/>}
-  <div className={styles.toolbar} aria-label="Controlos da vista 3D">{[['perspective',english?'Reset view':'Repor vista'],['front',english?'Front':'Frente'],['side',english?'Side':'Lado'],['top',english?'Top':'Topo']].map(([view,label])=><button type="button" key={view} onClick={()=>actions.current.view?.(view)}>{label}</button>)}<button type="button" aria-label="Aproximar modelo" onClick={()=>actions.current.zoom?.(.8)}>+</button><button type="button" aria-label="Afastar modelo" onClick={()=>actions.current.zoom?.(1.25)}>−</button><button type="button" className={styles.arButton} disabled={!summary} onClick={()=>setAROpen(true)}>{english?"View in your space":"Ver no meu espaço"}</button></div>
-  {error&&<p className={styles.error} role="alert">{error}</p>}<div ref={host} className={styles.canvas}/>
+  <div className={styles.toolbar} aria-label="Controlos da vista 3D">{[['perspective',english?'Reset view':'Repor vista'],['front',english?'Front':'Frente'],['side',english?'Side':'Lado'],['top',english?'Top':'Topo']].map(([view,label])=><button type="button" key={view} disabled={!ready} onClick={()=>actions.current.view?.(view)}>{label}</button>)}<button type="button" aria-label="Aproximar modelo" disabled={!ready} onClick={()=>actions.current.zoom?.(.8)}>+</button><button type="button" aria-label="Afastar modelo" disabled={!ready} onClick={()=>actions.current.zoom?.(1.25)}>−</button><button type="button" className={styles.arButton} disabled={!summary||!ready} onClick={()=>setAROpen(true)}>{english?"View in your space":"Ver no meu espaço"}</button></div>
+  {error&&<div className={styles.error} role="alert"><p>{error}</p><button type="button" className={styles.retryButton} onClick={()=>setRetry(value=>value+1)}>{english?"Try again":"Tentar novamente"}</button></div>}<div ref={host} className={styles.canvas}/>
   {props.type==='racks'&&<RackLoadSummary height={props.height} slots={props.slots} levelsByModule={props.levelsByModule} value={props.useRequirements} modules={props.modules} capacity={props.loadCapacity} english={english}/>}
   <p className={styles.help}>{english?'Drag to rotate · Scroll or pinch to zoom · Right-click or use two fingers to pan.':'Arraste para rodar · Roda do rato ou pinça para zoom · Botão direito ou dois dedos para deslocar.'}</p>
   <p className={styles.note}>{english?'One row of your current configuration. Finishes and details are inspired by product photographs. Illustrative model; refer to the technical drawing for dimensions. Removed shelves match the 2D drawing.':'Vista de uma fila da configuração atual. Acabamentos e pormenores inspirados nas fotografias dos produtos. Modelo ilustrativo, sem substituir o desenho técnico. Os níveis removidos acompanham o desenho 2D.'}</p>

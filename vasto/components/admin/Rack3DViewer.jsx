@@ -6,6 +6,7 @@ import {createRackGeometry} from '@/lib/admin/rack-3d-geometry.mjs';
 import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
 import {rackModel} from '@/lib/admin/rack-3d-model.mjs';
 import styles from './Rack3DViewer.module.css';
+import RackLoadSummary from '@/components/simulador/RackLoadSummary';
 import dynamic from 'next/dynamic';
 const ARPreview=dynamic(()=>import('./RackARPreview'),{ssr:false});
 export default function Rack3DViewer(props){
@@ -60,14 +61,15 @@ export default function Rack3DViewer(props){
    dimension(new THREE.Vector3(model.width/2+dimOffset,.02,-model.depth/2),new THREE.Vector3(model.width/2+dimOffset,.02,model.depth/2),fmt(model.depth));
    const groundGeo=new THREE.PlaneGeometry(200,200);const groundMat=new THREE.ShadowMaterial({opacity:.1});const ground=new THREE.Mesh(groundGeo,groundMat);ground.rotation.x=-Math.PI/2;ground.position.y=-.009;ground.receiveShadow=true;scene.add(ground);disposables.push(groundGeo,groundMat);
    const gridSize=Math.max(model.width,model.depth,4)*1.8;const grid=new THREE.GridHelper(gridSize,24,0xbac8d7,0xe0e6ee);grid.position.y=-.02;scene.add(grid);disposables.push(grid.geometry,grid.material);
-   const render=()=>renderer.render(scene,camera);const target=new THREE.Vector3(0,model.height/2,0);
+   const previewHeight=Math.max(model.height,...model.bays.flatMap(b=>b.palletLoad?b.levels.map(y=>y+b.palletLoad.loadHeight):[]));
+   const render=()=>renderer.render(scene,camera);const target=new THREE.Vector3(0,previewHeight/2,0);
    function fit(view='perspective'){
     // Keep long rows close enough to inspect in every preset view.
     // Single bays keep their approved fit.
     const framedWidth=model.bays.length>1
      ?Math.min(model.width,Math.max(model.height*(model.type==='racks'?1.1:2.2),model.bays[0].length*(model.type==='racks'?1.2:2)))
      :model.width;
-    const sphereRadius=Math.sqrt(framedWidth**2+model.height**2+model.depth**2)/2;
+    const sphereRadius=Math.sqrt(framedWidth**2+previewHeight**2+model.depth**2)/2;
     const fov=THREE.MathUtils.degToRad(camera.fov);const limitingFov=Math.min(fov,2*Math.atan(Math.tan(fov/2)*camera.aspect));const distance=sphereRadius/Math.sin(limitingFov/2)*1.12;
     const direction=view==='front'?new THREE.Vector3(0,0,1):view==='side'?new THREE.Vector3(1,0,0):view==='top'?new THREE.Vector3(0,1,.001):new THREE.Vector3(.9,.38,1.5).normalize();
     controls.target.copy(target);camera.position.copy(target).addScaledVector(direction,distance);controls.update();render();
@@ -91,6 +93,7 @@ export default function Rack3DViewer(props){
   {arOpen&&summary&&<ARPreview model={summary} english={english} onClose={()=>setAROpen(false)}/>}
   <div className={styles.toolbar} aria-label="Controlos da vista 3D">{[['perspective',english?'Reset view':'Repor vista'],['front',english?'Front':'Frente'],['side',english?'Side':'Lado'],['top',english?'Top':'Topo']].map(([view,label])=><button type="button" key={view} onClick={()=>actions.current.view?.(view)}>{label}</button>)}<button type="button" aria-label="Aproximar modelo" onClick={()=>actions.current.zoom?.(.8)}>+</button><button type="button" aria-label="Afastar modelo" onClick={()=>actions.current.zoom?.(1.25)}>−</button><button type="button" className={styles.arButton} disabled={!summary} onClick={()=>setAROpen(true)}>{english?"View in your space":"Ver no meu espaço"}</button></div>
   {error&&<p className={styles.error} role="alert">{error}</p>}<div ref={host} className={styles.canvas}/>
+  {props.type==='racks'&&<RackLoadSummary height={props.height} slots={props.slots} levelsByModule={props.levelsByModule} value={props.useRequirements} modules={props.modules} capacity={props.loadCapacity} english={english}/>}
   <p className={styles.help}>{english?'Drag to rotate · Scroll or pinch to zoom · Right-click or use two fingers to pan.':'Arraste para rodar · Roda do rato ou pinça para zoom · Botão direito ou dois dedos para deslocar.'}</p>
   <p className={styles.note}>{english?'One row of your current configuration. Finishes and details are inspired by product photographs. Illustrative model; refer to the technical drawing for dimensions. Removed shelves match the 2D drawing.':'Vista de uma fila da configuração atual. Acabamentos e pormenores inspirados nas fotografias dos produtos. Modelo ilustrativo, sem substituir o desenho técnico. Os níveis removidos acompanham o desenho 2D.'}</p>
  </div>;

@@ -157,3 +157,15 @@ test('light-duty rear ties mount with curved end returns and no rear bolts',()=>
   assert.ok(!r.group.children.some(mesh=>mesh.name==='Parafuso sextavado'||mesh.name==='Anilha zincada'||mesh.name==='Aba do travamento horizontal'));
  }finally{r.dispose();}
 });
+
+test('rack storage requirements add real-sized pallets only to active levels',()=>{
+ const model=rackModel({...base,type:'racks',modules:[2300],levelsByModule:[[0,2]],useRequirements:{pallet:'EUR 1200 × 800 mm',palletsPerLevel:'2',loadHeight:'1500',protection:true}});
+ const r=createRackGeometry(model);
+ try{
+  assert.equal(model.bays[0].palletLoad.count,2);
+  assert.equal(r.group.children.filter(mesh=>mesh.name==='Tábua superior da palete').reduce((sum,mesh)=>sum+mesh.count,0),20);
+  assert.equal(r.group.children.find(mesh=>mesh.name==='Bloco da palete').count,36);
+  assert.equal(r.group.children.find(mesh=>mesh.name==='Carga ilustrativa sobre palete').count,4);
+  assert.equal(r.group.children.find(mesh=>mesh.name==='Proteção de pilar solicitada').count,2);
+ }finally{r.dispose();}
+});

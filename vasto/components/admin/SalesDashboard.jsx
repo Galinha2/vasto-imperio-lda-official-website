@@ -909,7 +909,7 @@ export default function SalesDashboard() {
                 <div className="admin-surface rounded-2xl border border-orange-200 bg-white px-6 py-5 text-center shadow-lg">
                   <IoCloudUploadOutline className="mx-auto text-3xl text-orange-600" />
                   <p className="mt-2 text-sm font-semibold text-[#1d1d1f]">Largue os PDFs para registar</p>
-                  <p className="mt-1 text-xs text-[#86868b]">Orçamentos ou simulações · até 6 MB por PDF</p>
+                  <p className="mt-1 text-xs text-[#86868b]">Orçamentos ou configurações · até 6 MB por PDF</p>
                 </div>
               </div>
             )}
@@ -1067,7 +1067,7 @@ export default function SalesDashboard() {
 
                             <p className={styles.quoteReference} title={sale.fileName}>{sale.nif ? `NIF ${sale.nif}` : "Sem NIF indicado"}{sale.emailSentAt ? " · Email enviado" : ""}</p>
                             <div className="mt-1 flex items-center gap-2">
-                              <p className="min-w-0 truncate text-[10px] text-[#86868b]">{sale.source === "simulador" ? "Criado no simulador" : "Documento PDF"}</p>
+                              <p className="min-w-0 truncate text-[10px] text-[#86868b]">{sale.source === "simulador" ? "Criado no configurador" : "Documento PDF"}</p>
                             <span title={sale.entryOrigin === "cliente" || (!sale.entryOrigin && sale.orderDetails) ? "Pedido enviado pelo cliente através do site, com envio por email." : "Orçamento introduzido através do painel de administração."} className={`shrink-0 inline-flex rounded-full px-2 py-0.5 text-[10px] font-medium ${sale.entryOrigin === "cliente" || (!sale.entryOrigin && sale.orderDetails) ? "border border-orange-200 bg-orange-50 text-orange-700" : "border border-blue-200 bg-blue-50 text-blue-700"}`}>
                               {sale.entryOrigin === "cliente" || (!sale.entryOrigin && sale.orderDetails) ? "Cliente · Site" : "Admin"}
                             </span>
@@ -1245,10 +1245,10 @@ export default function SalesDashboard() {
                   </tbody>)}
                 </table>
               </div>
-            ) : <div className="px-6 py-14 text-center"><span className="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-[#f5f5f7] text-2xl text-[#a1a1a6]"><IoDocumentTextOutline /></span><h3 className="mt-4 text-lg font-semibold tracking-tight">{sales.length ? "Ainda sem documentos neste período." : "Tudo começa com o primeiro PDF."}</h3><p className="mx-auto mt-2 max-w-sm text-sm leading-relaxed text-[#86868b]">{sales.length ? "Escolha outro mês ou ajuste os filtros para consultar as suas encomendas." : "Importe um orçamento ou uma simulação. Os dados ficam organizados automaticamente."}</p></div>}
+            ) : <div className="px-6 py-14 text-center"><span className="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-[#f5f5f7] text-2xl text-[#a1a1a6]"><IoDocumentTextOutline /></span><h3 className="mt-4 text-lg font-semibold tracking-tight">{sales.length ? "Ainda sem documentos neste período." : "Tudo começa com o primeiro PDF."}</h3><p className="mx-auto mt-2 max-w-sm text-sm leading-relaxed text-[#86868b]">{sales.length ? "Escolha outro mês ou ajuste os filtros para consultar as suas encomendas." : "Importe um orçamento ou uma configuração. Os dados ficam organizados automaticamente."}</p></div>}
           </section>
 
-          <button type="button" disabled={uploading || loading} onClick={() => inputRef.current?.click()} onDragOver={(event) => { event.preventDefault(); if (!uploading && !loading) setDragging(true); }} onDragLeave={() => setDragging(false)} onDrop={(event) => { event.preventDefault(); setDragging(false); importFiles(Array.from(event.dataTransfer.files)); }} className={`mt-6 flex w-full cursor-pointer flex-col items-center justify-center gap-3 rounded-full border-2 border-dashed p-7 transition disabled:cursor-wait disabled:opacity-60 sm:flex-row sm:gap-5 ${dragging ? "border-orange-400 bg-orange-50" : "border-[#dcdce2] hover:border-orange-300 hover:bg-orange-50/50"}`}><IoCloudUploadOutline className="text-3xl text-orange-600" /><span className="text-center sm:text-left"><span className="block text-sm font-semibold">{uploading ? "A ler e registar os documentos…" : "Arraste os seus PDFs para aqui."}</span><span className="mt-1 block text-xs text-[#86868b]">Ou clique para escolher · Orçamentos e simulador · Até 6 MB por PDF</span></span></button>
+          <button type="button" disabled={uploading || loading} onClick={() => inputRef.current?.click()} onDragOver={(event) => { event.preventDefault(); if (!uploading && !loading) setDragging(true); }} onDragLeave={() => setDragging(false)} onDrop={(event) => { event.preventDefault(); setDragging(false); importFiles(Array.from(event.dataTransfer.files)); }} className={`mt-6 flex w-full cursor-pointer flex-col items-center justify-center gap-3 rounded-full border-2 border-dashed p-7 transition disabled:cursor-wait disabled:opacity-60 sm:flex-row sm:gap-5 ${dragging ? "border-orange-400 bg-orange-50" : "border-[#dcdce2] hover:border-orange-300 hover:bg-orange-50/50"}`}><IoCloudUploadOutline className="text-3xl text-orange-600" /><span className="text-center sm:text-left"><span className="block text-sm font-semibold">{uploading ? "A ler e registar os documentos…" : "Arraste os seus PDFs para aqui."}</span><span className="mt-1 block text-xs text-[#86868b]">Ou clique para escolher · Orçamentos e configurador · Até 6 MB por PDF</span></span></button>
           <p className="mt-5 text-center text-[11px] leading-relaxed text-[#a1a1a6]">As vendas contam no mês de confirmação pelo cliente. Exceção: os orçamentos emitidos antes de setembro de 2026 e já entregues contam no mês da entrega registada. Os orçamentos a aguardar resposta contam no mês de emissão.</p>
         </div>
         {salesDetail && (

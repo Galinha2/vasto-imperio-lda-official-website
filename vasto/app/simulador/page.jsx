@@ -122,13 +122,13 @@ export default function SimulatorSelectionPage() {
       <div className="mx-auto max-w-[1440px]">
         <header className="mb-10 max-w-4xl sm:mb-14">
           <p className="inline-flex rounded-full border border-[#e5e5e7] bg-white px-3.5 py-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-(--orange)">
-            {english ? "Quote simulator" : "Simulador de orçamento"}
+            {english ? "Product configurator" : "Configurador de orçamento"}
           </p>
           <h1 className="mt-5 max-w-3xl text-4xl font-semibold leading-[1.04] tracking-[-0.055em] text-[#1d1d1f] sm:text-5xl lg:text-[60px]">
             {english ? "Choose what you want to configure." : "Escolha o que pretende configurar."}
           </h1>
           <p className="mt-4 max-w-2xl text-base leading-relaxed text-[#6e6e73] sm:text-lg">
-            {english ? "Configure a storage solution or find the right materials handling equipment." : "Simule uma solução de armazenagem ou encontre o equipamento de movimentação de cargas adequado."}
+            {english ? "Configure a storage solution or find the right materials handling equipment." : "Configure uma solução de armazenagem ou encontre o equipamento de movimentação de cargas adequado."}
           </p>
         </header>
 
@@ -137,7 +137,7 @@ export default function SimulatorSelectionPage() {
             <div>
               <p className="text-xs font-semibold uppercase tracking-[0.14em] text-(--orange)">{english ? "Configure your storage" : "Configure a sua armazenagem"}</p>
               <h2 id="shelving-heading" className="mt-1 text-2xl font-semibold tracking-[-0.04em] text-[#1d1d1f] sm:text-3xl">
-                {english ? "Shelving simulators" : "Simuladores de estantes"}
+                {english ? "Shelving configurators" : "Configuradores de estantes"}
               </h2>
             </div>
             <span className="text-sm text-[#86868b]">{english ? "Choose one to start configuring" : "Escolha uma opção para começar"}</span>

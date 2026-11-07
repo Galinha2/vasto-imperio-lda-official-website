@@ -145,9 +145,9 @@ export default function SimulatorOrderModal({ open, onClose, total, details, ite
   }
 
   const text = english ? {
-    title: "Place your order", intro: "Fill in your details to submit the order. The technical list is sent only internally to Vasto Império.", name: "Name", nif: "Tax number", fiscal: "Billing address", same: "Shipping address is the same as billing", shipping: "Shipping address", assembly: "Do you need assembly?", yes: "Yes", no: "No", phone: "Phone number", email: "Email", notes: "Notes", notesPlaceholder: "Anything else we should know?", final: "Final value", vat: "+ VAT at the applicable rate. Delivery is not included.", submit: "Confirm order", cancel: "Cancel", sending: "Sending…", success: "Order submitted successfully", successText: "Our team will contact you shortly.", close: "Close", error: "Please fill in all required fields.",
+    title: "Request a proposal", intro: "Free, non-binding request, subject to technical validation and commercial confirmation. Submitting this form does not complete a purchase.", name: "Name", nif: "Tax number", fiscal: "Billing address", same: "Shipping address is the same as billing", shipping: "Shipping address", assembly: "Do you need assembly?", yes: "Yes", no: "No", phone: "Phone number", email: "Email", notes: "Notes", notesPlaceholder: "Anything else we should know?", final: "Estimated value", vat: "+ VAT at the applicable rate. Delivery is not included.", submit: "Submit proposal request", cancel: "Cancel", sending: "Sending…", success: "Order submitted successfully", successText: "Our team will contact you shortly.", close: "Close", error: "Please fill in all required fields.",
   } : {
-    title: "Encomendar", intro: "Preenche os dados para enviar o pedido. A lista técnica segue apenas internamente para a Vasto Império.", name: "Nome", nif: "NIF", fiscal: "Morada fiscal", same: "A morada de envio é igual à morada fiscal", shipping: "Morada de envio", assembly: "Quer montagem?", yes: "Sim", no: "Não", phone: "Contacto telefónico", email: "Email", notes: "Observações", notesPlaceholder: "Escreva aqui alguma informação adicional", final: "Valor final", vat: "+ IVA à taxa legal em vigor. Transporte não incluído.", submit: "Confirmar encomenda", cancel: "Cancelar", sending: "A enviar…", success: "Pedido enviado com sucesso", successText: "A nossa equipa entrará em contacto consigo em breve.", close: "Fechar", error: "Preencha todos os campos obrigatórios.",
+    title: "Pedir proposta", intro: "Pedido gratuito e sem compromisso, sujeito a validação técnica e confirmação comercial. O envio não conclui uma compra.", name: "Nome", nif: "NIF", fiscal: "Morada fiscal", same: "A morada de envio é igual à morada fiscal", shipping: "Morada de envio", assembly: "Quer montagem?", yes: "Sim", no: "Não", phone: "Contacto telefónico", email: "Email", notes: "Observações", notesPlaceholder: "Escreva aqui alguma informação adicional", final: "Valor estimado", vat: "+ IVA à taxa legal em vigor. Transporte não incluído.", submit: "Enviar pedido de proposta", cancel: "Cancelar", sending: "A enviar…", success: "Pedido enviado com sucesso", successText: "A nossa equipa entrará em contacto consigo em breve.", close: "Fechar", error: "Preencha todos os campos obrigatórios.",
   };
 
   return (
@@ -189,7 +189,7 @@ export default function SimulatorOrderModal({ open, onClose, total, details, ite
                   <section className={styles.card}>
                     <div className="mb-4 lg:mb-2">
                       <h3 className="text-base font-semibold tracking-[-0.02em] text-[#1d1d1f]">{english ? "Addresses" : "Moradas"}</h3>
-                      <p className="mt-1 text-xs text-[#86868b]">{english ? "Tell us where to invoice and deliver the order." : "Indica onde faturar e entregar a encomenda."}</p>
+                      <p className="mt-1 text-xs text-[#86868b]">{english ? "Provide the address and intended installation location." : "Indique a morada e o local previsto para a instalação."}</p>
                     </div>
                     <div className="space-y-4 lg:space-y-2">
                       <label className="block space-y-1 text-sm font-medium text-[#424245]">{text.fiscal}<input required autoComplete="billing street-address" value={form.moradaFiscal} onChange={(event) => setField("moradaFiscal", event.target.value)} className={styles.input} /></label>
@@ -210,7 +210,7 @@ export default function SimulatorOrderModal({ open, onClose, total, details, ite
                 </div>
 
                 <aside className={styles.summary}>
-                  <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[#6e6e73]">{english ? "Order summary" : "Resumo da encomenda"}</p>
+                  <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[#6e6e73]">{english ? "Request summary" : "Resumo do pedido"}</p>
                   <div className={styles.summaryBadge}>{english?'Prepared for you':'Preparado à sua medida'}</div>
                   {cartOrder && <p className={styles.summaryCount}>{cartConfigurations?.length || 0} {english?'configurations in your request':'configurações no seu pedido'}</p>}
                   {equipment && <p className="mt-3 text-sm leading-relaxed text-[#424245]">{details}</p>}
@@ -219,7 +219,7 @@ export default function SimulatorOrderModal({ open, onClose, total, details, ite
                     <p className="mt-2 text-3xl font-semibold tracking-[-0.05em] text-(--orange)">{currency.format(total || 0)}</p>
                     <p className="mt-2 text-xs leading-relaxed text-[#6e6e73]">{text.vat}</p>
                   </div>
-                  <div className={styles.vatRow}><span>{english?'Total including VAT (23%)':'Total com IVA (23%)'}</span><strong>{currency.format((total || 0) * 1.23)}</strong></div>
+                  <div className={styles.vatRow}><span>{english?'Estimated with VAT (23% · mainland)':'Estimativa com IVA (23% · continente)'}</span><strong>{currency.format((total || 0) * 1.23)}</strong></div>
                   <p className="mt-4 text-xs leading-relaxed text-[#6e6e73]">{equipment
                     ? (english ? "The item list, equipment image and quotation will be sent to Vasto Império with your request." : "A lista de artigos, a imagem do equipamento e o orçamento seguem para a Vasto Império juntamente com o pedido.")
                     : (english ? "The technical specification and drawing will be sent to Vasto Império with your request." : "A lista técnica e o desenho seguem para a Vasto Império juntamente com o pedido.")}</p>

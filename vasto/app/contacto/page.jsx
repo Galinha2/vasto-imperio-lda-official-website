@@ -1,5 +1,5 @@
 
-import ContactCard from "@/components/contacts/ContactCard"
+import ContactDetails from "@/components/contacts/ContactDetails"
 import ContactHeader from "@/components/contacts/ContactHeader"
 import { createPageMetadata } from "@/lib/seo";
 
@@ -13,7 +13,7 @@ function page() {
     return (
         <div className="bg-[#f5f5f7] pt-[76px]">
             <ContactHeader />
-            <ContactCard wide />
+            <ContactDetails />
         </div>
     )
 }

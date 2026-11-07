@@ -1,10 +1,10 @@
-export async function captureCartDrawing(drawingRef) {
+export async function captureCartDrawing(drawingRef, maxImageLength = 350000) {
   const drawing = drawingRef?.current?.querySelector('svg[role="img"], svg[data-order-drawing]');
   if (!drawing) throw new Error('O desenho ainda não está disponível. Aguarde e tente novamente.');
   await document.fonts?.ready;
   const { toJpeg } = await import('html-to-image');
   const image = await toJpeg(drawing, { pixelRatio: 1, quality: .8, backgroundColor: '#ffffff', cacheBust: true });
-  if (image.length > 350000) throw new Error('Este desenho é demasiado grande para o carrinho. Reduza a configuração ou envie-a individualmente.');
+  if (image.length > maxImageLength) throw new Error('Este desenho é demasiado grande para o carrinho. Reduza a configuração ou envie-a individualmente.');
   return image;
 }
 export async function cartDrawing(entries) {

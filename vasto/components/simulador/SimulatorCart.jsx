@@ -97,6 +97,17 @@ function CartState({ children, admin }) {
       setOpen(false);
     } finally {setBusy(false);}
   }
+  async function downloadSummary() {
+    if (busy || !entriesRef.current.length) return;
+    setBusy(true); setError('');
+    try {
+      const selected = entriesRef.current;
+      const quote = cartQuote(selected);
+      const image = await cartDrawing(selected);
+      const { default: exportPdf } = await import('@/lib/download-configuration-pdf');
+      await exportPdf({ quote, image, english });
+    } catch (e) { setError(e.message); } finally { setBusy(false); }
+  }
   async function prepareCheckout() {
     if (busy || !entries.length) return;
     setBusy(true); setError('');
@@ -120,8 +131,8 @@ function CartState({ children, admin }) {
     {open && !checkout && <div className={styles.overlay}>
       <section role="dialog" aria-modal="true" aria-labelledby="simulator-cart-title" className={styles.panel}>
         <header className={styles.header}><div><p className={styles.eyebrow}>A sua seleção</p><h2 id="simulator-cart-title">Rever o seu pedido</h2><p className={styles.subtitle}>{entries.length} {entries.length === 1 ? 'configuração, preparada à sua medida.' : 'configurações, preparadas à sua medida.'}</p></div><button type="button" className={styles.close} autoFocus onClick={() => setOpen(false)} aria-label="Fechar carrinho"><IoCloseOutline size={20} /></button></header>
-        <div className={styles.body} role="region" aria-label="Artigos do carrinho" tabIndex={0}><div className={styles.listHeader}><h3>Artigos do pedido</h3><span>{entries.length} {entries.length === 1 ? 'configuração' : 'configurações'}</span></div>{error && <p role="alert" className={styles.error}>{error}</p>}<CartContents />{!entries.length && <p className={styles.empty}>Adicione uma configuração num dos simuladores.</p>}</div>
-        <div className={styles.bottom}><p className={styles.summaryHeading}>Resumo do pedido</p><div className={styles.summaryRows}><p><span>Configurações</span><strong>{entries.length}</strong></p><p><span>IVA · 23%</span><strong>{money(quote.total * .23)}</strong></p></div><footer className={styles.footer}><div><p className={styles.totalLabel}>Total estimado</p><p className={styles.total}>{money(quote.total)}</p><p className={styles.tax}>Sem IVA · Transporte não incluído.</p><p className={styles.totalWithVat}>Com IVA: {money(quote.total * 1.23)}</p></div><button type="button" disabled={busy || !entries.length} onClick={prepareCheckout} className={styles.checkout}>{busy ? 'A preparar…' : 'Enviar pedido completo'}<IoArrowForward size={17} /></button></footer><button type="button" onClick={() => setOpen(false)} className={styles.continue}>Continuar a simular</button></div>
+        <div className={styles.body} role="region" aria-label="Artigos do carrinho" tabIndex={0}><div className={styles.listHeader}><h3>Artigos do pedido</h3><span>{entries.length} {entries.length === 1 ? 'configuração' : 'configurações'}</span></div>{error && <p role="alert" className={styles.error}>{error}</p>}<CartContents />{!entries.length && <p className={styles.empty}>Adicione uma configuração num dos configuradores.</p>}</div>
+        <div className={styles.bottom}><p className={styles.summaryHeading}>Resumo do pedido</p><div className={styles.summaryRows}><p><span>Configurações</span><strong>{entries.length}</strong></p><p><span>IVA · 23%</span><strong>{money(quote.total * .23)}</strong></p></div><footer className={styles.footer}><div><p className={styles.totalLabel}>Total estimado</p><p className={styles.total}>{money(quote.total)}</p><p className={styles.tax}>Sem IVA · Transporte não incluído.</p><p className={styles.totalWithVat}>Estimativa com IVA (23% · continente): {money(quote.total * 1.23)}</p></div><button type="button" disabled={busy || !entries.length} onClick={prepareCheckout} className={styles.checkout}>{busy ? 'A preparar…' : 'Pedir proposta completa'}<IoArrowForward size={17} /></button></footer><button type="button" disabled={busy || !entries.length} onClick={downloadSummary} className={styles.continue}>{busy ? "A preparar…" : "Descarregar pedido em PDF"}</button><button type="button" onClick={() => setOpen(false)} className={styles.continue}>Continuar a configurar</button></div>
       </section>
     </div>}
     {checkout && <SimulatorOrderModal open onClose={() => {setCheckout(null); setOpen(false);}} {...checkout} details={checkout.details} imageSrc={checkout.image} cartOrder cartConfigurations={checkout.configurations} onSent={sent} />}
@@ -167,7 +178,7 @@ export function AddToSimulatorCart({ quoteRef, getQuote, drawingRef, label, engl
     } catch (failure) { setNotice(failure.message); }
     finally { setBusy(false); }
   }
-  return <div className="mt-3"><div className={onOrder ? styles.simulatorActions : undefined}><button type="button" disabled={disabled || busy || !cart?.ready} onClick={()=>add(false)} className={`${styles.addToCartPrimary} ${onOrder ? styles.addToCartBlue : ''}`}><IoCartOutline size={21}/>{busy ? (english ? 'Adding…' : 'A adicionar…') : (cart?.editingId ? (english ? 'Save cart changes' : 'Guardar alterações no carrinho') : (english ? 'Add to cart' : 'Adicionar ao carrinho'))}</button>{onOrder && <button type="button" disabled={disabled || busy || !cart?.ready} onClick={()=>add(true)} className={styles.addToCartPrimary}><IoArrowForward size={20}/>{busy ? (english?'Preparing…':'A preparar…') : (english?'Order':'Encomendar')}</button>}</div>{!cart?.editingId && <p className={styles.addToCartHint}>{english?'Combine different shelving configurations in one request.':'Junte diferentes estantes num único pedido.'}</p>}{notice && <p role="status" className="mt-2 text-xs text-[#6e6e73]">{notice}</p>}</div>;
+  return <div className="mt-3"><div className={onOrder ? styles.simulatorActions : undefined}><button type="button" disabled={disabled || busy || !cart?.ready} onClick={()=>add(false)} className={`${styles.addToCartPrimary} ${onOrder ? styles.addToCartBlue : ''}`}><IoCartOutline size={21}/>{busy ? (english ? 'Adding…' : 'A adicionar…') : (cart?.editingId ? (english ? 'Save cart changes' : 'Guardar alterações no carrinho') : (english ? 'Add to request' : 'Adicionar ao pedido'))}</button>{onOrder && <button type="button" disabled={disabled || busy || !cart?.ready} onClick={()=>add(true)} className={styles.addToCartPrimary}><IoArrowForward size={20}/>{busy ? (english?'Preparing…':'A preparar…') : (english?'Request proposal':'Pedir proposta')}</button>}</div>{!cart?.editingId && <p className={styles.addToCartHint}>{english?'Combine different shelving configurations in one request.':'Junte diferentes estantes num único pedido.'}</p>}{notice && <p role="status" className="mt-2 text-xs text-[#6e6e73]">{notice}</p>}</div>;
 }
 
 export function SimulatorHeaderCart({english=false}) {

@@ -7,7 +7,7 @@ import {createRackGeometry} from '../lib/admin/rack-3d-geometry.mjs';
 
 test('AR bakes every repeated fitting into exportable meshes without changing metre dimensions',()=>{
  for(const type of ['picking','racks','ligeiras','bancadas']){
-  const model=rackModel({type,modules:[1000,1500],height:2000,depth:600,slots:2,bracedIndexes:[0]});
+  const model=rackModel({type,modules:[1000,1500],height:2000,depth:600,slots:2,bracedIndexes:[0],useRequirements:type==='racks'?{pallet:'EUR 1200 × 800 mm',loadHeight:'1200',protection:true}:{}});
   const source=createRackGeometry(model),asset=createARScene(model);
   try{
    assert.ok(asset.scene.children.length>0);

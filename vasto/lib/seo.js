@@ -1,3 +1,4 @@
+import { productLandingPaths, productLanguagePaths } from "./product-seo.mjs";
 export function createPageMetadata({ title, description, path, locale = "pt_PT", image }) {
   const brandedTitle = `${title} | Vasto Império`;
 
@@ -9,7 +10,7 @@ export function createPageMetadata({ title, description, path, locale = "pt_PT",
       follow: true,
       googleBot: { index: true, follow: true, "max-image-preview": "large", "max-snippet": -1, "max-video-preview": -1 },
     },
-    alternates: path ? { canonical: path } : undefined,
+    alternates: path ? { canonical: path, ...(Object.values(productLandingPaths).includes(path) ? { languages: productLanguagePaths(path.slice(1)) } : {}) } : undefined,
     openGraph: {
       title: brandedTitle,
       description,

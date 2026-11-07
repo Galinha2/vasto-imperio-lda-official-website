@@ -1,3 +1,4 @@
+import { productStructuredData } from "@/lib/product-seo.mjs";
 import PromotionalPage from "../../components/produtos/PromotionalPage";
 import racksData from "../../assets/contentpt.json";
 import { createPageMetadata } from "@/lib/seo";
@@ -13,7 +14,8 @@ function Page() {
     (p) => p.id === "estante-carga-ligeira"
   );
 
-  return <PromotionalPage produto={produto} />;
+  const product = racksData.productsShowcase.products.find(p => p.id === "estante-carga-ligeira");
+  return <><script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(productStructuredData(product, 'pt')).replace(/</g, "\\u003c") }} /><PromotionalPage produto={produto} /></>;
 }
 
 export default Page; 

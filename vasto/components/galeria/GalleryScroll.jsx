@@ -5,7 +5,7 @@ export default function GalleryScroll({ images }) {
   if (!images || images.length === 0) return null;
 
   return (
-    <div className="overflow-hidden relative -mx-5 md:-mx-10">
+    <div className="overflow-hidden relative w-full min-w-0">
       <div className="flex animate-scroll-horizontal gap-4 py-2">
         {images.concat(images).map((img, idx) => (
           <Image

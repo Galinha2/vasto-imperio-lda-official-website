@@ -16,6 +16,9 @@ export function createRackGeometry(model,{woodTexture=null,zincTexture=null}={})
   wood:material('Tampo aglomerado',0xbda47e,.03,.86,woodTexture),
   metal:material('Tampo metálico',0xd3d7d3,.4,.38),
   shelfRib:material('Reforço integrado cinzento claro',0xe1e4e0,.4,.38),
+  pallet:material('Madeira de palete',0xb99a6f,.02,.85),
+  cargo:material('Carga ilustrativa',0xcbbda4,.01,.9),
+  guard:material('Proteção solicitada',0xefb52c,.25,.38),
   tie:material('Travamento cinzento',0xaeb8b2,.3,.48),
   bolt:material('Parafusos zincados',0xd5dce0,.75,.28),
   plastic:material('Pés de proteção branco suave',0xeeefe9,.02,.82),
@@ -67,6 +70,10 @@ export function createRackGeometry(model,{woodTexture=null,zincTexture=null}={})
    }else{
     put('Montante com perfuração',perforatedWeb(),mats.upright,x,0,z,[0,z>0?0:Math.PI,0]);
     for(const edge of [-1,1]){box('Aba do montante',thickness,model.height,profileDepth,x+edge*(model.upright/2-thickness/2),model.height/2,z+inward*profileDepth/2,mats.upright);box('Retorno do perfil',.009,model.height,thickness,x+edge*(model.upright/2-.0045),model.height/2,z+inward*profileDepth,mats.upright);}
+   }
+   if(rack&&z>0&&model.useRequirements?.protection){
+    box('Proteção de pilar solicitada',model.upright+.06,.35,.008,x,.175,z+.07,mats.guard);
+    for(const side of [-1,1])box('Aba da proteção solicitada',.008,.35,.12,x+side*(model.upright/2+.03),.175,z+.014,mats.guard);
    }
    if(light){
     box('Pé plástico',model.upright+.004,.018,profileDepth+.012,x,.009,z+inward*.008,mats.plastic);
@@ -131,6 +138,25 @@ export function createRackGeometry(model,{woodTexture=null,zincTexture=null}={})
       }
       box('Retorno lateral do encaixe',.003,bh*1.45,.025,end+(end<center?-.018:.018),y-bh*.55,z-sign*.006,mats.connector);
       box('Freio de segurança',.009,.012,.014,end+.012,y-.006,z+sign*.014,mats.bolt);
+     }
+    }
+   }
+   if(rack&&b.palletLoad){
+    const load=b.palletLoad;
+    for(const offset of load.centres){
+     const px=center+offset,w=load.width,d=load.depth;
+     // Euro pallet: five top boards, three bottom runners and nine spacer blocks.
+     const boardWidths=w===.8?[.145,.1,.145,.1,.145]:Array(5).fill(.145);
+     const boardGap=(w-boardWidths.reduce((sum,bw)=>sum+bw,0))/4;let boardX=px-w/2;
+     for(const bw of boardWidths){box('Tábua superior da palete',bw,.022,d,boardX+bw/2,y+.133,0,mats.pallet);boardX+=bw+boardGap;}
+     for(const sx of [-1,0,1]){
+      box('Patim inferior da palete',.1,.022,d,px+sx*(w/2-.05),y+.011,0,mats.pallet);
+      for(const sz of [-1,0,1])box('Bloco da palete',.1,.078,.14,px+sx*(w/2-.05),y+.061,sz*(d/2-.07),mats.pallet);
+     }
+     for(const sz of [-1,0,1])box('Travessa da palete',w,.022,.14,px,y+.111,sz*(d/2-.07),mats.pallet);
+     if(load.loadHeight>load.palletHeight){
+      const ch=load.loadHeight-load.palletHeight;
+      box('Carga ilustrativa sobre palete',w-.04,ch,d-.04,px,y+load.palletHeight+ch/2,0,mats.cargo);
      }
     }
    }

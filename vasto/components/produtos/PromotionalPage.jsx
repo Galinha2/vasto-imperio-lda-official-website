@@ -1,5 +1,7 @@
 "use client";
 
+import ProductSelectionGuide from "./ProductSelectionGuide";
+
 import React from "react";
 import Image from "@/components/loadings/LoadingImage";
 import Link from "next/link";
@@ -31,13 +33,13 @@ function PromotionalPage({ produto }) {
     title: "Picking Shelving with Shelves",
     galleryTitle: "Our customers",
     subtitle: "A modular solution for organising products and keeping stock within easy reach. Choose the dimensions and configure your shelving to suit the available space.",
-    description: "<span class='label'>Material:</span> High-strength metal structure.<br/><span class='label'>Load capacity:</span> Up to 1,000 kg per beam pair.<br/><span class='label'>Frame height:</span> 2,000 to 5,500 mm.<br/><span class='label'>Frame depth:</span> 400 to 1,100 mm.<br/><span class='label'>Beam length:</span> 1,000 to 2,750 mm.<br/><span class='label'>Beam profiles:</span> Z60 or Z100.<br/><span class='label'>Description:</span> A robust metal shelving system for warehouses, workshops and storage areas. Its modular structure and quick-fit beams support a range of height, depth and length configurations to suit your load and organisation needs.",
+    description: "<span class='label'>Material:</span> High-strength metal structure.<br/><span class='label'>Load capacity:</span> Up to 1,000 kg per beam pair.<br/><span class='label'>Frame height:</span> 2,000 to 5,000 mm.<br/><span class='label'>Frame depth:</span> 400 to 1,200 mm.<br/><span class='label'>Beam length:</span> 1,000 to 2,750 mm.<br/><span class='label'>Beam profiles:</span> Z60 or Z100.<br/><span class='label'>Description:</span> A robust metal shelving system for warehouses, workshops and storage areas. Its modular structure and quick-fit beams support a range of height, depth and length configurations to suit your load and organisation needs.",
   } : produto);
   const produtoCompleto = (english ? contenten : content).productsShowcase.products.find((p) => p.id === displayProduct.id);
   const tabelaFinal = displayProduct.tabela?.length ? displayProduct.tabela : produtoCompleto?.tabela || [];
   const simulatorHref = simulatorLinks[produto.id];
   const faqItems = english && isPickingProduct ? [
-    { q: "Can I configure the shelving dimensions?", a: "Yes. In the simulator you can choose the length, height, depth and number of levels." },
+    { q: "Can I configure the shelving dimensions?", a: "Yes. In the configurator you can choose the length, height, depth and number of levels." },
     { q: "Which shelf types are available?", a: "You can choose chipboard or metal shelves, depending on the configuration." },
     { q: "Can I request a different configuration?", a: "Yes. Send us the details of your space and our team will help you find the right solution." },
   ] : displayProduct.faq;
@@ -73,7 +75,7 @@ function PromotionalPage({ produto }) {
             <div className="mt-8 flex w-full flex-col gap-3 sm:w-auto sm:flex-row">
               {simulatorHref && (
                 <Link href={simulatorHref} className="inline-flex min-h-12 cursor-pointer items-center justify-center gap-3 rounded-full bg-(--orange) px-6 py-3 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:bg-(--orange-hover) focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--orange)">
-                  {english ? "Open simulator" : "Abrir simulador"} <FaArrowRight aria-hidden="true" />
+                  {english ? "Configure and see price" : "Configurar e ver preço"} <FaArrowRight aria-hidden="true" />
                 </Link>
               )}
               <Link href="/contacto" className="inline-flex min-h-12 cursor-pointer items-center justify-center gap-3 rounded-full border border-[#d2d2d7] bg-white px-6 py-3 text-sm font-semibold text-[#1d1d1f] transition hover:bg-[#eceef2] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1d1d1f]">
@@ -102,7 +104,7 @@ function PromotionalPage({ produto }) {
         )}
 
         {displayProduct.gallery?.length > 0 && (
-          <section className="py-14 sm:py-20 lg:py-24">
+          <section id="projetos-clientes" className="scroll-mt-24 py-14 sm:py-20 lg:py-24">
             <header className="mb-8 flex flex-col gap-3 border-b border-[#dedee3] pb-6 sm:flex-row sm:items-end sm:justify-between">
               <div>
                 <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-(--orange)">{english ? "In the field" : "No terreno"}</p>
@@ -114,6 +116,7 @@ function PromotionalPage({ produto }) {
           </section>
         )}
 
+        <ProductSelectionGuide id={displayProduct.id} english={english} />
         {tabelaFinal.length > 0 && (
           <section className="site-section site-glass overflow-hidden rounded-[28px] border border-[#e5e5e7] bg-white py-7 sm:py-9">
             <header className="px-5 pb-5 sm:px-9">

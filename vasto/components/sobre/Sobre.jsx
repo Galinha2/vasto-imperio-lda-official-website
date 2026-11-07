@@ -1,5 +1,6 @@
 "use client";
 
+import Link from 'next/link';
 import contentpt from "@/assets/contentpt.json";
 import contenten from "@/assets/contenten.json";
 import { useLanguage } from "../header/LanguageContext";
@@ -56,6 +57,12 @@ function Sobre() {
           <StoryCard title={item.p4t} accent="blue">{item.p4}</StoryCard>
         </div>
       </section>
+      <section className="bg-white px-5 py-12 sm:px-8"><div className="mx-auto max-w-[1320px] rounded-[28px] border border-[#e5e5e7] bg-[#f5f5f7] p-7 sm:p-9">
+        <h2 className="text-2xl font-semibold tracking-tight text-[#1d1d1f]">Vasto Império Lda.</h2>
+        <p className="mt-3 text-sm text-[#6e6e73]">NIPC 508738873 · geral@vastoimperio.pt · +351 928 348 117</p>
+        <p className="mt-4 max-w-3xl text-sm leading-7 text-[#6e6e73]">{language==='en'?'Compare the shelving families, explore customer installations and prepare your request with the information our team needs.':'Compare as famílias de estantes, veja instalações em clientes e prepare o seu pedido com a informação de que a equipa precisa.'}</p>
+        <div className="mt-5 flex flex-wrap gap-6 text-sm font-semibold text-[#0879c0]"><Link href="/apoio-ao-projeto">{language==='en'?'How your project works →':'Como funciona o seu projeto →'}</Link><Link href="/contacto">{language==='en'?'Contacts and locations →':'Contactos e localizações →'}</Link><Link href="/#escolher-estantes">{language==='en'?'See customer installations →':'Ver instalações em clientes →'}</Link></div>
+      </div></section>
     </div>
   );
 }

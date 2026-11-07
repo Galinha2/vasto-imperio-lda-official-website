@@ -19,7 +19,7 @@ const sections = [
   { href: "/admin/estatisticas", label: "Estatísticas", Icon: IoPieChartOutline },
   { href: "/admin/comissoes", label: "Comissões", Icon: IoWalletOutline },
   { href: "/admin/orcamentos", label: "Orçamentos", Icon: IoDocumentTextOutline },
-  { href: "/admin/simulador", label: "Simulador", Icon: IoConstructOutline },
+  { href: "/admin/simulador", label: "Configurador", Icon: IoConstructOutline },
   { href: "/admin/conversas", label: "Conversas", Icon: IoChatbubblesOutline },
   { href: "/admin/definicoes", label: "Definições", Icon: IoSettingsOutline },
 ];

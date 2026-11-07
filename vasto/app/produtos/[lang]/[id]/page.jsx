@@ -1,3 +1,5 @@
+import { productLanguagePaths, plainDescription, productStructuredData } from "@/lib/product-seo.mjs";
+import ProductSelectionGuide from "@/components/produtos/ProductSelectionGuide";
 import { notFound } from "next/navigation";
 import contentpt from "@/assets/contentpt.json";
 import contenten from "@/assets/contenten.json";
@@ -67,15 +69,15 @@ export async function generateMetadata({ params }) {
 
   if (!product) notFound();
 
-  const canonicalPath = `/produtos/${lang}/${id}`;
+  const canonicalPath = lang === "pt" ? productLanguagePaths(product.id)["pt-PT"] : `/produtos/en/${product.id}`;
   const localizedSeo = lang === "pt" ? portugueseProductSeo[product.id] : null;
   const title = localizedSeo?.title ?? product.text;
-  const description = localizedSeo?.description ?? product.description;
+  const description = localizedSeo?.description ?? plainDescription(product.description);
   const languageAlternates = {};
 
   if (contentpt.productsShowcase.products.some((item) => item.id === product.id)) {
-    languageAlternates["pt-PT"] = `/produtos/pt/${id}`;
-    languageAlternates["x-default"] = `/produtos/pt/${id}`;
+    languageAlternates["pt-PT"] = productLanguagePaths(product.id)["pt-PT"];
+    languageAlternates["x-default"] = productLanguagePaths(product.id)["pt-PT"];
   }
   if (contenten.productsShowcase.products.some((item) => item.id === product.id)) {
     languageAlternates["en-US"] = `/produtos/en/${id}`;
@@ -138,6 +140,7 @@ export default async function Page({ params }) {
 
   return (
     <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(productStructuredData(product, lang)).replace(/</g, "\\u003c") }} />
       <main className="bg-[#f5f5f7] px-5 pb-16 pt-[76px] sm:px-8 sm:pt-[84px] lg:pb-20">
         <div className="mx-auto max-w-[1440px]">
           <nav aria-label={lang === "pt" ? "Navegação estrutural" : "Breadcrumb"} className="mb-7 text-sm text-[#7a7a80]">
@@ -159,6 +162,7 @@ export default async function Page({ params }) {
           <GalleryClient product={product} text={text} handlingProduct={handlingProduct} english={lang === "en"} />
         </div>
       </main>
+      <ProductSelectionGuide id={product.id} english={lang === "en"} />
       {tabela && (
         <section className="border-y border-[#e5e5e7] bg-white py-14 sm:py-16 lg:py-20">
           <ProductTabela tabela={tabela} />

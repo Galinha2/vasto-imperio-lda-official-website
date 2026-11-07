@@ -52,8 +52,8 @@ export default function SimulatorConfigurationOptions({
           <div className="min-w-0 flex-1">
             <label className="block text-sm font-semibold text-[#424245]">
               {english ? "Total number of identical rows" : "Número total de filas iguais"}
-              <input type="number" min="1" step="1" value={rowInput}
-                onChange={(event) => { setRowInput(event.target.value); const count = Number(event.target.value); if (Number.isSafeInteger(count) && count >= 1) onRowCountChange(count); }}
+              <input type="number" min="1" max="100" step="1" value={rowInput}
+                onChange={(event) => { setRowInput(event.target.value); const count = Number(event.target.value); if (Number.isSafeInteger(count) && count >= 1 && count <= 100) onRowCountChange(count); }}
                 onBlur={() => setRowInput(String(rowCount))}
                 className="mt-2 h-11 w-full rounded-full border border-[#d2d2d7] bg-white px-4 text-sm font-medium text-[#1d1d1f] outline-none focus:border-[#ff5500]" />
             </label>
@@ -79,6 +79,7 @@ export default function SimulatorConfigurationOptions({
           </div>
         </div>
       </div>
+      <p className="text-xs text-[#6e6e73]">{english ? "Up to 100 identical rows per configuration." : "Até 100 filas iguais por configuração."}</p>
       <div>
         <div className="flex items-center gap-2">
           <button

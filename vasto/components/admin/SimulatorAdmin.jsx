@@ -106,7 +106,7 @@ export default function SimulatorAdmin() {
       link.href = dataUrl;
       link.click();
     } catch (error) {
-      console.error("Não foi possível guardar a imagem da simulação.", error);
+      console.error("Não foi possível guardar a imagem da configuração.", error);
       setMensagem("Não foi possível guardar a imagem. Tente novamente.");
     } finally {
       setAExportar(false);
@@ -159,7 +159,7 @@ export default function SimulatorAdmin() {
     try {
       await generateBudgetPdf(dadosPdf);
     } catch (error) {
-      console.error("Não foi possível gerar o PDF da simulação.", error);
+      console.error("Não foi possível gerar o PDF da configuração.", error);
       setMensagem("Não foi possível gerar o PDF. Tente novamente.");
     } finally {
       setAExportar(false);
@@ -189,13 +189,13 @@ export default function SimulatorAdmin() {
       const response = await fetch("/api/admin/sales", { method: "POST", body: form, cache: "no-store" });
       const result = await response.json();
       if (response.status === 401) throw new Error("A sessão de administração expirou. Inicie sessão novamente.");
-      if (!response.ok) throw new Error(result.error || "Não foi possível enviar a simulação para as vendas.");
+      if (!response.ok) throw new Error(result.error || "Não foi possível enviar a configuração para as vendas.");
       window.dispatchEvent(new Event("admin:sales-changed"));
-      setMensagem(`Simulação de ${result.sale.customerName} enviada para as vendas com o PDF e a imagem.`);
+      setMensagem(`Configuração de ${result.sale.customerName} enviada para as vendas com o PDF e a imagem.`);
       setMensagemSucesso(true);
     } catch (error) {
-      console.error("Não foi possível enviar a simulação para as vendas.", error);
-      setMensagem(error.message || "Não foi possível enviar a simulação para as vendas.");
+      console.error("Não foi possível enviar a configuração para as vendas.", error);
+      setMensagem(error.message || "Não foi possível enviar a configuração para as vendas.");
     } finally {
       setAExportar(false);
     }
@@ -240,7 +240,7 @@ export default function SimulatorAdmin() {
         <header className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
           <div>
             <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[#86868b]">Ferramenta interna</p>
-            <h1 className="mt-1.5 text-3xl font-semibold tracking-[-0.05em] text-[#1d1d1f] sm:text-4xl">Simular equipamento</h1>
+            <h1 className="mt-1.5 text-3xl font-semibold tracking-[-0.05em] text-[#1d1d1f] sm:text-4xl">Configurar equipamento</h1>
             <p className="mt-1.5 max-w-2xl text-sm leading-relaxed text-[#6e6e73]">
               Configure as medidas e prepare a imagem ou o orçamento para o cliente.
             </p>
@@ -285,7 +285,7 @@ export default function SimulatorAdmin() {
           return [{ blob, name: quoteFilename({ quoteType: cart?.entries.length ? "Conjunto" : simuladorAtivo, customerName: resolveCustomerName(dadosEmpresa, nomeCliente) }) }, { blob: await (await fetch(url)).blob(), name: quoteFilename({ quoteType: cart?.entries.length ? "Conjunto" : simuladorAtivo, customerName: resolveCustomerName(dadosEmpresa, nomeCliente) }, "Desenho", "jpg") }];
         }} /></div>
 
-        <section ref={capturaRef} aria-label={`Simulação de ${ativo.label}`} className="min-w-0">
+        <section ref={capturaRef} aria-label={`Configuração de ${ativo.label}`} className="min-w-0">
           <Simulator key={simuladorAtivo} variant={simuladorAtivo === "bancadas" ? "workbench" : undefined} adminMode adminPanel={adminPanel} adminDiscountPercent={descontoManual} onQuoteDataChange={receberDadosOrcamento} />
         </section>
     </div>

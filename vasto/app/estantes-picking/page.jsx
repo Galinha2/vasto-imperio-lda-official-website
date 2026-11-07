@@ -1,3 +1,4 @@
+import { productStructuredData } from "@/lib/product-seo.mjs";
 import content from "@/assets/contentpt.json";
 import PromotionalPage from "@/components/produtos/PromotionalPage";
 import { createPageMetadata } from "@/lib/seo";
@@ -16,6 +17,8 @@ export default function EstantesPickingPage() {
   if (!product) return <p className="px-5 py-24 text-center">Produto não encontrado</p>;
 
   return (
+    <>
+    <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(productStructuredData(product, "pt")).replace(/</g, "\\u003c") }} />
     <PromotionalPage
       produto={{
         id: product.id,
@@ -31,7 +34,7 @@ export default function EstantesPickingPage() {
         faq: [
           {
             q: "Posso configurar as dimensões da estante?",
-            a: "Sim. No simulador pode escolher o comprimento, a altura, a profundidade e o número de níveis.",
+            a: "Sim. No configurador pode escolher o comprimento, a altura, a profundidade e o número de níveis.",
           },
           {
             q: "Que tipos de tampo estão disponíveis?",
@@ -44,5 +47,6 @@ export default function EstantesPickingPage() {
         ],
       }}
     />
+    </>
   );
 }

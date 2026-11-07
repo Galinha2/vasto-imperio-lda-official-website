@@ -8,7 +8,7 @@
         "url": "/"
       },
       {
-        "label": "Simular",
+        "label": "Configurar",
         "url": "/simulador"
       },
       {
@@ -38,13 +38,13 @@
     ]
   },
   "simulationCards": {
-    "title": "Simule o seu Orçamento",
+    "title": "Configure e veja o preço",
     "text": [
       {
         "image": "/estantessim.png",
         "title": "Estantes",
         "url": "/simulador/estantes-ligeiras",
-        "simulation": "Simulador",
+        "simulation": "Configurar e ver preço",
         "subTitle": [
           {
             "text": "Racks - Carga pesada para paletes"
@@ -61,7 +61,7 @@
         "image": "/transport.png",
         "title": "Movimentação de carga",
         "url": "/simulador/movimentacao-de-carga",
-        "simulation": "Simulador",
+        "simulation": "Ver equipamentos e preços",
         "subTitle": [
           {
             "text": "Stackers"
@@ -105,7 +105,7 @@
     "text": [
       {
         "pageTitle": "Solicite o Seu Orçamento",
-        "title": "Orçamentos 100% Gratuitos e Sem Compromisso",
+        "title": "Orçamento gratuito e sem compromisso",
         "subTitle": "Receba um orçamento transparente para racks, prateleiras e soluções de arrumação, adaptado às necessidades do seu negócio local.",
         "button": "Pedir",
         "url": "/orcamento",
@@ -113,7 +113,7 @@
       },
       {
         "pageTitle": "Descubra os Nossos Produtos em Benedita e Viseu",
-        "title": "Racks, Prateleiras, Cacifos e Mais",
+        "title": "Racks, Estantes, Cacifos e Mais",
         "subTitle": "Explore a nossa gama completa de soluções de arrumação, incluindo empilhadores manuais e elétricos, disponíveis para entrega rápida nas regiões de Benedita e Viseu.",
         "button": "Ver Produtos",
         "url": "/produtos",
@@ -123,7 +123,7 @@
   },
   "homeContacts": {
     "title": "Contacte a Vasto Império em Benedita e Viseu",
-    "subTitle": "Soluções com orçamento 100% Gratuito",
+    "subTitle": "Soluções com orçamento gratuito e sem compromisso",
     "button": "Pedir",
     "url": "/orcamento",
     "text": [
@@ -139,7 +139,6 @@
       }
     ]
   },
-
   "promotionalPages": [
     {
       "id": "racks-industriais",
@@ -148,8 +147,12 @@
       "mainImage": "/orcamento/i1.png",
       "backgroundImage": "/Background.png",
       "features": [
-        { "image": "/orcamento/i1.png" },
-        { "image": "/orcamento/i2.png" }
+        {
+          "image": "/orcamento/i1.png"
+        },
+        {
+          "image": "/orcamento/i2.png"
+        }
       ],
       "description": "<span class='label'>Material:</span> Galvanizado ou RAL 5005 / 7035<br/><span class='label'>Peso suportado:</span> 3300 kg par de vigas<br/><span class='label'>Altura dos Bastidores:</span>  2000 a 5500 mm <br/><span class='label'>Profundidade dos Bastidores:</span> 800 a 1100 mm. <br/><span class='label'>Comprimento das Vigas:</span> 2200 a 2750 mm. <br/><span class='label'>Descrição:</span> Bastidor metálico com sapata, indicado para sistemas de armazenagem e estruturas industriais. Fabricado em aço de elevada resistência, permite múltiplas configurações de altura e profundidade, adaptando-se a diferentes necessidades de carga e espaço. Disponível em acabamento galvanizado ou pintado, garantindo durabilidade e proteção anticorrosão em ambientes industriais.",
       "galleryTitle": "Os nossos Clientes",
@@ -190,8 +193,12 @@
       "mainImage": "/orcamento/prateleira inteira.png",
       "backgroundImage": "/Background.png",
       "features": [
-        { "image": "/prateleira inteira.png" },
-        { "image": "/orcamento/a2.png" }
+        {
+          "image": "/prateleira inteira.png"
+        },
+        {
+          "image": "/orcamento/a2.png"
+        }
       ],
       "description": "<span class='label'>Altura dos Bastidores:</span>  1000 a 3000 mm <br/><span class='label'>Profundidade dos Bastidores:</span> 300 a 600 mm. <br/><span class='label'>Comprimento das Prateleiras:</span>  750 a 1000 mm <br/><span class='label'>Largura das Prateleiras:</span>  300 a 600 mm <br/><span class='label'>Descrição:</span> As estantes metálicas de encaixe sem parafusos são uma solução prática e resistente para espaços que exigem organização eficiente e elevada capacidade de carga, como armazéns, arquivos ou zonas industriais. O sistema modular permite ajustar facilmente a altura das prateleiras, adaptando a estrutura às necessidades específicas de cada utilização. A montagem é rápida e segura, através de encaixes reforçados que garantem estabilidade e evitam deslocações indesejadas. Fabricadas em aço robusto, estas estantes oferecem durabilidade, flexibilidade e uma excelente resposta para diferentes configurações de armazenamento, podendo ser dimensionadas à medida do espaço disponível.",
       "galleryTitle": "Os nossos Clientes",
@@ -221,7 +228,6 @@
       ]
     }
   ],
-
   "productBanner": {
     "background": "/product banner.png",
     "logo": "/logo.png",
@@ -339,15 +345,15 @@
         ],
         "galeriaTitle": "Os nossos clientes",
         "galeria": [
-        "/produtos/prateleiras-ligeiras/a2.jpeg",
-        "/produtos/prateleiras-ligeiras/a1.jpeg",
-        "/produtos/prateleiras-ligeiras/a4.jpg",
-        "/produtos/prateleiras-ligeiras/a5.jpg",
-        "/produtos/prateleiras-ligeiras/a3.jpeg",
-        "/produtos/prateleiras-ligeiras/a6.jpg",
-        "/produtos/prateleiras-ligeiras/cliente-ligeiras-1.webp",
-        "/produtos/prateleiras-ligeiras/cliente-ligeiras-2.webp"
-      ],
+          "/produtos/prateleiras-ligeiras/a2.jpeg",
+          "/produtos/prateleiras-ligeiras/a1.jpeg",
+          "/produtos/prateleiras-ligeiras/a4.jpg",
+          "/produtos/prateleiras-ligeiras/a5.jpg",
+          "/produtos/prateleiras-ligeiras/a3.jpeg",
+          "/produtos/prateleiras-ligeiras/a6.jpg",
+          "/produtos/prateleiras-ligeiras/cliente-ligeiras-1.webp",
+          "/produtos/prateleiras-ligeiras/cliente-ligeiras-2.webp"
+        ],
         "tabela": [
           {
             "nome": "Prateleira",
@@ -415,7 +421,13 @@
       {
         "id": "estantes-picking",
         "galeriaTitle": "Os nossos clientes",
-        "galeria": ["/produtos/estantes-picking/clientes/picking-galvanizada-aglomerado.webp", "/produtos/estantes-picking/clientes/picking-pintada-perspetiva.webp", "/produtos/estantes-picking/clientes/picking-pintada-frente.webp", "/produtos/estantes-picking/clientes/picking-pintada-detalhe.webp", "/produtos/estantes-picking/clientes/picking-galvanizada-lateral.webp"],
+        "galeria": [
+          "/produtos/estantes-picking/clientes/picking-galvanizada-aglomerado.webp",
+          "/produtos/estantes-picking/clientes/picking-pintada-perspetiva.webp",
+          "/produtos/estantes-picking/clientes/picking-pintada-frente.webp",
+          "/produtos/estantes-picking/clientes/picking-pintada-detalhe.webp",
+          "/produtos/estantes-picking/clientes/picking-galvanizada-lateral.webp"
+        ],
         "image": "/produtos/9-Porteco Z60/i1.png",
         "width": 160,
         "text": "Estantes de Picking com Tampos",
@@ -437,97 +449,89 @@
           "/produtos/9-Porteco Z60/i16.jpg",
           "/produtos/9-Porteco Z60/i17.jpg"
         ],
-
-        "description": "<span class='label'>Material:</span> Estrutura metálica de alta resistência.<br/><span class='label'>Capacidade de carga:</span> Até 1000 kg por par de vigas.<br/><span class='label'>Altura dos Bastidores:</span> 2000 a 5500 mm.<br/><span class='label'>Profundidade dos Bastidores:</span> 400 a 1100 mm.<br/><span class='label'>Comprimento das Vigas:</span> 1000 a 2750 mm.<br/><span class='label'>Modelos de Viga:</span> Z60 ou Z100.<br/><span class='label'>Descrição:</span> Sistema de estantes metálicas robustas indicado para armazéns, oficinas e espaços de armazenamento. Estrutura modular com vigas de encaixe rápido, permitindo diferentes configurações de altura, profundidade e largura conforme as necessidades de carga e organização.",
+        "description": "<span class='label'>Material:</span> Estrutura metálica de alta resistência.<br/><span class='label'>Capacidade de carga:</span> Até 1000 kg por par de vigas.<br/><span class='label'>Altura dos Bastidores:</span> 2000 a 5000 mm.<br/><span class='label'>Profundidade dos Bastidores:</span> 400 a 1200 mm.<br/><span class='label'>Comprimento das Vigas:</span> 1000 a 2750 mm.<br/><span class='label'>Modelos de Viga:</span> Z60 ou Z100.<br/><span class='label'>Descrição:</span> Sistema de estantes metálicas robustas indicado para armazéns, oficinas e espaços de armazenamento. Estrutura modular com vigas de encaixe rápido, permitindo diferentes configurações de altura, profundidade e largura conforme as necessidades de carga e organização.",
         "tabela": [
           {
             "nome": "Bastidores",
             "altura_mm": 2000,
-            "largura_mm": "800 | 900 | 1000 | 1100",
+            "profundidade_mm": "400 | 500 | 600 | 700 | 800 | 900 | 1000 | 1100 | 1200",
             "acabamento": "Galvanizado ou RAL 5005 / 7035"
           },
           {
             "nome": "Bastidores",
             "altura_mm": 2500,
-            "largura_mm": "800 | 900 | 1000 | 1100",
+            "profundidade_mm": "400 | 500 | 600 | 700 | 800 | 900 | 1000 | 1100 | 1200",
             "acabamento": "Galvanizado ou RAL 5005 / 7035"
           },
           {
             "nome": "Bastidores",
             "altura_mm": 3000,
-            "largura_mm": "800 | 900 | 1000 | 1100",
+            "profundidade_mm": "400 | 500 | 600 | 700 | 800 | 900 | 1000 | 1100 | 1200",
             "acabamento": "Galvanizado ou RAL 5005 / 7035"
           },
           {
             "nome": "Bastidores",
             "altura_mm": 3500,
-            "largura_mm": "800 | 900 | 1000 | 1100",
+            "profundidade_mm": "400 | 500 | 600 | 700 | 800 | 900 | 1000 | 1100 | 1200",
             "acabamento": "Galvanizado ou RAL 5005 / 7035"
           },
           {
             "nome": "Bastidores",
             "altura_mm": 4000,
-            "largura_mm": "800 | 900 | 1000 | 1100",
+            "profundidade_mm": "400 | 500 | 600 | 700 | 800 | 900 | 1000 | 1100 | 1200",
             "acabamento": "Galvanizado ou RAL 5005 / 7035"
           },
           {
             "nome": "Bastidores",
             "altura_mm": 4500,
-            "largura_mm": "800 | 900 | 1000 | 1100",
+            "profundidade_mm": "400 | 500 | 600 | 700 | 800 | 900 | 1000 | 1100 | 1200",
             "acabamento": "Galvanizado ou RAL 5005 / 7035"
           },
           {
             "nome": "Bastidores",
             "altura_mm": 5000,
-            "largura_mm": "800 | 900 | 1000 | 1100",
+            "profundidade_mm": "400 | 500 | 600 | 700 | 800 | 900 | 1000 | 1100 | 1200",
             "acabamento": "Galvanizado ou RAL 5005 / 7035"
           },
           {
-            "nome": "Bastidores",
-            "altura_mm": 5500,
-            "largura_mm": "800 | 900 | 1000 | 1100",
-            "acabamento": "Galvanizado ou RAL 5005 / 7035"
-          },
-
-          {
             "nome": "Vigas Z60 | Z100",
             "altura_mm": "-",
-            "largura_mm": 1000
+            "comprimento_mm": 1000
           },
           {
             "nome": "Vigas Z60 | Z100",
             "altura_mm": "-",
-            "largura_mm": 1250
+            "comprimento_mm": 1250
           },
           {
             "nome": "Vigas Z60 | Z100",
             "altura_mm": "-",
-            "largura_mm": 1500
+            "comprimento_mm": 1500
           },
           {
             "nome": "Vigas Z60 | Z100",
             "altura_mm": "-",
-            "largura_mm": 1750
+            "comprimento_mm": 1750
           },
           {
             "nome": "Vigas Z60 | Z100",
             "altura_mm": "-",
-            "largura_mm": 2000
+            "comprimento_mm": 2000
           },
           {
             "nome": "Vigas Z60 | Z100",
             "altura_mm": "-",
-            "largura_mm": 2250
+            "comprimento_mm": 2250
           },
           {
             "nome": "Vigas Z60 | Z100",
             "altura_mm": "-",
-            "largura_mm": 2500
+            "comprimento_mm": 2500
           },
           {
             "nome": "Vigas Z60 | Z100",
             "altura_mm": "-",
-            "largura_mm": 2750
+            "comprimento_mm": 2750
           }
         ]
       },
@@ -537,7 +541,10 @@
         "text": "Cacifos Metálicos",
         "width": 200,
         "height": 200,
-        "images": ["/produtos/4-cacifos/i3.jpg", "/produtos/4-cacifos/i2.jpg"],
+        "images": [
+          "/produtos/4-cacifos/i3.jpg",
+          "/produtos/4-cacifos/i2.jpg"
+        ],
         "galeriaTitle": "Os nossos clientes",
         "galeria": [
           "/produtos/4-cacifos/a1.jpg",
@@ -545,7 +552,7 @@
           "/produtos/4-cacifos/a2.webp",
           "/produtos/4-cacifos/a3.webp"
         ],
-        "description": "<span class='label'>Portas:</span> Disponíveis com 3 e 6 portas<br/><span class='label'>Dimensões:</span> 1900 × 900 × 500 mm<br/><span class='label'>Descrição:</span> Cacifos homologados de acordo com a Norma Portuguesa NP 1116.<br/>Práticos, seguros e essenciais para organizar os seus pertences, estes cacifos são ideais para utilização em vestiários e espaços de armazenamento. Mantenha tudo arrumado com estes armários de qualidade."
+        "description": "<span class='label'>Portas:</span> Disponíveis com 3 e 6 portas<br/><span class='label'>Dimensões:</span> 1900 × 900 × 500 mm<br/><span class='label'>Descrição:</span> Cacifos metálicos para organização de roupa e objetos pessoais.<br/>Práticos, seguros e essenciais para organizar os seus pertences, estes cacifos são ideais para utilização em vestiários e espaços de armazenamento. Mantenha tudo arrumado com estes armários de qualidade."
       },
       {
         "id": "porta-paletes-eletrico",
@@ -562,7 +569,6 @@
           "/produtos/5-porta-paletes-eletrico/i6.png",
           "/produtos/5-porta-paletes-eletrico/i7.png"
         ],
-
         "description": "<span class='label'>Capacidade:</span> 1500 kg<br/><span class='label'>Peso sem bateria:</span> 110 kg<br/><span class='label'>Peso com bateria:</span> 116 kg<br/><span class='label'>Voltagem:</span> 25,6 V<br/><span class='label'>Capacidade da bateria:</span> 20 Ah <span class='label'>Descrição:</span> O nosso porta-paletes elétrico de 1500 kg é ideal para movimentação rápida e segura de cargas em armazéns, centros logísticos ou fábricas. Equipado com motor elétrico e bateria de alta capacidade, permite manobras precisas com esforço mínimo, aumentando a eficiência operacional e reduzindo o esforço do operador. A estrutura em aço reforçado garante robustez e durabilidade, enquanto o design ergonómico assegura conforto e segurança durante o transporte de cargas pesadas. Uma solução fiável para otimizar a logística interna e aumentar a produtividade."
       },
       {
@@ -586,8 +592,7 @@
           "/produtos/2-Stacker/a5.jpg",
           "/produtos/2-Stacker/a6.jpg"
         ],
-
-        "description": "<span class='label'>Capacidade:</span> 1500 kg<br/><span class='label'>Peso sem bateria:</span> 110 kg<br/><span class='label'>Peso com bateria:</span> 116 kg<br/><span class='label'>Voltagem:</span> 25,6 V<br/><span class='label'>Capacidade da bateria:</span> 20 Ah <span class='label'>Descrição:</span> O nosso porta-paletes elétrico de 1500 kg é ideal para movimentação rápida e segura de cargas em armazéns, centros logísticos ou fábricas. Equipado com motor elétrico e bateria de alta capacidade, permite manobras precisas com esforço mínimo, aumentando a eficiência operacional e reduzindo o esforço do operador. A estrutura em aço reforçado garante robustez e durabilidade, enquanto o design ergonómico assegura conforto e segurança durante o transporte de cargas pesadas. Uma solução fiável para otimizar a logística interna e aumentar a produtividade."
+        "description": "<span class='label'>Marca:</span> JMAO<br/><span class='label'>Modelo:</span> PSL15-30<br/><span class='label'>Tipo de equipamento:</span> Stacker elétrico de operador a pé<br/><span class='label'>Capacidade nominal:</span> 1500 kg<br/><span class='label'>Altura máxima de elevação:</span> 3000 mm (3,00 m)<br/><span class='label'>Tensão de funcionamento:</span> 48 V<br/><span class='label'>Potência do motor indicada na chapa:</span> 1,0 kW<br/><span class='label'>Dimensões gerais (C × L × A):</span> 1820 × 820 × 2040 mm<br/><span class='label'>Baterias na configuração fotografada:</span> 4 × LEOCH 6-EVF-40, de chumbo-ácido<br/><span class='label'>Especificação de cada bateria:</span> 12 V · 40 Ah (regime de 20 horas)<br/><span class='label'>Mastro e elevação:</span> Mastro telescópico com correntes de elevação e sistema hidráulico<br/><span class='label'>Comandos:</span> Timão multifunções para condução pelo operador a pé<br/><span class='label'>Equipamento visível:</span> Grelha de proteção do mastro, botão de paragem de emergência, interruptor com chave e rodas de carga nos garfos<br/><span class='label'>Descrição:</span> Stacker elétrico para movimentar e elevar cargas paletizadas em armazéns e zonas de armazenagem. A configuração apresentada combina capacidade nominal de 1500 kg com elevação até 3 metros, sistema elétrico de 48 V e comando por timão. As dimensões e os dados principais foram confirmados na chapa do equipamento disponível na galeria.<br/><span class='label'>Informação técnica:</span> Confirme a configuração fornecida e a capacidade residual à altura de trabalho através do respetivo diagrama de cargas. A capacidade nominal não significa que 1500 kg sejam admissíveis em todas as alturas e condições de utilização."
       },
       {
         "id": "porta-paletes-manual",
@@ -600,7 +605,6 @@
           "/produtos/6-porta-paletes-manual/i2.png",
           "/produtos/6-porta-paletes-manual/i3.png"
         ],
-
         "description": "<span class='label'>Capacidade:</span> 3000 kg<br/><span class='label'>Descrição:</span> As nossas soluções de porta-paletes manuais de alta capacidade são ideais para movimentação e transporte seguro de cargas pesadas em armazéns, fábricas ou centros logísticos. Este modelo suporta até 3000 kg, garantindo robustez e fiabilidade, com estrutura reforçada em aço resistente. A operação é prática e eficiente, permitindo manobras precisas mesmo em espaços reduzidos. Um equipamento essencial para otimizar a logística interna e aumentar a produtividade, mantendo sempre a segurança do operador e das mercadorias."
       },
       {
@@ -621,7 +625,6 @@
           "/produtos/7-Arrumação Vertical (Vertical Storage)/i9.jpg",
           "/produtos/7-Arrumação Vertical (Vertical Storage)/i10.jpg"
         ],
-
         "description": "<span class='label'>Material:</span> RAL 5005 / 7035<br/><span class='label'>Altura:</span>  2400 mm <br/><span class='label'>Largura:</span> 1500 a 1750 mm <br/><span class='label'>Descrição:</span> Estante PORTECO para arrumação vertical, composta por módulo inicial e módulos de continuidade. <br/>Vigas Z junto ao solo e no topo para garantir estabilidade da estrutura. <br/>2 vigas em tubo 50x30, aplicadas nas costas da estante, onde ficam apoiados e deslizam os braços de separação. Contempla 4 braços de separação por módulo. <br/>Cada módulo apresenta uma base em OSB de 22mm."
       },
       {
@@ -650,43 +653,43 @@
             "altura_mm": 2400,
             "largura_mm": 800,
             "bracos_mm": 400,
-            "peso_kg": 275,
-            "codigo": "CASF0840"
+            "codigo": "CASF0840",
+            "carga_par_bracos_kg": 275
           },
           {
             "altura_mm": 2400,
             "largura_mm": 800,
             "bracos_mm": 500,
-            "peso_kg": 250,
-            "codigo": "CASF0850"
+            "codigo": "CASF0850",
+            "carga_par_bracos_kg": 250
           },
           {
             "altura_mm": 2400,
             "largura_mm": 800,
             "bracos_mm": 600,
-            "peso_kg": 225,
-            "codigo": "CASF0860"
+            "codigo": "CASF0860",
+            "carga_par_bracos_kg": 225
           },
           {
             "altura_mm": 2400,
             "largura_mm": 1000,
             "bracos_mm": 400,
-            "peso_kg": 250,
-            "codigo": "CASF1040"
+            "codigo": "CASF1040",
+            "carga_par_bracos_kg": 250
           },
           {
             "altura_mm": 2400,
             "largura_mm": 1000,
             "bracos_mm": 500,
-            "peso_kg": 225,
-            "codigo": "CASF1050"
+            "codigo": "CASF1050",
+            "carga_par_bracos_kg": 225
           },
           {
             "altura_mm": 2400,
             "largura_mm": 1000,
             "bracos_mm": 600,
-            "peso_kg": 200,
-            "codigo": "CASF1060"
+            "codigo": "CASF1060",
+            "carga_par_bracos_kg": 200
           }
         ]
       },
@@ -708,7 +711,6 @@
           "/produtos/13-Cantilever Ligeiro (Light Cantilever)/i10.jpg",
           "/produtos/13-Cantilever Ligeiro (Light Cantilever)/i11.jpg"
         ],
-
         "description": "<span class='label'>Carga por braço:</span> até 40 kg distribuídos uniformemente (80 kg por par de braços).<br/><span class='label'>Descrição:</span> Cantilever ligeiro, para carga manual, tipologia simples (acesso apenas de um lado). Base aparafusada à coluna do cantilever, com furação para permitir a fixação ao solo. Ajuste da altura dos braços de 50mm em 50mm. Os braços apresentam topo anti-queda. Carga por braço: até 40 kg distribuídos uniformemente (80 kg por par de braços). Pilares e base com acabamento a pintura epoxy de cor azul, RAL 5005, braços em cinza claro, RAL 7035, travessas e diagonais galvanizadas. Inclui fixação ao solo. Dimensões: 800x400x2000mm (CxPxA) ou 800x500x2000mm (CxPxA).",
         "tabela": [
           {
@@ -848,7 +850,6 @@
             "peso_kg": 19.4
           }
         ],
-
         "description": "<span class='label'>Descrição:</span> Kits de estantes Rang'Eco Pneus, que incluem: bastidores (travessas e diagonais soldadas), e vigas principais em tubo ovalizado. Existem duas tipologias de Kits: módulo Inicial (individual) e módulo seguinte, que liga ao módulo inicial, partilhando um dos bastidores. Podem apresentar 3 níveis (bastidor com 2000mm altura) ou 4 níveis (bastidor com 2400mm altura) por cada módulo. O ajuste da altura dos níveis é feito de 50mm em 50mm. Considera-se uma travessa de reforço por cada nível."
       },
       {
@@ -863,7 +864,6 @@
           "/produtos/14-Bancadas (Workbench)/i4.jpg",
           "/produtos/14-Bancadas (Workbench)/i5.jpg"
         ],
-
         "description": "<span class='label'>Descrição:</span> Bancada multiusos, construída com bastidores PORTECO, com pés metálicos e vigas Z. Tampo superior em melamina de cor branca de 22mm de espessura e orla perimetral. Possibilidade de ter prateleira inferior. Comprimento: 1200, 1600 e 2000mm. Profundidade: 800mm. Cores standard: azul RAL 5005 (pernas) e cinza RAL 7035 (vigas). É possível ter totalmente em azul ou cinza.",
         "tabela": [
           {
@@ -979,7 +979,7 @@
     ]
   },
   "orcamento": {
-    "title": "Solicite já o seu orçamento 100% Gratuito",
+    "title": "Peça uma proposta para o seu espaço",
     "nome": "Nome | Empresa",
     "phone": "Telemóvel",
     "mail": "E-mail",

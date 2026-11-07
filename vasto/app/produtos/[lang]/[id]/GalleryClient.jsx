@@ -106,7 +106,7 @@ export default function GalleryClient({ product, text, handlingProduct, english 
           <div className="mt-7 flex flex-col items-stretch gap-3 sm:flex-row lg:flex-col">
             {simulatorHref && (
               <Link href={simulatorHref} className="inline-flex min-h-12 cursor-pointer items-center justify-center gap-2 rounded-full bg-(--orange) px-6 py-3 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:bg-(--orange-hover) focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--orange)">
-                {text?.caracteristicas === "Características" ? "Simular configuração" : "Configure in the simulator"}
+                {text?.caracteristicas === "Características" ? "Configurar e ver preço" : "Configure and see price"}
                 <span aria-hidden="true">→</span>
               </Link>
             )}

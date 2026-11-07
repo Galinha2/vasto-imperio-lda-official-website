@@ -10,7 +10,8 @@ const columns = [
   ["bracos_mm", "Braços (mm)", "Arms (mm)"],
   ["medidas_mm", "Medidas (mm)", "Measurements (mm)"],
   ["acabamento", "Acabamento", "Finish"],
-  ["peso_kg", "Peso (kg)", "Weight (kg)"],
+  ["peso_kg", "Peso do equipamento (kg)", "Equipment weight (kg)"],
+  ["carga_par_bracos_kg", "Carga por par de braços (kg)", "Load per pair of arms (kg)"],
 ];
 
 export default function ProductTabela({ tabela = [] }) {

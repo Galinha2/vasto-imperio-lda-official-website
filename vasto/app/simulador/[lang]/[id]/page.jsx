@@ -14,8 +14,8 @@ export async function generateMetadata({ params }) {
   validate(await params);
   // The simulator defaults to Portuguese; its language switch is client-side.
   return createPageMetadata({
-    title: "Simulador de Estantes de Picking Metálicas",
-    description: "Configure estantes de picking: dimensões, níveis e tampos metálicos ou em aglomerado. Simule o preço e peça apoio em Viseu, Benedita e Portugal.",
+    title: "Configurador de Estantes de Picking Metálicas",
+    description: "Configure estantes de picking: dimensões, níveis e tampos metálicos ou em aglomerado. Configure o preço e peça apoio em Viseu, Benedita e Portugal.",
     path: "/simulador/pt/estantes-picking",
   });
 }

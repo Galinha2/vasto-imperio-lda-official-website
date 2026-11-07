@@ -21,6 +21,8 @@ export default function OrcamentoInputs() {
     phone: "",
     email: "",
     body: "",
+    installation: "",
+    assembly: "confirmar",
   });
   const [mounted, setMounted] = useState(false);
   const router = useRouter();
@@ -48,9 +50,8 @@ export default function OrcamentoInputs() {
       alert("Apenas é permitido até três ficheiros (imagem ou PDF).");
       return;
     }
-    if (files.some(file => file.size > 10 * 1024 * 1024)) {
-      const largeFile = files.find(file => file.size > 10 * 1024 * 1024);
-      alert(`O ficheiro "${largeFile.name}" excede 10MB e não será enviado.`);
+    if (files.reduce((sum, file) => sum + file.size, 0) > 3 * 1024 * 1024) {
+      setFileError(language === "pt" ? "Os anexos não podem exceder 3 MB no total." : "Attachments must not exceed 3 MB in total.");
       return;
     }
 
@@ -61,7 +62,7 @@ export default function OrcamentoInputs() {
       formData.append("name", formDataState.name);
       formData.append("phone", formDataState.phone);
       formData.append("email", formDataState.email);
-      formData.append("body", formDataState.body);
+      formData.append("body", `${formDataState.body}\n\nLocal de instalação: ${formDataState.installation || "Não indicado"}\nMontagem: ${formDataState.assembly === "sim" ? "Pretendida" : formDataState.assembly === "nao" ? "Não pretendida" : "A confirmar"}`);
       files.forEach((file) => {
         // Todos os ficheiros enviados com o mesmo nome 'attachment'
         formData.append("attachment", file);
@@ -143,6 +144,10 @@ export default function OrcamentoInputs() {
           value={formDataState.email}
           onChange={handleInputChange}
         />
+        <div className="grid gap-5 sm:grid-cols-2">
+          <label className="text-sm font-semibold text-[#424245]">{language === "pt" ? "Local de instalação" : "Installation location"}<input name="installation" type="text" maxLength={250} value={formDataState.installation} onChange={handleInputChange} placeholder={language === "pt" ? "Localidade ou código postal" : "Town or postal code"} className="mt-2 w-full rounded-full border border-[#e5e5e7] bg-white px-5 py-4 text-base font-normal" /></label>
+          <label className="text-sm font-semibold text-[#424245]">{language === "pt" ? "Precisa de montagem?" : "Do you need assembly?"}<select name="assembly" value={formDataState.assembly} onChange={handleInputChange} className="mt-2 w-full rounded-full border border-[#e5e5e7] bg-white px-5 py-4 text-base font-normal"><option value="confirmar">{language === "pt" ? "A confirmar" : "To be confirmed"}</option><option value="sim">{language === "pt" ? "Sim" : "Yes"}</option><option value="nao">{language === "pt" ? "Não" : "No"}</option></select></label>
+        </div>
         <textarea
           className="input min-h-[190px] resize-y border border-[#e5e5e7] bg-white px-5 py-4 text-base text-[#1d1d1f] shadow-sm outline-none transition placeholder:text-[#929299] focus:border-(--blue) focus:ring-4 focus:ring-[#0879c0]/10"
           name="body"
@@ -151,6 +156,7 @@ export default function OrcamentoInputs() {
           value={formDataState.body}
           onChange={handleInputChange}
         />
+        <p className="text-sm leading-6 text-[#6e6e73]">{language === "pt" ? "Pode anexar plantas e fotografias: até 3 ficheiros (imagem ou PDF), com 3 MB no total." : "Attach plans and photos: up to 3 image or PDF files, totalling 3 MB."}</p>
         {files.length < 3 && (
           <label className="flex w-fit cursor-pointer items-center gap-2 rounded-full border border-[#e5e5e7] bg-[#f5f5f7] px-5 py-3 text-sm font-semibold text-[#424245] transition hover:bg-[#eceef2]">
             <div className="flex items-center gap-2">
@@ -160,6 +166,7 @@ export default function OrcamentoInputs() {
             <input
               type="file"
               name="attachment"
+              accept="image/*,application/pdf"
               className="hidden"
               multiple
               onChange={(e) => {
@@ -170,13 +177,11 @@ export default function OrcamentoInputs() {
                   e.target.value = "";
                   return;
                 }
-                for (const file of selected) {
-                  if (file.size > 10 * 1024 * 1024) {
-                    setFileError(`O ficheiro "${file.name}" excede 10MB e não será adicionado.`);
-                    e.target.value = "";
-                    return;
-                  }
+                if ([...files, ...selected].reduce((sum, file) => sum + file.size, 0) > 3 * 1024 * 1024) {
+                  setFileError(language === "pt" ? "Os anexos não podem exceder 3 MB no total." : "Attachments must not exceed 3 MB in total.");
+                  e.target.value = ""; return;
                 }
+                setFileError("");
                 setFiles((prev) => [...prev, ...selected]);
                 e.target.value = "";
               }}

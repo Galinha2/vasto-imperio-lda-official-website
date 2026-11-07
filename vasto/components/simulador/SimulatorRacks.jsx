@@ -1,5 +1,12 @@
 "use client";
+import ConfigurationReview from "./ConfigurationReview";
+import { configurationReference } from "@/lib/configuration-summary.mjs";
 
+import {rackBeamLevels} from '@/lib/rack-level-layout.mjs';
+import RackLoadSummary from './RackLoadSummary';
+import RackPalletDrawing from './RackPalletDrawing';
+import RackUseRequirements from './RackUseRequirements';
+import {normalizeRackUse,rackUseDetails,rackPalletLayout} from '@/lib/rack-use-requirements.mjs';
 import AdminRack3D from "@/components/admin/AdminRack3D";
 import SimulatorProductPhoto from "./SimulatorProductPhoto";
 import photoStyles from "./SimulatorProductPhoto.module.css";
@@ -38,7 +45,6 @@ const heights = unique(frames.map((frame) => frame.height));
 const depths = unique(frames.map((frame) => frame.depth));
 const beamLengths = unique(beams.map((beam) => beam.length));
 const levelOptions = Array.from({ length: 11 }, (_, index) => index + 1);
-const verticalClearanceRatio = 0.12;
 const numericPrice = (product) => Number(product?.["preço"]) || 0;
 const formatMeters = (millimeters) => `${(millimeters / 1000).toLocaleString("pt-PT", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} m`;
 const formatPrice = (price) => new Intl.NumberFormat("pt-PT", { style: "currency", currency: "EUR" }).format(price);
@@ -107,7 +113,7 @@ function findBestModules(targetLength, { height, depth, levels, sameBeamLength, 
   return modules;
 }
 
-function RackPreview({ activeLevels, levelsForModule, hasRemovedLevels, removeLevel, restoreLevels, modules, height, depth, levels, rowCount, capacityLabel, solutions, selectedSolutionId, onSelectSolution, english }) {
+function RackPreview({ useRequirements,levelCapacity,activeLevels, levelsForModule, hasRemovedLevels, removeLevel, restoreLevels, modules, height, depth, levels, rowCount, capacityLabel, solutions, selectedSolutionId, onSelectSolution, english }) {
   const formatMeters = (value) => `${(value / 1000).toLocaleString(english ? "en-IE" : "pt-PT", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} m`;
   const width = 1000;
   const bottom = 410;
@@ -120,16 +126,15 @@ function RackPreview({ activeLevels, levelsForModule, hasRemovedLevels, removeLe
   const rackLeft = (width - rackWidth) / 2;
   const rackRight = rackLeft + rackWidth;
   const top = bottom - rackHeight;
-  const floorClearance = rackHeight * verticalClearanceRatio;
   const scale = rackWidth / totalLength;
   const uprightWidth = 100 * scale;
   const beamHeight = Math.max(2.5, 100 * scale);
   const tabHeight = Math.max(3.5, beamHeight * 1.25);
-  const topLevelInset = beamHeight + (tabHeight - beamHeight) / 2;
-  const levelSpacing = Math.round((height * (1 - verticalClearanceRatio)) / Math.max(1, levels - 1));
-  const levelGap = (rackHeight - floorClearance) / Math.max(1, levels - 1);
-  const clearLevelSpacing = Math.max(0, levelSpacing - 100);
+  const beamLevels=rackBeamLevels(height/1000,levels);
+  const beamTopForLevel=index=>bottom-beamLevels[index]*1000*scale;
+  const beamBottomForLevel=index=>beamTopForLevel(index)+beamHeight;
 
+  const loadTop=Math.min(0,...modules.map(length=>{const load=rackPalletLayout(useRequirements,length/1000);return load?top-load.loadHeight*1000*scale-20:0;}));
   return (
     <div className="site-glass min-w-0 flex-1 rounded-[30px] border border-[#e5e5e7] bg-white p-5 shadow-[0_12px_40px_rgba(0,0,0,0.05)] sm:p-7 md:p-9">
       <div className="mb-5 flex items-center justify-between gap-3"><div><p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#86868b]">{english ? "Preview" : "Visualização"}</p><h2 className="mt-1 text-xl font-semibold tracking-tight text-[#1d1d1f]">{english ? "Industrial pallet racking" : "Rack industrial para paletes"}</h2><p className="mt-1 text-xs text-[#86868b]">{english ? "Your configuration · 2D preview" : "A sua configuração · Pré-visualização 2D"}</p></div><span className="simulator-pill rounded-full bg-[#f5f5f7] px-3 py-1.5 text-right text-sm font-medium text-[#6e6e73]">{modules.length} {english ? "module(s)" : "módulo(s)"} · {activeLevels.length} {english ? "levels" : "níveis"} · {rowCount} {rowCount === 1 ? (english ? "row" : "fila") : (english ? "rows" : "filas")}</span></div>
@@ -138,7 +143,7 @@ function RackPreview({ activeLevels, levelsForModule, hasRemovedLevels, removeLe
           <p>{english ? "Click a level to remove it from that module only. Other modules remain unchanged." : "Clique num nível para o retirar apenas desse módulo. As restantes estantes mantêm-se."}</p>
           {hasRemovedLevels && <button type="button" onClick={restoreLevels} className="cursor-pointer rounded-full border border-[#e5e5e7] px-3 py-1.5 font-medium text-[#0879c0]">{english ? "Restore levels" : "Repor níveis"}</button>}
         </div>
-        <svg viewBox={`0 0 ${Math.max(width, rackRight + 120)} 490`} role="img" aria-label={english ? `Front view of an industrial rack row with ${modules.length} modules, ${formatMeters(height)} high, ${levels} levels, repeated ${rowCount} times` : `Vista frontal de uma fila de rack industrial com ${modules.length} módulos, ${formatMeters(height)} de altura, ${levels} níveis e repetida ${rowCount} vezes`} className="h-auto w-full">
+        <svg viewBox={`0 ${loadTop} ${Math.max(width, rackRight + 120)} ${490-loadTop}`} role="img" aria-label={english ? `Front view of an industrial rack row with ${modules.length} modules, ${formatMeters(height)} high, ${levels} levels, repeated ${rowCount} times` : `Vista frontal de uma fila de rack industrial com ${modules.length} módulos, ${formatMeters(height)} de altura, ${levels} níveis e repetida ${rowCount} vezes`} className="h-auto w-full">
           <defs>
             <linearGradient id="rackUprightFinish" x1="0" x2="1" y1="0" y2="0">
               <stop offset="0" stopColor="#07518e" />
@@ -204,15 +209,14 @@ function RackPreview({ activeLevels, levelsForModule, hasRemovedLevels, removeLe
             const tabWidth = Math.max(2, uprightWidth * 0.5);
             return <g key={`beam-${moduleIndex}`}>
               {levelsForModule(moduleIndex).map((levelIndex) => {
-                const levelY = levels === 1 ? (top + bottom + beamHeight) / 2 : bottom - floorClearance - (levelIndex * (rackHeight - floorClearance)) / Math.max(1, levels - 1);
-                const y = levelIndex === levels - 1 ? Math.max(levelY, top + topLevelInset) : levelY;
-                const beamTop = y - beamHeight;
+                const beamTop = beamTopForLevel(levelIndex);
                 const tabY = beamTop - (tabHeight - beamHeight) / 2;
                 const leftTabX = beamInnerX - tabWidth * 0.5;
                 const rightTabX = beamInnerX + beamInnerWidth - tabWidth * 0.5;
                 const rivetRadius = Math.max(0.65, Math.min(1.5, tabWidth * 0.12));
                 return (
                   <g key={levelIndex}>
+                    <RackPalletDrawing requirements={useRequirements} length={moduleLength} center={beamInnerX+beamInnerWidth/2} beamY={beamTop} scale={scale}/>
                     <rect x={beamInnerX} y={beamTop} width={beamInnerWidth} height={beamHeight} rx={Math.min(2, beamHeight * 0.14)} fill="url(#rackBeamFinish)" stroke="#c83b00" strokeWidth={Math.max(0.5, scale * 1.5)} />
                     <path d={`M ${beamInnerX + 2} ${beamTop + beamHeight * 0.2} H ${beamInnerX + beamInnerWidth - 2}`} fill="none" stroke="#ffd0b8" strokeOpacity="0.75" strokeWidth={Math.max(0.6, beamHeight * 0.07)} />
                     <path d={`M ${beamInnerX + 1} ${beamTop + beamHeight * 0.88} H ${beamInnerX + beamInnerWidth - 1}`} fill="none" stroke="#a82f00" strokeOpacity="0.7" strokeWidth={Math.max(0.6, beamHeight * 0.08)} />
@@ -233,15 +237,16 @@ function RackPreview({ activeLevels, levelsForModule, hasRemovedLevels, removeLe
               <text x={beamX + beamWidth / 2} y={bottom + 27} textAnchor="middle" fill="#666" fontSize="16">{formatMeters(moduleLength)}</text><title>{beam?.produto}</title>
             </g>;
           })}
+          {useRequirements?.protection&&Array.from({length:modules.length+1},(_,index)=>{const x=rackLeft+(modules.slice(0,index).reduce((a,b)=>a+b,0)+index*100+50)*scale;return <rect key={`guard-${index}`} x={x-80*scale} y={bottom-350*scale} width={160*scale} height={350*scale} rx="1" fill="#efb52c" stroke="#bd861b" strokeWidth=".5"/>;})}
           <text x={width - 70} y="460" textAnchor="end" fill="#ff5500" fontSize="15" fontWeight="700">{capacityLabel}</text>
           <g transform="translate(70 470)" fontSize="13" fill="#777"><rect width="8" height="8" fill="#1787ff" /><text x="13" y="8">{english ? "Frame" : "Bastidor"}</text><rect x="92" width="8" height="8" fill="#FF5500" /><text x="105" y="8">{english ? "Beam" : "Viga"}</text></g>
-          <ModuleLevelDimensions activeLevels={activeLevels} yForLevel={(index) => levels === 1 ? (top + bottom + beamHeight) / 2 : Math.max(bottom - floorClearance - index * levelGap, index === levels - 1 ? top + topLevelInset : -Infinity)} thickness={beamHeight} x={rackRight + 20} floorY={bottom} scale={scale} format={formatMeters} english={english} />
+          <ModuleLevelDimensions activeLevels={activeLevels} yForLevel={beamBottomForLevel} thickness={beamHeight} x={rackRight + 20} floorY={bottom} scale={scale} format={formatMeters} english={english} />
           {modules.map((length, moduleIndex) => {
             const left = rackLeft + (100 + moduleIndex * 100 + modules.slice(0, moduleIndex).reduce((sum, value) => sum + value, 0)) * scale;
             const right = left + length * scale;
             const moduleLevels = levelsForModule(moduleIndex);
             const moduleEdited = moduleLevels.length < levels;
-            const yForLevel = (index) => levels === 1 ? (top + bottom + beamHeight) / 2 : Math.max(bottom - floorClearance - index * levelGap, index === levels - 1 ? top + topLevelInset : -Infinity);
+            const yForLevel = beamBottomForLevel;
             return <g key={`module-controls-${moduleIndex}`}>
               {moduleEdited && <ModuleLevelDimensions changedOnly activeLevels={moduleLevels} yForLevel={yForLevel} thickness={beamHeight} x={right - Math.min(55, (right - left) * 0.35)} floorY={bottom} scale={scale} format={formatMeters} english={english} />}
               <LevelRemovalTargets activeLevels={moduleLevels} yForLevel={(index) => yForLevel(index) - beamHeight / 2} left={left} right={right} removeLevel={(index) => removeLevel(index, moduleIndex)} english={english} />
@@ -250,6 +255,7 @@ function RackPreview({ activeLevels, levelsForModule, hasRemovedLevels, removeLe
         </svg>
       </div>
       <p className="mt-2 text-xs leading-relaxed text-[#86868b] sm:text-sm">{english ? "Dimensions are shown in the drawing; total length includes the frames." : "Cotas indicam as medidas; o comprimento total inclui os bastidores."}</p>
+      <RackLoadSummary height={height} slots={levels} levelsByModule={modules.map((_,index)=>levelsForModule(index))} value={useRequirements} modules={modules} capacity={levelCapacity} english={english}/>
       <SimulatorSolutions solutions={solutions} selectedId={selectedSolutionId} onSelect={onSelectSolution} />
     </div>
   );
@@ -264,6 +270,7 @@ export default function SimulatorRacks({ onQuoteDataChange, adminMode = false, a
   const formatMeters = (value) => `${(value / 1000).toLocaleString(english ? "en-IE" : "pt-PT", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} m`;
   const formatPrice = (value) => new Intl.NumberFormat(english ? "en-IE" : "pt-PT", { style: "currency", currency: "EUR" }).format(value);
   const [desiredLength, setDesiredLength] = useState(initialConfiguration.desiredLength ?? ("2.30"));
+  const [useRequirements,setUseRequirements]=useState(()=>normalizeRackUse(initialConfiguration.useRequirements));
   const [rowCount, setRowCount] = useState(initialConfiguration.rowCount ?? (1));
   const [sameBeamLength, setSameBeamLength] = useState(initialConfiguration.sameBeamLength ?? (false));
   const [desiredBeamLength, setDesiredBeamLength] = useState(initialConfiguration.desiredBeamLength ?? (beamLengths[0] || 1000));
@@ -272,7 +279,7 @@ export default function SimulatorRacks({ onQuoteDataChange, adminMode = false, a
   const { levels, setLevels, levelSlots, activeLevels, levelsForModule, hasRemovedLevels, removedKey, removeLevel, restoreLevels } = useEditableLevels(initialConfiguration.levelsState || 4);
   const [selectedSolutionId, setSelectedSolutionId] = useState(initialConfiguration.selectedSolutionId ?? ("chosen"));
   const enteredLength = Number(desiredLength.replace(",", "."));
-  const isLengthUnavailable = enteredLength > 30;
+  const isLengthUnavailable = !Number.isFinite(enteredLength) || enteredLength <= 0 || enteredLength > 30;
   const targetLength = enteredLength > 0 ? Math.min(30, enteredLength) * 1000 : 2300;
   const availableHeights = unique(frames.filter((frame) => frame.depth === depth).map((frame) => frame.height));
   const availableDepths = unique(frames.filter((frame) => frame.height === height).map((frame) => frame.depth));
@@ -337,17 +344,20 @@ export default function SimulatorRacks({ onQuoteDataChange, adminMode = false, a
     const format = (value) => (value / 1000).toLocaleString("pt-PT", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     const quote = {
       simulatorType: "racks",
-      configuration: { desiredLength, rowCount, sameBeamLength, desiredBeamLength, height, depth, selectedSolutionId, levelsState: { slots: levelSlots, modules: JSON.parse(removedKey) } },
+      requestedLengthMetres: enteredLength, effectiveLengthMillimetres: finalLength,
+      configuration: { useRequirements, desiredLength, rowCount, sameBeamLength, desiredBeamLength, height, depth, selectedSolutionId, levelsState: { slots: levelSlots, modules: JSON.parse(removedKey) } },
       rowCount,
       items: createQuoteLines(entries, 2),
       discountPercent: discountRate * 100,
       total: discountedEstimate,
-      details: `Racks para paletes · Comprimento por fila: ${format(finalLength)} m · Comprimento total: ${format(finalLength * rowCount)} m · Altura: ${format(height)} m · Profundidade: ${format(depth)} m · Níveis: ${levels} (posições de baixo para cima por módulo: ${modules.map((_, moduleIndex) => `${moduleIndex + 1}: ${levelsForModule(moduleIndex).map((index) => index + 1).join("/")}`).join("; ")} de ${levelSlots}) · Níveis por módulo: ${modules.map((_, index) => `${index + 1}: ${levelsForModule(index).length}`).join(", ")} · Linhas de estantes lado a lado: ${rowCount} · Vigas: ${beamDistribution.map(({ length, count }) => `${count} × ${format(length)} m`).join(", ")} · Carga máxima por par de vigas: ${capacityIsMinimum ? "> " : ""}${levelCapacity.toLocaleString("pt-PT")} kg`,
+      details: `Comprimento pedido por fila: ${format(enteredLength * 1000)} m · Racks para paletes · Comprimento por fila: ${format(finalLength)} m · Comprimento total: ${format(finalLength * rowCount)} m · Altura: ${format(height)} m · Profundidade: ${format(depth)} m · Níveis: ${levels} (posições de baixo para cima por módulo: ${modules.map((_, moduleIndex) => `${moduleIndex + 1}: ${levelsForModule(moduleIndex).map((index) => index + 1).join("/")}`).join("; ")} de ${levelSlots}) · Níveis por módulo: ${modules.map((_, index) => `${index + 1}: ${levelsForModule(index).length}`).join(", ")} · Linhas de estantes lado a lado: ${rowCount} · Vigas: ${beamDistribution.map(({ length, count }) => `${count} × ${format(length)} m`).join(", ")} · Carga máxima por par de vigas: ${capacityIsMinimum ? "> " : ""}${levelCapacity.toLocaleString("pt-PT")} kg${rackUseDetails(useRequirements)}`,
       unavailable: isLengthUnavailable || !matchingFrame || modules.length === 0,
     };
+    quote.reference = configurationReference(quote);
+    quote.details += ` · Referência da configuração: ${quote.reference}`;
     orderQuoteRef.current = quote;
     onQuoteDataChange?.(quote);
-  }, [removedKey, activeLevels.join(","), levelSlots, onQuoteDataChange, matchingFrame, modules, levels, rowCount, safetyBrake, discountRate, discountedEstimate, finalLength, height, depth, beamDistribution, capacityIsMinimum, levelCapacity, isLengthUnavailable, desiredLength, sameBeamLength, desiredBeamLength, selectedSolutionId]);
+  }, [useRequirements, removedKey, activeLevels.join(","), levelSlots, onQuoteDataChange, matchingFrame, modules, levels, rowCount, safetyBrake, discountRate, discountedEstimate, finalLength, height, depth, beamDistribution, capacityIsMinimum, levelCapacity, isLengthUnavailable, desiredLength, sameBeamLength, desiredBeamLength, selectedSolutionId]);
 
   function handleHeightChange(nextHeight) {
     const validDepths = unique(frames.filter((frame) => frame.height === nextHeight).map((frame) => frame.depth));
@@ -360,6 +370,7 @@ export default function SimulatorRacks({ onQuoteDataChange, adminMode = false, a
     if (!validHeights.includes(height)) setHeight(validHeights[0]);
   }
   function reset() {
+    setUseRequirements(normalizeRackUse());
     setDesiredLength("2.30");
     setRowCount(1);
     setSameBeamLength(false);
@@ -395,13 +406,14 @@ export default function SimulatorRacks({ onQuoteDataChange, adminMode = false, a
                 <input type="text" inputMode="decimal" value={desiredLength} onClick={(event) => event.currentTarget.select()} onChange={(event) => setDesiredLength(event.target.value.slice(0, 6))} onBlur={() => { const value = Number(desiredLength.replace(",", ".")); if (value > 0) setDesiredLength(value.toFixed(2)); }} className="w-full bg-transparent py-3.5 text-[15px] font-medium text-[#1d1d1f] outline-none" aria-label={english ? "Total desired length in metres" : "Comprimento total pretendido em metros"} />
                 <span className="text-sm font-medium text-[#86868b]">m</span>
               </div>
-              {isLengthUnavailable && <span className="mt-1 block text-sm font-medium text-red-600">{english ? "Lengths over 30.00 m are not available." : "Comprimentos superiores a 30,00 m não estão disponíveis."}</span>}
+              {isLengthUnavailable && <span className="mt-1 block text-sm font-medium text-red-600">{english ? "Enter a length greater than 0 and up to 30.00 m." : "Introduza um comprimento superior a 0 e até 30,00 m."}</span>}
             </label>
             <SimulatorDropdown label={english ? "Frame height (m)" : "Altura do bastidor (m)"} value={height} onChange={handleHeightChange} options={availableHeights.length ? availableHeights : heights} format={formatMeters} />
             <SimulatorDropdown label={english ? "Depth (m)" : "Profundidade (m)"} value={depth} onChange={handleDepthChange} options={availableDepths.length ? availableDepths : depths} format={formatMeters} />
             <SimulatorDropdown label={english ? "Number of levels" : "N.º de níveis"} value={levels} onChange={setLevels} options={levelOptions} />
             <SimulatorConfigurationOptions rowCount={rowCount} onRowCountChange={setRowCount} sameBeamLength={sameBeamLength} onSameBeamLengthChange={setSameBeamLength} desiredBeamLength={desiredBeamLength} onDesiredBeamLengthChange={setDesiredBeamLength} sameLengthToggleLabel={english ? "Beams of the same length" : "Vigas do mesmo comprimento"} sameLengthSelectLabel={english ? "Available beam length (m)" : "Medida disponível das vigas (m)"} sameLengthOptions={beamLengths} sameLengthFormat={formatMeters} automaticLengthMessage={english ? "When this option is off, beams of different lengths can be combined to get close to the requested length." : "Com esta opção desligada, o cálculo pode combinar vigas de diferentes comprimentos para aproximar o comprimento pedido."} />
           </div>
+          <RackUseRequirements value={useRequirements} onChange={setUseRequirements} english={english}/>
           <div className="mt-7 border-t border-[#e5e5e7] pt-6">
             <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#86868b]">{english ? "Price estimate" : "Estimativa de preço"}</p>
             <div className="mt-1 flex flex-wrap items-baseline gap-x-2 gap-y-1"><p className="text-4xl font-semibold tracking-[-0.04em] text-(--orange)">{isLengthUnavailable ? (english ? "Unavailable" : "Indisponível") : formatPrice(discountedEstimate)}</p>{!isLengthUnavailable && <span className="text-sm font-medium text-[#86868b]">{english ? "+ VAT" : "+ IVA"}</span>}</div>
@@ -418,6 +430,7 @@ export default function SimulatorRacks({ onQuoteDataChange, adminMode = false, a
               <p className="col-span-2"><span className="block text-xs text-[#86868b]">{english ? "Beams by length" : "Vigas por medida"}</span><strong className="mt-0.5 block font-semibold text-[#1d1d1f]">{beamDistribution.map(({ length, count }) => `${count} × ${formatMeters(length)}`).join(" · ")}</strong></p>
               <p className="col-span-2 border-t border-[#e5e5e7] pt-2 text-[#6e6e73]">{english ? "Maximum load per beam pair" : "Carga máxima por par de vigas"} <strong className="font-semibold text-(--orange)">{capacityIsMinimum ? "> " : ""}{levelCapacity.toLocaleString(english ? "en-IE" : "pt-PT")} kg</strong></p>
             </div>}
+            {!isLengthUnavailable && <ConfigurationReview requested={desiredLength} effective={finalLength} rows={rowCount} total={discountedEstimate} quoteRef={orderQuoteRef} drawingRef={drawingRef} english={english} />}
             <AddToSimulatorCart quoteRef={orderQuoteRef} drawingRef={drawingRef} label="Racks" english={english} onOrder={!adminMode ? () => setOrderOpen(true) : undefined} disabled={isLengthUnavailable} />
             <div className={`mt-5 grid gap-3 ${adminMode ? "grid-cols-1" : "grid-cols-[1fr_auto]"}`}><button type="button" onClick={reset} className="cursor-pointer simulator-pill rounded-full border border-[#d2d2d7] bg-white px-4 py-3 text-sm font-semibold text-[#1d1d1f] transition hover:bg-[#f5f5f7]">{adminMode ? (english ? "Reset configuration" : "Repor configuração") : (english ? "Reset" : "Recomeçar")}</button></div>
           </div>
@@ -425,10 +438,10 @@ export default function SimulatorRacks({ onQuoteDataChange, adminMode = false, a
           {!matchingFrame && <p className="mt-3 rounded-[30px] bg-amber-50 p-3 text-sm text-amber-800">{english ? "No frame with this height and depth combination is available in catalogue ref. 2." : "Não existe um bastidor com esta combinação de altura e profundidade no catálogo ref. 2."}</p>}
         </div>
         <div className="order-1 min-w-0 space-y-4 lg:order-2">
-          <AdminRack3D rowCount={rowCount} capacityLabel={`${english ? "Maximum load per beam pair" : "Carga máxima por par de vigas"}: ${levelCapacity.toLocaleString(english ? "en-IE" : "pt-PT")} kg`} solutions={solutions} selectedSolutionId={selectedSolutionId} onSelectSolution={setSelectedSolutionId} english={english} unavailable={isLengthUnavailable} type="racks" modules={modules} height={height} depth={depth} slots={levelSlots} levelsByModule={modules.map((_,index)=>levelsForModule(index))} finalLength={finalLength}>
+          <AdminRack3D useRequirements={useRequirements} loadCapacity={levelCapacity} rowCount={rowCount} capacityLabel={`${english ? "Maximum load per beam pair" : "Carga máxima por par de vigas"}: ${levelCapacity.toLocaleString(english ? "en-IE" : "pt-PT")} kg`} solutions={solutions} selectedSolutionId={selectedSolutionId} onSelectSolution={setSelectedSolutionId} english={english} unavailable={isLengthUnavailable} type="racks" modules={modules} height={height} depth={depth} slots={levelSlots} levelsByModule={modules.map((_,index)=>levelsForModule(index))} finalLength={finalLength}>
           {isLengthUnavailable
-            ? <div className="site-glass rounded-[30px] border border-[#e5e5e7] bg-white p-7 shadow-[0_12px_40px_rgba(0,0,0,0.05)]"><h2 className="text-xl font-semibold tracking-tight text-[#1d1d1f]">{english ? "Industrial pallet racking" : "Rack industrial para paletes"}</h2><p className="mt-1 text-xs text-[#86868b]">{english ? "Your configuration · 2D preview" : "A sua configuração · Pré-visualização 2D"}</p><p className="mt-4 rounded-[30px] bg-red-50 p-4 text-sm text-red-700">{english ? "Lengths over 30.00 m are not available." : "Comprimentos superiores a 30.00 m não estão disponíveis."}</p></div>
-            : <RackPreview modules={modules} height={height} depth={depth} levels={levelSlots} activeLevels={activeLevels} levelsForModule={levelsForModule} hasRemovedLevels={hasRemovedLevels} removeLevel={removeLevel} restoreLevels={restoreLevels} rowCount={rowCount} capacityLabel={`${english ? "Maximum load per beam pair" : "Carga máxima por par de vigas"}: ${capacityIsMinimum ? "> " : ""}${levelCapacity.toLocaleString(english ? "en-IE" : "pt-PT")} kg`} solutions={solutions} selectedSolutionId={selectedSolutionId} onSelectSolution={setSelectedSolutionId} english={english} />}
+            ? <div className="site-glass rounded-[30px] border border-[#e5e5e7] bg-white p-7 shadow-[0_12px_40px_rgba(0,0,0,0.05)]"><h2 className="text-xl font-semibold tracking-tight text-[#1d1d1f]">{english ? "Industrial pallet racking" : "Rack industrial para paletes"}</h2><p className="mt-1 text-xs text-[#86868b]">{english ? "Your configuration · 2D preview" : "A sua configuração · Pré-visualização 2D"}</p><p className="mt-4 rounded-[30px] bg-red-50 p-4 text-sm text-red-700">{english ? "Enter a length greater than 0 and up to 30.00 m." : "Introduza um comprimento superior a 0 e até 30,00 m."}</p></div>
+            : <RackPreview useRequirements={useRequirements} levelCapacity={levelCapacity} modules={modules} height={height} depth={depth} levels={levelSlots} activeLevels={activeLevels} levelsForModule={levelsForModule} hasRemovedLevels={hasRemovedLevels} removeLevel={removeLevel} restoreLevels={restoreLevels} rowCount={rowCount} capacityLabel={`${english ? "Maximum load per beam pair" : "Carga máxima por par de vigas"}: ${capacityIsMinimum ? "> " : ""}${levelCapacity.toLocaleString(english ? "en-IE" : "pt-PT")} kg`} solutions={solutions} selectedSolutionId={selectedSolutionId} onSelectSolution={setSelectedSolutionId} english={english} />}
           </AdminRack3D>
           {adminMode && <SimulatorProductPhoto type="racks" english={english}/>}
           {adminMode && adminPanel}

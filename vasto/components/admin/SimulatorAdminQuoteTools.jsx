@@ -161,7 +161,7 @@ export default function SimulatorAdminQuoteTools({
 
       {cartPanel}
 
-      <section aria-label="Exportar simulação" className="admin-surface flex flex-col justify-between gap-4 rounded-[24px] border border-[#e5e5e7] bg-white p-5 shadow-[0_8px_30px_rgba(0,0,0,0.035)] sm:px-6">
+      <section aria-label="Exportar configuração" className="admin-surface flex flex-col justify-between gap-4 rounded-[24px] border border-[#e5e5e7] bg-white p-5 shadow-[0_8px_30px_rgba(0,0,0,0.035)] sm:px-6">
         <div>
           <h2 className="text-base font-semibold text-[#1d1d1f]">Guardar esta configuração</h2>
           <p className="mt-1 text-sm text-[#6e6e73]">A imagem guarda apenas o desenho e as cotas. O PDF gera a folha de orçamento com artigos, quantidades, preços e desconto.</p>

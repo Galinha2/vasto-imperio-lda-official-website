@@ -21,7 +21,7 @@ export default async function handler(req, res) {
     }
 
     // parse do formulário multipart
-    const form = formidable({ multiples: true, maxFiles: 3 });
+    const form = formidable({ multiples: true, maxFiles: 3, maxFileSize: 3 * 1024 * 1024, maxTotalFileSize: 3 * 1024 * 1024, maxFieldsSize: 64 * 1024 });
     const { fields, files } = await new Promise((resolve, reject) => {
       form.parse(req, (err, fields, files) => {
         if (err) reject(err);

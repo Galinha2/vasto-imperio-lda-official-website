@@ -12,8 +12,8 @@ export default function HandlingOrderPanel({ product, label, english = false, em
   const total = price * quantity;
   const currency = new Intl.NumberFormat(english ? "en-IE" : "pt-PT", { style: "currency", currency: "EUR" });
   const copy = english
-    ? { quantity: "Quantity", unit: "per unit", vat: "+ VAT at the applicable rate", order: "Place order" }
-    : { quantity: "Quantidade", unit: "por unidade", vat: "+ IVA à taxa legal em vigor", order: "Encomendar" };
+    ? { quantity: "Quantity", unit: "per unit", vat: "+ VAT at the applicable rate", order: "Request proposal" }
+    : { quantity: "Quantidade", unit: "por unidade", vat: "+ IVA à taxa legal em vigor", order: "Pedir proposta" };
   const items = createQuoteLines([{ product, quantity }], 5);
   const details = [
     `${english ? "Product" : "Produto"}: ${product?.produto || label}`,

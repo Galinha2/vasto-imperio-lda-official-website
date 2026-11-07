@@ -8,7 +8,7 @@
         "url": "/"
       },
       {
-        "label": "Simulate",
+        "label": "Configure",
         "url": "/simulador"
       },
       {
@@ -38,13 +38,13 @@
     ]
   },
   "simulationCards": {
-    "title": "Simulate Your Quote",
+    "title": "Configure and see prices",
     "text": [
       {
         "image": "/estantessim.png",
         "title": "Shelving",
         "url": "/simulador/estantes-ligeiras",
-        "simulation": "Simulator",
+        "simulation": "Configure and see price",
         "subTitle": [
           {
             "text": "Racks - Heavy pallet loads"
@@ -61,7 +61,7 @@
         "image": "/transport.png",
         "title": "Material Handling",
         "url": "/simulador/movimentacao-de-carga",
-        "simulation": "Simulator",
+        "simulation": "View equipment and prices",
         "subTitle": [
           {
             "text": "Stackers"
@@ -345,15 +345,15 @@
         ],
         "galeriaTitle": "Our Customers",
         "galeria": [
-        "/produtos/prateleiras-ligeiras/a2.jpeg",
-        "/produtos/prateleiras-ligeiras/a1.jpeg",
-        "/produtos/prateleiras-ligeiras/a4.jpg",
-        "/produtos/prateleiras-ligeiras/a5.jpg",
-        "/produtos/prateleiras-ligeiras/a3.jpeg",
-        "/produtos/prateleiras-ligeiras/a6.jpg",
-        "/produtos/prateleiras-ligeiras/cliente-ligeiras-1.webp",
-        "/produtos/prateleiras-ligeiras/cliente-ligeiras-2.webp"
-      ],
+          "/produtos/prateleiras-ligeiras/a2.jpeg",
+          "/produtos/prateleiras-ligeiras/a1.jpeg",
+          "/produtos/prateleiras-ligeiras/a4.jpg",
+          "/produtos/prateleiras-ligeiras/a5.jpg",
+          "/produtos/prateleiras-ligeiras/a3.jpeg",
+          "/produtos/prateleiras-ligeiras/a6.jpg",
+          "/produtos/prateleiras-ligeiras/cliente-ligeiras-1.webp",
+          "/produtos/prateleiras-ligeiras/cliente-ligeiras-2.webp"
+        ],
         "tabela": [
           {
             "nome": "Shelf",
@@ -421,7 +421,13 @@
       {
         "id": "estantes-picking",
         "galeriaTitle": "Our customers",
-        "galeria": ["/produtos/estantes-picking/clientes/picking-galvanizada-aglomerado.webp", "/produtos/estantes-picking/clientes/picking-pintada-perspetiva.webp", "/produtos/estantes-picking/clientes/picking-pintada-frente.webp", "/produtos/estantes-picking/clientes/picking-pintada-detalhe.webp", "/produtos/estantes-picking/clientes/picking-galvanizada-lateral.webp"],
+        "galeria": [
+          "/produtos/estantes-picking/clientes/picking-galvanizada-aglomerado.webp",
+          "/produtos/estantes-picking/clientes/picking-pintada-perspetiva.webp",
+          "/produtos/estantes-picking/clientes/picking-pintada-frente.webp",
+          "/produtos/estantes-picking/clientes/picking-pintada-detalhe.webp",
+          "/produtos/estantes-picking/clientes/picking-galvanizada-lateral.webp"
+        ],
         "image": "/produtos/9-Porteco Z60/i1.png",
         "width": 160,
         "text": "Picking Shelving with Shelves",
@@ -443,95 +449,89 @@
           "/produtos/9-Porteco Z60/i16.jpg",
           "/produtos/9-Porteco Z60/i17.jpg"
         ],
-        "description": "<span class='label'>Material:</span> High-strength metal structure.<br/><span class='label'>Load capacity:</span> Up to 1,000 kg per beam pair.<br/><span class='label'>Frame height:</span> 2,000 to 5,500 mm.<br/><span class='label'>Frame depth:</span> 400 to 1,100 mm.<br/><span class='label'>Beam length:</span> 1,000 to 2,750 mm.<br/><span class='label'>Beam profiles:</span> Z60 or Z100.<br/><span class='label'>Description:</span> A robust metal shelving system for warehouses, workshops and storage areas. Its modular structure and quick-fit beams support a range of height, depth and length configurations to suit your load and organisation needs.",
+        "description": "<span class='label'>Material:</span> High-strength metal structure.<br/><span class='label'>Load capacity:</span> Up to 1,000 kg per beam pair.<br/><span class='label'>Frame height:</span> 2,000 to 5,000 mm.<br/><span class='label'>Frame depth:</span> 400 to 1,200 mm.<br/><span class='label'>Beam length:</span> 1,000 to 2,750 mm.<br/><span class='label'>Beam profiles:</span> Z60 or Z100.<br/><span class='label'>Description:</span> A robust metal shelving system for warehouses, workshops and storage areas. Its modular structure and quick-fit beams support a range of height, depth and length configurations to suit your load and organisation needs.",
         "tabela": [
           {
             "nome": "Frames",
             "altura_mm": 2000,
-            "largura_mm": "800 | 900 | 1000 | 1100",
+            "profundidade_mm": "400 | 500 | 600 | 700 | 800 | 900 | 1000 | 1100 | 1200",
             "acabamento": "Galvanised or RAL 5005 / 7035"
           },
           {
             "nome": "Frames",
             "altura_mm": 2500,
-            "largura_mm": "800 | 900 | 1000 | 1100",
+            "profundidade_mm": "400 | 500 | 600 | 700 | 800 | 900 | 1000 | 1100 | 1200",
             "acabamento": "Galvanised or RAL 5005 / 7035"
           },
           {
             "nome": "Frames",
             "altura_mm": 3000,
-            "largura_mm": "800 | 900 | 1000 | 1100",
+            "profundidade_mm": "400 | 500 | 600 | 700 | 800 | 900 | 1000 | 1100 | 1200",
             "acabamento": "Galvanised or RAL 5005 / 7035"
           },
           {
             "nome": "Frames",
             "altura_mm": 3500,
-            "largura_mm": "800 | 900 | 1000 | 1100",
+            "profundidade_mm": "400 | 500 | 600 | 700 | 800 | 900 | 1000 | 1100 | 1200",
             "acabamento": "Galvanised or RAL 5005 / 7035"
           },
           {
             "nome": "Frames",
             "altura_mm": 4000,
-            "largura_mm": "800 | 900 | 1000 | 1100",
+            "profundidade_mm": "400 | 500 | 600 | 700 | 800 | 900 | 1000 | 1100 | 1200",
             "acabamento": "Galvanised or RAL 5005 / 7035"
           },
           {
             "nome": "Frames",
             "altura_mm": 4500,
-            "largura_mm": "800 | 900 | 1000 | 1100",
+            "profundidade_mm": "400 | 500 | 600 | 700 | 800 | 900 | 1000 | 1100 | 1200",
             "acabamento": "Galvanised or RAL 5005 / 7035"
           },
           {
             "nome": "Frames",
             "altura_mm": 5000,
-            "largura_mm": "800 | 900 | 1000 | 1100",
-            "acabamento": "Galvanised or RAL 5005 / 7035"
-          },
-          {
-            "nome": "Frames",
-            "altura_mm": 5500,
-            "largura_mm": "800 | 900 | 1000 | 1100",
+            "profundidade_mm": "400 | 500 | 600 | 700 | 800 | 900 | 1000 | 1100 | 1200",
             "acabamento": "Galvanised or RAL 5005 / 7035"
           },
           {
             "nome": "Z60 | Z100 Beams",
             "altura_mm": "-",
-            "largura_mm": 1000
+            "comprimento_mm": 1000
           },
           {
             "nome": "Z60 | Z100 Beams",
             "altura_mm": "-",
-            "largura_mm": 1250
+            "comprimento_mm": 1250
           },
           {
             "nome": "Z60 | Z100 Beams",
             "altura_mm": "-",
-            "largura_mm": 1500
+            "comprimento_mm": 1500
           },
           {
             "nome": "Z60 | Z100 Beams",
             "altura_mm": "-",
-            "largura_mm": 1750
+            "comprimento_mm": 1750
           },
           {
             "nome": "Z60 | Z100 Beams",
             "altura_mm": "-",
-            "largura_mm": 2000
+            "comprimento_mm": 2000
           },
           {
             "nome": "Z60 | Z100 Beams",
             "altura_mm": "-",
-            "largura_mm": 2250
+            "comprimento_mm": 2250
           },
           {
             "nome": "Z60 | Z100 Beams",
             "altura_mm": "-",
-            "largura_mm": 2500
+            "comprimento_mm": 2500
           },
           {
             "nome": "Z60 | Z100 Beams",
             "altura_mm": "-",
-            "largura_mm": 2750
+            "comprimento_mm": 2750
           }
         ]
       },
@@ -573,7 +573,7 @@
           "/produtos/2-Stacker/a5.jpg",
           "/produtos/2-Stacker/a6.jpg"
         ],
-        "description": "<span class='label'>Capacity:</span> 1500 kg<br/><span class='label'>Weight without battery:</span> 110 kg<br/><span class='label'>Weight with battery:</span> 116 kg<br/><span class='label'>Voltage:</span> 25.6 V<br/><span class='label'>Battery capacity:</span> 20 Ah <span class='label'>Description:</span> Our 1500 kg electric pallet truck is ideal for fast and safe movement of loads in warehouses, logistics centers, or factories. Equipped with an electric motor and high-capacity battery, it allows precise maneuvers with minimal effort, increasing operational efficiency and reducing operator strain. The reinforced steel structure ensures robustness and durability, while the ergonomic design ensures comfort and safety during the transport of heavy loads. A reliable solution to optimize internal logistics and increase productivity."
+        "description": "<span class='label'>Brand:</span> JMAO<br/><span class='label'>Model:</span> PSL15-30<br/><span class='label'>Equipment type:</span> Electric walk-behind stacker<br/><span class='label'>Rated capacity:</span> 1500 kg<br/><span class='label'>Maximum lift height:</span> 3000 mm (3.00 m)<br/><span class='label'>Working voltage:</span> 48 V<br/><span class='label'>Motor power stated on the nameplate:</span> 1.0 kW<br/><span class='label'>Overall dimensions (L × W × H):</span> 1820 × 820 × 2040 mm<br/><span class='label'>Batteries in the photographed configuration:</span> 4 × LEOCH 6-EVF-40 lead-acid batteries<br/><span class='label'>Specification of each battery:</span> 12 V · 40 Ah (20-hour rate)<br/><span class='label'>Mast and lifting system:</span> Telescopic mast with lifting chains and hydraulic system<br/><span class='label'>Controls:</span> Multifunction tiller for walk-behind operation<br/><span class='label'>Visible equipment:</span> Mast protective mesh, emergency-stop button, key switch and fork load wheels<br/><span class='label'>Description:</span> Electric stacker for moving and lifting palletised goods in warehouses and storage areas. The configuration shown combines a rated capacity of 1500 kg with lifting up to 3 metres, a 48 V electrical system and tiller controls. Overall dimensions and key specifications were checked against the equipment nameplate shown in the gallery.<br/><span class='label'>Technical information:</span> Confirm the supplied configuration and residual capacity at the working height using its load chart. A nominal capacity of 1500 kg does not mean that this load is permissible at every height and under all operating conditions."
       },
       {
         "id": "porta-paletes-manual",
@@ -605,7 +605,7 @@
           "/produtos/4-cacifos/a2.webp",
           "/produtos/4-cacifos/a3.webp"
         ],
-        "description": "<span class='label'>Doors:</span> Available with 3 and 6 doors<br/><span class='label'>Dimensions:</span> 1900 × 900 × 500 mm<br/><span class='label'>Description:</span> Lockers approved according to Portuguese Standard NP 1116.<br/>Practical, secure and essential for organizing your belongings, these lockers are ideal for use in changing rooms and storage spaces. Keep everything organized with these quality cabinets."
+        "description": "<span class='label'>Doors:</span> Available with 3 and 6 doors<br/><span class='label'>Dimensions:</span> 1900 × 900 × 500 mm<br/><span class='label'>Description:</span> Metal lockers for clothing and personal belongings.<br/>Practical, secure and essential for organizing your belongings, these lockers are ideal for use in changing rooms and storage spaces. Keep everything organized with these quality cabinets."
       },
       {
         "id": "arrumacao-vertical",
@@ -653,43 +653,43 @@
             "altura_mm": 2400,
             "largura_mm": 800,
             "bracos_mm": 400,
-            "peso_kg": 275,
-            "codigo": "CASF0840"
+            "codigo": "CASF0840",
+            "carga_par_bracos_kg": 275
           },
           {
             "altura_mm": 2400,
             "largura_mm": 800,
             "bracos_mm": 500,
-            "peso_kg": 250,
-            "codigo": "CASF0850"
+            "codigo": "CASF0850",
+            "carga_par_bracos_kg": 250
           },
           {
             "altura_mm": 2400,
             "largura_mm": 800,
             "bracos_mm": 600,
-            "peso_kg": 225,
-            "codigo": "CASF0860"
+            "codigo": "CASF0860",
+            "carga_par_bracos_kg": 225
           },
           {
             "altura_mm": 2400,
             "largura_mm": 1000,
             "bracos_mm": 400,
-            "peso_kg": 250,
-            "codigo": "CASF1040"
+            "codigo": "CASF1040",
+            "carga_par_bracos_kg": 250
           },
           {
             "altura_mm": 2400,
             "largura_mm": 1000,
             "bracos_mm": 500,
-            "peso_kg": 225,
-            "codigo": "CASF1050"
+            "codigo": "CASF1050",
+            "carga_par_bracos_kg": 225
           },
           {
             "altura_mm": 2400,
             "largura_mm": 1000,
             "bracos_mm": 600,
-            "peso_kg": 200,
-            "codigo": "CASF1060"
+            "codigo": "CASF1060",
+            "carga_par_bracos_kg": 200
           }
         ]
       },

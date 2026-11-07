@@ -68,7 +68,7 @@ export function ProductDetailLoading() {
 
 export function SimulatorChooserLoading() {
   return (
-    <PageFrame label="A carregar os simuladores">
+    <PageFrame label="A carregar os configuradores">
       <header className="mb-8 max-w-3xl space-y-4"><Skeleton className="h-5 w-44 rounded-full" /><Skeleton className="h-12 w-full" /><Skeleton className="h-5 w-4/5" /></header>
       <div className="mb-8 flex flex-wrap gap-3">{[0, 1, 2].map((item) => <Skeleton key={item} className="h-16 w-48 rounded-full" />)}</div>
       <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">{[0, 1, 2, 3, 4, 5].map((item) => <article key={item} className="overflow-hidden rounded-[30px] border border-[#e5e5e7] bg-white"><ImageSlot className="h-56 rounded-none" /><div className="space-y-3 p-6"><Skeleton className="h-6 w-3/4" /><Skeleton className="h-4 w-full" /><Skeleton className="h-11 w-36 rounded-full" /></div></article>)}</div>

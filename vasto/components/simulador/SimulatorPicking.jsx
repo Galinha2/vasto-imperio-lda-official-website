@@ -1,4 +1,6 @@
 "use client";
+import ConfigurationReview from "./ConfigurationReview";
+import { configurationReference } from "@/lib/configuration-summary.mjs";
 
 import AdminRack3D from "@/components/admin/AdminRack3D";
 import SimulatorProductPhoto from "./SimulatorProductPhoto";
@@ -399,7 +401,7 @@ export default function SimulatorPicking({ onQuoteDataChange, adminMode = false,
     .filter((beam) => beam.produto.includes(reinforcedBeams ? "Viga Z100" : "Viga Z60"))
     .map((beam) => beam.length)), [reinforcedBeams]);
   const enteredLength = Number(desiredLength.replace(",", "."));
-  const isLengthUnavailable = enteredLength > 30;
+  const isLengthUnavailable = !Number.isFinite(enteredLength) || enteredLength <= 0 || enteredLength > 30;
   const targetLength = enteredLength > 0 ? Math.min(30, enteredLength) * 1000 : 5000;
   const availableHeights = unique(usableFrames.filter((frame) => frame.galvanized === galvanized && allowedHeight(frame)).map((frame) => frame.height));
   const availableDepths = unique(usableFrames.filter((frame) => frame.galvanized === galvanized && allowedHeight(frame)).map((frame) => frame.depth));
@@ -495,14 +497,17 @@ export default function SimulatorPicking({ onQuoteDataChange, adminMode = false,
     const format = (value) => (value / 1000).toLocaleString("pt-PT", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     const quote = {
       simulatorType: workbench ? "bancadas" : "picking",
+      requestedLengthMetres: enteredLength, effectiveLengthMillimetres: finalLength,
       configuration: { desiredLength, rowCount, sameBeamLength, desiredBeamLength, height, depth, floorType, galvanized, reinforcedBeams, selectedSolutionId, levelsState: { slots: levelSlots, modules: JSON.parse(removedKey) } },
       rowCount,
       items: createQuoteLines(entries, 3),
       discountPercent: discountRate * 100,
       total: discountedEstimate,
-      details: `${workbench ? "Bancadas" : "Estantes picking"} · Comprimento por fila: ${format(finalLength)} m · Comprimento total: ${format(finalLength * rowCount)} m · Altura: ${format(height)} m · Profundidade: ${format(depth)} m · Níveis: ${levels} (posições de baixo para cima por módulo: ${modules.map((_, moduleIndex) => `${moduleIndex + 1}: ${levelsForModule(moduleIndex).map((index) => index + 1).join("/")}`).join("; ")} de ${levelSlots}) · Níveis por módulo: ${modules.map((_, index) => `${index + 1}: ${levelsForModule(index).length}`).join(", ")} · Linhas de estantes lado a lado: ${rowCount} · Piso: ${floorType} · Bastidores: ${galvanized ? "galvanizados" : "pintados"} · Vigas: ${profile} · Carga máxima por par de vigas: ${levelCapacity.toLocaleString("pt-PT")} kg`,
+      details: `Comprimento pedido por fila: ${format(enteredLength * 1000)} m · ${workbench ? "Bancadas" : "Estantes picking"} · Comprimento por fila: ${format(finalLength)} m · Comprimento total: ${format(finalLength * rowCount)} m · Altura: ${format(height)} m · Profundidade: ${format(depth)} m · Níveis: ${levels} (posições de baixo para cima por módulo: ${modules.map((_, moduleIndex) => `${moduleIndex + 1}: ${levelsForModule(moduleIndex).map((index) => index + 1).join("/")}`).join("; ")} de ${levelSlots}) · Níveis por módulo: ${modules.map((_, index) => `${index + 1}: ${levelsForModule(index).length}`).join(", ")} · Linhas de estantes lado a lado: ${rowCount} · Piso: ${floorType} · Bastidores: ${galvanized ? "galvanizados" : "pintados"} · Vigas: ${profile} · Carga máxima por par de vigas: ${levelCapacity.toLocaleString("pt-PT")} kg`,
       unavailable: isLengthUnavailable || !matchingFrame || modules.length === 0,
     };
+    quote.reference = configurationReference(quote);
+    quote.details += ` · Referência da configuração: ${quote.reference}`;
     orderQuoteRef.current = quote;
     onQuoteDataChange?.(quote);
   }, [removedKey, activeLevels.join(","), levelSlots, workbench, onQuoteDataChange, matchingFrame, modules, levels, rowCount, depth, floorType, safetyBrake, reinforcedBeams, galvanized, discountRate, discountedEstimate, finalLength, height, levelCapacity, isLengthUnavailable, desiredLength, sameBeamLength, desiredBeamLength, selectedSolutionId]);
@@ -604,7 +609,7 @@ export default function SimulatorPicking({ onQuoteDataChange, adminMode = false,
                 <span className="text-sm font-medium text-[#86868b]">m</span>
               </div>
         {isLengthUnavailable ? (
-                <span className="mt-1 block text-sm font-medium text-red-600">{english ? "Lengths over 30.00 m are not available." : "Comprimentos superiores a 30,00 m não estão disponíveis."}</span>
+                <span className="mt-1 block text-sm font-medium text-red-600">{english ? "Enter a length greater than 0 and up to 30.00 m." : "Introduza um comprimento superior a 0 e até 30,00 m."}</span>
               ) : null}
             </label>
             <SimulatorDropdown label={english ? "Frame height (m)" : "Altura do bastidor (m)"} value={height} onChange={handleHeightChange} options={availableHeights.length ? availableHeights : workbench ? [] : heights} format={formatMeters} />
@@ -657,6 +662,7 @@ export default function SimulatorPicking({ onQuoteDataChange, adminMode = false,
                 <p className="col-span-2 border-t border-[#e5e5e7] pt-2 text-[#6e6e73]">{english ? "Maximum load per beam pair" : "Carga máxima por par de vigas"} <strong className="font-semibold text-(--orange)">{levelCapacity.toLocaleString(english ? "en-IE" : "pt-PT")} kg</strong></p>
               </div>
             )}
+            {!isLengthUnavailable && <ConfigurationReview requested={desiredLength} effective={finalLength} rows={rowCount} total={discountedEstimate} quoteRef={orderQuoteRef} drawingRef={drawingRef} english={english} />}
             <AddToSimulatorCart quoteRef={orderQuoteRef} drawingRef={drawingRef} label={workbench ? "Bancadas" : "Picking"} english={english} onOrder={!adminMode ? () => setOrderOpen(true) : undefined} disabled={isLengthUnavailable} />
             <div className={`mt-5 grid gap-3 ${adminMode ? "grid-cols-1" : "grid-cols-[1fr_auto]"}`}>
 
@@ -671,7 +677,7 @@ export default function SimulatorPicking({ onQuoteDataChange, adminMode = false,
         {isLengthUnavailable ? (
           <div className="site-glass flex-1 rounded-[30px] border border-[#e5e5e7] bg-white p-7 shadow-[0_12px_40px_rgba(0,0,0,0.05)]">
             <h2 className="text-xl font-semibold tracking-tight text-[#1d1d1f]">{workbench ? (english ? "Workbench" : "Bancada") : (english ? "Picking shelving" : "Estante de picking")}</h2><p className="mt-1 text-xs text-[#86868b]">{english ? "Your configuration · 2D preview" : "A sua configuração · Pré-visualização 2D"}</p>
-            <p className="mt-4 rounded-[30px] bg-red-50 p-4 text-sm text-red-700">{english ? "Lengths over 30.00 m are not available." : "Comprimentos superiores a 30,00 m não estão disponíveis."}</p>
+            <p className="mt-4 rounded-[30px] bg-red-50 p-4 text-sm text-red-700">{english ? "Enter a length greater than 0 and up to 30.00 m." : "Introduza um comprimento superior a 0 e até 30,00 m."}</p>
           </div>
         ) : (
           <div className="order-1 min-w-0 lg:order-2">

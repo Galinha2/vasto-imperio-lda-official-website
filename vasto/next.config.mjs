@@ -1,7 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   async redirects() {
-    return [{ source: "/home", destination: "/", permanent: true }];
+    return [{ source: "/home", destination: "/", permanent: true }, ...["racks-industriais", "estante-carga-ligeira", "estantes-picking"].map(id => ({ source: `/produtos/pt/${id}`, destination: `/${id}`, permanent: true }))];
   },
   async headers() {
     return [{ source: "/admin-push-sw.js", headers: [{ key: "Cache-Control", value: "no-cache, no-store, must-revalidate" }, { key: "Service-Worker-Allowed", value: "/admin/" }] }, ...["/admin/:path*", "/orcamento/admin/:path*", "/simulador/admin/:path*", "/api/:path*"].map((source) => ({

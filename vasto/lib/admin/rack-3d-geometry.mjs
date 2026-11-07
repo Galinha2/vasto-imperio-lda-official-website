@@ -116,6 +116,29 @@ export function createRackGeometry(model,{woodTexture=null,zincTexture=null}={})
     put('Aba curva lateral do travamento',hook,mats.tie,center+side*b.clearLength/2,y+.065,z,[Math.PI/2,0,0]);
    }
   }
+  function drawPallets(y){
+   const center=(b.left+b.right)/2;
+   if(rack&&b.palletLoad){
+    const load=b.palletLoad;
+    for(const offset of load.centres){
+     const px=center+offset,w=load.width,d=load.depth;
+     // Euro pallet: five top boards, three bottom runners and nine spacer blocks.
+     const boardWidths=w===.8?[.145,.1,.145,.1,.145]:Array(5).fill(.145);
+     const boardGap=(w-boardWidths.reduce((sum,bw)=>sum+bw,0))/4;let boardX=px-w/2;
+     for(const bw of boardWidths){box('Tábua superior da palete',bw,.022,d,boardX+bw/2,y+.133,0,mats.pallet);boardX+=bw+boardGap;}
+     for(const sx of [-1,0,1]){
+      box('Patim inferior da palete',.1,.022,d,px+sx*(w/2-.05),y+.011,0,mats.pallet);
+      for(const sz of [-1,0,1])box('Bloco da palete',.1,.078,.14,px+sx*(w/2-.05),y+.061,sz*(d/2-.07),mats.pallet);
+     }
+     for(const sz of [-1,0,1])box('Travessa da palete',w,.022,.14,px,y+.111,sz*(d/2-.07),mats.pallet);
+     if(load.loadHeight>load.palletHeight){
+      const ch=load.loadHeight-load.palletHeight;
+      box('Carga ilustrativa sobre palete',w-.04,ch,d-.04,px,y+load.palletHeight+ch/2,0,mats.cargo);
+     }
+    }
+   }
+  }
+  if(b.floorPallets)drawPallets(0);
   b.levels.forEach(y=>{
    const center=(b.left+b.right)/2,span=b.clearLength;
    for(const z of [-model.depth/2,model.depth/2]){
@@ -141,25 +164,7 @@ export function createRackGeometry(model,{woodTexture=null,zincTexture=null}={})
      }
     }
    }
-   if(rack&&b.palletLoad){
-    const load=b.palletLoad;
-    for(const offset of load.centres){
-     const px=center+offset,w=load.width,d=load.depth;
-     // Euro pallet: five top boards, three bottom runners and nine spacer blocks.
-     const boardWidths=w===.8?[.145,.1,.145,.1,.145]:Array(5).fill(.145);
-     const boardGap=(w-boardWidths.reduce((sum,bw)=>sum+bw,0))/4;let boardX=px-w/2;
-     for(const bw of boardWidths){box('Tábua superior da palete',bw,.022,d,boardX+bw/2,y+.133,0,mats.pallet);boardX+=bw+boardGap;}
-     for(const sx of [-1,0,1]){
-      box('Patim inferior da palete',.1,.022,d,px+sx*(w/2-.05),y+.011,0,mats.pallet);
-      for(const sz of [-1,0,1])box('Bloco da palete',.1,.078,.14,px+sx*(w/2-.05),y+.061,sz*(d/2-.07),mats.pallet);
-     }
-     for(const sz of [-1,0,1])box('Travessa da palete',w,.022,.14,px,y+.111,sz*(d/2-.07),mats.pallet);
-     if(load.loadHeight>load.palletHeight){
-      const ch=load.loadHeight-load.palletHeight;
-      box('Carga ilustrativa sobre palete',w-.04,ch,d-.04,px,y+load.palletHeight+ch/2,0,mats.cargo);
-     }
-    }
-   }
+   drawPallets(y);
    if(!rack){
     const wood=!light&&model.floorType==='Aglomerado';const shelfMat=wood?mats.wood:mats.metal;
     const overhang=model.type==='bancadas'&&y===Math.max(...b.levels)?.035:0;

@@ -2,7 +2,7 @@
 import ConfigurationReview, { ConfigurationPdfDownload } from "./ConfigurationReview";
 import { configurationReference } from "@/lib/configuration-summary.mjs";
 
-import {rackBeamLevels} from '@/lib/rack-level-layout.mjs';
+import {rackBeamLevels,rackFloorFits} from '@/lib/rack-level-layout.mjs';
 import RackLoadSummary from './RackLoadSummary';
 import RackPalletDrawing from './RackPalletDrawing';
 import RackUseRequirements from './RackUseRequirements';
@@ -130,7 +130,7 @@ function RackPreview({ useRequirements,levelCapacity,activeLevels, levelsForModu
   const uprightWidth = 100 * scale;
   const beamHeight = Math.max(2.5, 100 * scale);
   const tabHeight = Math.max(3.5, beamHeight * 1.25);
-  const beamLevels=rackBeamLevels(height/1000,levels);
+  const beamLevels=rackBeamLevels(height/1000,levels,rackPalletLayout(useRequirements,1)?.loadHeight||0);
   const beamTopForLevel=index=>bottom-beamLevels[index]*1000*scale;
   const beamBottomForLevel=index=>beamTopForLevel(index)+beamHeight;
 
@@ -208,6 +208,7 @@ function RackPreview({ useRequirements,levelCapacity,activeLevels, levelsForModu
             const beam = beams.find((item) => item.length === moduleLength);
             const tabWidth = Math.max(2, uprightWidth * 0.5);
             return <g key={`beam-${moduleIndex}`}>
+              {rackFloorFits(levelsForModule(moduleIndex).map(i=>beamLevels[i]),rackPalletLayout(useRequirements,moduleLength/1000)?.loadHeight||0)&&<RackPalletDrawing requirements={useRequirements} length={moduleLength} center={beamInnerX+beamInnerWidth/2} beamY={bottom} scale={scale}/>}
               {levelsForModule(moduleIndex).map((levelIndex) => {
                 const beamTop = beamTopForLevel(levelIndex);
                 const tabY = beamTop - (tabHeight - beamHeight) / 2;

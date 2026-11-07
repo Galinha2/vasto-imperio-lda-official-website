@@ -1,6 +1,7 @@
 'use client';
 import {useEffect,useRef,useState} from 'react';
 import * as THREE from 'three';
+import {createRackWarehouse} from '@/lib/admin/rack-warehouse.mjs';
 import {RoomEnvironment} from 'three/addons/environments/RoomEnvironment.js';
 import {createRackGeometry} from '@/lib/admin/rack-3d-geometry.mjs';
 import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
@@ -64,8 +65,7 @@ export default function Rack3DViewer(props){
    dimension(new THREE.Vector3(-model.width/2,.02,model.depth/2+dimOffset),new THREE.Vector3(model.width/2,.02,model.depth/2+dimOffset),fmt(model.width));
    dimension(new THREE.Vector3(-model.width/2-dimOffset,0,0),new THREE.Vector3(-model.width/2-dimOffset,model.height,0),fmt(model.height));
    dimension(new THREE.Vector3(model.width/2+dimOffset,.02,-model.depth/2),new THREE.Vector3(model.width/2+dimOffset,.02,model.depth/2),fmt(model.depth));
-   const groundGeo=new THREE.PlaneGeometry(200,200);const groundMat=new THREE.ShadowMaterial({opacity:.1});const ground=new THREE.Mesh(groundGeo,groundMat);ground.rotation.x=-Math.PI/2;ground.position.y=-.009;ground.receiveShadow=true;scene.add(ground);disposables.push(groundGeo,groundMat);
-   const gridSize=Math.max(model.width,model.depth,4)*1.8;const grid=new THREE.GridHelper(gridSize,24,0xbac8d7,0xe0e6ee);grid.position.y=-.02;scene.add(grid);disposables.push(grid.geometry,grid.material);
+   const warehouse=createRackWarehouse(model);scene.add(warehouse.group);disposables.push(warehouse);
    const previewHeight=Math.max(model.height,...model.bays.flatMap(b=>b.palletLoad?b.levels.map(y=>y+b.palletLoad.loadHeight):[]));
    const render=()=>renderer.render(scene,camera);const target=new THREE.Vector3(0,previewHeight/2,0);
    function fit(view='perspective'){

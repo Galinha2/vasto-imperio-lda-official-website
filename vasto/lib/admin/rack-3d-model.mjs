@@ -1,4 +1,4 @@
-import {rackBeamLevels} from '../rack-level-layout.mjs';
+import {rackBeamLevels,rackFloorFits} from '../rack-level-layout.mjs';
 import {normalizeRackUse,rackPalletLayout} from '../rack-use-requirements.mjs';
 import {lightShelfPositions,lightBracePositions} from '../light-shelf-layout.mjs';
 import {pickingCentralCount} from '../picking-reinforcements.mjs';
@@ -16,7 +16,7 @@ export function rackModel({modules=[],height,depth,slots=4,levelsByModule=[],typ
  const beamHeight=type==='racks'?.1:type==='ligeiras'?.028:type==='picking'?(reinforcedBeams?.1:.06):reinforcedBeams?.11:.075;
  const topInset=type==='ligeiras'?.0015:type==='picking'?0:beamHeight*1.25+(type==='racks'?0:.018);
  const lightCounts=type==='ligeiras'?lengths.map((_,index)=>bracedIndexes.includes(index)?(braceCounts[index]??(h>=3&&(index===0||index===lengths.length-1)?3:2)):0):[];
- const rackLevels=type==='racks'?rackBeamLevels(h,slots):[];
+ const rackLevels=type==='racks'?rackBeamLevels(h,slots,rackPalletLayout(useRequirements,1)?.loadHeight||0):[];
  const lightLevels=type==='ligeiras'?lightShelfPositions(h,slots,lightCounts):[];
  let x=upright/2;const bays=lengths.map((mm,index)=>{const length=mm/1000;const left=x;const right=x+(length+(type==='racks'?upright:0))*pitchScale;x=right;
   const levelIds=levelsByModule[index]||Array.from({length:slots},(_,i)=>i);
@@ -25,7 +25,7 @@ export function rackModel({modules=[],height,depth,slots=4,levelsByModule=[],typ
   const braced=bracedIndexes.includes(index);
   const braceCount=type==='ligeiras'&&braced?(braceCounts[index] ?? (h>=3&&(index===0||index===lengths.length-1)?3:2)):0;
   const horizontalBraces=lightBracePositions(h,braceCount);
-  return {left,right,length,clearLength:right-left-upright,levels:ys,palletLoad:type==='racks'?rackPalletLayout(useRequirements,right-left-upright):null,braced,horizontalBraces,centralSupports:pickingCentralCount(mm)};});
+  return {left,right,length,clearLength:right-left-upright,levels:ys,floorPallets:type==='racks'&&rackFloorFits(ys,rackPalletLayout(useRequirements,right-left-upright)?.loadHeight||0),palletLoad:type==='racks'?rackPalletLayout(useRequirements,right-left-upright):null,braced,horizontalBraces,centralSupports:pickingCentralCount(mm)};});
  return {useRequirements:normalizeRackUse(useRequirements),height:h,depth:d,width,upright,beamHeight,bays,type,galvanized,floorType,reinforcedBeams,shelfRibCount:type==='ligeiras'?(Number(depth)===600?2:Number(depth)===500?1:0):0};
 }
 

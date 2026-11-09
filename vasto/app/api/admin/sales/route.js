@@ -18,7 +18,9 @@ function errorResponse(error) {
 export async function GET(request) {
   try {
     assertSession(request);
-    return NextResponse.json({ sales: await listSales(), storage: storageMode() }, { headers: { "Cache-Control": "no-store" } });
+    const view = new URL(request.url).searchParams.get('view');
+    const projection = ['statistics', 'commissions'].includes(view) ? view : undefined;
+    return NextResponse.json({ sales: await listSales({ projection }), storage: storageMode() }, { headers: { "Cache-Control": "no-store" } });
   } catch (error) { return errorResponse(error); }
 }
 

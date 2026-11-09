@@ -198,7 +198,11 @@ export async function updateMonthlyCommission(year, month, paid, commissionRate)
 }
 
 // Ask PostgREST for only the fields needed by frequently repeated background reads.
+const reportFields = ['customerName', 'nif', 'issuedAt', 'saleDate', 'deliveryDate', 'periodDateOverride', 'status', 'paymentStatus', 'deliveryStatus', 'subtotal', 'vat', 'total', 'fileName', 'quoteNotSelected', 'mergedInto', 'mergeArchived'];
+const reportSelect = ['id', ...reportFields.map(field => `${field}:record->${field}`)].join(',');
 const saleProjections = {
+  commissions: reportSelect,
+  statistics: `${reportSelect},articles:record->orderDetails->artigos`,
   notifications: 'id,customerName:record->>customerName,mergedInto:record->>mergedInto,mergeArchived:record->mergeArchived',
   followUps: 'id,customerName:record->>customerName,nif:record->>nif,mergedInto:record->>mergedInto,mergeArchived:record->mergeArchived,customerNotes:record->customerNotes',
   customers: 'id,customerName:record->>customerName,nif:record->>nif,mergedInto:record->>mergedInto,mergeArchived:record->mergeArchived,updatedAt:record->>updatedAt,uploadedAt:record->>uploadedAt,customerPhone:record->>customerPhone,address:record->orderDetails->>moradaFiscal,email:record->orderDetails->>email,phone:record->orderDetails->>telefone',
@@ -215,6 +219,8 @@ export async function listSales({ includeArchived = false, projection, since } =
       const rows = await (await cloud(`/rest/v1/admin_sales?select=${encodeURIComponent(select)}&order=uploaded_at.desc,id.desc&limit=500&offset=${offset}${filter}`)).json();
       records.push(...rows.map((row) => projection === 'customers'
         ? { ...row, orderDetails: { moradaFiscal: row.address, email: row.email, telefone: row.phone } }
+        : projection === 'statistics' ? normalizeSale({ ...row, orderDetails: { artigos: row.articles } })
+        : projection === 'commissions' ? normalizeSale(row)
         : projection ? row : normalizeSale(row.record)));
       if (rows.length < 500) break;
     }

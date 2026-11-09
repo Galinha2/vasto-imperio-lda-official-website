@@ -1,6 +1,6 @@
 import {NextResponse} from 'next/server';
 import {assertOrigin,assertSession,verifySession,SESSION_COOKIE} from '@/lib/admin/auth.mjs';
-import {CHAT_COOKIE,visitorThread,createThread,threadExists,messages,sendMessage,setPresence} from '@/lib/chat.mjs';
+import {CHAT_COOKIE,visitorThread,createThread,threadExists,messages,sendMessage,setPresence,chatImageMessage} from '@/lib/chat.mjs';
 import {readChatImage} from '@/lib/chat-images.mjs';
 import {notifyAdminPush} from '@/lib/admin/push.mjs';
 import {deliverChatEmail,contactEmail} from '@/lib/chat-email.mjs';
@@ -36,7 +36,7 @@ export async function GET(request){
    const thread=await visitorThread(request.cookies.get(CHAT_COOKIE)?.value);
    if(!thread||thread.id!==id)return NextResponse.json({error:'Sem acesso à imagem.'},{status:403});
   }
-  const message=(await messages(id)).find(message=>message.id===params.get('message'));
+  const message=await chatImageMessage(id,params.get('message'));
   if(!message?.image)return NextResponse.json({error:'Imagem não encontrada.'},{status:404});
   return new Response(await readChatImage(message.image),{headers:{'Content-Type':'image/webp','Cache-Control':'private, no-store','X-Content-Type-Options':'nosniff'}});
  }catch(error){return failure(error);}

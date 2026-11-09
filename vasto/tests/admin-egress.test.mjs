@@ -3,6 +3,36 @@ import assert from 'node:assert/strict';
 import { listSales, saleNotifications } from '../lib/admin/store.mjs';
 import { dueFollowUps } from '../lib/admin/follow-ups.mjs';
 import { customerSuggestions } from '../lib/admin/customer-suggestions.mjs';
+import { salePeriodDate } from '../lib/admin/sale-period.mjs';
+
+test('report projections retain financial and historical dates without downloading quote lines or notes', async () => {
+  const original={...process.env}, originalFetch=globalThis.fetch;
+  process.env.SUPABASE_URL='https://example.invalid';process.env.SUPABASE_SERVICE_ROLE_KEY='test-only';
+  const record={id:'a'.repeat(64),customerName:'Empresa',issuedAt:'2026-08-01',saleDate:'2026-08-05',deliveryDate:'2026-09-20',periodDateOverride:'2026-10-01',status:'resolvida',subtotal:100,vat:23,total:123,orderDetails:{artigos:[{produto:'Estante',unidades:2}],observacoes:'x'.repeat(5000)},quoteLines:[{produto:'x'.repeat(5000)}],customerNotes:[{text:'x'.repeat(5000)}]};
+  globalThis.fetch=async url=>{
+    const select=new URL(url).searchParams.get('select');
+    assert.ok(!select.includes('quoteLines')&&!select.includes('customerNotes')&&!select.includes('observacoes'));
+    const row={};
+    for(const entry of select.split(',')){
+      if(entry==='id'){row.id=record.id;continue;}
+      const [alias,path]=entry.split(':');
+      row[alias]=path.split('->').slice(1).reduce((value,key)=>value?.[key],record)??null;
+    }
+    return Response.json([row]);
+  };
+  try{
+    for(const projection of ['commissions','statistics']){
+      const [sale]=await listSales({projection});
+      assert.equal(sale.subtotal,100);assert.equal(sale.total,123);
+      assert.equal(sale.status,'confirmada');assert.equal(sale.paymentStatus,'pago');assert.equal(sale.deliveryStatus,'entregue');
+      assert.equal(salePeriodDate(sale),'2026-10-01');
+      assert.equal(salePeriodDate({...sale,periodDateOverride:null}),'2026-09-20');
+      if(projection==='statistics')assert.deepEqual(sale.orderDetails.artigos,record.orderDetails.artigos);
+      else assert.equal(sale.orderDetails,undefined);
+      assert.ok(JSON.stringify(sale).length<JSON.stringify(record).length/4);
+    }
+  }finally{process.env=original;globalThis.fetch=originalFetch;}
+});
 
 test('background queries paginate small projections and preserve notes and contacts', async () => {
   const savedFetch = globalThis.fetch;

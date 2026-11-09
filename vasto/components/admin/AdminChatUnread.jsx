@@ -9,6 +9,7 @@ export default function AdminChatUnread({ children }) {
   const alive = useRef(true);
   const generation = useRef(0);
   const refresh = useCallback(async () => {
+    if (document.hidden) return;
     const version = ++generation.current;
     try {
       const response = await fetch('/api/admin/chat?unread=1', { cache: 'no-store' });
@@ -20,7 +21,7 @@ export default function AdminChatUnread({ children }) {
   useEffect(() => {
     alive.current = true;
     refresh();
-    const timer = setInterval(refresh, 3000);
+    const timer = setInterval(refresh, 10000);
     const visible = () => { if (!document.hidden) refresh(); };
     window.addEventListener('admin:new-chat', refresh);
     window.addEventListener('focus', refresh);

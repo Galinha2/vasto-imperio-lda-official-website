@@ -57,7 +57,7 @@ export function cleanMessage(value) {
 export async function visitorThread(token) {
   if (!/^[a-f0-9]{64}$/.test(token || '')) return null;
   const id = hash(token);
-  return (await rows('site_chat_threads', `id=eq.${id}&limit=1`)).find(t => t.id === id) || null;
+  return (await rows('site_chat_threads', `id=eq.${id}&select=id,name,contact,created_at&limit=1`)).find(t => t.id === id) || null;
 }
 export async function createThread({ name, contact, address }) {
   if (typeof name !== 'string' || !name.trim() || name.length > 100 || typeof contact !== 'string' || contact.length > 160) throw fail('Indique o seu nome e um contacto válido.', 400);
@@ -70,9 +70,16 @@ export async function createThread({ name, contact, address }) {
   await insert('site_chat_threads', thread);
   return { thread, token };
 }
-export async function messages(id) {
+export async function messages(id, { since } = {}) {
   if (!/^[a-f0-9]{64}$/.test(id || '')) throw fail('Conversa inválida.', 400);
-  return (await rows('site_chat_messages', `thread_id=eq.${id}&order=created_at.asc&limit=500`)).filter(m => m.thread_id === id).sort((a,b) => a.created_at.localeCompare(b.created_at));
+  if (since && !Number.isFinite(Date.parse(since))) throw fail('Data inválida.', 400);
+  const start = since ? new Date(since).toISOString() : null;
+  const filter = start ? `&created_at=gte.${encodeURIComponent(start)}` : '';
+  return (await rows('site_chat_messages', `thread_id=eq.${id}${filter}&order=created_at.asc&limit=500`)).filter(m => m.thread_id === id && (!start || m.created_at >= start)).sort((a,b) => a.created_at.localeCompare(b.created_at));
+}
+export async function chatImageMessage(threadId, messageId) {
+  if (!/^[a-f0-9]{64}$/.test(threadId || '') || !/^[0-9a-f-]{36}$/.test(messageId || '')) throw fail('Imagem inválida.', 400);
+  return (await rows('site_chat_messages', `thread_id=eq.${threadId}&id=eq.${messageId}&select=id,thread_id,image&limit=1`)).find(message => message.thread_id === threadId && message.id === messageId) || null;
 }
 export async function sendMessage(id, text, sender, imageBytes = null) {
   const body = cleanMessage(text);
@@ -87,11 +94,11 @@ export async function sendMessage(id, text, sender, imageBytes = null) {
   return message;
 }
 export async function listThreads() {
-  return (await rows('site_chat_threads', 'order=created_at.desc&limit=100')).sort((a,b) => b.created_at.localeCompare(a.created_at)).slice(0,100).map(({ ip_hash, ...thread }) => thread);
+  return (await rows('site_chat_threads', 'select=id,name,contact,created_at&order=created_at.desc&limit=100')).sort((a,b) => b.created_at.localeCompare(a.created_at)).slice(0,100).map(({ ip_hash, ...thread }) => thread);
 }
 export async function threadExists(id) {
   if (!/^[a-f0-9]{64}$/.test(id || '')) throw fail('Conversa inválida.', 400);
-  const thread = (await rows('site_chat_threads', `id=eq.${id}&limit=1`)).find(t => t.id === id);
+  const thread = (await rows('site_chat_threads', `id=eq.${id}&select=id,name,contact,created_at&limit=1`)).find(t => t.id === id);
   if (!thread) throw fail('Conversa não encontrada.', 404);
   return thread;
 }
@@ -145,7 +152,7 @@ export async function unreadChatCounts() {
     unread = [];
     let offset = 0;
     while (true) {
-      const page = await rows('site_chat_messages', `sender=eq.visitor&admin_read_at=is.null&select=id,thread_id&order=id.asc&limit=1000&offset=${offset}`);
+      const page = await rows('site_chat_messages', `sender=eq.visitor&admin_read_at=is.null&select=thread_id&order=id.asc&limit=1000&offset=${offset}`);
       unread.push(...page);
       if (page.length < 1000) break;
       offset += page.length;

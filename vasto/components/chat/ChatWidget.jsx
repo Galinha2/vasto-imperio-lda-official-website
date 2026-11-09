@@ -5,6 +5,7 @@ import { IoChatbubblesOutline, IoCloseOutline, IoArrowUp } from 'react-icons/io5
 import styles from './Chat.module.css';
 import ChatMessages from './ChatMessages';
 import {prepareChatImage} from '@/lib/prepare-chat-image.mjs';
+import {mergeChatMessages} from '@/lib/chat-sync.mjs';
 import {CHAT_REPLY_WAIT_MS, unansweredSince} from '@/lib/chat-waiting.mjs';
 import {IoCallOutline} from 'react-icons/io5';
 import {IoImageOutline} from 'react-icons/io5';
@@ -76,15 +77,23 @@ export default function ChatWidget({ preview = false }) {
     if (hidden) return;
     let active = true;
     let pending = false;
+    let syncThread = null, since = null;
     async function refresh() {
       if (pending || document.hidden) return;
       pending = true;
       const version = generation.current;
       try {
-        const response = await fetch('/api/chat', { cache: 'no-store' });
+        const response = await fetch(`/api/chat${syncThread && since ? `?thread=${encodeURIComponent(syncThread)}&since=${encodeURIComponent(since)}` : ''}`, { cache: 'no-store' });
         const data = await response.json();
         if (!response.ok) throw new Error(data.error);
-        if (active && version === generation.current) { setThread(data.thread); setMessages(data.messages); setError(''); }
+        if (active && version === generation.current) {
+          setThread(data.thread);
+          setMessages(current => data.incremental ? mergeChatMessages(current, data.messages) : data.messages);
+          if (syncThread !== data.thread?.id) since = null;
+          syncThread = data.thread?.id || null;
+          since = data.messages.at(-1)?.created_at || since || new Date(0).toISOString();
+          setError('');
+        }
       } catch (error) { if (active && version === generation.current) setError(error.message || 'Não foi possível ligar ao chat.'); }
       finally { pending = false; if (active) setLoading(false); }
     }

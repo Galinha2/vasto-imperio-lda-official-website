@@ -9,7 +9,10 @@ const errorResponse = error => NextResponse.json({ error: error.status ? error.m
 export async function GET(request) {
   try {
     const thread = await visitorThread(request.cookies.get(CHAT_COOKIE)?.value);
-    return NextResponse.json({ thread: thread ? { id: thread.id, name: thread.name } : null, messages: thread ? await messages(thread.id) : [] }, { headers: { 'Cache-Control': 'no-store' } });
+    const params = new URL(request.url).searchParams;
+    // A cookie may change in another tab; never reuse the previous thread's cursor.
+    const since = thread && params.get('thread') === thread.id ? params.get('since') : null;
+    return NextResponse.json({ thread: thread ? { id: thread.id, name: thread.name } : null, messages: thread ? await messages(thread.id, { since }) : [], incremental: Boolean(since) }, { headers: { 'Cache-Control': 'no-store' } });
   } catch (error) { return errorResponse(error); }
 }
 export async function POST(request) {

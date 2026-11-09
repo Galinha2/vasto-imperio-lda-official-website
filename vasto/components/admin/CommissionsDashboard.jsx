@@ -39,7 +39,7 @@ export default function CommissionsDashboard() {
   useEffect(() => {
     let active = true;
     Promise.all([
-      fetch("/api/admin/sales", { cache: "no-store" }).then(readJson),
+      fetch("/api/admin/sales?view=commissions", { cache: "no-store" }).then(readJson),
       fetch("/api/admin/commissions", { cache: "no-store" }).then(readJson),
     ]).then(([salesResult, commissionResult]) => {
       if (!active) return;

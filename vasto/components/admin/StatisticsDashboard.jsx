@@ -62,7 +62,7 @@ export default function StatisticsDashboard() {
 
   useEffect(() => {
     let active = true;
-    fetch("/api/admin/sales", { cache: "no-store" })
+    fetch("/api/admin/sales?view=statistics", { cache: "no-store" })
       .then(async (response) => {
         const result = await response.json();
         if (response.status === 401) {

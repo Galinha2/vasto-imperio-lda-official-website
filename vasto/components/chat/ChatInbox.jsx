@@ -7,6 +7,7 @@ import SwipeChatThread from './SwipeChatThread';
 import {useAdminPreferences} from '@/components/admin/AdminPreferences';
 import {IoNotificationsOffOutline} from 'react-icons/io5';
 import ChatMessages from './ChatMessages';
+import {mergeChatMessages} from '@/lib/chat-sync.mjs';
 import {prepareChatImage} from '@/lib/prepare-chat-image.mjs';
 import {IoImageOutline} from 'react-icons/io5';
 import { useAdminChatUnread } from '@/components/admin/AdminChatUnread';
@@ -82,21 +83,28 @@ export default function ChatInbox() {
       } catch (error) { if (active) setError(error.message); }
       finally { pending = false; if (active) setLoading(false); }
     }
-    refresh(); const timer = setInterval(refresh, 5000);
-    return () => { active = false; clearInterval(timer); };
+    const visible = () => { if (!document.hidden) refresh(); };
+    refresh(); const timer = setInterval(refresh, 30000);
+    window.addEventListener('admin:new-chat', refresh);
+    document.addEventListener('visibilitychange', visible);
+    return () => { active = false; clearInterval(timer); window.removeEventListener('admin:new-chat', refresh); document.removeEventListener('visibilitychange', visible); };
   }, []);
   useEffect(() => {
     if (!selected) return;
     let active = true;
     let pending = false;
+    let since = null;
     async function refresh() {
       if (pending || document.hidden) return;
       pending = true;
       try {
-        const response = await fetch(`/api/admin/chat?id=${selected.id}`, { cache: 'no-store' });
+        const response = await fetch(`/api/admin/chat?id=${selected.id}${since ? `&since=${encodeURIComponent(since)}` : ''}`, { cache: 'no-store' });
         const data = await response.json();
         if (!response.ok) throw new Error(data.error);
-        if (active && !deletedIds.current.has(selected.id)) setMessages(data.messages);
+        if (active && !deletedIds.current.has(selected.id)) {
+          setMessages(current => mergeChatMessages(current, data.messages));
+          since = data.messages.at(-1)?.created_at || since || new Date(0).toISOString();
+        }
       } catch (error) { if (active && !deletedIds.current.has(selected.id)) setError(error.message); }
       finally { pending = false; }
     }

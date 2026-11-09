@@ -360,6 +360,7 @@ export default function SimulatorEstantesLigeiras({ onQuoteDataChange, adminMode
       simulatorType: "ligeiras",
       requestedLengthMetres: enteredLength, effectiveLengthMillimetres: finalLength,
       configuration: { desiredLength, rowCount, height, depth, selectedSolutionId, sameShelfLength, desiredShelfLength, levelsState: { slots: levelSlots, modules: JSON.parse(removedKey) } },
+      preview3d: [{ type: "ligeiras", modules, height, depth, slots: levelSlots, levelsByModule: modules.map((_, index) => levelsForModule(index)), finalLength, bracedIndexes, braceCounts: modules.map((_, index) => bracedIndexes.includes(index) ? bracesInBay(index, modules.length, height) : 0) }],
       rowCount,
       items: createQuoteLines(entries, 1),
       discountPercent: discountRate * 100,
@@ -437,7 +438,7 @@ export default function SimulatorEstantesLigeiras({ onQuoteDataChange, adminMode
         </div>
       </div>
       </>
-      {!adminMode && <SimulatorOrderModal open={orderOpen} onClose={() => setOrderOpen(false)} total={orderQuoteRef.current?.total ?? discountedEstimate} details={orderQuoteRef.current?.details} items={orderQuoteRef.current?.items} discountPercent={orderQuoteRef.current?.discountPercent ?? discountRate * 100} drawingRef={drawingRef} english={english} />}
+      {!adminMode && <SimulatorOrderModal preview3d={orderQuoteRef.current?.preview3d} open={orderOpen} onClose={() => setOrderOpen(false)} total={orderQuoteRef.current?.total ?? discountedEstimate} details={orderQuoteRef.current?.details} items={orderQuoteRef.current?.items} discountPercent={orderQuoteRef.current?.discountPercent ?? discountRate * 100} drawingRef={drawingRef} english={english} />}
     </section>
   );
 }

@@ -9,7 +9,7 @@ export async function GET(request) {
     const url = new URL(request.url);
     const query = (url.searchParams.get("q") || "").slice(0, 150);
     const field = url.searchParams.get("field") === "nif" ? "nif" : "name";
-    const customers = query.trim().length >= (field === "nif" ? 1 : 2) ? customerSuggestions(await listSales(), query, field) : [];
+    const customers = query.trim().length >= (field === "nif" ? 1 : 2) ? customerSuggestions(await listSales({ projection: 'customers' }), query, field) : [];
     return NextResponse.json({ customers }, { headers: { "Cache-Control": "no-store" } });
   } catch (error) { return NextResponse.json({ error: "Não foi possível consultar clientes anteriores." }, { status: error.status || 500 }); }
 }

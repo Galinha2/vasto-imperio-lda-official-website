@@ -94,6 +94,21 @@ export default function SimulatorAdmin() {
     const { toJpeg } = await import("html-to-image");
     return toJpeg(drawing, { pixelRatio: 2, quality: .9, backgroundColor: "#ffffff", cacheBust: true });
   }
+  async function obterImagem3d() {
+    const { capture3dDrawing } = await import("@/lib/admin/rack-3d-export.mjs");
+    return capture3dDrawing(cart?.entries.length ? cart.entries : [{ ...quoteData, label: simuladores.find(item => item.id === simuladorAtivo)?.label }]);
+  }
+  async function gerarImagem3d() {
+    if (aExportar) return;
+    setAExportar(true); setMensagem(""); setMensagemSucesso(false);
+    try {
+      const url = await obterImagem3d();
+      const link = document.createElement("a");
+      link.download = quoteFilename({ quoteType: cart?.entries.length ? "Conjunto" : simuladorAtivo, customerName: resolveCustomerName(dadosEmpresa, nomeCliente) }, "Desenho 3D", "jpg");
+      link.href = url; link.click();
+    } catch (error) { setMensagem(error.message || "Não foi possível guardar o desenho 3D."); }
+    finally { setAExportar(false); }
+  }
   async function gerarImagem() {
     if (!capturaRef.current || aExportar) return;
     setAExportar(true);
@@ -173,25 +188,27 @@ export default function SimulatorAdmin() {
     setMensagem("");
     setMensagemSucesso(false);
     try {
-      const [imagemDataUrl, pdf] = await Promise.all([
-        obterImagem(), generateBudgetPdf({ ...dadosPdf, returnBlob: true }),
+      const [imagemDataUrl, imagem3dDataUrl, pdf] = await Promise.all([
+        obterImagem(), obterImagem3d(), generateBudgetPdf({ ...dadosPdf, returnBlob: true }),
       ]);
       const imagemBlob = await (await fetch(imagemDataUrl)).blob();
       if (imagemBlob.size > 4 * 1024 * 1024) throw new Error("A imagem gerada ultrapassa o limite de 4 MB.");
       if (pdf.size > 6 * 1024 * 1024) throw new Error("O PDF gerado ultrapassa o limite de 6 MB.");
 
-      const nomeBase = `simulacao-${simuladorAtivo}-${new Date().toISOString().slice(0, 10)}`;
+      const imagem3dBlob = await (await fetch(imagem3dDataUrl)).blob();
+      if (imagem3dBlob.size + imagemBlob.size + pdf.size > 3.9 * 1024 * 1024) throw new Error("Os desenhos e o PDF excedem o limite de envio. Reduza o número de configurações.");
       const form = new FormData();
       form.append("email", emailCliente.trim());
       form.append("telefone", telefoneCliente.trim());
       form.append("pdf", pdf, quoteFilename({ quoteType: cart?.entries.length ? "Conjunto" : simuladorAtivo, customerName: resolveCustomerName(dadosEmpresa, nomeCliente) }));
       form.append("image", imagemBlob, quoteFilename({ quoteType: cart?.entries.length ? "Conjunto" : simuladorAtivo, customerName: resolveCustomerName(dadosEmpresa, nomeCliente) }, "Desenho", "jpg"));
+      form.append("image3d", imagem3dBlob, quoteFilename({ quoteType: cart?.entries.length ? "Conjunto" : simuladorAtivo, customerName: resolveCustomerName(dadosEmpresa, nomeCliente) }, "Desenho 3D", "jpg"));
       const response = await fetch("/api/admin/sales", { method: "POST", body: form, cache: "no-store" });
       const result = await response.json();
       if (response.status === 401) throw new Error("A sessão de administração expirou. Inicie sessão novamente.");
       if (!response.ok) throw new Error(result.error || "Não foi possível enviar a configuração para as vendas.");
       window.dispatchEvent(new Event("admin:sales-changed"));
-      setMensagem(`Configuração de ${result.sale.customerName} enviada para as vendas com o PDF e a imagem.`);
+      setMensagem(`Configuração de ${result.sale.customerName} enviada para as vendas com o PDF e os desenhos 2D e 3D.`);
       setMensagemSucesso(true);
     } catch (error) {
       console.error("Não foi possível enviar a configuração para as vendas.", error);
@@ -230,6 +247,7 @@ export default function SimulatorAdmin() {
       mensagemSucesso={mensagemSucesso}
       aExportar={aExportar}
       gerarImagem={gerarImagem}
+      gerarImagem3d={gerarImagem3d}
       gerarPdf={gerarPdf}
       enviarParaVendas={enviarParaVendas}
     />
@@ -281,8 +299,8 @@ export default function SimulatorAdmin() {
         <div className="flex justify-end"><QuoteEmailButton initialEmail={emailCliente} prepare={async () => {
           const data = obterDadosPdf();
           if (!data) throw new Error("Confirme a configuração e os dados do cliente.");
-          const [blob, url] = await Promise.all([generateBudgetPdf({ ...data, returnBlob: true }), obterImagem()]);
-          return [{ blob, name: quoteFilename({ quoteType: cart?.entries.length ? "Conjunto" : simuladorAtivo, customerName: resolveCustomerName(dadosEmpresa, nomeCliente) }) }, { blob: await (await fetch(url)).blob(), name: quoteFilename({ quoteType: cart?.entries.length ? "Conjunto" : simuladorAtivo, customerName: resolveCustomerName(dadosEmpresa, nomeCliente) }, "Desenho", "jpg") }];
+          const [blob, url, url3d] = await Promise.all([generateBudgetPdf({ ...data, returnBlob: true }), obterImagem(), obterImagem3d()]);
+          return [{ blob, name: quoteFilename({ quoteType: cart?.entries.length ? "Conjunto" : simuladorAtivo, customerName: resolveCustomerName(dadosEmpresa, nomeCliente) }) }, { blob: await (await fetch(url)).blob(), name: quoteFilename({ quoteType: cart?.entries.length ? "Conjunto" : simuladorAtivo, customerName: resolveCustomerName(dadosEmpresa, nomeCliente) }, "Desenho", "jpg") }, { blob: await (await fetch(url3d)).blob(), name: quoteFilename({ quoteType: cart?.entries.length ? "Conjunto" : simuladorAtivo, customerName: resolveCustomerName(dadosEmpresa, nomeCliente) }, "Desenho 3D", "jpg") }];
         }} /></div>
 
         <section ref={capturaRef} aria-label={`Configuração de ${ativo.label}`} className="min-w-0">

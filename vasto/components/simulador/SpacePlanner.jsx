@@ -85,6 +85,11 @@ export default function SpacePlanner({ models, initialType, onClose, onTypeChang
     orderQuoteRef.current = {
       simulatorType: type,
       configuration: {kind: "space", form, type, selected, excludedWalls, removedByPlan},
+      preview3d: plan.shelves.map((shelf) => {
+        const vertical = ["left", "right", "center"].includes(shelf.wall) || (!shelf.wall && shelf.h > shelf.w);
+        const model = models.find(item => item.type === type && Math.abs(item.width - (shelf.runWidth || Math.max(shelf.w, shelf.h))) < .001 && item.height === shelf.height && Math.abs(item.depth - (shelf.depth || Math.min(shelf.w, shelf.h))) < .001 && (!item.material || item.material === form.material));
+        return { type, modules: [Math.round((model?.nominalWidth || (shelf.runWidth || Math.max(shelf.w, shelf.h)) - .05) * 1000)], height: Math.round(shelf.height * 1000), depth: Math.round((shelf.depth || Math.min(shelf.w, shelf.h)) * 1000), slots: Number(form.levels), finalLength: Math.round((shelf.runWidth || Math.max(shelf.w, shelf.h)) * 1000), floorType: form.material, position: [shelf.x + shelf.w / 2, 0, shelf.y + shelf.h / 2], rotation: vertical ? Math.PI / 2 : 0 };
+      }),
       total: discountedTotal, items, discountPercent: discountRate * 100,
       details: `Planeamento de espaço · ${type} · Sala: ${meters(config.width)} × ${meters(config.length)} m · Espaço entre filas: ${meters(config.aisle)} m · Disposição: ${form.parallelOnly ? "Apenas filas paralelas" : "Livre"} · Altura disponível: ${meters(config.height)} m · Porta: ${walls[form.doorWall]}, ${meters(config.doorWidth)} m de largura, a ${meters(config.doorOffset)} m do canto · ${plan.shelves.length} módulos · ${form.levels} níveis · Tampo: ${type === "picking" ? form.material : type === "racks" ? "Sem tampo" : "Metálico"} · Altura das estantes: ${meters(plan.height)} m · Profundidade: ${meters(config.depth)} m.\n${plan.shelves.map((shelf, index) => `Módulo ${index + 1}: posição (${meters(shelf.x)}; ${meters(shelf.y)}) m, ${meters(shelf.w)} × ${meters(shelf.h)} m`).join("\n")}`,
     };
@@ -160,7 +165,7 @@ export default function SpacePlanner({ models, initialType, onClose, onTypeChang
           </div>
         </div>
       </div>
-      <SimulatorOrderModal open={orderOpen} onClose={() => setOrderOpen(false)} total={orderQuoteRef.current?.total || 0} details={orderQuoteRef.current?.details} items={orderQuoteRef.current?.items || []} discountPercent={orderQuoteRef.current?.discountPercent || 0} drawingRef={drawingRef} />
+      <SimulatorOrderModal open={orderOpen} onClose={() => setOrderOpen(false)} total={orderQuoteRef.current?.total || 0} details={orderQuoteRef.current?.details} items={orderQuoteRef.current?.items || []} discountPercent={orderQuoteRef.current?.discountPercent || 0} preview3d={orderQuoteRef.current?.preview3d} drawingRef={drawingRef} />
     </section>
   );
 }

@@ -8,6 +8,6 @@ export async function GET(request) {
   try {
     assertSession(request);
     const today = followUpToday();
-    return NextResponse.json({ reminders: dueFollowUps(await listSales({ includeArchived: true }), today), today }, { headers: { 'Cache-Control': 'no-store' } });
+    return NextResponse.json({ reminders: dueFollowUps(await listSales({ includeArchived: true, projection: 'followUps' }), today), today }, { headers: { 'Cache-Control': 'no-store' } });
   } catch (error) { return NextResponse.json({ error: error.status ? error.message : 'Não foi possível consultar os contactos agendados.' }, { status: error.status || 500 }); }
 }

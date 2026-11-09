@@ -34,8 +34,8 @@ export async function POST(request) {
     if (!file || typeof file.arrayBuffer !== "function" || file.size > 6 * 1024 * 1024) {
       return NextResponse.json({ error: "Escolha um ficheiro PDF com até 6 MB." }, { status: 400 });
     }
-    const image = data.get("image");
-    if (image && (typeof image.arrayBuffer !== "function" || image.size > 4 * 1024 * 1024 || !["image/jpeg", "image/png", "image/webp"].includes(image.type))) {
+    const images = [data.get("image"), data.get("image3d")].filter(Boolean);
+    if (images.some(image => typeof image.arrayBuffer !== "function" || image.size > 4 * 1024 * 1024 || !["image/jpeg", "image/png", "image/webp"].includes(image.type))) {
       return NextResponse.json({ error: "A imagem deve ser JPG, PNG ou WebP e ter até 4 MB." }, { status: 400 });
     }
     const buffer = Buffer.from(await file.arrayBuffer());
@@ -57,11 +57,12 @@ export async function POST(request) {
         throw error;
       }
     }
-    if (!image) { await notifyNewSale(sale); return NextResponse.json({ sale }, { status: 201, headers: { "Cache-Control": "no-store" } }); }
+    if (!images.length) { await notifyNewSale(sale); return NextResponse.json({ sale }, { status: 201, headers: { "Cache-Control": "no-store" } }); }
     try {
-      const savedImage = await addSaleImage(sale.id, image.name, image.type, Buffer.from(await image.arrayBuffer()));
+      const savedImages = [...(sale.images || [])];
+      for (const image of images) savedImages.push(await addSaleImage(sale.id, image.name, image.type, Buffer.from(await image.arrayBuffer())));
       await notifyNewSale(sale);
-      return NextResponse.json({ sale: { ...sale, images: [savedImage] } }, { status: 201, headers: { "Cache-Control": "no-store" } });
+      return NextResponse.json({ sale: { ...sale, images: savedImages } }, { status: 201, headers: { "Cache-Control": "no-store" } });
     } catch (error) {
       try {
         await deleteSale(sale.id);

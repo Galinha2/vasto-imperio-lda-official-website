@@ -16,7 +16,7 @@ export default async function handler(req, res) {
 
   let temporaryFiles = [];
   try {
-    const form = formidable({ multiples: false, maxFiles: 2, maxFileSize: 15 * 1024 * 1024 });
+    const form = formidable({ multiples: false, maxFiles: 3, maxFileSize: 15 * 1024 * 1024 });
     const { fields, files } = await new Promise((resolve, reject) => {
       form.parse(req, (error, parsedFields, parsedFiles) => {
         if (error) reject(error);
@@ -33,6 +33,8 @@ export default async function handler(req, res) {
     }
     const uploadedImage = Array.isArray(files.imagem) ? files.imagem[0] : files.imagem;
     const uploadedPdf = Array.isArray(files.orcamento) ? files.orcamento[0] : files.orcamento;
+    const uploaded3d = Array.isArray(files.imagem3d) ? files.imagem3d[0] : files.imagem3d;
+    if (uploaded3d && (uploaded3d.mimetype !== "image/jpeg" || uploaded3d.size > 4 * 1024 * 1024)) return res.status(400).json({ error: "O desenho 3D deve ser JPG e ter até 4 MB." });
     if (!uploadedImage || !uploadedPdf) return res.status(400).json({ error: equipmentOrder ? "A imagem do equipamento e a folha de orçamento são obrigatórios." : "O desenho e a folha de orçamento são obrigatórios." });
     if (!process.env.SMTP_HOST || !process.env.SMTP_PORT || !process.env.SMTP_USER || !process.env.SMTP_PASS) {
       throw new Error("Faltam variáveis de ambiente do SMTP");
@@ -107,6 +109,7 @@ export default async function handler(req, res) {
     const pdfBuffer = fs.readFileSync(uploadedPdf.filepath);
     const fileInfo = { customerName: nome, details: detalhes, lines: items };
     const imageFilename = quoteFilename(fileInfo, equipmentOrder ? "Equipamento" : "Desenho", "jpg");
+    const drawing3d = uploaded3d ? { filename: quoteFilename(fileInfo, "Desenho 3D", "jpg"), content: fs.readFileSync(uploaded3d.filepath), contentType: "image/jpeg" } : null;
     await sendMailWithSentCopy(transporter, {
       from: process.env.SMTP_USER,
       to: "geral@vastoimperio.pt",
@@ -116,6 +119,7 @@ export default async function handler(req, res) {
       attachments: [
         { filename: imageFilename, content: imageAttachment, contentType: "image/jpeg" },
         { filename: quoteFilename(fileInfo), content: pdfBuffer, contentType: "application/pdf" },
+        ...(drawing3d ? [drawing3d] : []),
       ],
     });
     await sendMailWithSentCopy(transporter, {
@@ -127,6 +131,7 @@ export default async function handler(req, res) {
       attachments: [
         { filename: imageFilename, content: imageAttachment, contentType: "image/jpeg" },
         { filename: quoteFilename(fileInfo), content: pdfBuffer, contentType: "application/pdf" },
+        ...(drawing3d ? [drawing3d] : []),
       ],
     });
     const imageBuffer = imageAttachment;
@@ -152,6 +157,7 @@ export default async function handler(req, res) {
       imageBuffer,
       imageName: imageFilename,
       imageContentType: uploadedImage.mimetype || "image/jpeg",
+      additionalImages: drawing3d ? [{ buffer: drawing3d.content, name: drawing3d.filename, contentType: drawing3d.contentType }] : [],
       orderDetails: salesOrderDetails,
     });
     return res.status(200).json({ message: "Encomenda enviada com sucesso." });

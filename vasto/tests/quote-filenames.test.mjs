@@ -1,6 +1,11 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { quoteFilename, quoteTypeLabel } from "../lib/quote-filenames.mjs";
+import { quoteFilename, quoteTypeLabel, quoteImageKind } from "../lib/quote-filenames.mjs";
+test("3D drawings remain identifiable after storage and email renaming", () => {
+ assert.equal(quoteImageKind({name:"Desenho 3D - Picking.webp"}), "Desenho 3D");
+ assert.equal(quoteImageKind({name:"Desenho - Picking.webp"}), "Desenho");
+ assert.equal(quoteImageKind({}), "Desenho");
+});
 test("documents identify equipment, customer, date and drawing number",()=>{
  assert.equal(quoteFilename({quoteType:"picking",customerName:"João Silva",issuedAt:"2026-10-20"}),"Orçamento - Estantes Picking - João Silva - 20-10-2026.pdf");
  assert.equal(quoteFilename({quoteType:"racks",customerName:"Cliente A",issuedAt:"2026-10-20"},"Desenho","jpg",2),"Desenho - Racks para Paletes - Cliente A - 20-10-2026 - 02.jpg");

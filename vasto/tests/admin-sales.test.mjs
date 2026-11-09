@@ -142,7 +142,7 @@ test("actual shared PDF generator round trip, including discount and delivery", 
   }
   const source = (await readFile(path.join(root, "lib/generateBudgetPdf.js"), "utf8"))
     .replace('import { lineDiscount, lineNet } from "./quote-discounts.mjs";', "")
-    .replace('import jsPDF from "jspdf";', "")
+    .replace(/import (?:jsPDF|\{ jsPDF \}) from "jspdf";/, "")
     .replace('import { quoteFilename } from "./quote-filenames.mjs";', "")
     .replace('import { resolveCustomerName } from "./customer-identity.mjs";', "")
     .replace('const { default: autoTable } = await import("jspdf-autotable");', "")
@@ -409,7 +409,7 @@ test("Supabase failures report actionable setup guidance without logging credent
   }
 });
 
-test("public simulator orders are saved as confirmed sales with their image and order details", async () => {
+test("public simulator orders keep separate 2D and 3D images and their order details", async () => {
   const pdf = pdfWithMetadata({ ...metadata, customerName: "Encomenda pública", issuedAt: "2026-10-13" });
   const image = await sharp({create:{width:16,height:16,channels:3,background:"white"}}).jpeg().toBuffer();
   const orderDetails = { email: "cliente@example.com", artigos: [{ produto: "Rack", unidades: 1, total: 180 }] };
@@ -418,6 +418,7 @@ test("public simulator orders are saved as confirmed sales with their image and 
     imageBuffer: image,
     imageName: "desenho-estante.jpg",
     imageContentType: "image/jpeg",
+    additionalImages: [{ buffer: image, name: "desenho-3d.jpg", contentType: "image/jpeg" }],
     orderDetails,
   }), true);
 
@@ -427,7 +428,10 @@ test("public simulator orders are saved as confirmed sales with their image and 
   assert.equal(sale.saleDate, "2026-10-13");
   assert.deepEqual(sale.orderDetails, orderDetails);
   assert.equal(sale.entryOrigin, "cliente");
-  assert.equal(sale.images.length, 1);
+  assert.equal(sale.images.length, 2);
+  assert.match(sale.images[1].name, /desenho-3d/);
+  assert.notEqual(sale.images[0].id, sale.images[1].id);
+  assert.deepEqual((await getSaleImage(sale.id, sale.images[1].id)).buffer, (await optimizeImage(image)).buffer);
   assert.deepEqual((await getSaleImage(sale.id, sale.images[0].id)).buffer, (await optimizeImage(image)).buffer);
   await deleteSale(sale.id);
 });

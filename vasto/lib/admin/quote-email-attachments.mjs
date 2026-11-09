@@ -1,4 +1,4 @@
-import { quoteFilename } from '../quote-filenames.mjs';
+import { quoteFilename, quoteImageKind } from '../quote-filenames.mjs';
 import { getPdf, getSaleImage, listSales } from './store.mjs';
 
 export async function quoteEmailAttachments(id, includeGroup, storage = { getPdf, getSaleImage, listSales }) {
@@ -15,7 +15,7 @@ export async function quoteEmailAttachments(id, includeGroup, storage = { getPdf
     for (const [imageIndex, image] of (sale.images || []).entries()) {
       const saved = await storage.getSaleImage(sale.id, image.id);
       const extension = image.contentType === 'image/png' ? 'png' : image.contentType === 'image/webp' ? 'webp' : 'jpg';
-      attachments.push({ filename: prefix + quoteFilename(sale, 'Desenho', extension, imageIndex + 1), content: saved.buffer, contentType: image.contentType });
+      attachments.push({ filename: prefix + quoteFilename(sale, quoteImageKind(image), extension, imageIndex + 1), content: saved.buffer, contentType: image.contentType });
     }
   }
   return { attachments, saleIds: records.map((sale) => sale.id) };

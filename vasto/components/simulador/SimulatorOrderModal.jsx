@@ -32,7 +32,7 @@ function createEquipmentImage(image, pixelRatio, quality) {
   });
 }
 
-export default function SimulatorOrderModal({ open, onClose, total, details, items = [], discountPercent = 0, drawingRef, imageSrc, english = false, cartOrder = false, cartConfigurations = [], onSent }) {
+export default function SimulatorOrderModal({ open, onClose, total, details, items = [], discountPercent = 0, preview3d, drawingRef, imageSrc, english = false, cartOrder = false, cartConfigurations = [], onSent }) {
   const [form, setForm] = useState(initialForm);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
@@ -85,6 +85,12 @@ export default function SimulatorOrderModal({ open, onClose, total, details, ite
           return fetch(dataUrl).then((response) => response.blob());
         };
       }
+      let image3dBlob = null;
+      if (!equipment) {
+        const { capture3dDrawing } = await import("@/lib/admin/rack-3d-export.mjs");
+        const image3d = await capture3dDrawing(cartOrder ? cartConfigurations : [{ preview3d }], { english });
+        image3dBlob = await (await fetch(image3d)).blob();
+      }
       const budgetPdf = await generateBudgetPdf({
         source: "simulador",
         linhas: items,
@@ -97,7 +103,7 @@ export default function SimulatorOrderModal({ open, onClose, total, details, ite
       const orderData = JSON.stringify({ ...form, montagem: equipment ? undefined : form.montagem, total, detalhes: details, artigos: items, idioma: english ? "en" : "pt", tipoEncomenda: cartOrder ? "carrinho" : equipment ? "equipamento" : "estante", configuracoes: cartOrder ? cartConfigurations : undefined });
       const maxRequestBytes = 3.9 * 1024 * 1024;
       const multipartMarginBytes = 96 * 1024;
-      const fixedRequestBytes = budgetPdf.size + new Blob([orderData]).size + multipartMarginBytes;
+      const fixedRequestBytes = budgetPdf.size + (image3dBlob?.size || 0) + new Blob([orderData]).size + multipartMarginBytes;
       const imageProfiles = [[2, 0.9], [1.6, 0.86], [1.3, 0.82], [1, 0.78]];
       let imageBlob = null;
       let estimatedBytes = fixedRequestBytes;
@@ -117,6 +123,7 @@ export default function SimulatorOrderModal({ open, onClose, total, details, ite
       const payload = new FormData();
       payload.append("dados", orderData);
       payload.append("imagem", imageBlob, quoteFilename({ customerName: form.nome, details, lines: items }, equipment ? "Equipamento" : "Desenho", "jpg"));
+      if (image3dBlob) payload.append("imagem3d", image3dBlob, quoteFilename({ customerName: form.nome, details, lines: items }, "Desenho 3D", "jpg"));
       payload.append("orcamento", budgetPdf, quoteFilename({ customerName: form.nome, details, lines: items }));
       const response = await fetch("/api/encomenda-simulador", {
         method: "POST",

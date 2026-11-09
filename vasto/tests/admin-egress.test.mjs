@@ -1,0 +1,44 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { listSales, saleNotifications } from '../lib/admin/store.mjs';
+import { dueFollowUps } from '../lib/admin/follow-ups.mjs';
+import { customerSuggestions } from '../lib/admin/customer-suggestions.mjs';
+
+test('background queries paginate small projections and preserve notes and contacts', async () => {
+  const savedFetch = globalThis.fetch;
+  const savedUrl = process.env.SUPABASE_URL, savedKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  process.env.SUPABASE_URL = 'https://example.invalid'; process.env.SUPABASE_SERVICE_ROLE_KEY = 'test-only';
+  const queries = [];
+  globalThis.fetch = async url => {
+    const query = new URL(url).searchParams; queries.push(query);
+    const select = query.get('select');
+    assert.notEqual(select, 'record');
+    let rows;
+    if (select.includes('customerNotes:')) rows = [
+      {id:'a', customerName:'Empresa', nif:'123456789', mergedInto:'b', customerNotes:[{id:'note', text:'Contactar', followUpDate:'2026-11-09'}]},
+      {id:'b', customerName:'Empresa', nif:'123456789', customerNotes:[]},
+    ];
+    else if (select.includes('address:')) rows = [{id:'b',customerName:'Empresa',nif:'123456789',address:'Rua de teste',email:'teste@example.com',phone:'928348117'}];
+    else rows = Array.from({length:505},(_,i)=>({id:String(i),customerName:`Empresa ${i}`}));
+    return Response.json(rows.slice(Number(query.get('offset')), Number(query.get('offset'))+500));
+  };
+  try {
+    const reminders = dueFollowUps(await listSales({includeArchived:true,projection:'followUps'}),'2026-11-09');
+    assert.equal(reminders[0].saleId, 'b'); assert.equal(reminders[0].text,'Contactar');
+    const customers = customerSuggestions(await listSales({projection:'customers'}),'Em');
+    assert.equal(customers[0].email,'teste@example.com'); assert.equal(customers[0].address,'Rua de teste'); assert.equal(customers[0].phone,'928348117');
+    const since='2026-11-09T12:00:00.000Z';
+    const notifications = await saleNotifications(since);
+    assert.equal(notifications.sales.length,505);
+    assert.deepEqual(Object.keys(notifications.sales[0]),['id','customerName']);
+    assert.ok(Date.parse(notifications.cursor) <= Date.now()-4*60*1000);
+    const polls=queries.slice(-2);
+    assert.deepEqual(polls.map(q=>q.get('offset')),['0','500']);
+    assert.ok(polls.every(q=>q.get('uploaded_at')===`gte.${since}`));
+    await assert.rejects(()=>saleNotifications('invalid'),{status:400});
+  } finally {
+    globalThis.fetch=savedFetch;
+    if(savedUrl===undefined)delete process.env.SUPABASE_URL;else process.env.SUPABASE_URL=savedUrl;
+    if(savedKey===undefined)delete process.env.SUPABASE_SERVICE_ROLE_KEY;else process.env.SUPABASE_SERVICE_ROLE_KEY=savedKey;
+  }
+});

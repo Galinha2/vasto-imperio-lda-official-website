@@ -12,23 +12,28 @@ export default function FollowUpAlerts({ onSaved }) {
   useEffect(() => {
     let active = true;
     let pending = null;
-    const refresh = async () => {
-      pending?.abort();
+    let lastRefresh = 0;
+    const refresh = async (force = false) => {
+      if (force) { pending?.abort(); pending = null; }
+      if (pending || document.visibilityState === 'hidden' || (!force && Date.now() - lastRefresh < 30000)) return;
       const controller = new AbortController(); pending = controller;
       try {
         const response = await fetch('/api/admin/follow-ups', { cache: 'no-store', signal: controller.signal });
         const data = await response.json();
         if (!response.ok) throw new Error(data.error);
-        if (active) { setReminders(data.reminders); setError(''); }
+        if (active) { setReminders(data.reminders); setError(''); lastRefresh = Date.now(); }
       } catch (failure) { if (active && failure.name !== 'AbortError') setError(failure.message); }
+      finally { if (pending === controller) pending = null; }
     };
     refresh();
-    const timer = window.setInterval(refresh, 60000);
+    const timer = window.setInterval(() => refresh(), 60000);
+    const notesChanged = () => refresh(true);
+    const focused = () => refresh();
     const visibility = () => { if (document.visibilityState === 'visible') refresh(); };
-    window.addEventListener('admin:customer-notes', refresh);
-    window.addEventListener('focus', refresh);
+    window.addEventListener('admin:customer-notes', notesChanged);
+    window.addEventListener('focus', focused);
     document.addEventListener('visibilitychange', visibility);
-    return () => { active = false; pending?.abort(); window.clearInterval(timer); window.removeEventListener('admin:customer-notes', refresh); window.removeEventListener('focus', refresh); document.removeEventListener('visibilitychange', visibility); };
+    return () => { active = false; pending?.abort(); window.clearInterval(timer); window.removeEventListener('admin:customer-notes', notesChanged); window.removeEventListener('focus', focused); document.removeEventListener('visibilitychange', visibility); };
   }, []);
   useEffect(() => {
     if (!open) return;

@@ -347,6 +347,7 @@ export default function SimulatorRacks({ onQuoteDataChange, adminMode = false, a
       simulatorType: "racks",
       requestedLengthMetres: enteredLength, effectiveLengthMillimetres: finalLength,
       configuration: { useRequirements, desiredLength, rowCount, sameBeamLength, desiredBeamLength, height, depth, selectedSolutionId, levelsState: { slots: levelSlots, modules: JSON.parse(removedKey) } },
+      preview3d: [{ type: "racks", modules, height, depth, slots: levelSlots, levelsByModule: modules.map((_, index) => levelsForModule(index)), finalLength, useRequirements }],
       rowCount,
       items: createQuoteLines(entries, 2),
       discountPercent: discountRate * 100,
@@ -450,7 +451,7 @@ export default function SimulatorRacks({ onQuoteDataChange, adminMode = false, a
         </div>
       </div>
       </>
-      {!adminMode && <SimulatorOrderModal open={orderOpen} onClose={() => setOrderOpen(false)} total={orderQuoteRef.current?.total ?? discountedEstimate} details={orderQuoteRef.current?.details} items={orderQuoteRef.current?.items} discountPercent={orderQuoteRef.current?.discountPercent ?? discountRate * 100} drawingRef={drawingRef} english={english} />}
+      {!adminMode && <SimulatorOrderModal preview3d={orderQuoteRef.current?.preview3d} open={orderOpen} onClose={() => setOrderOpen(false)} total={orderQuoteRef.current?.total ?? discountedEstimate} details={orderQuoteRef.current?.details} items={orderQuoteRef.current?.items} discountPercent={orderQuoteRef.current?.discountPercent ?? discountRate * 100} drawingRef={drawingRef} english={english} />}
     </section>
   );
 }

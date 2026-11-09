@@ -1,4 +1,7 @@
 const clean = (value) => String(value || "").replace(/[<>:"/\\|?*\u0000-\u001f]/g, " ").replace(/\s+/g, " ").trim().slice(0, 100);
+export function quoteImageKind(image = {}) {
+  return /^Desenho 3D\b/i.test(image.name || image.fileName || '') ? 'Desenho 3D' : 'Desenho';
+}
 export function quoteTypeLabel(info = {}) {
   if (info.documentTypeLabel) return clean(info.documentTypeLabel);
   const explicit = String(info.quoteType || info.type || "").toLowerCase();

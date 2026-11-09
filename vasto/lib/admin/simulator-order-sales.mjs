@@ -2,7 +2,7 @@ import { addSaleImage, createSale, deleteSale, getSale } from "./store.mjs";
 import { notifyNewSale } from "./push.mjs";
 import { parseSalePdf } from "./pdf.mjs";
 
-export async function saveSimulatorOrderToSales({ pdfBuffer, imageBuffer, imageName, imageContentType, orderDetails }) {
+export async function saveSimulatorOrderToSales({ pdfBuffer, imageBuffer, imageName, imageContentType, additionalImages = [], orderDetails }) {
   let saleId;
   let created = false;
 
@@ -26,6 +26,7 @@ export async function saveSimulatorOrderToSales({ pdfBuffer, imageBuffer, imageN
     }
 
     await addSaleImage(saleId, imageName, imageContentType, imageBuffer);
+    for (const image of additionalImages) await addSaleImage(saleId, image.name, image.contentType, image.buffer);
     if (created) await notifyNewSale(record);
     return true;
   } catch (error) {

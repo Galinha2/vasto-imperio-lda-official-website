@@ -499,6 +499,7 @@ export default function SimulatorPicking({ onQuoteDataChange, adminMode = false,
       simulatorType: workbench ? "bancadas" : "picking",
       requestedLengthMetres: enteredLength, effectiveLengthMillimetres: finalLength,
       configuration: { desiredLength, rowCount, sameBeamLength, desiredBeamLength, height, depth, floorType, galvanized, reinforcedBeams, selectedSolutionId, levelsState: { slots: levelSlots, modules: JSON.parse(removedKey) } },
+      preview3d: [{ type: workbench ? "bancadas" : "picking", modules, height, depth, slots: levelSlots, levelsByModule: modules.map((_, index) => levelsForModule(index)), finalLength, galvanized, floorType, reinforcedBeams }],
       rowCount,
       items: createQuoteLines(entries, 3),
       discountPercent: discountRate * 100,
@@ -691,7 +692,7 @@ export default function SimulatorPicking({ onQuoteDataChange, adminMode = false,
         </div>
       </div>
       </>
-      {!adminMode && <SimulatorOrderModal open={orderOpen} onClose={() => setOrderOpen(false)} total={orderQuoteRef.current?.total ?? discountedEstimate} details={orderQuoteRef.current?.details} items={orderQuoteRef.current?.items} discountPercent={orderQuoteRef.current?.discountPercent ?? discountRate * 100} drawingRef={drawingRef} english={english} />}
+      {!adminMode && <SimulatorOrderModal preview3d={orderQuoteRef.current?.preview3d} open={orderOpen} onClose={() => setOrderOpen(false)} total={orderQuoteRef.current?.total ?? discountedEstimate} details={orderQuoteRef.current?.details} items={orderQuoteRef.current?.items} discountPercent={orderQuoteRef.current?.discountPercent ?? discountRate * 100} drawingRef={drawingRef} english={english} />}
     </section>
   );
 }

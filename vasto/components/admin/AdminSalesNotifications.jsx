@@ -14,7 +14,7 @@ export default function AdminSalesNotifications() {
   const pushStatus=useRef(pushActive);pushStatus.current=pushActive;
   const {preferences,ready}=useAdminPreferences();
   const current=useRef(preferences);current.current=preferences;
-  const seen=useRef(null);const cursor=useRef(null);const chatSeen=useRef(new Set());
+  const seen=useRef(null);const salesCursor=useRef(null);const cursor=useRef(null);const chatSeen=useRef(new Set());
   const audio=useRef(null);const notices=useRef(new Set());
   const [notice,setNotice]=useState(null);
   useEffect(()=>{if(!notice)return;const timer=setTimeout(()=>setNotice(null),7000);return()=>clearTimeout(timer);},[notice]);
@@ -49,11 +49,22 @@ export default function AdminSalesNotifications() {
     async function sales() {
       if(stopped||salesPending)return;salesPending=true;
       try{
-        const response=await fetch('/api/admin/sales',{cache:'no-store',signal:controller.signal});
+        const response=await fetch(`/api/admin/sales/notifications${salesCursor.current?`?since=${encodeURIComponent(salesCursor.current)}`:''}`,{cache:'no-store',signal:controller.signal});
         if(response.status===401){endSession();return;}if(!response.ok)return;
         const data=await response.json();if(stopped||!Array.isArray(data.sales))return;
-        const incoming=seen.current?data.sales.filter(s=>!seen.current.has(s.id)):[];
+        const summaries=seen.current?data.sales.filter(s=>!seen.current.has(s.id)):[];
+        const incoming=[];
+        // Read full details only for genuinely new records, never on idle polls.
+        for(const summary of summaries){
+          const detail=await fetch(`/api/admin/sales/${encodeURIComponent(summary.id)}`,{cache:'no-store',signal:controller.signal});
+          if(detail.status===401){endSession();return;}
+          if(detail.status===404)continue;
+          if(!detail.ok)throw new Error('Não foi possível consultar o novo orçamento.');
+          incoming.push((await detail.json()).sale);
+        }
+        if(stopped)return;
         seen.current ||= new Set();data.sales.forEach(s=>seen.current.add(s.id));
+        salesCursor.current=data.cursor;
         if(incoming.length){window.dispatchEvent(new CustomEvent('admin:new-sales',{detail:incoming}));notify({type:'sales',title:incoming.length===1?'Novo orçamento recebido':`${incoming.length} novos orçamentos recebidos`,body:incoming.map(s=>s.customerName||'Cliente').join('\n'),href:`/admin?orcamento=${encodeURIComponent(incoming[0].id)}`,key:incoming.map(s=>s.id).join('-')});}
       }catch{/* Retry transient failures. */}finally{salesPending=false;schedule(sales);}
     }

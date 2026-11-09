@@ -2,7 +2,7 @@
 import styles from "./QuoteEmailButton.module.css";
 import { polishEmailMessage } from "@/lib/email/polish-message.mjs";
 import { attachmentAccept, attachmentType } from "@/lib/email/attachments.mjs";
-import { quoteFilename } from "@/lib/quote-filenames.mjs";
+import { quoteFilename, quoteImageKind } from "@/lib/quote-filenames.mjs";
 import { emailSignature } from "@/lib/email/signature.mjs";
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
@@ -35,7 +35,7 @@ export default function QuoteEmailButton({ prepare, sale, groupSales, compact = 
     const files = [...(!sale ? attachments : []), ...extraAttachments.map((file) => ({ blob: file, name: file.name }))].map(({ blob, name }) => ({ name, type: attachmentType(name) || blob.type, url: URL.createObjectURL(blob) }));
     const saved = selectedSales.flatMap((sale, index) => [
       { name: (selectedSales.length > 1 ? `${index + 1} - ` : "") + quoteFilename(sale), type: "application/pdf", url: `/api/admin/sales/${sale.id}/pdf` },
-      ...(sale.images || []).map((image) => ({ name: (selectedSales.length > 1 ? `${index + 1} - ` : "") + quoteFilename(sale, "Desenho", image.contentType === "image/png" ? "png" : image.contentType === "image/webp" ? "webp" : "jpg", (sale.images || []).indexOf(image) + 1), type: image.contentType, url: `/api/admin/sales/${sale.id}/images/${image.id}` })),
+      ...(sale.images || []).map((image) => ({ name: (selectedSales.length > 1 ? `${index + 1} - ` : "") + quoteFilename(sale, quoteImageKind(image), image.contentType === "image/png" ? "png" : image.contentType === "image/webp" ? "webp" : "jpg", (sale.images || []).indexOf(image) + 1), type: image.contentType, url: `/api/admin/sales/${sale.id}/images/${image.id}` })),
     ]);
     setPreviews([...saved, ...files]);
     return () => files.forEach((file) => URL.revokeObjectURL(file.url));

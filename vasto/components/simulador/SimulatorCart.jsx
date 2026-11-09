@@ -171,7 +171,7 @@ export function AddToSimulatorCart({ quoteRef, getQuote, drawingRef, label, engl
       if (!quote || quote.unavailable || !quote.items?.length) throw new Error('Confirme a configuração antes de adicionar.');
       // Freeze data before awaiting the drawing capture.
       const snapshot = JSON.parse(JSON.stringify(quote));
-      const entry = {label,simulatorType:snapshot.simulatorType,configuration:snapshot.configuration,...(snapshot.rowCount ? {baseQuantity:snapshot.rowCount} : {}),details:snapshot.details || '',items:snapshot.items,discountPercent:Number(snapshot.discountPercent || 0),image:await captureCartDrawing(drawingRef)};
+      const entry = {label,simulatorType:snapshot.simulatorType,configuration:snapshot.configuration,preview3d:snapshot.preview3d,...(snapshot.rowCount ? {baseQuantity:snapshot.rowCount} : {}),details:snapshot.details || '',items:snapshot.items,discountPercent:Number(snapshot.discountPercent || 0),image:await captureCartDrawing(drawingRef)};
       if (orderNow) { await cart.orderWith(entry); return; }
       if (cart.editingId) cart.saveEdit(cart.editingId,entry); else cart.add(entry);
       setNotice(english ? 'Added to cart.' : 'Adicionado ao carrinho.');

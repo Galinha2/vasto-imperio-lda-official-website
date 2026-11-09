@@ -197,19 +197,39 @@ export async function updateMonthlyCommission(year, month, paid, commissionRate)
   });
 }
 
-export async function listSales({ includeArchived = false } = {}) {
+// Ask PostgREST for only the fields needed by frequently repeated background reads.
+const saleProjections = {
+  notifications: 'id,customerName:record->>customerName,mergedInto:record->>mergedInto,mergeArchived:record->mergeArchived',
+  followUps: 'id,customerName:record->>customerName,nif:record->>nif,mergedInto:record->>mergedInto,mergeArchived:record->mergeArchived,customerNotes:record->customerNotes',
+  customers: 'id,customerName:record->>customerName,nif:record->>nif,mergedInto:record->>mergedInto,mergeArchived:record->mergeArchived,updatedAt:record->>updatedAt,uploadedAt:record->>uploadedAt,customerPhone:record->>customerPhone,address:record->orderDetails->>moradaFiscal,email:record->orderDetails->>email,phone:record->orderDetails->>telefone',
+};
+
+export async function listSales({ includeArchived = false, projection, since } = {}) {
+  if (projection && !Object.hasOwn(saleProjections, projection)) throw fail('Consulta inválida.', 400);
+  if (since && !Number.isFinite(Date.parse(since))) throw fail('Data inválida.', 400);
   if (storageMode() === "cloud") {
     const records = [];
     for (let offset = 0; ; offset += 500) {
-      const rows = await (await cloud(`/rest/v1/admin_sales?select=record&order=uploaded_at.desc&limit=500&offset=${offset}`)).json();
-      records.push(...rows.map((row) => normalizeSale(row.record)));
+      const select = projection ? saleProjections[projection] : 'record';
+      const filter = since ? `&uploaded_at=gte.${encodeURIComponent(new Date(since).toISOString())}` : '';
+      const rows = await (await cloud(`/rest/v1/admin_sales?select=${encodeURIComponent(select)}&order=uploaded_at.desc,id.desc&limit=500&offset=${offset}${filter}`)).json();
+      records.push(...rows.map((row) => projection === 'customers'
+        ? { ...row, orderDetails: { moradaFiscal: row.address, email: row.email, telefone: row.phone } }
+        : projection ? row : normalizeSale(row.record)));
       if (rows.length < 500) break;
     }
     return includeArchived ? records : records.filter((record) => !record.mergedInto && !record.mergeArchived);
   }
   await mkdir(directory(), { recursive: true, mode: 0o700 });
   const files = (await readdir(directory())).filter((file) => /^[a-f0-9]{64}\.json$/.test(file));
-  return (await Promise.all(files.map(async (file) => normalizeSale(JSON.parse(await readFile(path.join(directory(), file), "utf8")))))).filter((record) => includeArchived || (!record.mergedInto && !record.mergeArchived));
+  return (await Promise.all(files.map(async (file) => normalizeSale(JSON.parse(await readFile(path.join(directory(), file), "utf8")))))).filter((record) => (includeArchived || (!record.mergedInto && !record.mergeArchived)) && (!since || record.uploadedAt >= new Date(since).toISOString()));
+}
+
+export async function saleNotifications(since) {
+  // Overlap cursors to tolerate uploads completing after their timestamp was assigned.
+  const cursor = new Date(Date.now() - 5 * 60 * 1000).toISOString();
+  const sales = await listSales({ projection: 'notifications', since });
+  return { sales: sales.map(({ id, customerName }) => ({ id, customerName })), cursor };
 }
 
 export async function getSale(id) {

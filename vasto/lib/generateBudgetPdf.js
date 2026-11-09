@@ -1,7 +1,7 @@
 import { lineDiscount, lineNet } from "./quote-discounts.mjs";
 import { quoteFilename } from "./quote-filenames.mjs";
 import { resolveCustomerName } from "./customer-identity.mjs";
-import jsPDF from "jspdf";
+import { jsPDF } from "jspdf";
 
 function formatarNumero(valor) {
   const [inteira, decimal] = Number(valor || 0).toFixed(2).split(".");
@@ -30,8 +30,7 @@ export default async function generateBudgetPdf({ linhas, descontoSelecionado, d
     const { default: autoTable } = await import("jspdf-autotable");
     const doc = new jsPDF({ compress: true });
     const corPretaFooter = [0, 0, 0];
-    const corBlue = [8, 121, 192];
-    const corOrange = [255, 85, 0];
+    const corOrange = [0, 0, 0];
     const corGray = [255, 255, 255];
     const corBlack = [0, 0, 0];
 
@@ -51,7 +50,7 @@ export default async function generateBudgetPdf({ linhas, descontoSelecionado, d
       doc.setFontSize(10);
       doc.setTextColor(...corPretaFooter);
       const tipoUpper = tipoFolha || "";
-      doc.text(`Folha Nº 1 de 1 ${tipoUpper}`, x, y, { align: "right" });
+      doc.text(`${tipoUpper}`, x, y, { align: "right" });
       y += 7;
       doc.text("Natureza: Orçamento", x, y, { align: "right" });
     }
@@ -71,14 +70,14 @@ export default async function generateBudgetPdf({ linhas, descontoSelecionado, d
       logoHeight *= ratio;
       const pageWidth = doc.internal.pageSize.getWidth();
       const pageHeight = doc.internal.pageSize.getHeight();
-      const logoX = (pageWidth - logoWidth) / 2;
+      const logoX = 12;
       doc.addImage(logo, "PNG", logoX, 12, logoWidth, logoHeight);
 
       drawTopoDireito(tipoFolha, doc, pageWidth);
 
-      let y = 12 + logoHeight + 6;
+      let y = 12 + maxHeight + 6;
       doc.setFont("helvetica", "normal");
-      doc.setFontSize(14);
+      doc.setFontSize(12);
       doc.setTextColor(...corPretaFooter);
       doc.text("VASTO IMPÉRIO, LDA", 12, y);
       y += 6;
@@ -111,16 +110,16 @@ export default async function generateBudgetPdf({ linhas, descontoSelecionado, d
 
       if (dadosEmpresa) {
         clienteNome = resolvedCustomerName;
-        clienteMorada = dadosEmpresa.codigoPostal || "V/ Morada";
+        clienteMorada = [dadosEmpresa.morada, dadosEmpresa.codigoPostal].filter(Boolean).join("\n");
         clienteNif = dadosEmpresa.nif || nif;
       } else if (nomeClienteManual.trim() !== "") {
         clienteNome = nomeClienteManual;
-        clienteMorada = "V/ Morada";
-        clienteNif = nif || "NIF do cliente";
+        clienteMorada = "";
+        clienteNif = nif || "—";
       } else {
         clienteNome = "Cliente";
-        clienteMorada = "V/ Morada";
-        clienteNif = nif || "NIF do cliente";
+        clienteMorada = "";
+        clienteNif = nif || "—";
       }
 
       const metadeX = pageWidth / 2;
@@ -139,36 +138,20 @@ export default async function generateBudgetPdf({ linhas, descontoSelecionado, d
       doc.setFontSize(12);
       doc.setTextColor(0, 0, 0);
 
-      const maxLen = 38;
-      const words = clienteNome.split(" ");
-      let line = "";
-      for (let i = 0; i < words.length; i++) {
-        const testLine = line ? line + " " + words[i] : words[i];
-        if (testLine.length > maxLen) {
-          doc.text(line, offsetClienteX, yCliente, { align: "left" });
-          yCliente += 5;
-          line = words[i];
-        } else {
-          line = testLine;
-        }
-      }
-      if (line) {
-        doc.text(line, offsetClienteX, yCliente, { align: "left" });
-        yCliente += 5;
-      }
+      const nomeLinhas = doc.splitTextToSize(clienteNome, 78);
+      doc.text(nomeLinhas, offsetClienteX, yCliente);
+      yCliente += nomeLinhas.length * 5 + 1;
       doc.setFont("helvetica", "normal");
-      doc.setFontSize(10);
-      doc.setTextColor(...corPretaFooter);
-      
-      const local = clienteMorada.split(" ").slice(1).join(" ") || clienteMorada;
-      doc.text(local, offsetClienteX, yCliente, { align: "left" });
-      yCliente += 5;
-      doc.text(local, offsetClienteX, yCliente, { align: "left" });
-      yCliente += 5;
-      doc.text(clienteMorada, offsetClienteX, yCliente, { align: "left" });
+      doc.setFontSize(9);
+      if (clienteMorada) {
+        const moradaLinhas = doc.splitTextToSize(clienteMorada, 78);
+        doc.text(moradaLinhas, offsetClienteX, yCliente);
+        yCliente += moradaLinhas.length * 4 + 2;
+      }
       if (telefoneCliente.trim()) {
-        doc.setFontSize(9);
-        doc.text(doc.splitTextToSize(`Contacto: ${telefoneCliente.trim()}`, 78), offsetClienteX, yCliente + 5);
+        const contactoLinhas = doc.splitTextToSize(`Contacto: ${telefoneCliente.trim()}`, 78);
+        doc.text(contactoLinhas, offsetClienteX, yCliente);
+        yCliente += contactoLinhas.length * 4;
       }
 
       const yDocumento = yDatas + boxHeight + 10;
@@ -216,7 +199,7 @@ export default async function generateBudgetPdf({ linhas, descontoSelecionado, d
       const larguraContribuinte = doc.getTextWidth(textoContribuinte);
       doc.line(xContribuinte, yCondicoes + 1, xContribuinte + larguraContribuinte, yCondicoes + 1);
 
-      y = yCondicoes + 8;
+      y = Math.max(yCondicoes + 8, yCliente + 8);
 
       const tableCols = [
         { title: "REF", dataKey: "referencia", width: 22 },
@@ -225,7 +208,7 @@ export default async function generateBudgetPdf({ linhas, descontoSelecionado, d
         { title: "UNI", dataKey: "uni", width: 13 },
         { title: "P. VENDA S/IVA", dataKey: "pvenda", width: 25 },
         { title: "DESC", dataKey: "desc", width: 13 },
-        { title: "VALOR LIQUIDO", dataKey: "valorliq", width: 22 },
+        { title: "VALOR LÍQUIDO", dataKey: "valorliq", width: 22 },
         { title: "IVA", dataKey: "iva", width: 15 },
       ];
 
@@ -263,19 +246,20 @@ export default async function generateBudgetPdf({ linhas, descontoSelecionado, d
         styles: {
           font: "helvetica",
           fontStyle: "normal",
-          fontSize: 9,
-          cellPadding: 0.5,
+          fontSize: 8.5,
+          cellPadding: 1.5,
           minCellHeight: 1,
           halign: "right",
           valign: "middle",
           textColor: corPretaFooter,
-          overflow: "hidden",
+          overflow: "linebreak",
           lineWidth: 0,
         },
         headStyles: {
-          fillColor: [200, 200, 200],
+          fillColor: [232, 232, 232],
           textColor: corPretaFooter,
-          fontStyle: "normal",
+          fontStyle: "bold",
+          fontSize: 7.5,
           font: "helvetica",
           halign: "center",
           lineWidth: 0.1,
@@ -288,7 +272,7 @@ export default async function generateBudgetPdf({ linhas, descontoSelecionado, d
           fontStyle: "normal",
           font: "helvetica",
           lineWidth: 0,
-          cellPadding: 0.5,
+          cellPadding: 1.5,
         },
         columnStyles: {
           0: { halign: "left" },
@@ -300,9 +284,11 @@ export default async function generateBudgetPdf({ linhas, descontoSelecionado, d
           6: { halign: "right" },
           7: { halign: "right" },
         },
-        margin: { left: 12, right: 8 },
-        tableWidth: "auto",
-        columnWidth: "auto",
+        margin: { left: 12, right: 10, top: 45, bottom: 32 },
+        rowPageBreak: "avoid",
+        willDrawPage: ({ pageNumber }) => {
+          if (pageNumber > 1) drawTopoDireito("Original", doc, pageWidth);
+        },
       });
 
       const totalBruto = linhas.reduce((acc, l) => acc + l.total, 0);
@@ -330,42 +316,15 @@ export default async function generateBudgetPdf({ linhas, descontoSelecionado, d
       );
       const totalFinal = totalLiquido + totalIVA;
 
-      doc.setFont("helvetica", "normal");
-      doc.setFontSize(8);
-      doc.setTextColor(...corBlack);
-      let yFooter = pageHeight - 24;
-      doc.setDrawColor(...corPretaFooter);
-      doc.setLineWidth(0.05);
-      doc.line(12, yFooter - 3, pageWidth - 8, yFooter - 3);
-      doc.text(
-        "RUA PRINCIPAL N 31 CABECINHA BENEDITA 2475-014 BENEDITA",
-        12,
-        yFooter,
-      );
-      yFooter += 4;
-      doc.text(
-        "Email: geral@vastoimperio.pt | Telefone: +351 928 348 117 (Chamada para a rede móvel nacional)",
-        12,
-        yFooter,
-      );
-      yFooter += 4;
-      doc.text(
-        "Email: geral@vastoimperio.pt | Telefone: +351 928 348 117 (Chamada para a rede móvel nacional)",
-        12,
-        yFooter,
-      );
-      yFooter += 4;
-      const anoAtual = new Date().getFullYear();
-      doc.text(
-        `© ${anoAtual} Vasto Império. Todos os direitos reservados.`,
-        12,
-        yFooter,
-      );
-
       const totaisAltura = 6 * 5 + 7 + 7;
       const margemFooter = 8;
       let yTot = pageHeight - 24 - margemFooter - totaisAltura;
       let yAfterTable = doc.lastAutoTable.finalY + 4;
+      if (yAfterTable + totaisAltura + 4 > pageHeight - 32) {
+        doc.addPage();
+        drawTopoDireito("Original", doc, pageWidth);
+        yAfterTable = 47;
+      }
       if (yTot < yAfterTable + 4) yTot = yAfterTable + 4;
       doc.setDrawColor(...corBlack);
       doc.setLineWidth(0.05);
@@ -453,7 +412,7 @@ export default async function generateBudgetPdf({ linhas, descontoSelecionado, d
       doc.setFontSize(13);
       doc.setTextColor(...corBlack);
       doc.text("TOTAL:", xTotais, yTot, { align: "left" });
-      doc.setTextColor(...corBlue);
+      doc.setTextColor(...corBlack);
       doc.text(formatarNumero(totalFinal) + "€", 200, yTot, {
         align: "right",
       });
@@ -468,11 +427,31 @@ export default async function generateBudgetPdf({ linhas, descontoSelecionado, d
     };
 
     const logoPreload = new window.Image();
-    logoPreload.src = "/logo.png";
-    await new Promise((resolve) => (logoPreload.onload = resolve));
+    await new Promise((resolve, reject) => {
+      logoPreload.onload = resolve;
+      logoPreload.onerror = () => reject(new Error("Não foi possível carregar o logótipo do orçamento."));
+      logoPreload.src = "/logo.png";
+    });
 
     // Apenas gera uma única folha (Original)
     desenharPagina("Original", logoPreload);
+
+    const totalPaginas = doc.getNumberOfPages();
+    for (let pagina = 1; pagina <= totalPaginas; pagina++) {
+      doc.setPage(pagina);
+      const largura = doc.internal.pageSize.getWidth();
+      const altura = doc.internal.pageSize.getHeight();
+      doc.setDrawColor(160, 160, 160);
+      doc.setLineWidth(0.15);
+      doc.line(12, altura - 27, largura - 10, altura - 27);
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(7.5);
+      doc.setTextColor(65, 65, 65);
+      doc.text("VASTO IMPÉRIO, LDA | Rua Principal n.º 31, Cabecinha, 2475-014 Benedita", 12, altura - 22);
+      doc.text("geral@vastoimperio.pt | +351 928 348 117 (Chamada para a rede móvel nacional)", 12, altura - 17);
+      doc.text("vastoimperio.pt", 12, altura - 12);
+      doc.text(`Folha Nº ${pagina} de ${totalPaginas}`, largura - 10, altura - 12, { align: "right" });
+    }
 
     let nomeFinalPDF = "Orçamento";
     if (resolvedCustomerName !== "Cliente") {

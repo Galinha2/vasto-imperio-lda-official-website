@@ -11,6 +11,7 @@ import { quoteFilename } from "@/lib/quote-filenames.mjs";
 import { hasCustomerName, resolveCustomerName } from "@/lib/customer-identity.mjs";
 import QuoteEmailButton from "./QuoteEmailButton";
 import generateBudgetPdf from "@/lib/generateBudgetPdf";
+import { copyDrawingImage } from "@/lib/copy-drawing-image.mjs";
 import { useSimulatorCart, CartContents } from "@/components/simulador/SimulatorCart";
 import { cartDrawing } from "@/components/simulador/cart-images";
 import orcamento from "@/assets/orcamento.json";
@@ -28,6 +29,7 @@ export default function SimulatorAdmin() {
   const [aExportar, setAExportar] = useState(false);
   const [mensagem, setMensagem] = useState("");
   const [mensagemSucesso, setMensagemSucesso] = useState(false);
+  const [mensagemDestino, setMensagemDestino] = useState("");
   const [quoteData, setQuoteData] = useState(null);
   const [telefoneCliente, setTelefoneCliente] = useState("");
   const [emailCliente, setEmailCliente] = useState("");
@@ -98,34 +100,16 @@ export default function SimulatorAdmin() {
     const { capture3dDrawing } = await import("@/lib/admin/rack-3d-export.mjs");
     return capture3dDrawing(cart?.entries.length ? cart.entries : [{ ...quoteData, label: simuladores.find(item => item.id === simuladorAtivo)?.label }]);
   }
-  async function gerarImagem3d() {
-    if (aExportar) return;
-    setAExportar(true); setMensagem(""); setMensagemSucesso(false);
-    try {
-      const url = await obterImagem3d();
-      const link = document.createElement("a");
-      link.download = quoteFilename({ quoteType: cart?.entries.length ? "Conjunto" : simuladorAtivo, customerName: resolveCustomerName(dadosEmpresa, nomeCliente) }, "Desenho 3D", "jpg");
-      link.href = url; link.click();
-    } catch (error) { setMensagem(error.message || "Não foi possível guardar o desenho 3D."); }
-    finally { setAExportar(false); }
-  }
-  async function gerarImagem() {
+  async function copiarImagem(tipo) {
     if (!capturaRef.current || aExportar) return;
-    setAExportar(true);
-    setMensagem("");
-    setMensagemSucesso(false);
+    setAExportar(true); setMensagem(""); setMensagemSucesso(false); setMensagemDestino("");
     try {
-      const dataUrl = await obterImagem();
-      const link = document.createElement("a");
-      link.download = quoteFilename({ quoteType: cart?.entries.length ? "Conjunto" : simuladorAtivo, customerName: resolveCustomerName(dadosEmpresa, nomeCliente) }, "Desenho", "jpg");
-      link.href = dataUrl;
-      link.click();
+      await copyDrawingImage(tipo === "3D" ? obterImagem3d : obterImagem);
+      setMensagem(`Imagem ${tipo} copiada. Pode colar diretamente na conversa com o cliente.`);
+      setMensagemSucesso(true);
     } catch (error) {
-      console.error("Não foi possível guardar a imagem da configuração.", error);
-      setMensagem("Não foi possível guardar a imagem. Tente novamente.");
-    } finally {
-      setAExportar(false);
-    }
+      setMensagem(error.name === "NotAllowedError" ? "O navegador bloqueou a cópia. Permita o acesso à área de transferência e tente novamente." : error.message || "Não foi possível copiar a imagem. Tente novamente.");
+    } finally { setAExportar(false); }
   }
 
   function obterDadosPdf() {
@@ -208,6 +192,7 @@ export default function SimulatorAdmin() {
       if (response.status === 401) throw new Error("A sessão de administração expirou. Inicie sessão novamente.");
       if (!response.ok) throw new Error(result.error || "Não foi possível enviar a configuração para as vendas.");
       window.dispatchEvent(new Event("admin:sales-changed"));
+      setMensagemDestino("vendas");
       setMensagem(`Configuração de ${result.sale.customerName} enviada para as vendas com o PDF e os desenhos 2D e 3D.`);
       setMensagemSucesso(true);
     } catch (error) {
@@ -245,9 +230,10 @@ export default function SimulatorAdmin() {
       dadosEmpresa={dadosEmpresa}
       mensagem={mensagem}
       mensagemSucesso={mensagemSucesso}
+      mostrarLinkVendas={mensagemDestino === "vendas"}
       aExportar={aExportar}
-      gerarImagem={gerarImagem}
-      gerarImagem3d={gerarImagem3d}
+      copiarImagem2d={() => copiarImagem("2D")}
+      copiarImagem3d={() => copiarImagem("3D")}
       gerarPdf={gerarPdf}
       enviarParaVendas={enviarParaVendas}
     />

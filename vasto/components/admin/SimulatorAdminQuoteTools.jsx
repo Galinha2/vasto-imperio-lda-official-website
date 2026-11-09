@@ -31,9 +31,10 @@ export default function SimulatorAdminQuoteTools({
   dadosEmpresa,
   mensagem,
   mensagemSucesso,
+  mostrarLinkVendas,
   aExportar,
-  gerarImagem,
-  gerarImagem3d,
+  copiarImagem2d,
+  copiarImagem3d,
   gerarPdf,
   enviarParaVendas,
 }) {
@@ -164,12 +165,12 @@ export default function SimulatorAdminQuoteTools({
 
       <section aria-label="Exportar configuração" className="admin-surface flex flex-col justify-between gap-4 rounded-[24px] border border-[#e5e5e7] bg-white p-5 shadow-[0_8px_30px_rgba(0,0,0,0.035)] sm:px-6">
         <div>
-          <h2 className="text-base font-semibold text-[#1d1d1f]">Guardar esta configuração</h2>
-          <p className="mt-1 text-sm text-[#6e6e73]">Guarde o desenho 2D com cotas ou o desenho 3D em vista diagonal, em ficheiros separados. O PDF gera a folha de orçamento com artigos, quantidades, preços e desconto.</p>
+          <h2 className="text-base font-semibold text-[#1d1d1f]">Imagens e orçamento</h2>
+          <p className="mt-1 text-sm text-[#6e6e73]">Copie o desenho 2D com cotas ou o 3D em vista diagonal e cole diretamente na conversa com o cliente. O PDF gera a folha de orçamento com artigos, quantidades, preços e desconto.</p>
           {mensagem && (
             <div role={mensagemSucesso ? "status" : "alert"} className={`mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm font-medium ${mensagemSucesso ? "text-emerald-700" : "text-red-600"}`}>
               <span>{mensagem}</span>
-              {mensagemSucesso && <a href="/admin" className="cursor-pointer font-semibold underline underline-offset-2 hover:text-emerald-900">Abrir vendas</a>}
+              {mensagemSucesso && mostrarLinkVendas && <a href="/admin" className="cursor-pointer font-semibold underline underline-offset-2 hover:text-emerald-900">Abrir vendas</a>}
             </div>
           )}
           <div className="mt-4 grid gap-3 sm:grid-cols-2">
@@ -196,19 +197,19 @@ export default function SimulatorAdminQuoteTools({
         <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
           <button
             type="button"
-            onClick={gerarImagem}
+            onClick={copiarImagem2d}
             disabled={aExportar || !quoteData || quoteData.unavailable}
             className="h-12 cursor-pointer rounded-full border border-[#d2d2d7] bg-white px-5 text-sm font-semibold text-[#1d1d1f] transition hover:bg-[#f5f5f7] disabled:cursor-not-allowed disabled:opacity-50"
           >
-            {aExportar ? "A preparar…" : "Guardar 2D"}
+            {aExportar ? "A preparar…" : "Copiar 2D"}
           </button>
           <button
             type="button"
-            onClick={gerarImagem3d}
+            onClick={copiarImagem3d}
             disabled={aExportar || !quoteData || quoteData.unavailable}
             className="h-12 cursor-pointer rounded-full border border-[#d2d2d7] bg-white px-5 text-sm font-semibold text-[#1d1d1f] transition hover:bg-[#f5f5f7] disabled:cursor-not-allowed disabled:opacity-50"
           >
-            {aExportar ? "A preparar…" : "Guardar 3D"}
+            {aExportar ? "A preparar…" : "Copiar 3D"}
           </button>
           <button
             type="button"

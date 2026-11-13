@@ -106,6 +106,12 @@ export default function BudgetBuilder({ editSaleId = "", duplicateSaleId = "" })
   const adicionarLinha = () =>
     setLinhas([...linhas, { produto: null, preco: 0, unidades: 0, total: 0, refCompleta: "", isPortes: false }]);
 
+  const adicionarItemPersonalizado = () => {
+    setLinhas(current => [...current, { produto: "", preco: 0, unidades: 1, total: 0, refCompleta: "", isPortes: false, isCustom: true }]);
+    setOpenProdutoIndex(null);
+    setPesquisaProduto("");
+  };
+
   const selecionarProduto = (index, produtoObj) => {
     const novasLinhas = [...linhas];
     const isPortes = produtoObj.ref === "0" || produtoObj.refCompleta?.startsWith("0.");
@@ -128,9 +134,9 @@ export default function BudgetBuilder({ editSaleId = "", duplicateSaleId = "" })
     setLinhas(novasLinhas);
   };
 
-  const alterarPrecoPortes = (index, valor) => {
+  const alterarPrecoUnitario = (index, valor) => {
     const novasLinhas = [...linhas];
-    const preco = Number(valor) || 0;
+    const preco = Math.max(0, Number(valor) || 0);
     novasLinhas[index].preco = preco;
     novasLinhas[index].total = novasLinhas[index].unidades * preco;
     setLinhas(novasLinhas);
@@ -276,29 +282,35 @@ export default function BudgetBuilder({ editSaleId = "", duplicateSaleId = "" })
                   <input
                     type="text"
                     value={
-                      openProdutoIndex === index
+                      !linha.isCustom && openProdutoIndex === index
                         ? pesquisaProduto
                         : linha.produto || ""
                     }
-                    onFocus={() => setOpenProdutoIndex(index)}
+                    onFocus={() => { if (!linha.isCustom) setOpenProdutoIndex(index); }}
                     onChange={(e) => {
-                      setPesquisaProduto(e.target.value);
+                      if (linha.isCustom) {
+                        const produto = e.target.value;
+                        setLinhas(current => current.map((line, i) => i === index ? { ...line, produto } : line));
+                      } else {
+                        setPesquisaProduto(e.target.value);
+                      }
                     }}
-                    placeholder="Pesquisar produto..."
+                    placeholder={linha.isCustom ? "Descrição do item personalizado..." : "Pesquisar produto..."}
+                    aria-label={linha.isCustom ? "Descrição do item personalizado" : "Pesquisar produto"}
                     className="w-full min-w-0 flex-1 bg-transparent text-sm text-[#1d1d1f] outline-none placeholder:text-[#86868b]"
                   />
 
-                  <IoIosArrowDown
+                  {!linha.isCustom && <IoIosArrowDown
                     className="ml-2 shrink-0 cursor-pointer text-[#6e6e73]"
                     onClick={() =>
                       setOpenProdutoIndex(
                         openProdutoIndex === index ? null : index,
                       )
                     }
-                  />
+                  />}
                 </div>
 
-                {openProdutoIndex === index && (
+                {!linha.isCustom && openProdutoIndex === index && (
                   <div className="absolute left-0 z-30 mt-2 max-h-80 w-[min(88vw,34rem)] overflow-y-auto rounded-[22px] border border-[#e5e5e7] bg-white p-2 shadow-[0_16px_42px_rgba(0,0,0,0.14)]">
                     {[
                       ...new Set(
@@ -367,14 +379,15 @@ export default function BudgetBuilder({ editSaleId = "", duplicateSaleId = "" })
               />
 
               <div className="flex h-11 w-full items-center rounded-full border border-[#e5e5e7] bg-white px-3 text-sm sm:bg-[#f5f5f7]">
-                {linha.isPortes ? (
+                {linha.isPortes || linha.isCustom ? (
                   <input
                     type="number"
                     min="0"
+                    aria-label="Preço por unidade"
                     step="0.01"
                     value={linha.preco || ""}
                     onChange={(e) => {
-                      alterarPrecoPortes(index, e.target.value);
+                      alterarPrecoUnitario(index, e.target.value);
                     }}
                     className="w-full rounded-full border border-[#d2d2d7] px-2 py-1 text-center outline-none focus:border-(--blue)"
                     placeholder="Preço"
@@ -415,6 +428,14 @@ export default function BudgetBuilder({ editSaleId = "", duplicateSaleId = "" })
           >
             <IoIosAdd className="text-xl text-(--orange)" />
             Adicionar produto
+          </button>
+          <button
+            type="button"
+            onClick={adicionarItemPersonalizado}
+            className="inline-flex h-11 cursor-pointer items-center gap-2 rounded-full border border-[#e5e5e7] bg-white px-5 text-sm font-semibold text-[#1d1d1f] transition hover:border-[#c8c9cf] hover:bg-[#f5f5f7]"
+          >
+            <IoIosAdd className="text-xl text-(--orange)" />
+            Adicionar item personalizado
           </button>
         </div>
 

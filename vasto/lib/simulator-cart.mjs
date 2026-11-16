@@ -9,13 +9,26 @@ export function validCartEntry(entry) {
     && entry.items.every(line => typeof line.produto === 'string' && Number.isFinite(line.preco) && line.preco >= 0 && Number.isFinite(line.unidades) && line.unidades > 0 && Number.isFinite(line.total) && line.total >= 0);
 }
 export function cartQuote(entries) {
-  const items = entries.flatMap((entry, index) => entry.items.map(line => {
+  const grouped = new Map();
+  for (const entry of entries) for (const line of entry.items) {
     const multiplier = entry.quantity / (entry.baseQuantity || 1);
     const units = Math.round(line.unidades * multiplier * 1e8) / 1e8;
     const rate = line.isPortes ? 1 : 1 - entry.discountPercent / 100;
     const total = Math.round(line.total * multiplier * rate * 100) / 100;
-    return { ...line, produto: `${index + 1}. ${entry.label} · ${line.produto}`, unidades: units, preco: total / units, total };
-  }));
+    const name = line.produto.normalize('NFC').trim().replace(/\s+/g, ' ');
+    const key = JSON.stringify([name.toLocaleLowerCase('pt-PT'), !!line.isPortes]);
+    const previous = grouped.get(key);
+    if (previous) {
+      previous.unidades = Math.round((previous.unidades + units) * 1e8) / 1e8;
+      previous.total = Math.round((previous.total + total) * 100) / 100;
+      previous.preco = previous.total / previous.unidades;
+    } else {
+      // Cart prices already include each configuration's discount. Different
+      // net prices use a weighted unit price so both quantity and total survive.
+      grouped.set(key, { ...line, produto: name, unidades: units, preco: total / units, total, discountPercent: 0 });
+    }
+  }
+  const items = [...grouped.values()];
   return {
     items, discountPercent: 0,
     total: Math.round(items.reduce((sum, line) => sum + line.total, 0) * 100) / 100,

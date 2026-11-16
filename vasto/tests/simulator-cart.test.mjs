@@ -2,18 +2,20 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { cartQuote, validCartEntry, CART_LIMIT } from '../lib/simulator-cart.mjs';
 const entry = {id:'test',label:'Picking',details:'2 módulos, 3 níveis',quantity:1,discountPercent:10,image:'data:image/jpeg;base64,AAAA',items:[{produto:'Viga',refCompleta:'3.1',preco:20,unidades:4,total:80,isPortes:false}]};
-test('combina famílias e configurações distintas sem perder identidade ou aplicar o desconto duas vezes',()=>{
+test('soma artigos iguais entre configurações e conserva as famílias e os descontos',()=>{
  const rack = {...entry,id:'rack',label:'Racks',quantity:2,discountPercent:0,items:[{produto:'Bastidor',refCompleta:'2.1',preco:100,unidades:2,total:200,isPortes:false}]};
  const quote=cartQuote([entry,{...entry,id:'picking-2',details:'Outra medida'},rack]);
  assert.equal(quote.total,544);
  assert.equal(quote.discountPercent,0);
- assert.equal(quote.items.length,3);
- assert.equal(quote.items[0].total,72);
- assert.equal(quote.items[2].unidades,4);
- assert.equal(quote.items[2].total,400);
- assert.equal(quote.items[2].refCompleta,'2.1');
+ assert.equal(quote.items.length,2);
+ assert.equal(quote.items[0].total,144);
+ assert.equal(quote.items[0].unidades,8);
+ assert.equal(quote.items[0].produto,'Viga');
+ assert.equal(quote.items[1].unidades,4);
+ assert.equal(quote.items[1].total,400);
+ assert.equal(quote.items[1].refCompleta,'2.1');
  assert.ok(quote.details.includes('Outra medida'));
- assert.notEqual(quote.items[0].produto,quote.items[1].produto);
+ assert.equal(quote.items[1].produto,'Bastidor');
  assert.equal(entry.items[0].total,80);
 });
 test('quantidades, descontos, limites e preços fracionários',()=>{
@@ -65,4 +67,45 @@ test('ordering includes the saved cart and current configuration exactly once',a
  assert.equal(repeated.added,false);assert.equal(repeated.entries.length,2);assert.equal(repeated.entries[1].quantity,1);
  const full=Array.from({length:10},(_,i)=>({...first,id:String(i),configuration:{height:4000+i}}));
  assert.throws(()=>cartWithCurrentConfiguration(full,current));assert.equal(cartWithCurrentConfiguration(full,{...full[0],id:'retry'}).added,false);
+});
+
+
+test('mesmo bastidor em estantes distintas ocupa uma única linha com a soma exata das quantidades', () => {
+ const frame = {produto:'Bastidor Picking Galvanizado 1500x600mm',refCompleta:'3.20',preco:40,unidades:2,total:80,isPortes:false};
+ const first = {...entry,items:[frame],quantity:3,baseQuantity:3,discountPercent:10};
+ const second = {...entry,id:'other',label:'Outra estante',items:[{...frame,refCompleta:'3.99',unidades:6,total:240}],quantity:2,baseQuantity:2,discountPercent:10};
+ const result = cartQuote([first,second]);
+ assert.equal(result.items.length,1);
+ assert.equal(result.items[0].produto,frame.produto);
+ assert.equal(result.items[0].unidades,8);
+ assert.equal(result.items[0].preco,36);
+ assert.equal(result.items[0].total,288);
+ assert.equal(result.total,288);
+ assert.equal(result.items[0].refCompleta,'3.20');
+ assert.equal(frame.unidades,2);
+ assert.ok(result.details.includes('Outra estante'));
+});
+
+test('artigos iguais com descontos diferentes conservam o total através do preço unitário ponderado', () => {
+ const first = {...entry,discountPercent:10};
+ const second = {...entry,id:'other',discountPercent:25,items:[{...entry.items[0],produto:'  viga  ',unidades:2,total:40}]};
+ const quote = cartQuote([first,second]);
+ assert.equal(quote.items.length,1);
+ assert.equal(quote.items[0].unidades,6);
+ assert.equal(quote.items[0].total,102);
+ assert.equal(quote.items[0].preco,17);
+ assert.equal(quote.items[0].discountPercent,0);
+ assert.equal(quote.total,cartQuote([first]).total+cartQuote([second]).total);
+});
+
+test('medidas diferentes e portes não são misturados com o mesmo nome de produto', () => {
+ const items = [
+  {produto:'Bastidor 1500x600mm',preco:40,unidades:2,total:80},
+  {produto:'Bastidor 1500x800mm',preco:45,unidades:2,total:90},
+  {produto:'Bastidor 1500x600mm',preco:5,unidades:1,total:5,isPortes:true},
+ ];
+ const quote=cartQuote([{...entry,items,discountPercent:10}]);
+ assert.equal(quote.items.length,3);
+ assert.equal(quote.total,158);
+ assert.equal(quote.items[2].total,5);
 });

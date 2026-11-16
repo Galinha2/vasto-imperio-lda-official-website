@@ -10,6 +10,8 @@ import CustomerPhoneButton from "./CustomerPhoneButton";
 import CustomerNotesButton from "./CustomerNotesButton";
 import FollowUpAlerts from "./FollowUpAlerts";
 import styles from "./SalesDashboard.module.css";
+import { salePdfUrl } from "@/lib/admin/sale-pdf-url.mjs";
+import { subscribeSaleUpdates } from "@/lib/admin/sale-updates.mjs";
 import DashboardPriorities from "./DashboardPriorities";
 import MetricCard from "./MetricCard";
 
@@ -294,6 +296,21 @@ export default function SalesDashboard() {
     };
     window.addEventListener("admin:email-sent", updateEmail);
     return () => window.removeEventListener("admin:email-sent", updateEmail);
+  }, []);
+
+  useEffect(() => {
+    let active = true;
+    const apply = (sale) => {
+      if (!active) return;
+      setSales(current => current.some(item => item.id === sale.id)
+        ? current.map(item => item.id === sale.id ? sale : item)
+        : [sale, ...current]);
+    };
+    const unsubscribe = subscribeSaleUpdates(apply, async (id) => {
+      try { apply((await api(`/api/admin/sales/${encodeURIComponent(id)}`)).sale); }
+      catch (error) { if (active) setError(error.message); }
+    });
+    return () => { active = false; unsubscribe(); };
   }, []);
 
   useEffect(() => {
@@ -1208,8 +1225,8 @@ export default function SalesDashboard() {
                                 )}
                               </div>
                               <section className="admin-surface mb-5 overflow-hidden rounded-2xl border border-[#e8e8ed] bg-white">
-                                <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#e8e8ed] px-4 py-3"><h3 className="text-sm font-semibold">Orçamento PDF</h3><div className="flex items-center gap-3"><a href={`/api/admin/sales/${sale.id}/pdf`} target="_blank" rel="noopener noreferrer" className="text-xs font-medium text-[#6e6e73] hover:underline">Abrir</a><a href={`/api/admin/sales/${sale.id}/pdf?download=1`} download className="rounded-full bg-orange-50 px-4 py-2 text-xs font-semibold text-orange-700 hover:bg-orange-100">Transferir PDF</a></div></div>
-                                <iframe src={`/api/admin/sales/${sale.id}/pdf`} title={`Orçamento de ${sale.customerName}`} loading="lazy" className="h-[520px] w-full border-0" />
+                                <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#e8e8ed] px-4 py-3"><h3 className="text-sm font-semibold">Orçamento PDF</h3><div className="flex items-center gap-3"><a href={salePdfUrl(sale)} target="_blank" rel="noopener noreferrer" className="text-xs font-medium text-[#6e6e73] hover:underline">Abrir</a><a href={salePdfUrl(sale, true)} download className="rounded-full bg-orange-50 px-4 py-2 text-xs font-semibold text-orange-700 hover:bg-orange-100">Transferir PDF</a></div></div>
+                                <iframe key={salePdfUrl(sale)} src={salePdfUrl(sale)} title={`Orçamento de ${sale.customerName}`} loading="lazy" className="h-[520px] w-full border-0" />
                               </section>
                               {sale.orderDetails && (
                                 <section className="admin-surface mb-5 rounded-2xl border border-[#e8e8ed] bg-white p-4 sm:p-5">

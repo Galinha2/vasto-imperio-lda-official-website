@@ -348,119 +348,119 @@
       "produto": "Viga Z60 c/ 1000mm suporta 600Kg par de Vigas",
       "ref": 3,
       "refCompleta": "3.1",
-      "preço": 9.81,
+      "preço": 10.69,
       "image": "/orcamento/i32.jpg"
     },
     {
       "produto": "Viga Z60 c/ 1250mm suporta 550Kg par de Vigas",
       "ref": 3,
       "refCompleta": "3.2",
-      "preço": 11.99,
+      "preço": 13.06,
       "image": "/orcamento/i32.jpg"
     },
     {
       "produto": "Viga Z60 c/ 1500mm suporta 475Kg par de Vigas",
       "ref": 3,
       "refCompleta": "3.3",
-      "preço": 12.61,
+      "preço": 13.74,
       "image": "/orcamento/i32.jpg"
     },
     {
       "produto": "Viga Z60 c/ 1750mm suporta 450Kg par de Vigas",
       "ref": 3,
       "refCompleta": "3.4",
-      "preço": 13.75,
+      "preço": 14.98,
       "image": "/orcamento/i32.jpg"
     },
     {
       "produto": "Viga Z60 c/ 2000mm suporta 400Kg par de Vigas",
       "ref": 3,
       "refCompleta": "3.5",
-      "preço": 14.86,
+      "preço": 16.2,
       "image": "/orcamento/i32.jpg"
     },
     {
       "produto": "Viga Z60 c/ 2250mm suporta 375Kg par de Vigas",
       "ref": 3,
       "refCompleta": "3.6",
-      "preço": 15.98,
+      "preço": 17.42,
       "image": "/orcamento/i32.jpg"
     },
     {
       "produto": "Viga Z60 c/ 2500mm suporta 350Kg par de Vigas",
       "ref": 3,
       "refCompleta": "3.7",
-      "preço": 16.93,
+      "preço": 18.45,
       "image": "/orcamento/i32.jpg"
     },
     {
       "produto": "Viga Z60 c/ 2750mm suporta 300Kg par de Vigas",
       "ref": 3,
       "refCompleta": "3.8",
-      "preço": 19.67,
+      "preço": 21.43,
       "image": "/orcamento/i32.jpg"
     },
     {
       "produto": "Viga Z100 c/ 1000mm suporta 1000Kg par de Vigas",
       "ref": 3,
       "refCompleta": "3.1",
-      "preço": 12.64,
+      "preço": 13.77,
       "image": "/orcamento/i32.jpg"
     },
     {
       "produto": "Viga Z100 c/ 1250mm suporta 930Kg par de Vigas",
       "ref": 3,
       "refCompleta": "3.2",
-      "preço": 13.89,
+      "preço": 15.13,
       "image": "/orcamento/i32.jpg"
     },
     {
       "produto": "Viga Z100 c/ 1500mm suporta 850Kg par de Vigas",
       "ref": 3,
       "refCompleta": "3.3",
-      "preço": 16.59,
+      "preço": 18.08,
       "image": "/orcamento/i32.jpg"
     },
     {
       "produto": "Viga Z100 c/ 1750mm suporta 770Kg par de Vigas",
       "ref": 3,
       "refCompleta": "3.4",
-      "preço": 18.39,
+      "preço": 20.04,
       "image": "/orcamento/i32.jpg"
     },
     {
-      "produto": "Viga Z100 c/ 2000mm suporta 690g par de Vigas",
+      "produto": "Viga Z100 c/ 2000mm suporta 690Kg par de Vigas",
       "ref": 3,
       "refCompleta": "3.5",
-      "preço": 20.22,
+      "preço": 22.03,
       "image": "/orcamento/i32.jpg"
     },
     {
       "produto": "Viga Z100 c/ 2250mm suporta 610Kg par de Vigas",
       "ref": 3,
       "refCompleta": "3.6",
-      "preço": 22.03,
+      "preço": 24.01,
       "image": "/orcamento/i32.jpg"
     },
     {
       "produto": "Viga Z100 c/ 2500mm suporta 530Kg par de Vigas",
       "ref": 3,
       "refCompleta": "3.7",
-      "preço": 24.12,
+      "preço": 26.29,
       "image": "/orcamento/i32.jpg"
     },
     {
       "produto": "Viga Z100 c/ 2600mm suporta 500Kg par de Vigas",
       "ref": 3,
       "refCompleta": "3.8",
-      "preço": 24.56,
+      "preço": 26.77,
       "image": "/orcamento/i32.jpg"
     },
     {
       "produto": "Viga Z100 c/ 2750mm suporta 450Kg par de Vigas",
       "ref": 3,
       "refCompleta": "3.9",
-      "preço": 25.66,
+      "preço": 27.97,
       "image": "/orcamento/i32.jpg"
     },
     {
@@ -491,1581 +491,1584 @@
     {
       "ref": 3,
       "produto": "Bastidor Picking Galvanizado 2000x400mm ",
-      "preço": 32.5,
+      "preço": 35.42,
       "image": "/orcamento/galvanizado.png"
     },
     {
       "ref": 3,
       "produto": "Bastidor Picking Galvanizado 2000x500mm ",
-      "preço": 32.9,
+      "preço": 35.86,
       "image": "/orcamento/galvanizado.png"
     },
     {
       "ref": 3,
       "produto": "Bastidor Picking Galvanizado 2000x600mm ",
-      "preço": 33.2,
+      "preço": 36.18,
       "image": "/orcamento/galvanizado.png"
     },
     {
       "ref": 3,
       "produto": "Bastidor Picking Galvanizado 2000x700mm ",
-      "preço": 33.66,
+      "preço": 36.68,
       "image": "/orcamento/galvanizado.png"
     },
     {
       "ref": 3,
       "produto": "Bastidor Picking Galvanizado 2000x800mm ",
-      "preço": 33.8,
+      "preço": 36.83,
       "image": "/orcamento/galvanizado.png"
     },
     {
       "ref": 3,
       "produto": "Bastidor Picking Galvanizado 2000x900mm ",
-      "preço": 34.08,
+      "preço": 37.15,
       "image": "/orcamento/galvanizado.png"
     },
     {
       "ref": 3,
       "produto": "Bastidor Picking Galvanizado 2000x1000mm ",
-      "preço": 34.37,
+      "preço": 37.46,
       "image": "/orcamento/galvanizado.png"
     },
     {
       "ref": 3,
       "produto": "Bastidor Picking Galvanizado 2000x1100mm ",
-      "preço": 34.8,
+      "preço": 37.93,
       "image": "/orcamento/galvanizado.png"
     },
     {
       "ref": 3,
       "produto": "Bastidor Picking Galvanizado 2000x1200mm ",
-      "preço": 34.96,
+      "preço": 38.1,
       "image": "/orcamento/galvanizado.png"
     },
 
     {
       "ref": 3,
       "produto": "Bastidor Picking Galvanizado 2500x400mm ",
-      "preço": 39.48,
+      "preço": 43.03,
       "image": "/orcamento/galvanizado.png"
     },
     {
       "ref": 3,
       "produto": "Bastidor Picking Galvanizado 2500x500mm ",
-      "preço": 40.05,
+      "preço": 43.65,
       "image": "/orcamento/galvanizado.png"
     },
     {
       "ref": 3,
       "produto": "Bastidor Picking Galvanizado 2500x600mm ",
-      "preço": 40.49,
+      "preço": 44.13,
       "image": "/orcamento/galvanizado.png"
     },
     {
       "ref": 3,
       "produto": "Bastidor Picking Galvanizado 2500x700mm ",
-      "preço": 41.03,
+      "preço": 44.71,
       "image": "/orcamento/galvanizado.png"
     },
     {
       "ref": 3,
       "produto": "Bastidor Picking Galvanizado 2500x800mm ",
-      "preço": 41.37,
+      "preço": 45.08,
       "image": "/orcamento/galvanizado.png"
     },
     {
       "ref": 3,
       "produto": "Bastidor Picking Galvanizado 2500x900mm ",
-      "preço": 41.89,
+      "preço": 45.66,
       "image": "/orcamento/galvanizado.png"
     },
     {
       "ref": 3,
       "produto": "Bastidor Picking Galvanizado 2500x1000mm ",
-      "preço": 42.25,
+      "preço": 46.05,
       "image": "/orcamento/galvanizado.png"
     },
     {
       "ref": 3,
       "produto": "Bastidor Picking Galvanizado 2500x1100mm ",
-      "preço": 42.65,
+      "preço": 46.48,
       "image": "/orcamento/galvanizado.png"
     },
     {
       "ref": 3,
       "produto": "Bastidor Picking Galvanizado 2500x1200mm ",
-      "preço": 43.13,
+      "preço": 47.0,
       "image": "/orcamento/galvanizado.png"
     },
 
     {
       "ref": 3,
       "produto": "Bastidor Picking Galvanizado 3000x400mm ",
-      "preço": 47.19,
+      "preço": 51.43,
       "image": "/orcamento/galvanizado.png"
     },
     {
       "ref": 3,
       "produto": "Bastidor Picking Galvanizado 3000x500mm ",
-      "preço": 47.81,
+      "preço": 52.11,
       "image": "/orcamento/galvanizado.png"
     },
     {
       "ref": 3,
       "produto": "Bastidor Picking Galvanizado 3000x600mm ",
-      "preço": 48.26,
+      "preço": 52.59,
       "image": "/orcamento/galvanizado.png"
     },
     {
       "ref": 3,
       "produto": "Bastidor Picking Galvanizado 3000x1000mm ",
-      "preço": 50.02,
+      "preço": 54.51,
       "image": "/orcamento/galvanizado.png"
     },
 
     {
       "ref": 3,
       "produto": "Bastidor Picking Galvanizado 3500x400mm ",
-      "preço": 52.37,
+      "preço": 57.08,
       "image": "/orcamento/galvanizado.png"
     },
     {
       "ref": 3,
       "produto": "Bastidor Picking Galvanizado 3500x500mm ",
-      "preço": 53.0,
+      "preço": 57.77,
       "image": "/orcamento/galvanizado.png"
     },
     {
       "ref": 3,
       "produto": "Bastidor Picking Galvanizado 3500x600mm ",
-      "preço": 53.43,
+      "preço": 58.23,
       "image": "/orcamento/galvanizado.png"
     },
 
     {
       "ref": 3,
       "produto": "Bastidor Picking Galvanizado 4000x400mm ",
-      "preço": 60.08,
+      "preço": 65.49,
       "image": "/orcamento/galvanizado.png"
     },
     {
       "ref": 3,
       "produto": "Bastidor Picking Galvanizado 4000x500mm ",
-      "preço": 60.77,
+      "preço": 66.23,
       "image": "/orcamento/galvanizado.png"
     },
     {
       "ref": 3,
       "produto": "Bastidor Picking Galvanizado 4000x600mm ",
-      "preço": 61.2,
+      "preço": 66.71,
       "image": "/orcamento/galvanizado.png"
     },
 
     {
       "ref": 3,
       "produto": "Bastidor Picking Galvanizado 4500x400mm ",
-      "preço": 65.99,
+      "preço": 71.92,
       "image": "/orcamento/galvanizado.png"
     },
     {
       "ref": 3,
       "produto": "Bastidor Picking Galvanizado 4500x500mm ",
-      "preço": 66.58,
+      "preço": 72.56,
       "image": "/orcamento/galvanizado.png"
     },
     {
       "ref": 3,
       "produto": "Bastidor Picking Galvanizado 4500x600mm ",
-      "preço": 66.87,
+      "preço": 72.88,
       "image": "/orcamento/galvanizado.png"
     },
     {
       "ref": 3,
       "produto": "Bastidor Picking Galvanizado 4500x1000mm ",
-      "preço": 68.04,
+      "preço": 74.16,
       "image": "/orcamento/galvanizado.png"
     },
 
     {
       "ref": 3,
       "produto": "Bastidor Picking Galvanizado 5000x400mm ",
-      "preço": 72.99,
+      "preço": 79.55,
       "image": "/orcamento/galvanizado.png"
     },
     {
       "ref": 3,
       "produto": "Bastidor Picking Galvanizado 5000x500mm ",
-      "preço": 73.73,
+      "preço": 80.36,
       "image": "/orcamento/galvanizado.png"
     },
     {
       "ref": 3,
       "produto": "Bastidor Picking Galvanizado 5000x600mm ",
-      "preço": 74.18,
+      "preço": 80.85,
       "image": "/orcamento/galvanizado.png"
     },
     {
       "ref": 3,
       "produto": "Bastidor Picking 2000x400mm (AxP) RAL 5005 / 7035",
-      "preço": 36.11,
+      "preço": 39.35,
       "image": "/orcamento/Bastidor Porteco ISO.jpg"
     },
     {
       "ref": 3,
       "produto": "Bastidor Picking 2000x500mm (AxP) RAL 5005 / 7035",
-      "preço": 36.56,
+      "preço": 39.84,
       "image": "/orcamento/Bastidor Porteco ISO.jpg"
     },
     {
       "ref": 3,
       "produto": "Bastidor Picking 2000x600mm (AxP) RAL 5005 / 7035",
-      "preço": 36.89,
+      "preço": 40.2,
       "image": "/orcamento/Bastidor Porteco ISO.jpg"
     },
     {
       "ref": 3,
       "produto": "Bastidor Picking 2000x700mm (AxP) RAL 5005 / 7035",
-      "preço": 37.4,
+      "preço": 40.76,
       "image": "/orcamento/Bastidor Porteco ISO.jpg"
     },
     {
       "ref": 3,
       "produto": "Bastidor Picking 2000x800mm (AxP) RAL 5005 / 7035",
-      "preço": 37.55,
+      "preço": 40.93,
       "image": "/orcamento/Bastidor Porteco ISO.jpg"
     },
     {
       "ref": 3,
       "produto": "Bastidor Picking 2000x900mm (AxP) RAL 5005 / 7035",
-      "preço": 37.87,
+      "preço": 41.27,
       "image": "/orcamento/Bastidor Porteco ISO.jpg"
     },
     {
       "ref": 3,
       "produto": "Bastidor Picking 2000x1000mm (AxP) RAL 5005 / 7035",
-      "preço": 38.19,
+      "preço": 41.62,
       "image": "/orcamento/Bastidor Porteco ISO.jpg"
     },
     {
       "ref": 3,
       "produto": "Bastidor Picking 2000x1100mm (AxP) RAL 5005 / 7035",
-      "preço": 38.67,
+      "preço": 42.15,
       "image": "/orcamento/Bastidor Porteco ISO.jpg"
     },
     {
       "ref": 3,
       "produto": "Bastidor Picking 2000x1200mm (AxP) RAL 5005 / 7035",
-      "preço": 38.84,
+      "preço": 42.34,
       "image": "/orcamento/Bastidor Porteco ISO.jpg"
     },
     {
       "ref": 3,
       "produto": "Bastidor Picking 2500x400mm (AxP) RAL 5005 / 7035",
-      "preço": 43.87,
+      "preço": 47.81,
       "image": "/orcamento/Bastidor Porteco ISO.jpg"
     },
     {
       "ref": 3,
       "produto": "Bastidor Picking 2500x500mm (AxP) RAL 5005 / 7035",
-      "preço": 44.5,
+      "preço": 48.49,
       "image": "/orcamento/Bastidor Porteco ISO.jpg"
     },
     {
       "ref": 3,
       "produto": "Bastidor Picking 2500x600mm (AxP) RAL 5005 / 7035",
-      "preço": 44.99,
+      "preço": 49.03,
       "image": "/orcamento/Bastidor Porteco ISO.jpg"
     },
     {
       "ref": 3,
       "produto": "Bastidor Picking 2500x700mm (AxP) RAL 5005 / 7035",
-      "preço": 45.59,
+      "preço": 49.68,
       "image": "/orcamento/Bastidor Porteco ISO.jpg"
     },
     {
       "ref": 3,
       "produto": "Bastidor Picking 2500x800mm (AxP) RAL 5005 / 7035",
-      "preço": 45.96,
+      "preço": 50.09,
       "image": "/orcamento/Bastidor Porteco ISO.jpg"
     },
     {
       "ref": 3,
       "produto": "Bastidor Picking 2500x900mm (AxP) RAL 5005 / 7035",
-      "preço": 46.55,
+      "preço": 50.73,
       "image": "/orcamento/Bastidor Porteco ISO.jpg"
     },
     {
       "ref": 3,
       "produto": "Bastidor Picking 2500x1000mm (AxP) RAL 5005 / 7035",
-      "preço": 46.94,
+      "preço": 51.16,
       "image": "/orcamento/Bastidor Porteco ISO.jpg"
     },
     {
       "ref": 3,
       "produto": "Bastidor Picking 2500x1100mm (AxP) RAL 5005 / 7035",
-      "preço": 47.39,
+      "preço": 51.65,
       "image": "/orcamento/Bastidor Porteco ISO.jpg"
     },
     {
       "ref": 3,
       "produto": "Bastidor Picking 2500x1200mm (AxP) RAL 5005 / 7035",
-      "preço": 47.92,
+      "preço": 52.23,
       "image": "/orcamento/Bastidor Porteco ISO.jpg"
     },
     {
       "ref": 3,
       "produto": "Bastidor Picking 3000x400mm (AxP) RAL 5005 / 7035",
-      "preço": 52.43,
+      "preço": 57.14,
       "image": "/orcamento/Bastidor Porteco ISO.jpg"
     },
     {
       "ref": 3,
       "produto": "Bastidor Picking 3000x500mm (AxP) RAL 5005 / 7035",
-      "preço": 53.13,
+      "preço": 57.9,
       "image": "/orcamento/Bastidor Porteco ISO.jpg"
     },
     {
       "ref": 3,
       "produto": "Bastidor Picking 3000x600mm (AxP) RAL 5005 / 7035",
-      "preço": 53.62,
+      "preço": 58.44,
       "image": "/orcamento/Bastidor Porteco ISO.jpg"
     },
     {
       "ref": 3,
       "produto": "Bastidor Picking 3000x700mm (AxP) RAL 5005 / 7035",
-      "preço": 53.66,
+      "preço": 58.48,
       "image": "/orcamento/Bastidor Porteco ISO.jpg"
     },
     {
       "ref": 3,
       "produto": "Bastidor Picking 3000x800mm (AxP) RAL 5005 / 7035",
-      "preço": 54.6,
+      "preço": 59.51,
       "image": "/orcamento/Bastidor Porteco ISO.jpg"
     },
     {
       "ref": 3,
       "produto": "Bastidor Picking 3000x900mm (AxP) RAL 5005 / 7035",
-      "preço": 55.3,
+      "preço": 60.27,
       "image": "/orcamento/Bastidor Porteco ISO.jpg"
     },
     {
       "ref": 3,
       "produto": "Bastidor Picking 3000x1000mm (AxP) RAL 5005 / 7035",
-      "preço": 55.57,
+      "preço": 60.57,
       "image": "/orcamento/Bastidor Porteco ISO.jpg"
     },
     {
       "ref": 3,
       "produto": "Bastidor Picking 3000x1100mm (AxP) RAL 5005 / 7035",
-      "preço": 56.99,
+      "preço": 62.12,
       "image": "/orcamento/Bastidor Porteco ISO.jpg"
     },
     {
       "ref": 3,
       "produto": "Bastidor Picking 3000x1200mm (AxP) RAL 5005 / 7035",
-      "preço": 60.1,
+      "preço": 65.5,
       "image": "/orcamento/Bastidor Porteco ISO.jpg"
     },
     {
       "ref": 3,
       "produto": "Bastidor Picking 3500x400mm (AxP) RAL 5005 / 7035",
-      "preço": 58.19,
+      "preço": 63.42,
       "image": "/orcamento/Bastidor Porteco ISO.jpg"
     },
     {
       "ref": 3,
       "produto": "Bastidor Picking 3500x500mm (AxP) RAL 5005 / 7035",
-      "preço": 58.89,
+      "preço": 64.19,
       "image": "/orcamento/Bastidor Porteco ISO.jpg"
     },
     {
       "ref": 3,
       "produto": "Bastidor Picking 3500x600mm (AxP) RAL 5005 / 7035",
-      "preço": 59.36,
+      "preço": 64.7,
       "image": "/orcamento/Bastidor Porteco ISO.jpg"
     },
     {
       "ref": 3,
       "produto": "Bastidor Picking 3500x700mm (AxP) RAL 5005 / 7035",
-      "preço": 59.42,
+      "preço": 64.76,
       "image": "/orcamento/Bastidor Porteco ISO.jpg"
     },
     {
       "ref": 3,
       "produto": "Bastidor Picking 3500x800mm (AxP) RAL 5005 / 7035",
-      "preço": 60.35,
-      "image": "/orcamento/Bastidor Porteco ISO.jpg"
-    },
-    {
-      "ref": 3,
-      "produto": "Bastidor Picking 3500x900mm (AxP) RAL 5005 / 7035",
-      "preço": 61.04,
-      "image": "/orcamento/Bastidor Porteco ISO.jpg"
-    },
-    {
-      "ref": 3,
-      "produto": "Bastidor Picking 3500x1000mm (AxP) RAL 5005 / 7035",
-      "preço": 61.32,
-      "image": "/orcamento/Bastidor Porteco ISO.jpg"
-    },
-    {
-      "ref": 3,
-      "produto": "Bastidor Picking 3500x1100mm (AxP) RAL 5005 / 7035",
-      "preço": 62.76,
-      "image": "/orcamento/Bastidor Porteco ISO.jpg"
-    },
-    {
-      "ref": 3,
-      "produto": "Bastidor Picking 3500x1200mm (AxP) RAL 5005 / 7035",
-      "preço": 65.84,
-      "image": "/orcamento/Bastidor Porteco ISO.jpg"
-    },
-    {
-      "ref": 3,
-      "produto": "Bastidor Picking 4000x400mm (AxP) RAL 5005 / 7035",
       "preço": 65.77,
       "image": "/orcamento/Bastidor Porteco ISO.jpg"
     },
     {
       "ref": 3,
+      "produto": "Bastidor Picking 3500x900mm (AxP) RAL 5005 / 7035",
+      "preço": 66.53,
+      "image": "/orcamento/Bastidor Porteco ISO.jpg"
+    },
+    {
+      "ref": 3,
+      "produto": "Bastidor Picking 3500x1000mm (AxP) RAL 5005 / 7035",
+      "preço": 66.84,
+      "image": "/orcamento/Bastidor Porteco ISO.jpg"
+    },
+    {
+      "ref": 3,
+      "produto": "Bastidor Picking 3500x1100mm (AxP) RAL 5005 / 7035",
+      "preço": 68.4,
+      "image": "/orcamento/Bastidor Porteco ISO.jpg"
+    },
+    {
+      "ref": 3,
+      "produto": "Bastidor Picking 3500x1200mm (AxP) RAL 5005 / 7035",
+      "preço": 71.76,
+      "image": "/orcamento/Bastidor Porteco ISO.jpg"
+    },
+    {
+      "ref": 3,
+      "produto": "Bastidor Picking 4000x400mm (AxP) RAL 5005 / 7035",
+      "preço": 72.76,
+      "image": "/orcamento/Bastidor Porteco ISO.jpg"
+    },
+    {
+      "ref": 3,
       "produto": "Bastidor Picking 4000x500mm (AxP) RAL 5005 / 7035",
-      "preço": 66.52,
+      "preço": 73.59,
       "image": "/orcamento/Bastidor Porteco ISO.jpg"
     },
     {
       "ref": 3,
       "produto": "Bastidor Picking 4000x600mm (AxP) RAL 5005 / 7035",
-      "preço": 68.0,
+      "preço": 74.12,
       "image": "/orcamento/Bastidor Porteco ISO.jpg"
     },
     {
       "ref": 3,
       "produto": "Bastidor Picking 4000x700mm (AxP) RAL 5005 / 7035",
-      "preço": 68.67,
+      "preço": 74.84,
       "image": "/orcamento/Bastidor Porteco ISO.jpg"
     },
     {
       "ref": 3,
       "produto": "Bastidor Picking 4000x800mm (AxP) RAL 5005 / 7035",
-      "preço": 68.99,
+      "preço": 75.19,
       "image": "/orcamento/Bastidor Porteco ISO.jpg"
     },
     {
       "ref": 3,
       "produto": "Bastidor Picking 4000x900mm (AxP) RAL 5005 / 7035",
-      "preço": 69.72,
+      "preço": 75.99,
       "image": "/orcamento/Bastidor Porteco ISO.jpg"
     },
     {
       "ref": 3,
       "produto": "Bastidor Picking 4000x1000mm (AxP) RAL 5005 / 7035",
-      "preço": 69.95,
+      "preço": 76.24,
       "image": "/orcamento/Bastidor Porteco ISO.jpg"
     },
     {
       "ref": 3,
       "produto": "Bastidor Picking 4000x1100mm (AxP) RAL 5005 / 7035",
-      "preço": 72.42,
+      "preço": 78.93,
       "image": "/orcamento/Bastidor Porteco ISO.jpg"
     },
     {
       "ref": 3,
       "produto": "Bastidor Picking 4000x1200mm (AxP) RAL 5005 / 7035",
-      "preço": 74.97,
+      "preço": 81.71,
       "image": "/orcamento/Bastidor Porteco ISO.jpg"
     },
     {
       "ref": 3,
       "produto": "Bastidor Picking 4500x400mm (AxP) RAL 5005 / 7035",
-      "preço": 73.32,
+      "preço": 79.91,
       "image": "/orcamento/Bastidor Porteco ISO.jpg"
     },
     {
       "ref": 3,
       "produto": "Bastidor Picking 4500x500mm (AxP) RAL 5005 / 7035",
-      "preço": 73.97,
+      "preço": 80.62,
       "image": "/orcamento/Bastidor Porteco ISO.jpg"
     },
     {
       "ref": 3,
       "produto": "Bastidor Picking 4500x600mm (AxP) RAL 5005 / 7035",
-      "preço": 74.3,
+      "preço": 80.98,
       "image": "/orcamento/Bastidor Porteco ISO.jpg"
     },
     {
       "ref": 3,
       "produto": "Bastidor Picking 4500x700mm (AxP) RAL 5005 / 7035",
-      "preço": 74.33,
+      "preço": 81.01,
       "image": "/orcamento/Bastidor Porteco ISO.jpg"
     },
     {
       "ref": 3,
       "produto": "Bastidor Picking 4500x800mm (AxP) RAL 5005 / 7035",
-      "preço": 74.97,
+      "preço": 81.71,
       "image": "/orcamento/Bastidor Porteco ISO.jpg"
     },
     {
       "ref": 3,
       "produto": "Bastidor Picking 4500x900mm (AxP) RAL 5005 / 7035",
-      "preço": 75.32,
+      "preço": 82.1,
       "image": "/orcamento/Bastidor Porteco ISO.jpg"
     },
     {
       "ref": 3,
       "produto": "Bastidor Picking 4500x1000mm (AxP) RAL 5005 / 7035",
-      "preço": 75.6,
+      "preço": 82.4,
       "image": "/orcamento/Bastidor Porteco ISO.jpg"
     },
     {
       "ref": 3,
       "produto": "Bastidor Picking 4500x1100mm (AxP) RAL 5005 / 7035",
-      "preço": 80.58,
+      "preço": 87.82,
       "image": "/orcamento/Bastidor Porteco ISO.jpg"
     },
     {
       "ref": 3,
       "produto": "Bastidor Picking 4500x1200mm (AxP) RAL 5005 / 7035",
-      "preço": 81.14,
+      "preço": 88.43,
       "image": "/orcamento/Bastidor Porteco ISO.jpg"
     },
     {
       "ref": 3,
       "produto": "Bastidor Picking 5000x400mm (AxP) RAL 5005 / 7035",
-      "preço": 81.1,
+      "preço": 88.39,
       "image": "/orcamento/Bastidor Porteco ISO.jpg"
     },
     {
       "ref": 3,
       "produto": "Bastidor Picking 5000x500mm (AxP) RAL 5005 / 7035",
-      "preço": 81.92,
+      "preço": 89.29,
       "image": "/orcamento/Bastidor Porteco ISO.jpg"
     },
     {
       "ref": 3,
       "produto": "Bastidor Picking 5000x600mm (AxP) RAL 5005 / 7035",
-      "preço": 82.42,
+      "preço": 89.83,
       "image": "/orcamento/Bastidor Porteco ISO.jpg"
     },
     {
       "ref": 3,
       "produto": "Bastidor Picking 5000x700mm (AxP) RAL 5005 / 7035",
-      "preço": 82.66,
+      "preço": 90.09,
       "image": "/orcamento/Bastidor Porteco ISO.jpg"
     },
     {
       "ref": 3,
       "produto": "Bastidor Picking 5000x800mm (AxP) RAL 5005 / 7035",
-      "preço": 83.37,
+      "preço": 90.87,
       "image": "/orcamento/Bastidor Porteco ISO.jpg"
     },
     {
       "ref": 3,
       "produto": "Bastidor Picking 5000x900mm (AxP) RAL 5005 / 7035",
-      "preço": 83.9,
+      "preço": 91.45,
       "image": "/orcamento/Bastidor Porteco ISO.jpg"
     },
     {
       "ref": 3,
       "produto": "Bastidor Picking 5000x1000mm (AxP) RAL 5005 / 7035",
-      "preço": 84.38,
+      "preço": 91.97,
       "image": "/orcamento/Bastidor Porteco ISO.jpg"
     },
     {
       "ref": 3,
       "produto": "Bastidor Picking 5000x1100mm (AxP) RAL 5005 / 7035",
-      "preço": 89.43,
+      "preço": 97.47,
       "image": "/orcamento/Bastidor Porteco ISO.jpg"
     },
     {
       "ref": 3,
       "produto": "Bastidor Picking 5000x1200mm (AxP) RAL 5005 / 7035",
-      "preço": 89.86,
+      "preço": 97.95,
       "image": "/orcamento/Bastidor Porteco ISO.jpg"
     },
     {
       "ref": 3,
       "produto": "Reforço lateral c/ 400mm (AxP) Galvanizado",
-      "preço": 2.62,
+      "preço": 2.85,
       "image": "/orcamento/reforco lateral.png"
     },
     {
       "ref": 3,
       "produto": "Reforço lateral c/ 500mm (AxP)",
-      "preço": 2.92,
+      "preço": 3.17,
       "image": "/orcamento/reforco lateral.png"
     },
     {
       "ref": 3,
       "produto": "Reforço lateral c/ 600mm (AxP)",
-      "preço": 3.13,
+      "preço": 3.41,
       "image": "/orcamento/reforco lateral.png"
     },
     {
       "ref": 3,
       "produto": "Reforço lateral c/ 700mm (AxP)",
-      "preço": 3.34,
+      "preço": 3.64,
       "image": "/orcamento/reforco lateral.png"
     },
     {
       "ref": 3,
       "produto": "Reforço lateral c/ 800mm (AxP)",
-      "preço": 3.55,
+      "preço": 3.87,
       "image": "/orcamento/reforco lateral.png"
     },
     {
       "ref": 3,
       "produto": "Reforço lateral c/ 900mm (AxP)",
-      "preço": 3.77,
+      "preço": 4.1,
       "image": "/orcamento/reforco lateral.png"
     },
     {
       "ref": 3,
       "produto": "Reforço lateral c/ 1000mm (AxP)",
-      "preço": 3.98,
+      "preço": 4.33,
       "image": "/orcamento/reforco lateral.png"
     },
     {
       "ref": 3,
       "produto": "Reforço lateral c/ 1100mm (AxP)",
-      "preço": 4.2,
+      "preço": 4.57,
       "image": "/orcamento/reforco lateral.png"
     },
     {
       "ref": 3,
       "produto": "Reforço lateral c/ 1200mm (AxP)",
-      "preço": 4.4,
+      "preço": 4.79,
       "image": "/orcamento/reforco lateral.png"
     },
     {
       "ref": 3,
       "produto": "Reforço central c/ 400mm (AxP) Galvanizado",
-      "preço": 3.18,
+      "preço": 3.46,
       "image": "/orcamento/reforco central.png"
     },
     {
       "ref": 3,
       "produto": "Reforço central c/ 500mm (AxP)",
-      "preço": 3.42,
+      "preço": 3.72,
       "image": "/orcamento/reforco central.png"
     },
     {
       "ref": 3,
       "produto": "Reforço central c/ 600mm (AxP)",
-      "preço": 3.67,
+      "preço": 3.99,
       "image": "/orcamento/reforco central.png"
     },
     {
       "ref": 3,
       "produto": "Reforço central c/ 700mm (AxP)",
-      "preço": 3.93,
+      "preço": 4.28,
       "image": "/orcamento/reforco central.png"
     },
     {
       "ref": 3,
       "produto": "Reforço central c/ 800mm (AxP)",
-      "preço": 4.17,
+      "preço": 4.54,
       "image": "/orcamento/reforco central.png"
     },
     {
       "ref": 3,
       "produto": "Reforço central c/ 900mm (AxP)",
-      "preço": 4.41,
+      "preço": 4.8,
       "image": "/orcamento/reforco central.png"
     },
     {
       "ref": 3,
       "produto": "Reforço central c/ 1000mm (AxP)",
-      "preço": 4.67,
+      "preço": 5.09,
       "image": "/orcamento/reforco central.png"
     },
     {
       "ref": 3,
       "produto": "Reforço central c/ 1100mm (AxP)",
-      "preço": 4.92,
+      "preço": 5.36,
       "image": "/orcamento/reforco central.png"
     },
     {
       "ref": 3,
       "produto": "Reforço central c/ 1200mm (AxP)",
-      "preço": 5.17,
+      "preço": 5.63,
       "image": "/orcamento/reforco central.png"
     },
     {
       "ref": 3,
       "produto": "Prat. Madeira. Aglom. 1000x400x19mm (CxPxA)",
-      "preço": 7.87,
+      "preço": 8.57,
       "image": "/orcamento/tampo madeira.png"
     },
     {
       "ref": 3,
       "produto": "Prat. Madeira. Aglom. 1250x400x19mm (CxPxA)",
-      "preço": 9.84,
+      "preço": 10.72,
       "image": "/orcamento/tampo madeira.png"
     },
     {
       "ref": 3,
       "produto": "Prat. Madeira. Aglom. 1500x400x19mm (CxPxA)",
-      "preço": 11.81,
+      "preço": 12.86,
       "image": "/orcamento/tampo madeira.png"
     },
     {
       "ref": 3,
       "produto": "Prat. Madeira. Aglom. 1750x400x19mm (CxPxA)",
-      "preço": 13.78,
+      "preço": 15.02,
       "image": "/orcamento/tampo madeira.png"
     },
     {
       "ref": 3,
       "produto": "Prat. Madeira. Aglom. 2000x400x19mm (CxPxA)",
-      "preço": 15.74,
+      "preço": 17.15,
       "image": "/orcamento/tampo madeira.png"
     },
     {
       "ref": 3,
       "produto": "Prat. Madeira. Aglom. 2250x400x19mm (CxPxA)",
-      "preço": 17.71,
+      "preço": 19.3,
       "image": "/orcamento/tampo madeira.png"
     },
     {
       "ref": 3,
       "produto": "Prat. Madeira. Aglom. 2500x400x19mm (CxPxA)",
-      "preço": 19.67,
+      "preço": 21.44,
       "image": "/orcamento/tampo madeira.png"
     },
     {
       "ref": 3,
       "produto": "Prat. Madeira. Aglom. 2600x400x19mm (CxPxA)",
-      "preço": 20.46,
+      "preço": 22.29,
       "image": "/orcamento/tampo madeira.png"
     },
     {
       "ref": 3,
       "produto": "Prat. Madeira. Aglom. 2750x400x19mm (CxPxA)",
-      "preço": 21.65,
+      "preço": 23.59,
       "image": "/orcamento/tampo madeira.png"
     },
     {
       "ref": 3,
       "produto": "Prat. Madeira. Aglom. 1000x500x19mm (CxPxA)",
-      "preço": 9.84,
+      "preço": 10.72,
       "image": "/orcamento/tampo madeira.png"
     },
     {
       "ref": 3,
       "produto": "Prat. Madeira. Aglom. 1250x500x19mm (CxPxA)",
-      "preço": 12.3,
+      "preço": 13.4,
       "image": "/orcamento/tampo madeira.png"
     },
     {
       "ref": 3,
       "produto": "Prat. Madeira. Aglom. 1500x500x19mm (CxPxA)",
-      "preço": 14.76,
+      "preço": 16.08,
       "image": "/orcamento/tampo madeira.png"
     },
     {
       "ref": 3,
       "produto": "Prat. Madeira. Aglom. 1750x500x19mm (CxPxA)",
-      "preço": 17.22,
+      "preço": 18.76,
       "image": "/orcamento/tampo madeira.png"
     },
     {
       "ref": 3,
       "produto": "Prat. Madeira. Aglom. 2000x500x19mm (CxPxA)",
-      "preço": 19.67,
+      "preço": 21.44,
       "image": "/orcamento/tampo madeira.png"
     },
     {
       "ref": 3,
       "produto": "Prat. Madeira. Aglom. 2250x500x19mm (CxPxA)",
-      "preço": 22.12,
+      "preço": 24.11,
       "image": "/orcamento/tampo madeira.png"
     },
     {
       "ref": 3,
       "produto": "Prat. Madeira. Aglom. 2500x500x19mm (CxPxA)",
-      "preço": 24.6,
+      "preço": 26.8,
       "image": "/orcamento/tampo madeira.png"
     },
     {
       "ref": 3,
       "produto": "Prat. Madeira. Aglom. 2600x500x19mm (CxPxA)",
-      "preço": 25.57,
+      "preço": 27.87,
       "image": "/orcamento/tampo madeira.png"
     },
     {
       "ref": 3,
       "produto": "Prat. Madeira. Aglom. 2750x500x19mm (CxPxA)",
-      "preço": 27.05,
+      "preço": 29.48,
       "image": "/orcamento/tampo madeira.png"
     },
     {
       "ref": 3,
       "produto": "Prat. Madeira. Aglom. 1000x600x19mm (CxPxA)",
-      "preço": 11.81,
+      "preço": 12.86,
       "image": "/orcamento/tampo madeira.png"
     },
     {
       "ref": 3,
       "produto": "Prat. Madeira. Aglom. 1250x600x19mm (CxPxA)",
-      "preço": 14.76,
+      "preço": 20.33,
       "image": "/orcamento/tampo madeira.png"
     },
     {
       "ref": 3,
       "produto": "Prat. Madeira. Aglom. 1500x600x19mm (CxPxA)",
-      "preço": 17.71,
+      "preço": 19.3,
       "image": "/orcamento/tampo madeira.png"
     },
     {
       "ref": 3,
       "produto": "Prat. Madeira. Aglom. 1750x600x19mm (CxPxA)",
-      "preço": 20.65,
+      "preço": 22.5,
       "image": "/orcamento/tampo madeira.png"
     },
     {
       "ref": 3,
       "produto": "Prat. Madeira. Aglom. 2000x600x19mm (CxPxA)",
-      "preço": 23.61,
+      "preço": 25.73,
       "image": "/orcamento/tampo madeira.png"
     },
     {
       "ref": 3,
       "produto": "Prat. Madeira. Aglom. 2250x600x19mm (CxPxA)",
-      "preço": 26.55,
+      "preço": 28.94,
       "image": "/orcamento/tampo madeira.png"
     },
     {
       "ref": 3,
       "produto": "Prat. Madeira. Aglom. 2500x600x19mm (CxPxA)",
-      "preço": 29.51,
+      "preço": 32.16,
       "image": "/orcamento/tampo madeira.png"
     },
     {
       "ref": 3,
       "produto": "Prat. Madeira. Aglom. 2600x600x19mm (CxPxA)",
-      "preço": 30.69,
+      "preço": 33.45,
       "image": "/orcamento/tampo madeira.png"
     },
     {
       "ref": 3,
       "produto": "Prat. Madeira. Aglom. 2750x600x19mm (CxPxA)",
-      "preço": 32.46,
+      "preço": 35.38,
       "image": "/orcamento/tampo madeira.png"
     },
     {
       "ref": 3,
       "produto": "Prat. Madeira. Aglom. 1000x700x19mm (CxPxA)",
-      "preço": 13.78,
+      "preço": 15.02,
       "image": "/orcamento/tampo madeira.png"
     },
     {
       "ref": 3,
       "produto": "Prat. Madeira. Aglom. 1250x700x19mm (CxPxA)",
-      "preço": 17.22,
+      "preço": 18.76,
       "image": "/orcamento/tampo madeira.png"
     },
     {
       "ref": 3,
       "produto": "Prat. Madeira. Aglom. 1500x700x19mm (CxPxA)",
-      "preço": 20.65,
+      "preço": 22.5,
       "image": "/orcamento/tampo madeira.png"
     },
     {
       "ref": 3,
       "produto": "Prat. Madeira. Aglom. 1750x700x19mm (CxPxA)",
-      "preço": 24.09,
+      "preço": 26.26,
       "image": "/orcamento/tampo madeira.png"
     },
     {
       "ref": 3,
       "produto": "Prat. Madeira. Aglom. 2000x700x19mm (CxPxA)",
-      "preço": 27.53,
+      "preço": 30.0,
       "image": "/orcamento/tampo madeira.png"
     },
     {
       "ref": 3,
       "produto": "Prat. Madeira. Aglom. 2250x700x19mm (CxPxA)",
-      "preço": 30.98,
+      "preço": 33.76,
       "image": "/orcamento/tampo madeira.png"
     },
     {
       "ref": 3,
       "produto": "Prat. Madeira. Aglom. 2500x700x19mm (CxPxA)",
-      "preço": 34.43,
+      "preço": 37.52,
       "image": "/orcamento/tampo madeira.png"
     },
     {
       "ref": 3,
       "produto": "Prat. Madeira. Aglom. 2600x700x19mm (CxPxA)",
-      "preço": 35.8,
+      "preço": 39.01,
       "image": "/orcamento/tampo madeira.png"
     },
     {
       "ref": 3,
       "produto": "Prat. Madeira. Aglom. 2750x700x19mm (CxPxA)",
-      "preço": 37.86,
+      "preço": 41.26,
       "image": "/orcamento/tampo madeira.png"
     },
     {
       "ref": 3,
       "produto": "Prat. Madeira. Aglom. 1000x800x19mm (CxPxA)",
-      "preço": 15.74,
+      "preço": 17.15,
       "image": "/orcamento/tampo madeira.png"
     },
     {
       "ref": 3,
       "produto": "Prat. Madeira. Aglom. 1250x800x19mm (CxPxA)",
-      "preço": 19.67,
+      "preço": 21.44,
       "image": "/orcamento/tampo madeira.png"
     },
     {
       "ref": 3,
       "produto": "Prat. Madeira. Aglom. 1500x800x19mm (CxPxA)",
-      "preço": 23.61,
+      "preço": 25.73,
       "image": "/orcamento/tampo madeira.png"
     },
     {
       "ref": 3,
       "produto": "Prat. Madeira. Aglom. 1750x800x19mm (CxPxA)",
-      "preço": 27.53,
+      "preço": 30.0,
       "image": "/orcamento/tampo madeira.png"
     },
     {
       "ref": 3,
       "produto": "Prat. Madeira. Aglom. 2000x800x19mm (CxPxA)",
-      "preço": 31.47,
+      "preço": 34.29,
       "image": "/orcamento/tampo madeira.png"
     },
     {
       "ref": 3,
       "produto": "Prat. Madeira. Aglom. 2250x800x19mm (CxPxA)",
-      "preço": 35.39,
+      "preço": 38.57,
       "image": "/orcamento/tampo madeira.png"
     },
     {
       "ref": 3,
       "produto": "Prat. Madeira. Aglom. 2500x800x19mm (CxPxA)",
-      "preço": 39.33,
+      "preço": 42.87,
       "image": "/orcamento/tampo madeira.png"
     },
     {
       "ref": 3,
       "produto": "Prat. Madeira. Aglom. 2600x800x19mm (CxPxA)",
-      "preço": 40.92,
+      "preço": 44.6,
       "image": "/orcamento/tampo madeira.png"
     },
     {
       "ref": 3,
       "produto": "Prat. Madeira. Aglom. 2750x800x19mm (CxPxA)",
-      "preço": 43.27,
+      "preço": 47.16,
       "image": "/orcamento/tampo madeira.png"
     },
     {
       "ref": 3,
       "produto": "Prat. Madeira. Aglom. 1000x900x19mm (CxPxA)",
-      "preço": 17.71,
+      "preço": 19.3,
       "image": "/orcamento/tampo madeira.png"
     },
     {
       "ref": 3,
       "produto": "Prat. Madeira. Aglom. 1250x900x19mm (CxPxA)",
-      "preço": 21.53,
+      "preço": 23.46,
       "image": "/orcamento/tampo madeira.png"
     },
     {
       "ref": 3,
       "produto": "Prat. Madeira. Aglom. 1500x900x19mm (CxPxA)",
-      "preço": 26.55,
+      "preço": 28.94,
       "image": "/orcamento/tampo madeira.png"
     },
     {
       "ref": 3,
       "produto": "Prat. Madeira. Aglom. 1750x900x19mm (CxPxA)",
-      "preço": 30.98,
+      "preço": 33.76,
       "image": "/orcamento/tampo madeira.png"
     },
     {
       "ref": 3,
       "produto": "Prat. Madeira. Aglom. 2000x900x19mm (CxPxA)",
-      "preço": 35.4,
+      "preço": 38.58,
       "image": "/orcamento/tampo madeira.png"
     },
     {
       "ref": 3,
       "produto": "Prat. Madeira. Aglom. 2250x900x19mm (CxPxA)",
-      "preço": 39.82,
+      "preço": 43.4,
       "image": "/orcamento/tampo madeira.png"
     },
     {
       "ref": 3,
       "produto": "Prat. Madeira. Aglom. 2500x900x19mm (CxPxA)",
-      "preço": 44.25,
+      "preço": 48.23,
       "image": "/orcamento/tampo madeira.png"
     },
     {
       "ref": 3,
       "produto": "Prat. Madeira. Aglom. 2600x900x19mm (CxPxA)",
-      "preço": 46.03,
+      "preço": 50.16,
       "image": "/orcamento/tampo madeira.png"
     },
     {
       "ref": 3,
       "produto": "Prat. Madeira. Aglom. 2750x900x19mm (CxPxA)",
-      "preço": 49.14,
+      "preço": 53.56,
       "image": "/orcamento/tampo madeira.png"
     },
     {
       "ref": 3,
       "produto": "Prat. Madeira. Aglom. 1000x1000x19mm (CxPxA)",
-      "preço": 19.67,
+      "preço": 21.44,
       "image": "/orcamento/tampo madeira.png"
     },
     {
       "ref": 3,
       "produto": "Prat. Madeira. Aglom. 1250x1000x19mm (CxPxA)",
-      "preço": 24.6,
+      "preço": 26.8,
       "image": "/orcamento/tampo madeira.png"
     },
     {
       "ref": 3,
       "produto": "Prat. Madeira. Aglom. 1500x1000x19mm (CxPxA)",
-      "preço": 29.51,
+      "preço": 32.16,
       "image": "/orcamento/tampo madeira.png"
     },
     {
       "ref": 3,
       "produto": "Prat. Madeira. Aglom. 1750x1000x19mm (CxPxA)",
-      "preço": 34.43,
+      "preço": 37.52,
       "image": "/orcamento/tampo madeira.png"
     },
     {
       "ref": 3,
       "produto": "Prat. Madeira. Aglom. 2000x1000x19mm (CxPxA)",
-      "preço": 39.33,
+      "preço": 42.87,
       "image": "/orcamento/tampo madeira.png"
     },
     {
       "ref": 3,
       "produto": "Prat. Madeira. Aglom. 2250x1000x19mm (CxPxA)",
-      "preço": 44.26,
+      "preço": 48.24,
       "image": "/orcamento/tampo madeira.png"
     },
     {
       "ref": 3,
       "produto": "Prat. Madeira. Aglom. 2500x1000x19mm (CxPxA)",
-      "preço": 49.17,
+      "preço": 53.59,
       "image": "/orcamento/tampo madeira.png"
     },
     {
       "ref": 3,
       "produto": "Prat. Madeira. Aglom. 2600x1000x19mm (CxPxA)",
-      "preço": 51.13,
+      "preço": 55.73,
       "image": "/orcamento/tampo madeira.png"
     },
     {
       "ref": 3,
       "produto": "Prat. Madeira. Aglom. 2750x1000x19mm (CxPxA)",
-      "preço": 54.09,
+      "preço": 58.96,
       "image": "/orcamento/tampo madeira.png"
     },
     {
       "ref": 3,
       "produto": "Prat. Painel Metálico 1000x500x19mm (CxPxA)",
-      "preço": 22.48,
+      "preço": 24.5,
       "image": "/orcamento/tampo metalico.png"
     },
     {
       "ref": 3,
       "produto": "Prat. Painel Metálico 1250x500x19mm (CxPxA)",
-      "preço": 28.42,
+      "preço": 30.97,
       "image": "/orcamento/tampo metalico.png"
     },
     {
       "ref": 3,
       "produto": "Prat. Painel Metálico 1500x500x19mm (CxPxA)",
-      "preço": 34.36,
+      "preço": 37.45,
       "image": "/orcamento/tampo metalico.png"
     },
     {
       "ref": 3,
       "produto": "Prat. Painel Metálico 1750x500x19mm (CxPxA)",
-      "preço": 40.3,
+      "preço": 43.92,
       "image": "/orcamento/tampo metalico.png"
     },
     {
       "ref": 3,
       "produto": "Prat. Painel Metálico 2000x500x19mm (CxPxA)",
-      "preço": 46.24,
+      "preço": 50.4,
       "image": "/orcamento/tampo metalico.png"
     },
     {
       "ref": 3,
       "produto": "Prat. Painel Metálico 2250x500x19mm (CxPxA)",
-      "preço": 52.18,
+      "preço": 56.87,
       "image": "/orcamento/tampo metalico.png"
     },
     {
       "ref": 3,
       "produto": "Prat. Painel Metálico 2500x500x19mm (CxPxA)",
-      "preço": 56.42,
+      "preço": 61.5,
       "image": "/orcamento/tampo metalico.png"
     },
     {
       "ref": 3,
       "produto": "Prat. Painel Metálico 2600x500x19mm (CxPxA)",
-      "preço": 60.48,
-      "image": "/orcamento/tampo metalico.png"
+      "preço": null,
+      "image": "/orcamento/tampo metalico.png",
+      "priceOnRequest": true
     },
     {
       "ref": 3,
       "produto": "Prat. Painel Metálico 2750x500x19mm (CxPxA)",
-      "preço": 64.05,
+      "preço": 69.81,
       "image": "/orcamento/tampo metalico.png"
     },
 
     {
       "ref": 3,
       "produto": "Prat. Painel Metálico 1000x600x19mm (CxPxA)",
-      "preço": 26.98,
+      "preço": 29.4,
       "image": "/orcamento/tampo metalico.png"
     },
     {
       "ref": 3,
       "produto": "Prat. Painel Metálico 1250x600x19mm (CxPxA)",
-      "preço": 34.1,
+      "preço": 37.16,
       "image": "/orcamento/tampo metalico.png"
     },
     {
       "ref": 3,
       "produto": "Prat. Painel Metálico 1500x600x19mm (CxPxA)",
-      "preço": 41.23,
+      "preço": 44.93,
       "image": "/orcamento/tampo metalico.png"
     },
     {
       "ref": 3,
       "produto": "Prat. Painel Metálico 1750x600x19mm (CxPxA)",
-      "preço": 48.36,
+      "preço": 52.71,
       "image": "/orcamento/tampo metalico.png"
     },
     {
       "ref": 3,
       "produto": "Prat. Painel Metálico 2000x600x19mm (CxPxA)",
-      "preço": 55.48,
+      "preço": 60.47,
       "image": "/orcamento/tampo metalico.png"
     },
     {
       "ref": 3,
       "produto": "Prat. Painel Metálico 2250x600x19mm (CxPxA)",
-      "preço": 62.61,
+      "preço": 68.24,
       "image": "/orcamento/tampo metalico.png"
     },
     {
       "ref": 3,
       "produto": "Prat. Painel Metálico 2500x600x19mm (CxPxA)",
-      "preço": 69.74,
+      "preço": 76.01,
       "image": "/orcamento/tampo metalico.png"
     },
     {
       "ref": 3,
       "produto": "Prat. Painel Metálico 2600x600x19mm (CxPxA)",
-      "preço": 72.58,
+      "preço": 79.11,
       "image": "/orcamento/tampo metalico.png"
     },
     {
       "ref": 3,
       "produto": "Prat. Painel Metálico 2750x600x19mm (CxPxA)",
-      "preço": 76.88,
+      "preço": 83.79,
       "image": "/orcamento/tampo metalico.png"
     },
 
     {
       "ref": 3,
       "produto": "Prat. Painel Metálico 1000x700x19mm (CxPxA)",
-      "preço": 30.42,
+      "preço": 33.15,
       "image": "/orcamento/tampo metalico.png"
     },
     {
       "ref": 3,
       "produto": "Prat. Painel Metálico 1250x700x19mm (CxPxA)",
-      "preço": 38.87,
+      "preço": 42.37,
       "image": "/orcamento/tampo metalico.png"
     },
     {
       "ref": 3,
       "produto": "Prat. Painel Metálico 1500x700x19mm (CxPxA)",
-      "preço": 46.13,
+      "preço": 50.27,
       "image": "/orcamento/tampo metalico.png"
     },
     {
       "ref": 3,
       "produto": "Prat. Painel Metálico 1750x700x19mm (CxPxA)",
-      "preço": 48.61,
+      "preço": 52.98,
       "image": "/orcamento/tampo metalico.png"
     },
     {
       "ref": 3,
       "produto": "Prat. Painel Metálico 2000x700x19mm (CxPxA)",
-      "preço": 63.2,
+      "preço": 68.88,
       "image": "/orcamento/tampo metalico.png"
     },
     {
       "ref": 3,
       "produto": "Prat. Painel Metálico 2250x700x19mm (CxPxA)",
-      "preço": 62.95,
+      "preço": 68.61,
       "image": "/orcamento/tampo metalico.png"
     },
     {
       "ref": 3,
       "produto": "Prat. Painel Metálico 2500x700x19mm (CxPxA)",
-      "preço": 79.65,
+      "preço": 86.82,
       "image": "/orcamento/tampo metalico.png"
     },
     {
       "ref": 3,
       "produto": "Prat. Painel Metálico 2600x700x19mm (CxPxA)",
-      "preço": 83.36,
+      "preço": 90.86,
       "image": "/orcamento/tampo metalico.png"
     },
     {
       "ref": 3,
       "produto": "Prat. Painel Metálico 2750x700x19mm (CxPxA)",
-      "preço": 85.56,
+      "preço": 93.26,
       "image": "/orcamento/tampo metalico.png"
     },
 
     {
       "ref": 3,
       "produto": "Prat. Painel Metálico 1000x800x19mm (CxPxA)",
-      "preço": 35.96,
+      "preço": 39.19,
       "image": "/orcamento/tampo metalico.png"
     },
     {
       "ref": 3,
       "produto": "Prat. Painel Metálico 1250x800x19mm (CxPxA)",
-      "preço": 45.49,
+      "preço": 49.58,
       "image": "/orcamento/tampo metalico.png"
     },
     {
       "ref": 3,
       "produto": "Prat. Painel Metálico 1500x800x19mm (CxPxA)",
-      "preço": 54.97,
+      "preço": 59.91,
       "image": "/orcamento/tampo metalico.png"
     },
     {
       "ref": 3,
       "produto": "Prat. Painel Metálico 1750x800x19mm (CxPxA)",
-      "preço": 64.47,
+      "preço": 70.27,
       "image": "/orcamento/tampo metalico.png"
     },
     {
       "ref": 3,
       "produto": "Prat. Painel Metálico 2000x800x19mm (CxPxA)",
-      "preço": 73.97,
+      "preço": 80.62,
       "image": "/orcamento/tampo metalico.png"
     },
     {
       "ref": 3,
       "produto": "Prat. Painel Metálico 2250x800x19mm (CxPxA)",
-      "preço": 83.48,
+      "preço": 90.99,
       "image": "/orcamento/tampo metalico.png"
     },
     {
       "ref": 3,
       "produto": "Prat. Painel Metálico 2500x800x19mm (CxPxA)",
-      "preço": 92.99,
+      "preço": 101.35,
       "image": "/orcamento/tampo metalico.png"
     },
     {
       "ref": 3,
       "produto": "Prat. Painel Metálico 2600x800x19mm (CxPxA)",
-      "preço": 96.77,
-      "image": "/orcamento/tampo metalico.png"
+      "preço": null,
+      "image": "/orcamento/tampo metalico.png",
+      "priceOnRequest": true
     },
     {
       "ref": 3,
       "produto": "Prat. Painel Metálico 2750x800x19mm (CxPxA)",
-      "preço": 102.49,
+      "preço": 111.7,
       "image": "/orcamento/tampo metalico.png"
     },
 
     {
       "ref": 3,
       "produto": "Prat. Painel Metálico 1000x900x19mm (CxPxA)",
-      "preço": 39.11,
+      "preço": 42.62,
       "image": "/orcamento/tampo metalico.png"
     },
     {
       "ref": 3,
       "produto": "Prat. Painel Metálico 1250x900x19mm (CxPxA)",
-      "preço": 49.98,
+      "preço": 54.48,
       "image": "/orcamento/tampo metalico.png"
     },
     {
       "ref": 3,
       "produto": "Prat. Painel Metálico 1500x900x19mm (CxPxA)",
-      "preço": 59.3,
+      "preço": 64.63,
       "image": "/orcamento/tampo metalico.png"
     },
     {
       "ref": 3,
       "produto": "Prat. Painel Metálico 1750x900x19mm (CxPxA)",
-      "preço": 73.21,
+      "preço": 79.79,
       "image": "/orcamento/tampo metalico.png"
     },
     {
       "ref": 3,
       "produto": "Prat. Painel Metálico 2000x900x19mm (CxPxA)",
-      "preço": 81.25,
+      "preço": 88.56,
       "image": "/orcamento/tampo metalico.png"
     },
     {
       "ref": 3,
       "produto": "Prat. Painel Metálico 2250x900x19mm (CxPxA)",
-      "preço": 91.03,
+      "preço": 99.22,
       "image": "/orcamento/tampo metalico.png"
     },
     {
       "ref": 3,
       "produto": "Prat. Painel Metálico 2500x900x19mm (CxPxA)",
-      "preço": 102.41,
+      "preço": 111.62,
       "image": "/orcamento/tampo metalico.png"
     },
     {
       "ref": 3,
       "produto": "Prat. Painel Metálico 2600x900x19mm (CxPxA)",
-      "preço": 107.18,
+      "preço": 116.82,
       "image": "/orcamento/tampo metalico.png"
     },
     {
       "ref": 3,
       "produto": "Prat. Painel Metálico 2750x900x19mm (CxPxA)",
-      "preço": 110.01,
+      "preço": 119.9,
       "image": "/orcamento/tampo metalico.png"
     },
 
     {
       "ref": 3,
       "produto": "Prat. Painel Metálico 1000x1000x19mm (CxPxA)",
-      "preço": 44.96,
+      "preço": 49.0,
       "image": "/orcamento/tampo metalico.png"
     },
     {
       "ref": 3,
       "produto": "Prat. Painel Metálico 1250x1000x19mm (CxPxA)",
-      "preço": 56.83,
+      "preço": 61.94,
       "image": "/orcamento/tampo metalico.png"
     },
     {
       "ref": 3,
       "produto": "Prat. Painel Metálico 1500x1000x19mm (CxPxA)",
-      "preço": 68.72,
+      "preço": 74.9,
       "image": "/orcamento/tampo metalico.png"
     },
     {
       "ref": 3,
       "produto": "Prat. Painel Metálico 1750x1000x19mm (CxPxA)",
-      "preço": 80.6,
+      "preço": 87.85,
       "image": "/orcamento/tampo metalico.png"
     },
     {
       "ref": 3,
       "produto": "Prat. Painel Metálico 2000x1000x19mm (CxPxA)",
-      "preço": 92.47,
+      "preço": 100.78,
       "image": "/orcamento/tampo metalico.png"
     },
     {
       "ref": 3,
       "produto": "Prat. Painel Metálico 2250x1000x19mm (CxPxA)",
-      "preço": 104.35,
+      "preço": 113.73,
       "image": "/orcamento/tampo metalico.png"
     },
     {
       "ref": 3,
       "produto": "Prat. Painel Metálico 2500x1000x19mm (CxPxA)",
-      "preço": 116.23,
+      "preço": 126.68,
       "image": "/orcamento/tampo metalico.png"
     },
     {
       "ref": 3,
       "produto": "Prat. Painel Metálico 2600x1000x19mm (CxPxA)",
-      "preço": 120.98,
+      "preço": 131.86,
       "image": "/orcamento/tampo metalico.png"
     },
     {
       "ref": 3,
       "produto": "Prat. Painel Metálico 2750x1000x19mm (CxPxA)",
-      "preço": 128.12,
+      "preço": 139.64,
       "image": "/orcamento/tampo metalico.png"
     },
 
     {
       "ref": 3,
       "produto": "Prat. Painel Metálico 1000x1100x19mm (CxPxA)",
-      "preço": 47.79,
+      "preço": 52.09,
       "image": "/orcamento/tampo metalico.png"
     },
     {
       "ref": 3,
       "produto": "Prat. Painel Metálico 1250x1100x19mm (CxPxA)",
-      "preço": 61.09,
+      "preço": 66.58,
       "image": "/orcamento/tampo metalico.png"
     },
     {
       "ref": 3,
       "produto": "Prat. Painel Metálico 1500x1100x19mm (CxPxA)",
-      "preço": 72.48,
+      "preço": 79.0,
       "image": "/orcamento/tampo metalico.png"
     },
     {
       "ref": 3,
       "produto": "Prat. Painel Metálico 1750x1100x19mm (CxPxA)",
-      "preço": 88.66,
+      "preço": 96.63,
       "image": "/orcamento/tampo metalico.png"
     },
     {
       "ref": 3,
       "produto": "Prat. Painel Metálico 2000x1100x19mm (CxPxA)",
-      "preço": 99.3,
+      "preço": 108.24,
       "image": "/orcamento/tampo metalico.png"
     },
     {
       "ref": 3,
       "produto": "Prat. Painel Metálico 2250x1100x19mm (CxPxA)",
-      "preço": 111.26,
+      "preço": 121.27,
       "image": "/orcamento/tampo metalico.png"
     },
     {
       "ref": 3,
       "produto": "Prat. Painel Metálico 2500x1100x19mm (CxPxA)",
-      "preço": 127.85,
+      "preço": 139.36,
       "image": "/orcamento/tampo metalico.png"
     },
     {
       "ref": 3,
       "produto": "Prat. Painel Metálico 2600x1100x19mm (CxPxA)",
-      "preço": 131.0,
+      "preço": 142.78,
       "image": "/orcamento/tampo metalico.png"
     },
     {
       "ref": 3,
       "produto": "Prat. Painel Metálico 2750x1100x19mm (CxPxA)",
-      "preço": 134.45,
+      "preço": 146.55,
       "image": "/orcamento/tampo metalico.png"
     },
 
     {
       "ref": 3,
       "produto": "Prat. Painel Metálico 1000x1200x19mm (CxPxA)",
-      "preço": 53.95,
+      "preço": 58.79,
       "image": "/orcamento/tampo metalico.png"
     },
     {
       "ref": 3,
       "produto": "Prat. Painel Metálico 1250x1200x19mm (CxPxA)",
-      "preço": 68.2,
+      "preço": 74.33,
       "image": "/orcamento/tampo metalico.png"
     },
     {
       "ref": 3,
       "produto": "Prat. Painel Metálico 1500x1200x19mm (CxPxA)",
-      "preço": 82.46,
+      "preço": 89.87,
       "image": "/orcamento/tampo metalico.png"
     },
     {
       "ref": 3,
       "produto": "Prat. Painel Metálico 1750x1200x19mm (CxPxA)",
-      "preço": 96.71,
+      "preço": 105.41,
       "image": "/orcamento/tampo metalico.png"
     },
     {
       "ref": 3,
       "produto": "Prat. Painel Metálico 2000x1200x19mm (CxPxA)",
-      "preço": 110.97,
+      "preço": 120.95,
       "image": "/orcamento/tampo metalico.png"
     },
     {
       "ref": 3,
       "produto": "Prat. Painel Metálico 2250x1200x19mm (CxPxA)",
-      "preço": 125.21,
+      "preço": 136.48,
       "image": "/orcamento/tampo metalico.png"
     },
     {
       "ref": 3,
       "produto": "Prat. Painel Metálico 2500x1200x19mm (CxPxA)",
-      "preço": 139.47,
+      "preço": 152.02,
       "image": "/orcamento/tampo metalico.png"
     },
     {
       "ref": 3,
       "produto": "Prat. Painel Metálico 2600x1200x19mm (CxPxA)",
-      "preço": 145.18,
+      "preço": 158.24,
       "image": "/orcamento/tampo metalico.png"
     },
     {
       "ref": 3,
       "produto": "Prat. Painel Metálico 2750x1200x19mm (CxPxA)",
-      "preço": 153.73,
+      "preço": 167.56,
       "image": "/orcamento/tampo metalico.png"
     },
     {
       "ref": 3,
       "produto": "Freio de segurança Picking",
-      "preço": 0.41,
-      "image": "/orcamento/.png"
+      "preço": 0.22,
+      "image": "/orcamento/.png",
+      "supplierUnitsPerPack": 2
     },
 
     {
       "ref": 3,
       "produto": "Reforço para prateleiras metálicas c/ 400mm",
-      "preço": 2.94,
+      "preço": 3.2,
       "image": "/orcamento/reforco.png"
     },
     {
       "ref": 3,
       "produto": "Reforço para prateleiras metálicas c/ 500mm",
-      "preço": 3.42,
+      "preço": 3.72,
       "image": "/orcamento/reforco.png"
     },
     {
       "ref": 3,
       "produto": "Reforço para prateleiras metálicas c/ 600mm",
-      "preço": 3.67,
+      "preço": 3.99,
       "image": "/orcamento/reforco.png"
     },
     {
       "ref": 3,
       "produto": "Reforço para prateleiras metálicas c/ 700mm",
-      "preço": 3.93,
+      "preço": 4.28,
       "image": "/orcamento/reforco.png"
     },
     {
       "ref": 3,
       "produto": "Reforço para prateleiras metálicas c/ 800mm",
-      "preço": 4.17,
+      "preço": 4.54,
       "image": "/orcamento/reforco.png"
     },
     {
       "ref": 3,
       "produto": "Reforço para prateleiras metálicas c/ 900mm",
-      "preço": 4.41,
+      "preço": 4.8,
       "image": "/orcamento/reforco.png"
     },
     {
       "ref": 3,
       "produto": "Reforço para prateleiras metálicas c/ 1000mm",
-      "preço": 4.67,
+      "preço": 5.09,
       "image": "/orcamento/reforco.png"
     },
     {
       "ref": 3,
       "produto": "Reforço para prateleiras metálicas c/ 1100mm",
-      "preço": 4.92,
+      "preço": 5.36,
       "image": "/orcamento/reforco.png"
     },
     {
       "ref": 3,
       "produto": "Reforço para prateleiras metálicas c/ 1200mm",
-      "preço": 5.17,
+      "preço": 5.63,
       "image": "/orcamento/reforco.png"
     },
     {
@@ -2131,331 +2134,332 @@
     {
       "ref": 3,
       "produto": "Bastidor Picking Galvanizado com sapata 3000x700mm (AxP)",
-      "preço": 48.29,
+      "preço": 52.63,
       "image": "/orcamento/galvanizado.png"
     },
     {
       "ref": 3,
       "produto": "Bastidor Picking Galvanizado com sapata 3000x800mm (AxP)",
-      "preço": 49.14,
+      "preço": 53.56,
       "image": "/orcamento/galvanizado.png"
     },
     {
       "ref": 3,
       "produto": "Bastidor Picking Galvanizado com sapata 3000x900mm (AxP)",
-      "preço": 49.77,
+      "preço": 54.24,
       "image": "/orcamento/galvanizado.png"
     },
     {
       "ref": 3,
       "produto": "Bastidor Picking Galvanizado com sapata 3000x1100mm (AxP)",
-      "preço": 51.29,
+      "preço": 55.9,
       "image": "/orcamento/galvanizado.png"
     },
     {
       "ref": 3,
       "produto": "Bastidor Picking Galvanizado com sapata 3000x1200mm (AxP)",
-      "preço": 54.09,
+      "preço": 58.95,
       "image": "/orcamento/galvanizado.png"
     },
     {
       "ref": 3,
       "produto": "Bastidor Picking Galvanizado com sapata 3500x700mm (AxP)",
-      "preço": 53.48,
+      "preço": 58.29,
       "image": "/orcamento/galvanizado.png"
     },
     {
       "ref": 3,
       "produto": "Bastidor Picking Galvanizado com sapata 3500x800mm (AxP)",
-      "preço": 54.31,
+      "preço": 59.2,
       "image": "/orcamento/galvanizado.png"
     },
     {
       "ref": 3,
       "produto": "Bastidor Picking Galvanizado com sapata 3500x900mm (AxP)",
-      "preço": 54.94,
+      "preço": 59.88,
       "image": "/orcamento/galvanizado.png"
     },
     {
       "ref": 3,
       "produto": "Bastidor Picking Galvanizado com sapata 3500x1000mm (AxP)",
-      "preço": 55.19,
+      "preço": 60.15,
       "image": "/orcamento/galvanizado.png"
     },
     {
       "ref": 3,
       "produto": "Bastidor Picking Galvanizado com sapata 3500x1100mm (AxP)",
-      "preço": 56.48,
+      "preço": 61.56,
       "image": "/orcamento/galvanizado.png"
     },
     {
       "ref": 3,
       "produto": "Bastidor Picking Galvanizado com sapata 3500x1200mm (AxP)",
-      "preço": 59.26,
+      "preço": 64.59,
       "image": "/orcamento/galvanizado.png"
     },
     {
       "ref": 3,
       "produto": "Bastidor Picking Galvanizado com sapata 4000x700mm (AxP)",
-      "preço": 61.8,
+      "preço": 67.36,
       "image": "/orcamento/galvanizado.png"
     },
     {
       "ref": 3,
       "produto": "Bastidor Picking Galvanizado com sapata 4000x800mm (AxP)",
-      "preço": 62.09,
+      "preço": 67.67,
       "image": "/orcamento/galvanizado.png"
     },
     {
       "ref": 3,
       "produto": "Bastidor Picking Galvanizado com sapata 4000x900mm (AxP)",
-      "preço": 62.75,
+      "preço": 68.39,
       "image": "/orcamento/galvanizado.png"
     },
     {
       "ref": 3,
       "produto": "Bastidor Picking Galvanizado com sapata 4000x1000mm (AxP)",
-      "preço": 62.96,
+      "preço": 68.62,
       "image": "/orcamento/galvanizado.png"
     },
     {
       "ref": 3,
       "produto": "Bastidor Picking Galvanizado com sapata 4000x1100mm (AxP)",
-      "preço": 65.18,
+      "preço": 71.04,
       "image": "/orcamento/galvanizado.png"
     },
     {
       "ref": 3,
       "produto": "Bastidor Picking Galvanizado com sapata 4000x1200mm (AxP)",
-      "preço": 67.47,
+      "preço": 73.54,
       "image": "/orcamento/galvanizado.png"
     },
     {
       "ref": 3,
       "produto": "Bastidor Picking Galvanizado com sapata 4500x700mm (AxP)",
-      "preço": 66.9,
+      "preço": 72.91,
       "image": "/orcamento/galvanizado.png"
     },
     {
       "ref": 3,
       "produto": "Bastidor Picking Galvanizado com sapata 4500x800mm (AxP)",
-      "preço": 67.47,
+      "preço": 73.54,
       "image": "/orcamento/galvanizado.png"
     },
     {
       "ref": 3,
       "produto": "Bastidor Picking Galvanizado com sapata 4500x900mm (AxP)",
-      "preço": 67.79,
+      "preço": 73.89,
       "image": "/orcamento/galvanizado.png"
     },
     {
       "ref": 3,
       "produto": "Bastidor Picking Galvanizado com sapata 4500x1100mm (AxP)",
-      "preço": 72.52,
+      "preço": 79.04,
       "image": "/orcamento/galvanizado.png"
     },
     {
       "ref": 3,
       "produto": "Bastidor Picking Galvanizado com sapata 4500x1200mm (AxP)",
-      "preço": 73.02,
+      "preço": 79.59,
       "image": "/orcamento/galvanizado.png"
     },
     {
       "ref": 3,
       "produto": "Bastidor Picking Galvanizado com sapata 5000x700mm (AxP)",
-      "preço": 74.39,
+      "preço": 81.09,
       "image": "/orcamento/galvanizado.png"
     },
     {
       "ref": 3,
       "produto": "Bastidor Picking Galvanizado com sapata 5000x800mm (AxP)",
-      "preço": 75.04,
+      "preço": 81.79,
       "image": "/orcamento/galvanizado.png"
     },
     {
       "ref": 3,
       "produto": "Bastidor Picking Galvanizado com sapata 5000x900mm (AxP)",
-      "preço": 75.51,
+      "preço": 82.31,
       "image": "/orcamento/galvanizado.png"
     },
     {
       "ref": 3,
       "produto": "Bastidor Picking Galvanizado com sapata 5000x1000mm (AxP)",
-      "preço": 75.94,
+      "preço": 82.77,
       "image": "/orcamento/galvanizado.png"
     },
     {
       "ref": 3,
       "produto": "Bastidor Picking Galvanizado com sapata 5000x1100mm (AxP)",
-      "preço": 80.49,
+      "preço": 87.73,
       "image": "/orcamento/galvanizado.png"
     },
     {
       "ref": 3,
       "produto": "Bastidor Picking Galvanizado com sapata 5000x1200mm (AxP)",
-      "preço": 80.88,
+      "preço": 88.15,
       "image": "/orcamento/galvanizado.png"
     },
     {
       "ref": 3,
       "produto": "Prat. Madeira. Aglom. 1000x1100x19mm (CxPxA)",
-      "preço": 21.65,
+      "preço": 23.6,
       "image": "/orcamento/tampo madeira.png"
     },
     {
       "ref": 3,
       "produto": "Prat. Madeira. Aglom. 1250x1100x19mm (CxPxA)",
-      "preço": 27.06,
+      "preço": 29.49,
       "image": "/orcamento/tampo madeira.png"
     },
     {
       "ref": 3,
       "produto": "Prat. Madeira. Aglom. 1500x1100x19mm (CxPxA)",
-      "preço": 29.51,
+      "preço": 32.16,
       "image": "/orcamento/tampo madeira.png"
     },
     {
       "ref": 3,
       "produto": "Prat. Madeira. Aglom. 1750x1100x19mm (CxPxA)",
-      "preço": 37.84,
+      "preço": 41.24,
       "image": "/orcamento/tampo madeira.png"
     },
     {
       "ref": 3,
       "produto": "Prat. Madeira. Aglom. 2000x1100x19mm (CxPxA)",
-      "preço": 39.33,
+      "preço": 42.87,
       "image": "/orcamento/tampo madeira.png"
     },
     {
       "ref": 3,
       "produto": "Prat. Madeira. Aglom. 2250x1100x19mm (CxPxA)",
-      "preço": 48.69,
+      "preço": 53.06,
       "image": "/orcamento/tampo madeira.png"
     },
     {
       "ref": 3,
       "produto": "Prat. Madeira. Aglom. 2500x1100x19mm (CxPxA)",
-      "preço": 54.08,
+      "preço": 58.95,
       "image": "/orcamento/tampo madeira.png"
     },
     {
       "ref": 3,
       "produto": "Prat. Madeira. Aglom. 2600x1100x19mm (CxPxA)",
-      "preço": 56.26,
+      "preço": 61.32,
       "image": "/orcamento/tampo madeira.png"
     },
     {
       "ref": 3,
       "produto": "Prat. Madeira. Aglom. 2750x1100x19mm (CxPxA)",
-      "preço": 59.49,
+      "preço": 64.84,
       "image": "/orcamento/tampo madeira.png"
     },
     {
       "ref": 3,
       "produto": "Prat. Madeira. Aglom. 1000x1200x19mm (CxPxA)",
-      "preço": 23.61,
+      "preço": 25.73,
       "image": "/orcamento/tampo madeira.png"
     },
     {
       "ref": 3,
       "produto": "Prat. Madeira. Aglom. 1250x1200x19mm (CxPxA)",
-      "preço": 29.51,
+      "preço": 32.16,
       "image": "/orcamento/tampo madeira.png"
     },
     {
       "ref": 3,
       "produto": "Prat. Madeira. Aglom. 1500x1200x19mm (CxPxA)",
-      "preço": 35.39,
+      "preço": 38.57,
       "image": "/orcamento/tampo madeira.png"
     },
     {
       "ref": 3,
       "produto": "Prat. Madeira. Aglom. 1750x1200x19mm (CxPxA)",
-      "preço": 41.3,
+      "preço": 45.02,
       "image": "/orcamento/tampo madeira.png"
     },
     {
       "ref": 3,
       "produto": "Prat. Madeira. Aglom. 2000x1200x19mm (CxPxA)",
-      "preço": 47.2,
+      "preço": 51.44,
       "image": "/orcamento/tampo madeira.png"
     },
     {
       "ref": 3,
       "produto": "Prat. Madeira. Aglom. 2250x1200x19mm (CxPxA)",
-      "preço": 53.11,
+      "preço": 57.88,
       "image": "/orcamento/tampo madeira.png"
     },
     {
       "ref": 3,
       "produto": "Prat. Madeira. Aglom. 2500x1200x19mm (CxPxA)",
-      "preço": 59.0,
+      "preço": 64.3,
       "image": "/orcamento/tampo madeira.png"
     },
     {
       "ref": 3,
       "produto": "Prat. Madeira. Aglom. 2600x1200x19mm (CxPxA)",
-      "preço": 61.36,
+      "preço": 66.88,
       "image": "/orcamento/tampo madeira.png"
     },
     {
       "ref": 3,
       "produto": "Prat. Madeira. Aglom. 2750x1200x19mm (CxPxA)",
-      "preço": 64.9,
+      "preço": 70.74,
       "image": "/orcamento/tampo madeira.png"
     },
     {
       "ref": 3,
       "produto": "Prat. Painel Metálico 1000x400x19mm (CxPxA)",
-      "preço": 17.99,
+      "preço": 19.6,
       "image": "/orcamento/tampo metalico.png"
     },
     {
       "ref": 3,
       "produto": "Prat. Painel Metálico 1250x400x19mm (CxPxA)",
-      "preço": 22.73,
+      "preço": 24.77,
       "image": "/orcamento/tampo metalico.png"
     },
     {
       "ref": 3,
       "produto": "Prat. Painel Metálico 1500x400x19mm (CxPxA)",
-      "preço": 27.5,
+      "preço": 29.96,
       "image": "/orcamento/tampo metalico.png"
     },
     {
       "ref": 3,
       "produto": "Prat. Painel Metálico 1750x400x19mm (CxPxA)",
-      "preço": 32.24,
+      "preço": 35.14,
       "image": "/orcamento/tampo metalico.png"
     },
     {
       "ref": 3,
       "produto": "Prat. Painel Metálico 2000x400x19mm (CxPxA)",
-      "preço": 36.99,
+      "preço": 40.32,
       "image": "/orcamento/tampo metalico.png"
     },
     {
       "ref": 3,
       "produto": "Prat. Painel Metálico 2250x400x19mm (CxPxA)",
-      "preço": 41.74,
+      "preço": 45.49,
       "image": "/orcamento/tampo metalico.png"
     },
     {
       "ref": 3,
       "produto": "Prat. Painel Metálico 2500x400x19mm (CxPxA)",
-      "preço": 46.5,
+      "preço": 50.68,
       "image": "/orcamento/tampo metalico.png"
     },
     {
       "ref": 3,
       "produto": "Prat. Painel Metálico 2600x400x19mm (CxPxA)",
-      "preço": 48.38,
-      "image": "/orcamento/tampo metalico.png"
+      "preço": null,
+      "image": "/orcamento/tampo metalico.png",
+      "priceOnRequest": true
     },
     {
       "ref": 3,
       "produto": "Prat. Painel Metálico 2750x400x19mm (CxPxA)",
-      "preço": 51.25,
+      "preço": 55.85,
       "image": "/orcamento/tampo metalico.png"
     },
     {
@@ -2481,26 +2485,106 @@
     {
       "ref": 3,
       "produto": "Viga em tubo 50x30 c/ 1500mm RAL 7035",
-      "preço": 27.73,
+      "preço": 30.22,
       "peso": 3.46
     },
     {
       "ref": 3,
       "produto": "Viga em tubo 50x30 c/ 1750mm RAL 7035",
-      "preço": 30.26,
+      "preço": 32.98,
       "peso": 4.04
     },
     {
       "ref": 3,
       "produto": "Braço de separação com 400mm RAL 7035",
-      "preço": 12.59,
+      "preço": 13.72,
       "peso": 0.6
     },
     {
       "ref": 3,
       "produto": "Braço de separação com 500mm RAL 7035",
-      "preço": 13.87,
+      "preço": 15.11,
       "peso": 0.75
+    },
+    {
+      "ref": 3,
+      "produto": "Calço de nivelação Picking Galvanizado",
+      "preço": 0.76
+    },
+    {
+      "ref": 3,
+      "produto": "Bucha metálica Picking M8x75 (2 unidades)",
+      "preço": 4.47
+    },
+    {
+      "ref": 3,
+      "produto": "Distanciador bastidor-bastidor Picking c/ 100mm Galvanizado",
+      "preço": 2.42
+    },
+    {
+      "ref": 3,
+      "produto": "Distanciador bastidor-bastidor Picking c/ 200mm Galvanizado",
+      "preço": 4.82
+    },
+    {
+      "ref": 3,
+      "produto": "Distanciador bastidor-bastidor Picking c/ 300mm Galvanizado",
+      "preço": 7.25
+    },
+    {
+      "ref": 3,
+      "produto": "Viga tubo oval c/ 1000mm RAL 7035",
+      "preço": 7.59
+    },
+    {
+      "ref": 3,
+      "produto": "Viga tubo oval c/ 1250mm RAL 7035",
+      "preço": 9.19
+    },
+    {
+      "ref": 3,
+      "produto": "Viga tubo oval c/ 1500mm RAL 7035",
+      "preço": 12.2
+    },
+    {
+      "ref": 3,
+      "produto": "Viga tubo oval c/ 1750mm RAL 7035",
+      "preço": 14.07
+    },
+    {
+      "ref": 3,
+      "produto": "Viga tubo oval c/ 2000mm RAL 7035",
+      "preço": 15.97
+    },
+    {
+      "ref": 3,
+      "produto": "Sapata metálica Picking com parafusos",
+      "preço": 2.21
+    },
+    {
+      "ref": 3,
+      "produto": "União de pilares Picking com 40mm",
+      "preço": 4.47
+    },
+    {
+      "ref": 3,
+      "produto": "Travessa de reforço para pneus c/ 400mm",
+      "preço": 6.71
+    },
+    {
+      "ref": 3,
+      "produto": "Travessa de reforço para pneus c/ 500mm",
+      "preço": 7.45
+    },
+    {
+      "ref": 3,
+      "produto": "Base de OSB 1500x500x22mm",
+      "preço": 35.66
+    },
+    {
+      "ref": 3,
+      "produto": "Base de OSB 1750x500x22mm",
+      "preço": 35.66
     }
   ],
   "descontos": [

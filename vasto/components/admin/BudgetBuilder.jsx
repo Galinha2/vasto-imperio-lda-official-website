@@ -11,6 +11,7 @@ import CustomerSuggestionInput from "./CustomerSuggestionInput";
 import QuoteEmailButton from "./QuoteEmailButton";
 import { lineDiscount, lineNet } from "@/lib/quote-discounts.mjs";
 import generateBudgetPdf from "@/lib/generateBudgetPdf";
+import { notifySaleSaved } from "@/lib/admin/sale-updates.mjs";
 import { MdOutlineDelete } from "react-icons/md";
 
 export default function BudgetBuilder({ editSaleId = "", duplicateSaleId = "" }) {
@@ -113,6 +114,10 @@ export default function BudgetBuilder({ editSaleId = "", duplicateSaleId = "" })
   };
 
   const selecionarProduto = (index, produtoObj) => {
+    if (produtoObj.priceOnRequest) {
+      setPopupMensagem("Este artigo tem preço sob consulta na tabela do fornecedor. Confirme o preço e adicione-o como item personalizado.");
+      return;
+    }
     const novasLinhas = [...linhas];
     const isPortes = produtoObj.ref === "0" || produtoObj.refCompleta?.startsWith("0.");
     
@@ -230,7 +235,7 @@ export default function BudgetBuilder({ editSaleId = "", duplicateSaleId = "" })
       const result = await response.json();
       if (response.status === 401) throw new Error("A sessão de administração expirou. Inicie sessão novamente.");
       if (!response.ok) throw new Error(result.error || "Não foi possível enviar o orçamento para as vendas.");
-      window.dispatchEvent(new Event("admin:sales-changed"));
+      notifySaleSaved(result.sale);
       if (editingRecord) setEditingRecord(result.sale);
       setPopupMensagem(editingRecord ? "Alterações guardadas no mesmo orçamento. PDF atualizado; desenhos e estados mantidos." : `Orçamento de ${result.sale.customerName} enviado para as vendas.`);
     } catch (error) {
@@ -358,7 +363,7 @@ export default function BudgetBuilder({ editSaleId = "", duplicateSaleId = "" })
                               }}
                               className="w-8 h-8 object-contain"
                             />
-                            <span>{p.produto}</span>
+                            <span>{p.produto}{p.priceOnRequest && <span className="ml-2 text-xs font-semibold text-(--orange)">Preço sob consulta</span>}</span>
                           </div>
                         )),
                     )}

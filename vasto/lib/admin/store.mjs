@@ -443,10 +443,14 @@ export async function updateSaleWorkflow(id, updates) {
 export async function getPdf(id) {
   const record = await getSale(id);
   if (!record) throw fail("Documento não encontrado.", 404);
-  const buffer = storageMode() === "cloud"
-    ? Buffer.from(await (await cloud(`/storage/v1/object/authenticated/${bucket()}/${id}.pdf`)).arrayBuffer())
-    : await readFile(path.join(directory(), `${id}.pdf`));
-  return { record, buffer };
+  return { record, buffer: await readSalePdf(record) };
+}
+
+async function readSalePdf(record) {
+  const version = encodeURIComponent(String(record.quoteRevision || 0));
+  return storageMode() === "cloud"
+    ? Buffer.from(await (await cloud(`/storage/v1/object/authenticated/${bucket()}/${record.id}.pdf?v=${version}`)).arrayBuffer())
+    : await readFile(path.join(directory(), `${record.id}.pdf`));
 }
 
 
@@ -495,9 +499,11 @@ export async function reviseSaleQuote(id, pdf, expectedUpdatedAt, lines, discoun
   const { customerPhone } = await import("./customer-phone.mjs");
   const contactPhone = phone === undefined ? existing.orderDetails?.telefone : customerPhone(phone);
   const contactEmail = email === undefined ? existing.orderDetails?.email : customerEmail(email);
-  const parsed = await parseSalePdf(pdf, existing.fileName);
+  const [parsed, originalPdf] = await Promise.all([
+    parseSalePdf(pdf, existing.fileName),
+    readSalePdf(existing),
+  ]);
   if (!validateQuoteLines(lines, parsed.subtotal, discount)) throw fail("Os artigos não correspondem aos totais do orçamento.", 400);
-  const { buffer: originalPdf } = await getPdf(id);
   const revision = randomUUID();
   const archive = `revisions/${id}/${revision}`;
   const { quoteRevisions: previousRevisions = [], ...snapshot } = existing;

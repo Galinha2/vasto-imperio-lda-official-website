@@ -1,6 +1,7 @@
 import sharp from "sharp";
 import {optimizeImage} from "../lib/optimize-image.mjs";
 import {lineDiscount,lineNet} from "../lib/quote-discounts.mjs";
+import { cartQuote } from "../lib/simulator-cart.mjs";
 import { quoteFilename } from "../lib/quote-filenames.mjs";
 import test from "node:test";
 import { resolveCustomerName } from "../lib/customer-identity.mjs";
@@ -172,6 +173,27 @@ test("actual shared PDF generator round trip, including discount and delivery", 
     const legacy = await parseSalePdf(Buffer.from(generatedDocument.output("arraybuffer")), "gerador-sem-metadados.pdf");
     assert.equal(legacy.customerName, "João & Companhia"); assert.equal(legacy.nif, "123456789");
     assert.equal(legacy.subtotal, 200); assert.equal(legacy.vat, 46); assert.equal(legacy.total, 246);
+
+    const frame = {produto:"Bastidor 1500x600mm",refCompleta:"3.1",preco:40,unidades:2,total:80};
+    const cart = cartQuote([
+      {label:"Estante A",details:"Primeira estante",quantity:1,discountPercent:10,items:[frame]},
+      {label:"Estante B",details:"Segunda estante",quantity:2,discountPercent:10,items:[frame]},
+    ]);
+    const cartBlob = await generate({quoteNumber:"23124",linhas:cart.items,descontoSelecionado:0,dadosEmpresa:null,nif:"",nomeClienteManual:"Cliente carrinho",returnBlob:true,source:"simulador",additionalDetails:cart.details});
+    const cartBytes = Buffer.from(await cartBlob.arrayBuffer());
+    const cartRecord = await parseSalePdf(cartBytes,"carrinho.pdf");
+    assert.equal(cartRecord.subtotal,216);
+    const { editableQuote } = await import("../lib/admin/editable-quote.mjs");
+    const recovered = await editableQuote(cartRecord,cartBytes);
+    assert.equal(recovered.lines.length,1);
+    assert.equal(recovered.lines[0].unidades,6);
+    assert.equal(recovered.lines[0].produto,frame.produto);
+    const cartTask = pdfjs.getDocument({data:new Uint8Array(cartBytes),useSystemFonts:true});
+    try {
+      const document = await cartTask.promise;
+      const content = await (await document.getPage(1)).getTextContent();
+      assert.equal(content.items.filter(item => item.str === frame.produto).length,1,"the actual PDF table has a single row for the shared frame");
+    } finally { await cartTask.destroy(); }
   } finally { jsPDF.API.loadFile = originalLoad; }
 });
 
@@ -609,6 +631,8 @@ test("cloud quote edits keep metadata in JSONB and upload only PDFs to the restr
   const originalPdf=pdfWithMetadata();
   const original=await parseSalePdf(originalPdf,"original.pdf");
   let record=original;
+  let recordReads=0;
+  const pdfVersions=[];
   const objects=new Map([[`${record.id}.pdf`,originalPdf]]);
   process.env.SUPABASE_URL="https://test-project.supabase.co";
   process.env.SUPABASE_SERVICE_ROLE_KEY="test-key";
@@ -616,10 +640,14 @@ test("cloud quote edits keep metadata in JSONB and upload only PDFs to the restr
     const parsed=new URL(url);
     if(parsed.pathname==="/rest/v1/admin_sales") {
       if(options.method==="PATCH") { record=JSON.parse(options.body).record; return new Response(null,{status:204}); }
+      recordReads++;
       return Response.json([{record}]);
     }
     const download="/storage/v1/object/authenticated/sales-pdfs/";
-    if(parsed.pathname.startsWith(download))return new Response(objects.get(parsed.pathname.slice(download.length)));
+    if(parsed.pathname.startsWith(download)) {
+      pdfVersions.push(parsed.searchParams.get("v"));
+      return new Response(objects.get(parsed.pathname.slice(download.length)));
+    }
     const upload="/storage/v1/object/sales-pdfs/";
     assert.ok(parsed.pathname.startsWith(upload));
     assert.equal(options.headers["Content-Type"],"application/pdf","JSON is not allowed in sales-pdfs");
@@ -640,6 +668,11 @@ test("cloud quote edits keep metadata in JSONB and upload only PDFs to the restr
     const again=await reviseSaleQuote(record.id,nextPdf,updated.updatedAt,lines,0);
     assert.equal(again.quoteRevisions.length,2);
     assert.equal(again.quoteRevisions[1].record.quoteRevisions,undefined,"History snapshots must not recursively duplicate history");
+    assert.equal(recordReads,2,"each edit reads the sale record once, without fetching it again for the original PDF");
+    assert.deepEqual(pdfVersions,["0","1"],"each archive downloads the exact previous PDF revision");
+    const fresh=await getPdf(again.id);
+    assert.deepEqual(fresh.buffer,nextPdf);
+    assert.equal(pdfVersions.at(-1),"2","opening the saved PDF uses its new Storage URL revision");
   } finally {
     globalThis.fetch=originalFetch;
     if(originalUrl===undefined)delete process.env.SUPABASE_URL;else process.env.SUPABASE_URL=originalUrl;

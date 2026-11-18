@@ -6,6 +6,7 @@ import styles from './Chat.module.css';
 import ChatMessages from './ChatMessages';
 import {prepareChatImage} from '@/lib/prepare-chat-image.mjs';
 import {mergeChatMessages} from '@/lib/chat-sync.mjs';
+import {startPolling} from '@/lib/polling.mjs';
 import {CHAT_REPLY_WAIT_MS, unansweredSince} from '@/lib/chat-waiting.mjs';
 import {IoCallOutline} from 'react-icons/io5';
 import {IoImageOutline} from 'react-icons/io5';
@@ -74,35 +75,37 @@ export default function ChatWidget({ preview = false }) {
     };
   }, [open, hidden]);
   useEffect(() => {
-    if (hidden) return;
+    // Browsing the site without opening a conversation must not invoke the API.
+    if (hidden || (!open && !thread)) return;
     let active = true;
-    let pending = false;
     let syncThread = null, since = null;
-    async function refresh() {
-      if (pending || document.hidden) return;
-      pending = true;
-      const version = generation.current;
-      try {
-        const response = await fetch(`/api/chat${syncThread && since ? `?thread=${encodeURIComponent(syncThread)}&since=${encodeURIComponent(since)}` : ''}`, { cache: 'no-store' });
-        const data = await response.json();
-        if (!response.ok) throw new Error(data.error);
-        if (active && version === generation.current) {
-          setThread(data.thread);
-          setMessages(current => data.incremental ? mergeChatMessages(current, data.messages) : data.messages);
-          if (syncThread !== data.thread?.id) since = null;
-          syncThread = data.thread?.id || null;
-          since = data.messages.at(-1)?.created_at || since || new Date(0).toISOString();
-          setError('');
-        }
-      } catch (error) { if (active && version === generation.current) setError(error.message || 'Não foi possível ligar ao chat.'); }
-      finally { pending = false; if (active) setLoading(false); }
-    }
-    refresh();
-    const timer = setInterval(refresh, 4000);
-    const visible = () => { if (!document.hidden) refresh(); };
-    document.addEventListener('visibilitychange', visible);
-    return () => { active = false; clearInterval(timer); document.removeEventListener('visibilitychange', visible); };
-  }, [open, hidden]);
+    const stop = startPolling({
+      interval: open ? 5000 : 60000,
+      load: async signal => {
+        const version = generation.current;
+        try {
+          const response = await fetch(`/api/chat${syncThread && since ? `?thread=${encodeURIComponent(syncThread)}&since=${encodeURIComponent(since)}` : ''}`, { cache: 'no-store', signal });
+          const data = await response.json();
+          if (!response.ok) throw new Error(data.error);
+          return {data,version};
+        } catch (error) {
+          if (active && error.name !== 'AbortError') setError(error.message || 'Não foi possível ligar ao chat.');
+          throw error;
+        } finally { if (active) setLoading(false); }
+      },
+      onData: ({data,version}) => {
+        if (!active || version !== generation.current) return;
+        setThread(data.thread);
+        setMessages(current => data.incremental ? mergeChatMessages(current, data.messages) : data.messages);
+        if (syncThread !== data.thread?.id) since = null;
+        syncThread = data.thread?.id || null;
+        since = data.messages.at(-1)?.created_at || since || new Date(0).toISOString();
+        setError('');
+        if (!data.thread) stop();
+      },
+    });
+    return () => { active = false; stop(); };
+  }, [open, hidden, thread?.id]);
   useEffect(() => {
     function loadReadIds() {
       try {
@@ -139,7 +142,7 @@ export default function ChatWidget({ preview = false }) {
     const update = () => presence(!document.hidden);
     const leave = () => presence(false);
     update();
-    const timer = setInterval(update, 15000);
+    const timer = setInterval(() => { if (!document.hidden) update(); }, 15000);
     document.addEventListener('visibilitychange', update);
     window.addEventListener('pagehide', leave);
     return () => {

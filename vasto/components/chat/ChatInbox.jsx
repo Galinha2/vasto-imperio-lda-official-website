@@ -8,6 +8,7 @@ import {useAdminPreferences} from '@/components/admin/AdminPreferences';
 import {IoNotificationsOffOutline} from 'react-icons/io5';
 import ChatMessages from './ChatMessages';
 import {mergeChatMessages} from '@/lib/chat-sync.mjs';
+import {startPolling} from '@/lib/polling.mjs';
 import {prepareChatImage} from '@/lib/prepare-chat-image.mjs';
 import {IoImageOutline} from 'react-icons/io5';
 import { useAdminChatUnread } from '@/components/admin/AdminChatUnread';
@@ -71,45 +72,46 @@ export default function ChatInbox() {
   }, [requestedChat]);
   useEffect(() => {
     let active = true;
-    let pending = false;
-    async function refresh() {
-      if (pending || document.hidden) return;
-      pending = true;
-      try {
-        const response = await fetch('/api/admin/chat', { cache: 'no-store' });
-        const data = await response.json();
-        if (!response.ok) throw new Error(data.error);
-        if (active) { setThreads(data.threads.filter(thread => !deletedIds.current.has(thread.id))); setError(''); }
-      } catch (error) { if (active) setError(error.message); }
-      finally { pending = false; if (active) setLoading(false); }
-    }
-    const visible = () => { if (!document.hidden) refresh(); };
-    refresh(); const timer = setInterval(refresh, 30000);
-    window.addEventListener('admin:new-chat', refresh);
-    document.addEventListener('visibilitychange', visible);
-    return () => { active = false; clearInterval(timer); window.removeEventListener('admin:new-chat', refresh); document.removeEventListener('visibilitychange', visible); };
+    const stop = startPolling({
+      interval:60000,
+      load:async signal=>{
+        try {
+          const response=await fetch('/api/admin/chat',{cache:'no-store',signal});
+          const data=await response.json();
+          if(!response.ok)throw new Error(data.error);
+          return data;
+        } catch(error) { if(active&&error.name!=='AbortError')setError(error.message);throw error; }
+        finally {if(active)setLoading(false);}
+      },
+      onData:data=>{if(active){setThreads(data.threads.filter(thread=>!deletedIds.current.has(thread.id)));setError('');setLoading(false);}},
+    });
+    // Message events update the list immediately; the timer is a slow fallback.
+    const incoming=()=>{if(!document.hidden)void fetch('/api/admin/chat',{cache:'no-store'}).then(async response=>{if(!response.ok)throw new Error();return response.json();}).then(data=>{if(active)setThreads(data.threads.filter(thread=>!deletedIds.current.has(thread.id)));}).catch(()=>{});};
+    window.addEventListener('admin:new-chat',incoming);
+    return()=>{active=false;stop();window.removeEventListener('admin:new-chat',incoming);};
   }, []);
   useEffect(() => {
     if (!selected) return;
-    let active = true;
-    let pending = false;
-    let since = null;
-    async function refresh() {
-      if (pending || document.hidden) return;
-      pending = true;
-      try {
-        const response = await fetch(`/api/admin/chat?id=${selected.id}${since ? `&since=${encodeURIComponent(since)}` : ''}`, { cache: 'no-store' });
-        const data = await response.json();
-        if (!response.ok) throw new Error(data.error);
-        if (active && !deletedIds.current.has(selected.id)) {
-          setMessages(current => mergeChatMessages(current, data.messages));
-          since = data.messages.at(-1)?.created_at || since || new Date(0).toISOString();
+    let active = true, since = null;
+    const stop = startPolling({
+      interval:5000,
+      load:async signal=>{
+        try {
+          const response=await fetch(`/api/admin/chat?id=${selected.id}${since?`&since=${encodeURIComponent(since)}`:''}`,{cache:'no-store',signal});
+          const data=await response.json();
+          if(!response.ok)throw new Error(data.error);
+          return data;
+        } catch(error) {if(active&&error.name!=='AbortError')setError(error.message);throw error;}
+      },
+      onData:data=>{
+        if(active&&!deletedIds.current.has(selected.id)) {
+          setMessages(current=>mergeChatMessages(current,data.messages));
+          setError('');
+          since=data.messages.at(-1)?.created_at||since||new Date(0).toISOString();
         }
-      } catch (error) { if (active && !deletedIds.current.has(selected.id)) setError(error.message); }
-      finally { pending = false; }
-    }
-    refresh(); const timer = setInterval(refresh, 3000);
-    return () => { active = false; clearInterval(timer); };
+      },
+    });
+    return()=>{active=false;stop();};
   }, [selected]);
   useEffect(() => {
     if (!selected) return;

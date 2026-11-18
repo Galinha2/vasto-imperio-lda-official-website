@@ -21,15 +21,14 @@ export default function AdminChatUnread({ children }) {
   useEffect(() => {
     alive.current = true;
     refresh();
-    const timer = setInterval(refresh, 10000);
+    const countsUpdated = event => { generation.current++; setCounts(event.detail); };
     const visible = () => { if (!document.hidden) refresh(); };
-    window.addEventListener('admin:new-chat', refresh);
+    window.addEventListener('admin:chat-counts', countsUpdated);
     window.addEventListener('focus', refresh);
     document.addEventListener('visibilitychange', visible);
     return () => {
       alive.current = false;
-      clearInterval(timer);
-      window.removeEventListener('admin:new-chat', refresh);
+      window.removeEventListener('admin:chat-counts', countsUpdated);
       window.removeEventListener('focus', refresh);
       document.removeEventListener('visibilitychange', visible);
     };

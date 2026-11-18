@@ -2585,6 +2585,13 @@
       "ref": 3,
       "produto": "Base de OSB 1750x500x22mm",
       "preço": 35.66
+    },
+    {
+      "ref": 3,
+      "produto": "Bancada Porteco com prateleira 2000x800x920mm (CxPxA) RAL 5005 / 7035 - TAB200-2-M",
+      "preço": 512.02,
+      "supplierCode": "TAB200-2-M",
+      "image": "/orcamento/i1.jpg"
     }
   ],
   "descontos": [

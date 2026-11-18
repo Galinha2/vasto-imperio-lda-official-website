@@ -6,7 +6,7 @@ SHA-256 do PDF de origem: `58d075b64edd6b36d7f99fb8596c741915e05d02da5e9c4b8bd4b
 
 A comparação foi feita por acabamento, medidas e tipo de componente. Uma segunda verificação independente conferiu a posição vertical de cada código do fornecedor e do respetivo PVP no PDF: **353 correspondências, sem diferenças**. As páginas 34, 37, 38 e 39 também foram renderizadas para conferência visual.
 
-O ficheiro [CSV de conferência](picking-precos-evoracks-2026-01.csv) contém os 360 artigos finais da família 3, com preço anterior, preço atual, página, código do fornecedor e estado. Os códigos desse relatório são os códigos do fornecedor; as referências internas existentes e a ordem dos artigos foram preservadas.
+O ficheiro [CSV de conferência](picking-precos-evoracks-2026-01.csv) contém os 361 artigos finais da família 3, com preço anterior, preço atual, página, código do fornecedor e estado. Os códigos desse relatório são os códigos do fornecedor; as referências internas existentes e a ordem dos artigos foram preservadas.
 
 ## Alterações
 
@@ -57,3 +57,11 @@ Foram acrescentados os componentes individuais em falta. Os kits completos de ar
 - Os valores pouco regulares do PDF, como aglomerado 1250×600 mm a 20,33 € e painel metálico 2250×700 mm a 68,61 €, foram transcritos tal como estão na fonte.
 
 As famílias de referências 0, 1, 2, 4, 5 e 6 e os descontos foram mantidos. Os orçamentos já guardados não são recalculados retroativamente.
+
+## Artigo adicional — TAB200-2-M
+
+Acrescentada à família **ref. 3** a **Bancada Porteco com prateleira 2000×800×920 mm, RAL 5005 / 7035**, correspondente ao código `TAB200-2M` da página 43 da tabela (código indicado pelo utilizador: `TAB200-2-M`).
+
+Preço definido pelo utilizador: **256,01 € sem IVA + 100% = 512,02 €/unidade sem IVA**. O IVA não está incluído no preço do artigo: é calculado no resumo final do orçamento. Para uma unidade sem descontos, IVA de 23% = **117,76 €**, total **629,78 €**. Os descontos habituais do orçamento continuam a aplicar-se se forem selecionados.
+
+Esta adição é posterior à conferência original dos 360 artigos e está também incluída no CSV de conferência.

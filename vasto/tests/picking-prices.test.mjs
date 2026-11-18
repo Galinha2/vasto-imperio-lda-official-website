@@ -10,7 +10,7 @@ const audit = readFileSync(new URL("../docs/picking-precos-evoracks-2026-01.csv"
 
 test("every picking article matches its audited price, including additions and unlisted special frames", () => {
   const picking = catalog.filter(product => product.ref === 3);
-  assert.equal(picking.length, 360);
+  assert.equal(picking.length, 361);
   assert.equal(audit.length, picking.length);
   assert.equal(new Set(audit.map(row => row[0])).size, picking.length);
   for (const [name, , , , current, status] of audit) {

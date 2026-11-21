@@ -3,26 +3,39 @@ import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { rackModel } from './rack-3d-model.mjs';
 import { createRackGeometry } from './rack-3d-geometry.mjs';
 
-// Fit the complete configuration, including long rows, in a fixed diagonal view.
+// Customer-facing exports start from the front-left corner of the shelving,
+// reading naturally from left to right. The restrained angle and long lens
+// keep a clean, product-style perspective instead of an exaggerated render.
+export const CLIENT_VIEW_DIRECTION = new THREE.Vector3(-.82, .5, 1.6).normalize();
+
+// Fit the complete configuration, including long rows, in the client perspective.
 export function frameDiagonalView(camera, bounds, aspect) {
   const center = bounds.getCenter(new THREE.Vector3());
   const radius = Math.max(bounds.getSize(new THREE.Vector3()).length() / 2, .1);
-  const direction = new THREE.Vector3(1, .25, 1.4).normalize();
-  camera.position.copy(center).addScaledVector(direction, radius * 3);
-  camera.lookAt(center);
-  camera.updateMatrixWorld(true);
-  const inverse = camera.matrixWorldInverse;
-  let halfWidth = 0, halfHeight = 0;
+  const corners = [];
   for (const x of [bounds.min.x, bounds.max.x]) for (const y of [bounds.min.y, bounds.max.y]) for (const z of [bounds.min.z, bounds.max.z]) {
-    const corner = new THREE.Vector3(x, y, z).applyMatrix4(inverse);
-    halfWidth = Math.max(halfWidth, Math.abs(corner.x));
-    halfHeight = Math.max(halfHeight, Math.abs(corner.y));
+    corners.push(new THREE.Vector3(x, y, z));
   }
-  const half = Math.max(halfHeight, halfWidth / aspect) * 1.12;
-  camera.left = -half * aspect; camera.right = half * aspect;
-  camera.top = half; camera.bottom = -half;
-  camera.near = .01; camera.far = radius * 8 + 10;
-  camera.updateProjectionMatrix();
+  camera.aspect = aspect;
+  let distance = radius * 3.2;
+  const targetExtent = .86;
+  // Scale distance from the projected corners, so the same composition works
+  // for a single bay, a tall rack, and a complete space plan.
+  for (let pass = 0; pass < 6; pass += 1) {
+    camera.position.copy(center).addScaledVector(CLIENT_VIEW_DIRECTION, distance);
+    camera.near = Math.max(.01, distance - radius * 2.2);
+    camera.far = distance + radius * 3 + 10;
+    camera.lookAt(center);
+    camera.updateProjectionMatrix();
+    camera.updateMatrixWorld(true);
+    const extent = Math.max(...corners.map(corner => {
+      const point = corner.clone().project(camera);
+      return Math.max(Math.abs(point.x), Math.abs(point.y));
+    }));
+    // Refit in both directions so a long 8 m configuration fills the image.
+    if (Math.abs(extent - targetExtent) <= .012) break;
+    distance *= Math.min(2, Math.max(.4, extent / targetExtent));
+  }
 }
 
 export async function capture3dDrawing(entries, { english = false } = {}) {
@@ -69,7 +82,7 @@ export async function capture3dDrawing(entries, { english = false } = {}) {
             wrapper.rotation.y = props.rotation || 0;
             configuration.add(wrapper);
           }
-          const camera = new THREE.OrthographicCamera();
+          const camera = new THREE.PerspectiveCamera(32, width / (panelHeight - 100), .01, 500);
           frameDiagonalView(camera, new THREE.Box3().setFromObject(configuration), width / (panelHeight - 100));
           renderer.render(scene, camera);
           context.drawImage(renderer.domElement, 0, index * panelHeight + 85);
@@ -78,7 +91,7 @@ export async function capture3dDrawing(entries, { english = false } = {}) {
           context.fillStyle = '#6e6e73'; context.font = '28px Arial';
           const rows = entry.quantity || entry.rowCount;
           const quantity = rows ? (english ? `${rows} row(s) / unit(s) · ` : `${rows} fila(s) / unidade(s) · `) : '';
-          context.fillText(english ? `Diagonal view · ${quantity}Illustrative drawing` : `Vista diagonal · ${quantity}Desenho ilustrativo`, 64, index * panelHeight + 100);
+          context.fillText(english ? `Low front-left perspective · ${quantity}Illustrative drawing` : `Perspetiva frontal esquerda · ${quantity}Desenho ilustrativo`, 64, index * panelHeight + 100);
         } finally { resources.forEach(resource => resource.dispose()); }
       }
     } finally { environment.dispose(); }

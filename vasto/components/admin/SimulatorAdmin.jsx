@@ -94,7 +94,7 @@ export default function SimulatorAdmin() {
     if (!drawing) throw new Error("O desenho da pré-visualização não está disponível.");
     await document.fonts?.ready;
     const { toJpeg } = await import("html-to-image");
-    return toJpeg(drawing, { pixelRatio: 2, quality: .9, backgroundColor: "#ffffff", cacheBust: true });
+    return toJpeg(drawing, { pixelRatio: 3, quality: .96, backgroundColor: "#ffffff", cacheBust: true });
   }
   async function obterImagem3d() {
     const { capture3dDrawing } = await import("@/lib/admin/rack-3d-export.mjs");

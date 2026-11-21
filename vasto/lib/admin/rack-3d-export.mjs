@@ -30,7 +30,7 @@ export async function capture3dDrawing(entries, { english = false } = {}) {
     throw new Error(english ? 'Edit and save older cart configurations to prepare their 3D drawings.' : 'Edite e guarde as configurações antigas do carrinho para preparar os desenhos 3D.');
   }
   await document.fonts?.ready;
-  const width = 1400, panelHeight = 800;
+  const width = 2200, panelHeight = 1200;
   const sheet = document.createElement('canvas');
   sheet.width = width; sheet.height = panelHeight * entries.length;
   const context = sheet.getContext('2d');
@@ -73,15 +73,15 @@ export async function capture3dDrawing(entries, { english = false } = {}) {
           frameDiagonalView(camera, new THREE.Box3().setFromObject(configuration), width / (panelHeight - 100));
           renderer.render(scene, camera);
           context.drawImage(renderer.domElement, 0, index * panelHeight + 85);
-          context.fillStyle = '#1d1d1f'; context.font = '600 26px Arial';
-          context.fillText(`${index + 1}. ${entry.label || (english ? 'Configuration' : 'Configuração')} · 3D`, 40, index * panelHeight + 37, width - 80);
-          context.fillStyle = '#6e6e73'; context.font = '18px Arial';
+          context.fillStyle = '#1d1d1f'; context.font = '600 40px Arial';
+          context.fillText(`${index + 1}. ${entry.label || (english ? 'Configuration' : 'Configuração')} · 3D`, 64, index * panelHeight + 55, width - 128);
+          context.fillStyle = '#6e6e73'; context.font = '28px Arial';
           const rows = entry.quantity || entry.rowCount;
           const quantity = rows ? (english ? `${rows} row(s) / unit(s) · ` : `${rows} fila(s) / unidade(s) · `) : '';
-          context.fillText(english ? `Diagonal view · ${quantity}Illustrative drawing` : `Vista diagonal · ${quantity}Desenho ilustrativo`, 40, index * panelHeight + 67);
+          context.fillText(english ? `Diagonal view · ${quantity}Illustrative drawing` : `Vista diagonal · ${quantity}Desenho ilustrativo`, 64, index * panelHeight + 100);
         } finally { resources.forEach(resource => resource.dispose()); }
       }
     } finally { environment.dispose(); }
-    return sheet.toDataURL('image/jpeg', .86);
+    return sheet.toDataURL('image/jpeg', .96);
   } finally { renderer?.dispose(); renderer?.forceContextLoss(); }
 }

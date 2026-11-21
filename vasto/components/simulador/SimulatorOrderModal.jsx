@@ -19,7 +19,7 @@ const initialForm = {
 };
 
 function createEquipmentImage(image, pixelRatio, quality) {
-  const scale = Math.min(1, (1024 * pixelRatio) / Math.max(image.naturalWidth, image.naturalHeight));
+  const scale = Math.min(1, (2560 * pixelRatio) / Math.max(image.naturalWidth, image.naturalHeight));
   const canvas = document.createElement("canvas");
   canvas.width = Math.max(1, Math.round(image.naturalWidth * scale));
   canvas.height = Math.max(1, Math.round(image.naturalHeight * scale));
@@ -104,7 +104,7 @@ export default function SimulatorOrderModal({ open, onClose, total, details, ite
       const maxRequestBytes = 3.9 * 1024 * 1024;
       const multipartMarginBytes = 96 * 1024;
       const fixedRequestBytes = budgetPdf.size + (image3dBlob?.size || 0) + new Blob([orderData]).size + multipartMarginBytes;
-      const imageProfiles = [[2, 0.9], [1.6, 0.86], [1.3, 0.82], [1, 0.78]];
+      const imageProfiles = [[3, 0.96], [2.4, 0.94], [1.8, 0.92], [1.2, 0.88]];
       let imageBlob = null;
       let estimatedBytes = fixedRequestBytes;
       // Começa com uma imagem nítida e reduz gradualmente apenas se o pedido se aproximar do limite da Vercel.

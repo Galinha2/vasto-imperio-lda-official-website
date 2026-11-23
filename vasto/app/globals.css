@@ -82,7 +82,7 @@ html, body {
 }
 
 .home-hero-background {
-  object-position: left bottom !important;
+  object-position: right bottom !important;
 }
 
 .contact-header-background {
@@ -142,7 +142,7 @@ html, body {
   .home-hero-background {
     display: block !important;
     opacity: 0.32;
-    object-position: left bottom !important;
+    object-position: right bottom !important;
     transform: none;
   }
 

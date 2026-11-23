@@ -16,14 +16,14 @@ export default function Banner() {
   return (
     <section className="site-section home-hero relative isolate overflow-hidden border-b border-[#dedee3] bg-white">
       <Image
-        src={content.homeHeader.background}
+        src={content.productBanner.background}
         alt=""
         fill
         priority
         sizes="100vw"
-        className="home-hero-background z-0 object-cover object-center"
+        className="home-hero-background z-0 object-cover object-center opacity-35"
       />
-      <div className="home-hero-overlay absolute inset-0 z-10 bg-[linear-gradient(90deg,rgba(255,255,255,0.98)_0%,rgba(255,255,255,0.90)_46%,rgba(255,255,255,0.65)_100%)]" />
+      <div className="home-hero-overlay absolute inset-0 z-10 bg-gradient-to-r from-white via-white/90 to-white/65" />
       <div className="home-hero-content relative z-20 mx-auto grid min-h-[620px] max-w-[1480px] items-center gap-8 px-5 py-14 sm:px-8 lg:min-h-[700px] lg:grid-cols-[1.05fr_0.95fr] lg:items-stretch lg:gap-4 lg:px-12 lg:pb-0 lg:pt-20">
         <div className="relative z-10 max-w-3xl lg:self-center">
           <p className="mb-5 inline-flex items-center gap-2 rounded-full border border-black/10 bg-white/75 px-4 py-2 text-xs font-semibold uppercase tracking-[0.14em] text-[#52545a] shadow-sm backdrop-blur-md sm:text-sm">

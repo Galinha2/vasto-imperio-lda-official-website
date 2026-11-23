@@ -135,6 +135,8 @@ function RackPreview({ useRequirements,levelCapacity,activeLevels, levelsForModu
   const beamBottomForLevel=index=>beamTopForLevel(index)+beamHeight;
 
   const loadTop=Math.min(0,...modules.map(length=>{const load=rackPalletLayout(useRequirements,length/1000);return load?top-load.loadHeight*1000*scale-20:0;}));
+  const hasPalletLoad=modules.some(length=>Boolean(rackPalletLayout(useRequirements,length/1000)));
+  const totalDimensionY=hasPalletLoad?Math.min(top-12,loadTop+14):top-12;
   return (
     <div className="site-glass min-w-0 flex-1 rounded-[30px] border border-[#e5e5e7] bg-white p-5 shadow-[0_12px_40px_rgba(0,0,0,0.05)] sm:p-7 md:p-9">
       <div className="mb-5 flex items-center justify-between gap-3"><div><p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#86868b]">{english ? "Preview" : "Visualização"}</p><h2 className="mt-1 text-xl font-semibold tracking-tight text-[#1d1d1f]">{english ? "Industrial pallet racking" : "Rack industrial para paletes"}</h2><p className="mt-1 text-xs text-[#86868b]">{english ? "Your configuration · 2D preview" : "A sua configuração · Pré-visualização 2D"}</p></div><span className="simulator-pill rounded-full bg-[#f5f5f7] px-3 py-1.5 text-right text-sm font-medium text-[#6e6e73]">{modules.length} {english ? "module(s)" : "módulo(s)"} · {activeLevels.length} {english ? "levels" : "níveis"} · {rowCount} {rowCount === 1 ? (english ? "row" : "fila") : (english ? "rows" : "filas")}</span></div>
@@ -168,12 +170,6 @@ function RackPreview({ useRequirements,levelCapacity,activeLevels, levelsForModu
           <line x1="35" y1={top} x2="35" y2={bottom} stroke="#a6a6a6" strokeWidth="2" /><line x1="28" y1={top} x2="42" y2={top} stroke="#a6a6a6" strokeWidth="2" /><line x1="28" y1={bottom} x2="42" y2={bottom} stroke="#a6a6a6" strokeWidth="2" />
           <text x={width - 70} y="55" textAnchor="end" fill="#777" fontSize="14">{english ? "Depth: " : "Profundidade: "}{formatMeters(depth)}</text>
           <text x="21" y={(top + bottom) / 2} transform={`rotate(-90 21 ${(top + bottom) / 2})`} textAnchor="middle" fill="#777" fontSize="16">{formatMeters(height)}</text>
-          <g aria-label={`${english ? "Total length" : "Comprimento total"} ${formatMeters(totalLength)}`}>
-            <line x1={rackLeft} y1={top - 12} x2={rackRight} y2={top - 12} stroke="#a6a6a6" strokeWidth="2" />
-            <line x1={rackLeft} y1={top - 17} x2={rackLeft} y2={top - 7} stroke="#a6a6a6" strokeWidth="2" />
-            <line x1={rackRight} y1={top - 17} x2={rackRight} y2={top - 7} stroke="#a6a6a6" strokeWidth="2" />
-            <text x={(rackLeft + rackRight) / 2} y={top - 20} textAnchor="middle" fill="#666" fontSize="16" fontWeight="600">{formatMeters(totalLength)}</text>
-          </g>
           {Array.from({ length: modules.length + 1 }, (_, index) => {
             const centerX = rackLeft + (50 + index * 100 + modules.slice(0, index).reduce((sum, item) => sum + item, 0)) * scale;
             const frameX = centerX - uprightWidth / 2;
@@ -253,6 +249,14 @@ function RackPreview({ useRequirements,levelCapacity,activeLevels, levelsForModu
               <LevelRemovalTargets activeLevels={moduleLevels} yForLevel={(index) => yForLevel(index) - beamHeight / 2} left={left} right={right} removeLevel={(index) => removeLevel(index, moduleIndex)} english={english} />
             </g>;
           })}
+          {/* Keep the upper dimension in the final SVG layer so loaded pallets
+              never paint over it. Its position also sits above the load. */}
+          <g aria-label={`${english ? "Total length" : "Comprimento total"} ${formatMeters(totalLength)}`} pointerEvents="none">
+            <line x1={rackLeft} y1={totalDimensionY} x2={rackRight} y2={totalDimensionY} stroke="#4d6273" strokeWidth="2" />
+            <line x1={rackLeft} y1={totalDimensionY - 5} x2={rackLeft} y2={totalDimensionY + 5} stroke="#4d6273" strokeWidth="2" />
+            <line x1={rackRight} y1={totalDimensionY - 5} x2={rackRight} y2={totalDimensionY + 5} stroke="#4d6273" strokeWidth="2" />
+            <text x={(rackLeft + rackRight) / 2} y={totalDimensionY - 8} textAnchor="middle" fill="#344b5e" fontSize="16" fontWeight="700" paintOrder="stroke" stroke="#ffffff" strokeWidth="4">{formatMeters(totalLength)}</text>
+          </g>
         </svg>
       </div>
       <p className="mt-2 text-xs leading-relaxed text-[#86868b] sm:text-sm">{english ? "Dimensions are shown in the drawing; total length includes the frames." : "Cotas indicam as medidas; o comprimento total inclui os bastidores."}</p>

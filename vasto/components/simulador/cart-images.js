@@ -1,11 +1,20 @@
-export async function captureCartDrawing(drawingRef, maxImageLength = 5 * 1024 * 1024) {
+// Cart entries live in localStorage (up to ten configurations), so their
+// drawing must stay compact. The former 5 MB capture allowance disagreed with
+// the cart validator's 350 KB ceiling and made otherwise valid admin quotes
+// fail only after the drawing was generated.
+export async function captureCartDrawing(drawingRef, maxImageLength = 340000) {
   const drawing = drawingRef?.current?.querySelector('svg[role="img"], svg[data-order-drawing]');
   if (!drawing) throw new Error('O desenho ainda não está disponível. Aguarde e tente novamente.');
   await document.fonts?.ready;
   const { toJpeg } = await import('html-to-image');
-  const image = await toJpeg(drawing, { pixelRatio: 3, quality: .96, backgroundColor: '#ffffff', cacheBust: true });
-  if (image.length > maxImageLength) throw new Error('Este desenho é demasiado grande para o carrinho. Reduza a configuração ou envie-a individualmente.');
-  return image;
+  const settings = maxImageLength === Infinity
+    ? [{ pixelRatio: 3, quality: .96 }]
+    : [{ pixelRatio: 2.2, quality: .9 }, { pixelRatio: 1.8, quality: .84 }, { pixelRatio: 1.45, quality: .78 }];
+  for (const setting of settings) {
+    const image = await toJpeg(drawing, { ...setting, backgroundColor: '#ffffff', cacheBust: true });
+    if (image.length <= maxImageLength) return image;
+  }
+  throw new Error('Este desenho é demasiado detalhado para o carrinho. Reduza a configuração ou envie-a individualmente.');
 }
 export async function cartDrawing(entries) {
   if (!entries.length) throw new Error('O carrinho está vazio.');

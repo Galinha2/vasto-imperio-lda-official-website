@@ -5,11 +5,12 @@ import { polishEmailMessage } from "@/lib/email/polish-message.mjs";
 import { attachmentAccept, attachmentType } from "@/lib/email/attachments.mjs";
 import { quoteFilename, quoteImageKind } from "@/lib/quote-filenames.mjs";
 import { emailSignature } from "@/lib/email/signature.mjs";
+import { quoteFollowUpDraft } from "@/lib/admin/quote-follow-up.mjs";
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { IoSparklesOutline, IoMailOutline } from "react-icons/io5";
 
-export default function QuoteEmailButton({ prepare, sale, groupSales, compact = false, menuItem = false, inlineAction = false, initialEmail = "" }) {
+export default function QuoteEmailButton({ prepare, sale, groupSales, compact = false, menuItem = false, inlineAction = false, initialEmail = "", followUp = false }) {
   const [includeGroup, setIncludeGroup] = useState(false);
   const selectedSales = sale ? (includeGroup && groupSales?.length > 1 ? groupSales : [sale]) : [];
   const [sentRecordIds, setSentRecordIds] = useState([]);
@@ -56,6 +57,8 @@ export default function QuoteEmailButton({ prepare, sale, groupSales, compact = 
   async function start() {
     setOriginalMessage(null); setIncludeGroup(false); setOpen(true); setBusy(true); setError(""); setSent(false); setAttachments([]); setExtraAttachments([]);
     setEmail(initialEmail || sale?.orderDetails?.email || "");
+    const draft = followUp && sale ? quoteFollowUpDraft(sale) : { subject: "Orçamento · Vasto Império", message: "Bom dia,\n\nSegue em anexo o nosso orçamento e os desenhos disponíveis para a sua apreciação.\n\nEstamos disponíveis para qualquer esclarecimento." };
+    setSubject(draft.subject); setMessage(draft.message);
     try { if (!sale) setAttachments(await prepare()); }
     catch (failure) { setError(failure.message || "Não foi possível preparar os anexos."); }
     finally { setBusy(false); }
@@ -75,7 +78,7 @@ export default function QuoteEmailButton({ prepare, sale, groupSales, compact = 
     try {
       const payload = new FormData();
       payload.append("email", email); payload.append("subject", subject); payload.append("message", message);
-      if (sale) { payload.append("saleId", sale.id); if (includeGroup) payload.append("includeGroup", "true"); }
+      if (sale) { payload.append("saleId", sale.id); if (includeGroup) payload.append("includeGroup", "true"); if (followUp) payload.append("followUp", "true"); }
       else attachments.forEach(({ blob, name }) => payload.append("attachments", blob, name));
       extraAttachments.forEach((file) => payload.append("extraAttachments", file, file.name));
       if (extraAttachments.reduce((sum, file) => sum + file.size, 0) + (!sale ? attachments.reduce((sum, file) => sum + file.blob.size, 0) : 0) > 3.7 * 1024 * 1024) throw new Error("Os anexos ultrapassam o limite de envio. Guarde nas vendas e envie a partir desse registo.");
@@ -90,9 +93,9 @@ export default function QuoteEmailButton({ prepare, sale, groupSales, compact = 
     finally { setBusy(false); }
   }
   return <>
-    <button type="button" onClick={start} title={emailWasSent ? "Orçamento já enviado por email. Clique para enviar novamente." : "Enviar orçamento por email"} aria-label="Enviar orçamento por email" className={`${emailWasSent ? "quote-email-sent " : ""}${inlineAction ? "inline-flex h-9 min-w-[56px] flex-1 cursor-pointer items-center justify-center whitespace-nowrap rounded-full border border-orange-200 bg-orange-50 px-2.5 text-xs font-semibold text-orange-700 transition hover:bg-orange-100" : menuItem ? "flex w-full cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-left text-xs text-[#424245] hover:bg-[#f5f5f7]" : compact ? "grid h-8 w-8 cursor-pointer place-items-center rounded-full text-[#86868b] hover:bg-orange-50 hover:text-orange-600" : "inline-flex h-12 cursor-pointer items-center justify-center gap-2 rounded-full border border-orange-200 bg-orange-50 px-5 text-sm font-semibold text-orange-700 hover:bg-orange-100"}`}>{!inlineAction && <IoMailOutline />}{inlineAction ? "Email" : !compact && "Enviar por email"}</button>
+    <button type="button" onClick={start} title={followUp ? "Preparar lembrete de seguimento para o cliente" : emailWasSent ? "Orçamento já enviado por email. Clique para enviar novamente." : "Enviar orçamento por email"} aria-label={followUp ? "Relembrar cliente sobre o orçamento" : "Enviar orçamento por email"} className={`${emailWasSent && !followUp ? "quote-email-sent " : ""}${inlineAction ? "inline-flex h-9 min-w-[56px] flex-1 cursor-pointer items-center justify-center whitespace-nowrap rounded-full border border-orange-200 bg-orange-50 px-2.5 text-xs font-semibold text-orange-700 transition hover:bg-orange-100" : menuItem ? "flex w-full cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-left text-xs text-[#424245] hover:bg-[#f5f5f7]" : compact ? "grid h-8 w-8 cursor-pointer place-items-center rounded-full text-[#86868b] hover:bg-orange-50 hover:text-orange-600" : "inline-flex h-12 cursor-pointer items-center justify-center gap-2 rounded-full border border-orange-200 bg-orange-50 px-5 text-sm font-semibold text-orange-700 hover:bg-orange-100"}`}>{!inlineAction && <IoMailOutline />}{inlineAction ? (followUp ? "Relembrar" : "Email") : !compact && (followUp ? "Relembrar cliente" : "Enviar por email")}</button>
     {open && createPortal(<div className={styles.overlay}><form onSubmit={send} data-admin-dialog="true" role="dialog" aria-modal="true" aria-label="Enviar orçamento por email" className={styles.dialog}>
-      <header className={styles.header}><span className={styles.headerIcon}><IoMailOutline aria-hidden="true" /></span><div><p>COMUNICAÇÃO COM O CLIENTE</p><h2>Enviar orçamento por email</h2><span>Reveja a mensagem e os anexos antes de enviar.</span></div></header>
+      <header className={styles.header}><span className={styles.headerIcon}><IoMailOutline aria-hidden="true" /></span><div><p>COMUNICAÇÃO COM O CLIENTE</p><h2>{followUp ? "Relembrar cliente" : "Enviar orçamento por email"}</h2><span>{followUp ? "Mensagem de seguimento preparada. Reveja antes de enviar." : "Reveja a mensagem e os anexos antes de enviar."}</span></div></header>
       {sent ? <p role="status" className="text-sm text-emerald-700">Email enviado com o orçamento e os desenhos disponíveis.</p> : <div className={styles.columns}>
       <div className={styles.editor}>
         {groupSales?.length > 1 && <label className="flex cursor-pointer items-start gap-3 rounded-2xl border border-orange-200 bg-orange-50/60 p-4 text-sm"><input type="checkbox" checked={includeGroup} onChange={(event) => setIncludeGroup(event.target.checked)} className="mt-1 accent-orange-600" /><span><strong>Enviar grupo completo ({groupSales.length} orçamentos)</strong><span className="mt-1 block text-xs text-gray-500">Inclui todos os PDFs e desenhos deste grupo num único email. Confirme os anexos na pré-visualização.</span></span></label>}

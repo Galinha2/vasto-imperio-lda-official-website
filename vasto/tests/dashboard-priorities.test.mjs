@@ -7,4 +7,5 @@ test('delivered but unpaid orders are prioritised; recent work is not inactive',
 test('commercial follow-up separates drafts, email tracking, contacts and recent arrivals',()=>{
  const result=dashboardPriorities([{...base,id:'old',status:'em_preparacao'},{...base,id:'sent',status:'em_preparacao',emailSentAt:'2026-11-01',orderDetails:{email:'cliente@example.com'}},{...base,id:'recent',uploadedAt:'2026-11-05T12:00:00Z',customerPhone:'123456789'},{...base,id:'future',uploadedAt:'2026-11-07T12:00:00Z',customerPhone:'123456789'},{...base,id:'ignored',quoteNotSelected:true}],now);
  assert.deepEqual(result.awaiting.map(s=>s.id),['old','sent']);assert.deepEqual(result.unsent.map(s=>s.id),['old']);assert.deepEqual(result.missingContact.map(s=>s.id),['old']);assert.deepEqual(result.recent.map(s=>s.id),['recent']);
+ assert.equal(result.followUp.length,0);
 });

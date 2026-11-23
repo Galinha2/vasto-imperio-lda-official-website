@@ -24,6 +24,8 @@ export async function POST(request) {
     if (!/^[^\s@,;<>]+@[^\s@,;<>]+\.[^\s@,;<>]+$/.test(email) || email.length > 254 || !subject || subject.length > 180 || /[\r\n]/.test(subject) || !message || message.length > 10000) return NextResponse.json({ error: "Confirme o email, o assunto e a mensagem." }, { status: 400 });
     const attachments = [];
     const id = form.get("saleId");
+    const followUp = form.get("followUp") === "true";
+    if (followUp && !id) return NextResponse.json({ error: "O lembrete só pode ser enviado a partir de um orçamento guardado." }, { status: 400 });
     let saleIds = [];
     if (id) {
       const selected = await quoteEmailAttachments(String(id), form.get("includeGroup") === "true");
@@ -45,7 +47,7 @@ export async function POST(request) {
     const sentSales = [];
     let trackingWarning = "";
     for (const saleId of saleIds) {
-      try { sentSales.push(await markSaleEmailSent(saleId, email)); }
+      try { sentSales.push(await markSaleEmailSent(saleId, email, { followUp })); }
       catch { trackingWarning = "O email foi enviado, mas não foi possível atualizar o indicador de envio em todos os orçamentos. Não volte a enviar por esse motivo."; }
     }
     return NextResponse.json({ sentSales, trackingWarning, message: "Orçamento enviado por email.", sentCopySaved: delivery.sentCopySaved, sentCopyError: delivery.sentCopyError });

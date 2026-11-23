@@ -597,9 +597,10 @@ export async function reserveQuoteNumber() {
   return operation;
 }
 
-export async function markSaleEmailSent(id, email) {
+export async function markSaleEmailSent(id, email, { followUp = false } = {}) {
   const record = await getSale(id);
-  const updated = { ...record, emailSentAt: new Date().toISOString(), emailSentTo: email };
+  const sentAt = new Date().toISOString();
+  const updated = { ...record, emailSentAt: sentAt, emailSentTo: email, ...(followUp ? { quoteFollowUpSentAt: sentAt } : {}) };
   await saveRecord(updated);
   return updated;
 }

@@ -292,7 +292,7 @@ export default function SalesDashboard() {
   useEffect(() => {
     const updateEmail = (event) => {
       const sent = new Map((event.detail?.sales || []).map((sale) => [sale.id, sale]));
-      setSales((current) => current.map((sale) => sent.has(sale.id) ? { ...sale, emailSentAt: sent.get(sale.id).emailSentAt, emailSentTo: sent.get(sale.id).emailSentTo } : sale));
+      setSales((current) => current.map((sale) => sent.has(sale.id) ? { ...sale, emailSentAt: sent.get(sale.id).emailSentAt, emailSentTo: sent.get(sale.id).emailSentTo, quoteFollowUpSentAt: sent.get(sale.id).quoteFollowUpSentAt } : sale));
     };
     window.addEventListener("admin:email-sent", updateEmail);
     return () => window.removeEventListener("admin:email-sent", updateEmail);

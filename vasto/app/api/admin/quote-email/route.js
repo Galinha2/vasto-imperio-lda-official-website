@@ -7,6 +7,7 @@ import { signedEmail } from "@/lib/email/signature.mjs";
 import { sendMailWithSentCopy } from "@/lib/email/send-with-sent-copy.mjs";
 import { NextResponse } from "next/server";
 import nodemailer from "nodemailer";
+import { randomUUID } from "node:crypto";
 import { assertSession, assertOrigin } from "@/lib/admin/auth.mjs";
 
 export const runtime = "nodejs";
@@ -45,9 +46,11 @@ export async function POST(request) {
     attachments.push({ filename: "vasto-imperio.png", content: signatureLogo, contentType: "image/png", cid: "vasto-signature-logo", contentDisposition: "inline" });
     const delivery = await sendMailWithSentCopy(transporter, { from: process.env.SMTP_USER, to: email, replyTo: "geral@vastoimperio.pt", subject, ...signedEmail(message), attachments });
     const sentSales = [];
+    const emailEventId = randomUUID();
+    const attachmentNames = attachments.filter((attachment) => !attachment.cid).map((attachment) => attachment.filename);
     let trackingWarning = "";
     for (const saleId of saleIds) {
-      try { sentSales.push(await markSaleEmailSent(saleId, email, { followUp })); }
+      try { sentSales.push(await markSaleEmailSent(saleId, email, { followUp, subject, message, eventId: emailEventId, attachmentNames })); }
       catch { trackingWarning = "O email foi enviado, mas não foi possível atualizar o indicador de envio em todos os orçamentos. Não volte a enviar por esse motivo."; }
     }
     return NextResponse.json({ sentSales, trackingWarning, message: "Orçamento enviado por email.", sentCopySaved: delivery.sentCopySaved, sentCopyError: delivery.sentCopyError });

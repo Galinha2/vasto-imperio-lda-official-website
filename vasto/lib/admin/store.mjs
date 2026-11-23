@@ -597,10 +597,27 @@ export async function reserveQuoteNumber() {
   return operation;
 }
 
-export async function markSaleEmailSent(id, email, { followUp = false } = {}) {
+export async function markSaleEmailSent(id, email, { followUp = false, subject = "", message = "", eventId = randomUUID(), attachmentNames = [] } = {}) {
   const record = await getSale(id);
+  if (!record) throw fail("Orçamento não encontrado.", 404);
   const sentAt = new Date().toISOString();
-  const updated = { ...record, emailSentAt: sentAt, emailSentTo: email, ...(followUp ? { quoteFollowUpSentAt: sentAt } : {}) };
+  const safeAttachments = Array.isArray(attachmentNames) ? attachmentNames.filter((name) => typeof name === "string").map((name) => name.slice(0, 180)).slice(0, 20) : [];
+  const historyItem = {
+    id: typeof eventId === "string" && eventId.length <= 100 ? eventId : randomUUID(),
+    sentAt,
+    to: String(email || "").slice(0, 254),
+    subject: String(subject || "").slice(0, 180),
+    message: String(message || "").slice(0, 10000),
+    followUp: Boolean(followUp),
+    attachmentNames: safeAttachments,
+  };
+  const updated = {
+    ...record,
+    emailSentAt: sentAt,
+    emailSentTo: email,
+    emailHistory: [historyItem, ...(Array.isArray(record.emailHistory) ? record.emailHistory : [])].slice(0, 100),
+    ...(followUp ? { quoteFollowUpSentAt: sentAt } : {}),
+  };
   await saveRecord(updated);
   return updated;
 }

@@ -63,6 +63,84 @@ export function sentCopyDiagnostic(error, stage = "connection") {
   return { code: "IMAP_FAILED", message: "A ligação IMAP falhou. Confirme as definições de receção da caixa no fornecedor de email." };
 }
 
+function sentMailboxClient() {
+  const client = new ImapFlow({
+    host: process.env.IMAP_HOST || process.env.SMTP_HOST,
+    port: Number(process.env.IMAP_PORT || 993),
+    secure: String(process.env.IMAP_PORT || 993) === "993",
+    auth: { user: process.env.IMAP_USER || process.env.SMTP_USER, pass: process.env.IMAP_PASS || process.env.SMTP_PASS },
+    logger: false, connectionTimeout: 10000, greetingTimeout: 10000, socketTimeout: 15000,
+  });
+  client.on("error", () => {});
+  return client;
+}
+
+async function openSentMailbox(client) {
+  await client.connect();
+  const folders = await client.list();
+  const sent = process.env.IMAP_SENT_FOLDER || folders.find((folder) => folder.specialUse === "\\Sent")?.path;
+  if (!sent) throw new Error("Pasta Enviados não identificada; configure IMAP_SENT_FOLDER.");
+  return { sent, lock: await client.getMailboxLock(sent) };
+}
+
+function addressList(addresses) {
+  return (addresses || []).map((address) => address.address || address.name).filter(Boolean).join(", ");
+}
+
+// Read-only: lightweight metadata for the admin history. Message bodies are
+// deliberately loaded only when the user opens a specific email.
+export async function listSentMailbox({ limit = 100 } = {}) {
+  const client = sentMailboxClient();
+  let lock;
+  try {
+    const opened = await openSentMailbox(client); lock = opened.lock;
+    const total = Number(client.mailbox?.exists || 0);
+    if (!total) return [];
+    const first = Math.max(1, total - Math.min(Math.max(1, limit), 200) + 1);
+    const messages = [];
+    for await (const message of client.fetch(`${first}:*`, { envelope: true, internalDate: true }, { uid: false })) {
+      messages.push({
+        id: `imap-${message.uid}`,
+        mailboxUid: message.uid,
+        sentAt: (message.envelope?.date || message.internalDate || new Date()).toISOString(),
+        to: addressList(message.envelope?.to),
+        subject: message.envelope?.subject || "Email enviado",
+        message: "",
+        followUp: false,
+        attachmentNames: [],
+        sales: [],
+        mailbox: true,
+      });
+    }
+    return messages.sort((a, b) => Date.parse(b.sentAt) - Date.parse(a.sentAt));
+  } finally {
+    try { lock?.release(); } catch {}
+    try { await client.logout(); } catch { client.close(); }
+  }
+}
+
+export async function getSentMailboxMessage(uid) {
+  if (!Number.isInteger(uid) || uid < 1) throw new Error("Email inválido.");
+  const client = sentMailboxClient();
+  let lock;
+  try {
+    const opened = await openSentMailbox(client); lock = opened.lock;
+    const message = await client.fetchOne(uid, { envelope: true, internalDate: true, source: true }, { uid: true });
+    if (!message?.source) throw new Error("Email não encontrado na pasta Enviados.");
+    return {
+      id: `imap-${uid}`,
+      sentAt: (message.envelope?.date || message.internalDate || new Date()).toISOString(),
+      to: addressList(message.envelope?.to),
+      subject: message.envelope?.subject || "Email enviado",
+      source: Buffer.from(message.source).toString("utf8"),
+      mailbox: true,
+    };
+  } finally {
+    try { lock?.release(); } catch {}
+    try { await client.logout(); } catch { client.close(); }
+  }
+}
+
 // Read-only check: no email is sent and no message is created.
 export async function checkSentMailbox() {
   const client = new ImapFlow({

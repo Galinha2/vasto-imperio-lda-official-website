@@ -457,7 +457,9 @@ export default function SimulatorPicking({ onQuoteDataChange, adminMode = false,
   const estimatePerRow = numericPrice(matchingFrame) * (modules.length + 1) + moduleSubtotal;
   const estimate = estimatePerRow * rowCount;
   const suggestedDiscountRate = pickingDiscountRate(estimate);
-  const discountRate = adminMode && adminDiscountPercent !== null
+  // The public simulator may suggest a volume discount. In administration,
+  // prices must remain catalogue prices until the operator enters a discount.
+  const discountRate = adminMode
     ? Math.min(100, Math.max(0, Number(adminDiscountPercent) || 0)) / 100
     : suggestedDiscountRate;
   const discountAmount = estimate * discountRate;

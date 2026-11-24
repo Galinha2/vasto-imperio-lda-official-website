@@ -8,5 +8,5 @@ export const metadata = { title: "Planear espaço · Administração", robots: {
 export default async function Page({ params }) {
   const { type } = await params;
   if (!["ligeiras", "picking", "racks"].includes(type)) notFound();
-  return <SpacePlannerPage type={type} models={spaceCatalog(budget.produtos)} />;
+  return <SpacePlannerPage type={type} models={spaceCatalog(budget.produtos)} adminMode />;
 }

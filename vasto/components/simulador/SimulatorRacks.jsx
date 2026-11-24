@@ -325,7 +325,9 @@ export default function SimulatorRacks({ onQuoteDataChange, adminMode = false, a
   const estimatePerRow = numericPrice(matchingFrame) * (modules.length + 1) + moduleSubtotal;
   const estimate = estimatePerRow * rowCount;
   const suggestedDiscountRate = estimate >= 2600 ? 0.15 : estimate >= 1900 ? 0.10 : estimate >= 1000 ? 0.05 : 0;
-  const discountRate = adminMode && adminDiscountPercent !== null
+  // The public simulator may suggest a volume discount. In administration,
+  // prices must remain catalogue prices until the operator enters a discount.
+  const discountRate = adminMode
     ? Math.min(100, Math.max(0, Number(adminDiscountPercent) || 0)) / 100
     : suggestedDiscountRate;
   const discountAmount = estimate * discountRate;

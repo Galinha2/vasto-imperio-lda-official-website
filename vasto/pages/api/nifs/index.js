@@ -2,6 +2,7 @@ import { verifySession, SESSION_COOKIE } from "../../../lib/admin/auth.mjs";
 import { listSales } from "../../../lib/admin/store.mjs";
 import { customerSuggestions } from "../../../lib/admin/customer-suggestions.mjs";
 import { hasCustomerName } from "../../../lib/customer-identity.mjs";
+import { addressFromRaciusHtml, postalAddressFromNifHtml, raciusUrlFromNifHtml } from "../../../lib/nif-address.mjs";
 import fetch from "node-fetch";
 import * as cheerio from "cheerio";
 
@@ -37,32 +38,25 @@ export default async function handler(req, res) {
     // NIF formatado
     const nifFormatado = $("h1.big-nif").first().text().replace(/\s+/g, "").trim() || nif;
 
-    // Morada (código postal + local) - Extração correta da morada e códigoPostal
-    let codigoPostal = "V/ Morada";
-    let morada = "";
-    // A morada e código postal normalmente aparecem em <div class="detail"><br>Morada<br>...</div>
-    // Vamos buscar o HTML, não só o texto, para analisar as quebras de linha (<br>)
-    const detailHtml = $("div.detail").first().html() || "";
-    // Separar por <br>
-    const moradaLines = detailHtml.split(/<br\s*\/?>/i).map((l) => l.replace(/\s+/g, " ").trim()).filter(Boolean);
-    // Procurar a linha com código postal (formato xxxx-xxx)
-    let foundCP = "";
-    for (const line of moradaLines) {
-      const cpMatch = line.match(/\d{4}-\d{3}\s+[A-Za-zÀ-ÿ\s]+/);
-      if (cpMatch) {
-        foundCP = cpMatch[0].trim();
-        break;
-      }
+    // nif.pt normally publishes only postcode + locality. If it links to the
+    // public company page at Racius, use its structured public head-office address.
+    const postalAddress = postalAddressFromNifHtml(html);
+    let morada = postalAddress;
+    const raciusUrl = raciusUrlFromNifHtml(html);
+    if (raciusUrl) {
+      try {
+        const raciusResponse = await fetch(raciusUrl, { signal: AbortSignal.timeout(6000) });
+        if (raciusResponse.ok) morada = addressFromRaciusHtml(await raciusResponse.text()) || postalAddress;
+      } catch { /* The postcode/locality remains a useful fallback. */ }
     }
-    if (foundCP) {
-      codigoPostal = foundCP;
-    }
+    const codigoPostal = morada || "V/ Morada";
 
     return res.status(200).json({
       nome,
       nif,
       nomeEncontrado: hasCustomerName(nome),
       codigoPostal,
+      morada: morada || "",
     });
   } catch (err) {
     console.error("Erro ao obter NIF:", err);

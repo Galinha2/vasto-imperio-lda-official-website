@@ -15,7 +15,8 @@ export default async function handler(req, res) {
     return res.status(200).json({
       nome: "Cliente",
       nif: nif || "",
-      codigoPostal: "V/ Morada",
+      codigoPostal: "",
+      morada: "",
     });
   }
 
@@ -49,7 +50,7 @@ export default async function handler(req, res) {
         if (raciusResponse.ok) morada = addressFromRaciusHtml(await raciusResponse.text()) || postalAddress;
       } catch { /* The postcode/locality remains a useful fallback. */ }
     }
-    const codigoPostal = morada || "V/ Morada";
+    const codigoPostal = morada || "";
 
     return res.status(200).json({
       nome,
@@ -63,7 +64,8 @@ export default async function handler(req, res) {
     return res.status(200).json({
       nome: "Cliente",
       nif,
-      codigoPostal: "V/ Morada",
+      codigoPostal: "",
+      morada: "",
     });
   }
 }

@@ -192,7 +192,7 @@ export default function SimulatorAdminQuoteTools({
           <input type="email" value={emailCliente} onChange={(event) => setEmailCliente(event.target.value)} placeholder="Email do cliente (opcional)" aria-label="Email do cliente" className="mt-3 h-11 w-full rounded-full border border-[#e5e5e7] bg-[#f5f5f7] px-4 text-sm outline-none focus:border-[#0879c0]" />
           <input type="tel" autoComplete="tel" maxLength={80} value={telefoneCliente} onChange={(event) => setTelefoneCliente(event.target.value)} placeholder="Telemóvel do cliente (opcional)" aria-label="Telemóvel do cliente" className="mt-3 h-11 w-full rounded-full border border-[#e5e5e7] bg-[#f5f5f7] px-4 text-sm outline-none focus:border-[#0879c0]" />
           {loadingNif && <p className="mt-2 text-xs text-[#86868b]">A procurar dados do NIF…</p>}
-          {dadosEmpresa && !loadingNif && <p className="mt-2 text-xs text-[#6e6e73]">{resolveCustomerName(dadosEmpresa, nomeCliente)} · {dadosEmpresa.codigoPostal}</p>}
+          {dadosEmpresa && !loadingNif && <p className="mt-2 text-xs text-[#6e6e73]">{resolveCustomerName(dadosEmpresa, nomeCliente)}{dadosEmpresa.codigoPostal ? ` · ${dadosEmpresa.codigoPostal}` : ""}</p>}
         </div>
         <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
           <button

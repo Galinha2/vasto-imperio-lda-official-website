@@ -61,7 +61,7 @@ export default function SimulatorAdmin() {
   }, []);
 
   useEffect(() => {
-    if (savedCustomer && savedCustomer.nif === nifCliente) {
+    if (savedCustomer && savedCustomer.nif === nifCliente && savedCustomer.address?.trim()) {
       setDadosEmpresa({ nome: savedCustomer.name, nif: savedCustomer.nif, codigoPostal: savedCustomer.address });
       setLoadingNif(false);
       return;
@@ -78,10 +78,10 @@ export default function SimulatorAdmin() {
       .then((data) => { if (!controller.signal.aborted) setDadosEmpresa({
         nome: data?.nome || "Cliente",
         nif: data?.nif || nifCliente,
-        codigoPostal: data?.codigoPostal || "V/ Morada",
+        codigoPostal: data?.morada || data?.codigoPostal || "",
       }); })
       .catch((error) => {
-        if (error.name !== "AbortError") setDadosEmpresa({ nome: "Cliente", nif: nifCliente, codigoPostal: "V/ Morada" });
+        if (error.name !== "AbortError") setDadosEmpresa({ nome: "Cliente", nif: nifCliente, codigoPostal: "" });
       })
       .finally(() => { if (!controller.signal.aborted) setLoadingNif(false); });
     return () => controller.abort();

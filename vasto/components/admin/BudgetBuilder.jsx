@@ -70,7 +70,13 @@ export default function BudgetBuilder({ editSaleId = "", duplicateSaleId = "" })
     nifLookupVersion.current++;
     setEmailCliente(customer.email || ""); setTelefoneCliente(customer.phone || "");
     setNif(customer.nif); setNomeClienteManual(customer.name); setLoadingNif(false);
-    setDadosEmpresa({ nome: customer.name, nif: customer.nif, codigoPostal: customer.address });
+    if (customer.address?.trim()) {
+      setDadosEmpresa({ nome: customer.name, nif: customer.nif, codigoPostal: customer.address });
+    } else if (/^\d{9}$/.test(customer.nif || "")) {
+      procurarNif(customer.nif);
+    } else {
+      setDadosEmpresa({ nome: customer.name, nif: "", codigoPostal: "" });
+    }
   };
   const procurarNif = async (valorNif) => {
     const version = ++nifLookupVersion.current;
@@ -90,14 +96,14 @@ export default function BudgetBuilder({ editSaleId = "", duplicateSaleId = "" })
       setDadosEmpresa({
         nome: data?.nome || "Cliente",
         nif: data?.nif || valorNif,
-        codigoPostal: data?.codigoPostal || "V/ Morada",
+        codigoPostal: data?.morada || data?.codigoPostal || "",
       });
     } catch (err) {
       if (version !== nifLookupVersion.current) return;
       setDadosEmpresa({
         nome: "Cliente",
         nif: valorNif,
-        codigoPostal: "V/ Morada",
+        codigoPostal: "",
       });
     } finally {
       if (version === nifLookupVersion.current) setLoadingNif(false);
@@ -497,7 +503,7 @@ export default function BudgetBuilder({ editSaleId = "", duplicateSaleId = "" })
                 <div className="mt-1 rounded-2xl border border-[#e5e5e7] bg-[#f5f5f7] p-4 text-sm text-[#6e6e73]">
                   <p><strong>{resolveCustomerName(dadosEmpresa, nomeClienteManual)}</strong></p>
                   <p>NIF: {dadosEmpresa.nif}</p>
-                  <p>{dadosEmpresa.codigoPostal}</p>
+                  {dadosEmpresa.codigoPostal && <p>{dadosEmpresa.codigoPostal}</p>}
                 </div>
               )}
             </div>

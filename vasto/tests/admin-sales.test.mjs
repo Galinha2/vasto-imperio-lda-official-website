@@ -162,6 +162,7 @@ test("actual shared PDF generator round trip, including discount and delivery", 
       for (let page=1; page<=document.numPages; page++) visible.push(...(await (await document.getPage(page)).getTextContent()).items.map((item)=>item.str));
       assert.ok(visible.join(" ").includes("Orçamento 23123"));
       assert.ok(visible.join(" ").includes("Contacto: +351 928348117"));
+      assert.ok(visible.join(" ").includes("VALOR S/ DESC."));
       assert.ok(!visible.join(" ").includes("Configuração técnica"));
     } finally { await task.destroy(); }
 

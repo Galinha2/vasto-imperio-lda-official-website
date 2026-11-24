@@ -8,8 +8,10 @@ test('soma artigos iguais entre configurações e conserva as famílias e os des
  assert.equal(quote.total,544);
  assert.equal(quote.discountPercent,0);
  assert.equal(quote.items.length,2);
- assert.equal(quote.items[0].total,144);
+ assert.equal(quote.items[0].total,160);
  assert.equal(quote.items[0].unidades,8);
+ assert.equal(quote.items[0].preco,20);
+ assert.equal(quote.items[0].discountPercent,10);
  assert.equal(quote.items[0].produto,'Viga');
  assert.equal(quote.items[1].unidades,4);
  assert.equal(quote.items[1].total,400);
@@ -24,7 +26,8 @@ test('quantidades, descontos, limites e preços fracionários',()=>{
  for(const invalid of [{...entry,quantity:0},{...entry,quantity:1.5},{...entry,discountPercent:101},{...entry,image:'https://example.com'},{...entry,items:[]}])assert.equal(validCartEntry(invalid),false);
  const quote=cartQuote([{...entry,discountPercent:15,items:[{produto:'Peça',preco:1.23,unidades:3,total:3.69}]}]);
  assert.equal(quote.total,3.14);
- assert.ok(Math.abs(quote.items[0].preco*quote.items[0].unidades-quote.total)<1e-8);
+ assert.equal(quote.items[0].preco*quote.items[0].unidades,3.69);
+ assert.equal(quote.items[0].discountPercent,15);
  assert.deepEqual(cartQuote([]).items,[]);
  assert.equal(cartQuote([]).total,0);
 });
@@ -78,23 +81,24 @@ test('mesmo bastidor em estantes distintas ocupa uma única linha com a soma exa
  assert.equal(result.items.length,1);
  assert.equal(result.items[0].produto,frame.produto);
  assert.equal(result.items[0].unidades,8);
- assert.equal(result.items[0].preco,36);
- assert.equal(result.items[0].total,288);
+ assert.equal(result.items[0].preco,40);
+ assert.equal(result.items[0].total,320);
+ assert.equal(result.items[0].discountPercent,10);
  assert.equal(result.total,288);
  assert.equal(result.items[0].refCompleta,'3.20');
  assert.equal(frame.unidades,2);
  assert.ok(result.details.includes('Outra estante'));
 });
 
-test('artigos iguais com descontos diferentes conservam o total através do preço unitário ponderado', () => {
+test('artigos iguais com descontos diferentes conservam o preço base e o desconto de origem', () => {
  const first = {...entry,discountPercent:10};
  const second = {...entry,id:'other',discountPercent:25,items:[{...entry.items[0],produto:'  viga  ',unidades:2,total:40}]};
  const quote = cartQuote([first,second]);
- assert.equal(quote.items.length,1);
- assert.equal(quote.items[0].unidades,6);
- assert.equal(quote.items[0].total,102);
- assert.equal(quote.items[0].preco,17);
- assert.equal(quote.items[0].discountPercent,0);
+ assert.equal(quote.items.length,2);
+ assert.deepEqual(quote.items.map(({unidades,preco,total,discountPercent})=>({unidades,preco,total,discountPercent})),[
+  {unidades:4,preco:20,total:80,discountPercent:10},
+  {unidades:2,preco:20,total:40,discountPercent:25},
+ ]);
  assert.equal(quote.total,cartQuote([first]).total+cartQuote([second]).total);
 });
 

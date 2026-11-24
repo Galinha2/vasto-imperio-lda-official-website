@@ -208,7 +208,7 @@ export default async function generateBudgetPdf({ linhas, descontoSelecionado, d
         { title: "UNI", dataKey: "uni", width: 13 },
         { title: "P. VENDA S/IVA", dataKey: "pvenda", width: 25 },
         { title: "DESC", dataKey: "desc", width: 13 },
-        { title: "VALOR LÍQUIDO", dataKey: "valorliq", width: 22 },
+        { title: "VALOR S/ DESC.", dataKey: "valorBruto", width: 22 },
         { title: "IVA", dataKey: "iva", width: 15 },
       ];
 
@@ -217,8 +217,6 @@ export default async function generateBudgetPdf({ linhas, descontoSelecionado, d
         .map((l) => {
           const unidade = "un";
           const descLinha = l.isPortes ? "" : lineDiscount(l, descontoSelecionado);
-          const valorDesc = l.isPortes ? 0 : (l.total * lineDiscount(l, descontoSelecionado) / 100);
-          const valorLiquido = l.total - valorDesc;
           return {
             referencia: l.refCompleta || "",
             descricao: l.produto,
@@ -226,7 +224,10 @@ export default async function generateBudgetPdf({ linhas, descontoSelecionado, d
             uni: unidade,
             pvenda: formatarNumero(l.preco) + "€",
             desc: descLinha !== "" && descLinha > 0 ? descLinha + "%" : "",
-            valorliq: formatarNumero(valorLiquido) + "€",
+            // The article table always shows catalogue/original amounts. The
+            // discount stays explicit in its own column and is applied only in
+            // the totals summary below.
+            valorBruto: formatarNumero(l.total) + "€",
             iva: "23%",
           };
         });

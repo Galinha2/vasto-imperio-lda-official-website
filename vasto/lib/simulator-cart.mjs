@@ -13,25 +13,27 @@ export function cartQuote(entries) {
   for (const entry of entries) for (const line of entry.items) {
     const multiplier = entry.quantity / (entry.baseQuantity || 1);
     const units = Math.round(line.unidades * multiplier * 1e8) / 1e8;
-    const rate = line.isPortes ? 1 : 1 - entry.discountPercent / 100;
-    const total = Math.round(line.total * multiplier * rate * 100) / 100;
+    const total = Math.round(line.total * multiplier * 100) / 100;
+    const discountPercent = line.isPortes ? 0 : entry.discountPercent;
+    const netTotal = Math.round(total * (1 - discountPercent / 100) * 100) / 100;
     const name = line.produto.normalize('NFC').trim().replace(/\s+/g, ' ');
-    const key = JSON.stringify([name.toLocaleLowerCase('pt-PT'), !!line.isPortes]);
+    // Do not turn a discounted price into a new catalogue price. A separate
+    // line is retained only where the same article genuinely has a different
+    // source discount, so editing a later discount never discounts twice.
+    const key = JSON.stringify([name.toLocaleLowerCase('pt-PT'), !!line.isPortes, Number(line.preco).toFixed(6), discountPercent]);
     const previous = grouped.get(key);
     if (previous) {
       previous.unidades = Math.round((previous.unidades + units) * 1e8) / 1e8;
       previous.total = Math.round((previous.total + total) * 100) / 100;
-      previous.preco = previous.total / previous.unidades;
+      previous.netTotal = Math.round((previous.netTotal + netTotal) * 100) / 100;
     } else {
-      // Cart prices already include each configuration's discount. Different
-      // net prices use a weighted unit price so both quantity and total survive.
-      grouped.set(key, { ...line, produto: name, unidades: units, preco: total / units, total, discountPercent: 0 });
+      grouped.set(key, { ...line, produto: name, unidades: units, preco: total / units, total, discountPercent, netTotal });
     }
   }
-  const items = [...grouped.values()];
+  const items = [...grouped.values()].map(({ netTotal, ...line }) => line);
   return {
     items, discountPercent: 0,
-    total: Math.round(items.reduce((sum, line) => sum + line.total, 0) * 100) / 100,
+    total: Math.round([...grouped.values()].reduce((sum, line) => sum + line.netTotal, 0) * 100) / 100,
     details: entries.map((entry, index) => `${index + 1}. ${entry.label} · ${entry.quantity} ${entry.baseQuantity ? "estante(s) / fila(s)" : "configuração(ões)"}\n${entry.baseQuantity ? `Simulação original: ${entry.baseQuantity} fila(s). ` : ""}${entry.details}`).join('\n\n'),
   };
 }
